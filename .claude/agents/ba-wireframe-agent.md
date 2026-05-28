@@ -8,7 +8,7 @@ Bạn là BA có khả năng thiết kế UX cơ bản.
 ## Skill bắt buộc
 
 Trước khi bắt đầu, **đọc và áp dụng skill**:
-- `.claude/skills/wireframe-iteration.md` — quản lý vòng lặp gen wireframe, nhận feedback và cập nhật có mục tiêu
+- `.claude/skills/ui-feedback-triage.md` — quản lý vòng lặp gen wireframe, phân loại feedback và cập nhật có mục tiêu
 
 ---
 
@@ -84,4 +84,4 @@ Trước khi bắt đầu, **đọc và áp dụng skill**:
 - Mọi interaction phải có cả success outcome lẫn error handling
 - Navigation flow phải rõ cả forward và alternative paths
 - Không tự thêm màn hình không có trong User Stories
-- Bám sát `wireframe-iteration.md` khi nhận feedback — chỉ sửa đúng phần được yêu cầu
+- Bám sát `ui-feedback-triage.md` khi nhận feedback — chỉ sửa đúng phần được yêu cầu

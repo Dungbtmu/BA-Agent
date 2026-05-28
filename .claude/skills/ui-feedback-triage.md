@@ -1,6 +1,6 @@
 ---
 name: ui_feedback_triage
-description: Phân loại feedback UI từ nhiều nguồn — map về đúng component/màn hình cần sửa, tách riêng wireframe vs React
+description: Quản lý vòng lặp wireframe/React — phân loại feedback, map về đúng component/màn hình, cập nhật có mục tiêu, không tái tạo toàn bộ
 tools: []
 ---
 
@@ -113,6 +113,31 @@ Biến feedback thô từ nhiều nguồn (BA, PO, khách hàng, dev) thành dan
 3. Sửa React: [Danh sách component cần update]
 ```
 
+## Wireframe Update — Quy tắc cập nhật sau triage
+
+Sau khi triage xong, khi thực hiện cập nhật wireframe:
+
+- **KHÔNG tái tạo toàn bộ wireframe** — chỉ render lại màn hình / section có thay đổi
+- Ghi rõ `(Updated)` sau tên màn hình được sửa
+- Ghi rõ `(Giữ nguyên)` cho màn hình không thay đổi
+- Đánh số vòng lặp: Vòng 1, Vòng 2...
+- Sau mỗi vòng update: tóm tắt thay đổi + hỏi "Còn phần nào cần điều chỉnh không?"
+- Không tự thêm màn hình / tính năng ngoài feedback
+
+**Output format mỗi vòng lặp:**
+
+```
+## Wireframe Update — Vòng [N]
+
+### [Tên màn hình] (Updated)
+[Nội dung đã cập nhật]
+
+### [Tên màn hình] (Giữ nguyên)
+
+### Thay đổi trong vòng này:
+- [Màn hình X] — [Mô tả thay đổi ngắn gọn]
+```
+
 ## Failure Cases
 
 - Tự suy diễn feedback mơ hồ → sửa sai ý
@@ -120,3 +145,5 @@ Biến feedback thô từ nhiều nguồn (BA, PO, khách hàng, dev) thành dan
 - Không phát hiện conflict giữa feedback từ PO và khách hàng → sửa xong phải sửa lại
 - Gộp "sửa wireframe" và "sửa React" vào cùng một bước → wireframe và React lệch nhau
 - Không ghi nguồn feedback → không trace lại được khi bị hỏi "ai yêu cầu cái này"
+- Tái tạo toàn bộ wireframe khi chỉ cần sửa 1 phần → mất nội dung cũ đã confirm
+- Không ghi rõ màn hình nào đã thay đổi → BA không biết cần review lại chỗ nào

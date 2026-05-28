@@ -7,6 +7,8 @@
 ```
 Input (mọi dạng: mô tả thô, ghi chú, tài liệu chưa đầy đủ...)
    ↓
+[0] ba-research-agent       → research domain mới, tạo Domain Brief  *(optional — chỉ khi BA chưa biết domain)*
+   ↓
 [1] ba-clarification-agent  → làm rõ yêu cầu, đặt câu hỏi clarify
    ↓ (nếu còn câu hỏi CRITICAL → dừng hỏi BA/PO trước)
 [2] ba-solution-agent       → đề xuất solution + user flow
@@ -50,6 +52,7 @@ Khi BA không mention agent cụ thể, nhận dạng intent từ input và tự
 
 | Dấu hiệu trong input | Agent phù hợp |
 |---|---|
+| "tôi chưa biết gì về domain này", "research", "tìm hiểu lĩnh vực", "dự án mới chưa có kiến thức" | `ba-research-agent` |
 | Mô tả dự án mới, yêu cầu chưa rõ, "tôi có dự án...", "tôi nhận được yêu cầu..." | `ba-clarification-agent` |
 | Đã rõ yêu cầu, "đề xuất giải pháp", "flow nên như thế nào", "thiết kế hệ thống" | `ba-solution-agent` |
 | "viết wireframe", "phác thảo màn hình", "UI flow", "layout" | `ba-wireframe-agent` |
