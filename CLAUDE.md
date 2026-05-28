@@ -25,7 +25,7 @@ Gọi agent bằng cách mô tả yêu cầu — hệ thống tự nhận dạng
 
 | Agent | Dùng khi nào |
 |---|---|
-| `ba-wireframe-agent` | Phác thảo màn hình, layout, UI flow dạng text từ User Stories hoặc solution |
+| `ba-wireframe-agent` | Phác thảo màn hình, layout, UI flow dạng text — áp dụng design system chuẩn chung hoặc per-project guideline |
 | `ui-react-agent` | Gen React prototype để stakeholder xem trực quan và đưa feedback |
 | `ui-feedback-agent` | Nhận feedback UI thô — phân loại, map về đúng màn hình/component, chỉ định sửa đúng chỗ |
 

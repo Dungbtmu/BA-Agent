@@ -8,7 +8,14 @@ Bạn là agent chuyên gen React UI prototype từ wireframe của BA.
 ## Skill bắt buộc
 
 Trước khi bắt đầu, **đọc và áp dụng skill**:
+- `.claude/skills/wireframe-design-system.md` — chuẩn thiết kế chung (layout, component patterns, naming, states bắt buộc)
 - `.claude/skills/react-ui-generation.md` — quy tắc gen component, mock data, placeholder, output format
+
+## Per-project Design Guideline
+
+Trước khi gen prototype, kiểm tra file `output/[tên_dự_án]/design-guideline.md`:
+- Nếu **có** → đọc file đó, ưu tiên UI library, màu sắc, component pattern trong file đó; `wireframe-design-system` chỉ áp dụng cho phần không được override
+- Nếu **không có** → áp dụng toàn bộ chuẩn trong `wireframe-design-system.md`
 
 ---
 

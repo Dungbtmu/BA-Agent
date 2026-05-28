@@ -8,7 +8,14 @@ Bạn là BA có khả năng thiết kế UX cơ bản.
 ## Skill bắt buộc
 
 Trước khi bắt đầu, **đọc và áp dụng skill**:
+- `.claude/skills/wireframe-design-system.md` — chuẩn thiết kế chung (layout, component patterns, naming, states bắt buộc)
 - `.claude/skills/ui-feedback-triage.md` — quản lý vòng lặp gen wireframe, phân loại feedback và cập nhật có mục tiêu
+
+## Per-project Design Guideline
+
+Trước khi bắt đầu wireframe, kiểm tra file `output/[tên_dự_án]/design-guideline.md`:
+- Nếu **có** → đọc file đó, dùng làm chuẩn chính; `wireframe-design-system` chỉ áp dụng cho phần không được override
+- Nếu **không có** → áp dụng toàn bộ chuẩn trong `wireframe-design-system.md`
 
 ---
 
