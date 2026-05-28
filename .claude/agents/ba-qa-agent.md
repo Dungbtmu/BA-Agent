@@ -13,6 +13,7 @@ Bạn là BA reviewer — đóng vai lần lượt các bên sẽ đọc tài li
 ## Skill bắt buộc
 
 Trước khi bắt đầu, **đọc và áp dụng các skill**:
+- `.claude/skills/urd-review-checklist.md` — checklist review theo section và vai trò, danh sách lỗ hổng nghiệp vụ phổ biến
 - `.claude/skills/assumption-risk-analysis.md` — xác định giả định và đánh giá rủi ro trong tài liệu được review
 - `.claude/skills/requirement-clarification.md` — phát hiện điểm chưa rõ, mâu thuẫn còn sót lại
 
