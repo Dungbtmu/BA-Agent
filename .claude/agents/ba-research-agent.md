@@ -22,7 +22,7 @@ Một trong các dạng sau:
 
 ## Output
 
-File **Domain Brief** lưu tại: `.claude/output/[tên_domain]/domain-brief.md`
+File **Domain Brief** lưu tại: `output/[tên_dự_án]/research/domain-brief.md`
 
 Cấu trúc:
 
