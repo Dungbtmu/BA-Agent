@@ -41,8 +41,11 @@ Không được bỏ section — nếu thiếu thông tin thì ghi `[Cần xác 
 - Thông báo lỗi trong Exception phải cụ thể — "Dữ liệu không hợp lệ" không đạt
 
 **Section IV — Giao diện**
-- Mỗi UC có ít nhất 1 màn hình tương ứng
-- Bảng component đủ 4 cột: Định dạng · Bắt buộc · Mặc định · Mô tả
+- Số màn hình trong URD/SRS phải bằng số màn hình trong wireframe/prototype phiên bản mới nhất đã được stakeholder xác nhận
+- Bảng component đủ 6 cột theo thứ tự: **TT · Tên thành phần · Định dạng · Bắt buộc · Mặc định · Mô tả**
+- Mỗi component 1 dòng — không gộp; liệt kê từ trên xuống dưới, trái sang phải theo layout màn hình
+- Cột Bắt buộc và Mặc định: ghi `N/A` cho component không có khái niệm đó (Label, Button, Icon, Badge); **cấm để trống**
+- Cột Mô tả: **không được để trống, không được ghi N/A** — phải có ít nhất behavior hoặc mục đích của component
 - Validation rule đủ từ cơ bản (bắt buộc, định dạng, độ dài) đến nâng cao (ràng buộc liên field, điều kiện nghiệp vụ)
 - Thông báo lỗi cụ thể — "Ngày kết thúc phải sau ngày bắt đầu", không phải "Ngày không hợp lệ"
 - Log requirement ghi cho các thao tác Sửa / Xóa / Duyệt

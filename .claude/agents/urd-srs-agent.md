@@ -87,7 +87,9 @@ Kiểm tra checklist:
 
 **Chất lượng:**
 - [ ] Business Rules trong UC cụ thể, testable
-- [ ] Bảng component giao diện đủ: Định dạng, Bắt buộc, Mặc định, Mô tả
+- [ ] Số màn hình Section IV bằng số màn hình trong wireframe/prototype phiên bản mới nhất
+- [ ] Bảng component đủ 6 cột: TT · Tên thành phần · Định dạng · Bắt buộc · Mặc định · Mô tả; mỗi component 1 dòng, không gộp
+- [ ] Cột Bắt buộc và Mặc định: ghi N/A cho Label/Button/Icon/Badge; cột Mô tả không để trống
 - [ ] Sequence Diagram có đủ alt block (hợp lệ / không hợp lệ)
 - [ ] Không có placeholder vô nghĩa (trừ `[Cần xác nhận: ...]`)
 
