@@ -3,7 +3,8 @@
 **Ngày tạo:** 2026-05-28
 **Người thực hiện:** ba-research-agent
 **Dự án:** Hệ thống CDP cho TCT (Tổ chức/Tập đoàn lớn tại Việt Nam)
-**Phiên bản:** v1.0
+**Phiên bản:** v1.1
+**Cập nhật:** 2026-06-02 — Bổ sung actor Quản lý đơn vị thành viên; rút gọn kiến trúc kỹ thuật Unomi; phân loại câu hỏi clarify CRITICAL/MAJOR/MINOR; bổ sung thông tin từ WBS dự án; thêm 3 câu hỏi còn thiếu
 
 ---
 
@@ -27,7 +28,7 @@ Customer Data Platform (Nền tảng Dữ liệu Khách hàng) là phần mềm 
 - Identity resolution phức tạp hơn vì cùng một khách hàng có thể tương tác qua nhiều kênh của nhiều đơn vị
 - Cần phân tách dữ liệu theo đơn vị nghiệp vụ (Scope) nhưng vẫn có hồ sơ hợp nhất ở cấp tập đoàn
 - Triển khai doanh nghiệp lớn thường kéo dài 16–24 tuần, có thể phân kỳ 3–6 tháng
-- Phải tuân thủ quy định bảo vệ dữ liệu cá nhân (tại VN: Nghị định 13/2023/NĐ-CP về PDPD)
+- Phải tuân thủ quy định bảo vệ dữ liệu cá nhân (tại VN: Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân)
 
 **Nguồn tham khảo:** [CDP.com — What is a CDP](https://cdp.com/basics/what-is-a-customer-data-platform-cdp/), [Hightouch — What is a CDP](https://hightouch.com/blog/what-is-a-customer-data-platform-cdp)
 
@@ -51,17 +52,22 @@ Customer Data Platform (Nền tảng Dữ liệu Khách hàng) là phần mềm 
 | **Giám đốc Marketing (CMO/Marketing Director)** | Phê duyệt chiến lược sử dụng CDP, đánh giá ROI | Hiệu quả chiến dịch, tỷ lệ chuyển đổi, chi phí |
 | **Giám đốc IT / CTO** | Phê duyệt kiến trúc kỹ thuật, đảm bảo an toàn hệ thống | Tích hợp hạ tầng hiện có, bảo mật, tuân thủ |
 | **Giám đốc Kinh doanh các đơn vị** | Sử dụng insight từ CDP cho quyết định kinh doanh | Báo cáo tổng quan, phân tích phân khúc khách hàng |
+| **Quản lý đơn vị thành viên (Business Unit Owner)** | Kiểm soát dữ liệu khách hàng tại cấp đơn vị; phê duyệt tích hợp và quyền chia sẻ dữ liệu lên cấp tập đoàn | Quyền sở hữu dữ liệu đơn vị, không muốn dữ liệu khách hàng bị dùng bởi đơn vị khác mà không kiểm soát — **actor hay gây friction nhất trong enterprise CDP** |
 | **Khách hàng cuối** | Đối tượng dữ liệu được thu thập và xử lý | Trải nghiệm cá nhân hóa, quyền riêng tư dữ liệu |
 
 ### Hệ thống ngoài tích hợp (Source Systems)
 
-- Hệ thống CRM (quản lý quan hệ khách hàng)
-- Mobile App / Website (tracking hành vi)
-- POS / Hệ thống bán lẻ (giao dịch offline)
-- Email Marketing Platform
-- Hệ thống Call Center / Support
-- ERP / Core Banking (nếu có)
-- Kênh quảng cáo (Google Ads, Facebook Ads...)
+Dựa trên WBS dự án, các hệ thống nguồn đã được xác định sơ bộ tại TCT:
+
+- **MPITS** — hệ thống thông tin bưu chính
+- **My VNPost (App)** — ứng dụng di động khách hàng (tracking hành vi real-time)
+- **CRM** — quản lý quan hệ khách hàng
+- **CMS** — hệ thống quản lý nội dung
+- **Cổng CSKH** — tổng đài, chăm sóc khách hàng
+- **MYVNP / PNS/DD** — hệ thống quản lý hành vi
+- **Sàn TMĐT** — kênh bán hàng online
+- **Zalo / Facebook / SMS** — kênh khách hàng bên ngoài (chưa nằm trong hệ thống nội bộ)
+- Các hệ thống khác cần rà soát thêm trong giai đoạn khảo sát
 
 ---
 
@@ -205,13 +211,13 @@ Apache Unomi là một **CDP mã nguồn mở** do Apache Software Foundation ph
 | **Action** | Hành động thực thi khi Rule khớp — cập nhật Profile, gọi API ngoài, thay đổi UX |
 | **Source** | Nguồn gốc của Event — xác định kênh nào gửi sự kiện |
 
-**Kiến trúc kỹ thuật Unomi:**
-- Backend: **Elasticsearch** (lưu trữ Profile, Segment, Event)
-- Runtime: **Apache Karaf** (OSGi container — hỗ trợ plugin mở rộng theo module)
-- API: **REST/JSON** — đầy đủ endpoint cho Profile, Event, Segment, Rule, Campaign, Goal
-- Tích hợp: Horizontal scalability, plugin architecture với JSON descriptor
-- Privacy: Tích hợp sẵn **GDPR consent management** và data portability
-- AI-ready: Cung cấp ngữ cảnh khách hàng sạch, hợp nhất, real-time cho LLM, chatbot, recommendation engine
+**Unomi làm được gì:**
+- Thu thập event real-time từ web/app qua REST API
+- Xây dựng Unified Profile tự động theo thời gian thực
+- Phân khúc động (Segment) tự cập nhật khi Profile thay đổi
+- Kích hoạt Rule tự động khi điều kiện thỏa mãn (gửi email, cập nhật hồ sơ, gọi API ngoài)
+- Quản lý consent tích hợp sẵn (phù hợp Nghị định 13/2023/NĐ-CP)
+- Hỗ trợ multi-scope — mỗi đơn vị kinh doanh/app là một Scope riêng, có thể có profile hợp nhất ở cấp tập đoàn
 
 **Phù hợp với yêu cầu TCT:**
 - Không phụ thuộc vendor, không bị lock-in
@@ -238,63 +244,58 @@ Apache Unomi là một **CDP mã nguồn mở** do Apache Software Foundation ph
 
 ## 7. Câu hỏi clarify cần hỏi BA/PO
 
-Dựa trên những gì đã research, dưới đây là các câu hỏi tập trung vào phần còn chưa rõ của dự án TCT. BA cần clarify những điểm này trước khi thiết kế solution.
-
-### Về phạm vi và bối cảnh tổ chức
-
-**Q1. TCT có bao nhiêu đơn vị thành viên và bao nhiêu hệ thống IT cần tích hợp vào CDP?**
-> Lý do hỏi: Quy mô tích hợp quyết định độ phức tạp của pipeline và thời gian triển khai. Một tập đoàn có 5–10 đơn vị với hệ thống khác nhau sẽ khác hoàn toàn so với 50+ đơn vị.
-
-**Q2. CDP này phục vụ toàn bộ tập đoàn (cấp group) hay chỉ một hoặc vài đơn vị thành viên trước?**
-> Lý do hỏi: Cần xác định có cần kiến trúc multi-tenant (mỗi đơn vị là một Scope riêng) hay bắt đầu từ một đơn vị cụ thể để pilot.
-
-**Q3. Cấu trúc IT hiện tại của TCT như thế nào — IT tập trung (centralized) hay phân tán tại từng đơn vị?**
-> Lý do hỏi: Ảnh hưởng trực tiếp đến cách thiết kế quyền truy cập dữ liệu, governance, và ai là chủ sở hữu dữ liệu khách hàng ở cấp nào.
+*WBS dự án đã trả lời một số câu — phần còn lại cần clarify trực tiếp với client.*
 
 ---
 
-### Về dữ liệu và nguồn tích hợp
+### CRITICAL — Phải có trước khi thiết kế solution
 
-**Q4. Những hệ thống nguồn nào đã tồn tại và sẵn sàng tích hợp? Hệ thống nào có API, hệ thống nào chỉ có file export (CSV, Excel)?**
-> Lý do hỏi: Xác định phương thức ingestion phù hợp (real-time API vs batch file) và ưu tiên thứ tự tích hợp.
+**Q1. TCT đã có Customer ID thống nhất toàn tập đoàn chưa, hay mỗi đơn vị/hệ thống đang dùng ID riêng?**
+> Lý do: Đây là nền tảng của toàn bộ Identity Resolution. WBS row 9 xác nhận cần "Match theo SĐT / Email / CCCD" — nghĩa là chưa có ID thống nhất. Nếu đúng vậy, bài toán MDM phải được giải quyết song song với CDP, không thể tách rời.
 
-**Q5. Khi nói "lịch sử định vị" — đây là dữ liệu GPS từ app di động của TCT, hay từ bên thứ ba (telco, đối tác)? Có thỏa thuận pháp lý để sử dụng không?**
-> Lý do hỏi: Dữ liệu định vị thuộc nhóm nhạy cảm cao, cần xác nhận nguồn gốc và tính hợp pháp trước khi thiết kế pipeline thu thập.
+**Q2. Với trường hợp xung đột dữ liệu (App ghi KH ở HN, quầy ghi KH ở HCM) — TCT muốn ưu tiên nguồn nào? Có rule ưu tiên theo thời gian (mới nhất thắng) hay theo nguồn (hệ thống nào đáng tin hơn)?**
+> Lý do: WBS row 10 đặt đúng câu hỏi này nhưng chưa có câu trả lời. Rule xử lý xung đột ảnh hưởng trực tiếp đến thiết kế Identity Resolution Engine — không thể assume.
 
-**Q6. Hiện tại dữ liệu khách hàng đang được lưu ở đâu — Data Warehouse, Data Lake, hay phân tán trong từng ứng dụng? TCT đã có hạ tầng dữ liệu nào sẵn chưa (Hadoop, Kafka, Spark...)?**
-> Lý do hỏi: CDP sẽ bổ sung hay thay thế hạ tầng hiện có? Cần hiểu để tránh duplicate và thiết kế đúng điểm tích hợp.
+**Q3. Mô hình đầu tư là gì — tự xây (build in-house trên Unomi), mua giải pháp đóng gói (Salesforce, Insider, Adobe...), hay thuê tư vấn triển khai?**
+> Lý do: WBS row 24 ghi rõ "Composable CDP vs Packaged CDP" là một đầu việc cần nghiên cứu — tức là chưa quyết định. Đây là quyết định CRITICAL vì ảnh hưởng toàn bộ kiến trúc, chi phí, và timeline.
 
----
+**Q4. Hệ thống nguồn nào có API sẵn, hệ thống nào chỉ có file export (CSV, batch)?**
+> Lý do: WBS row 21 liệt kê các phương thức kết nối (API/DB link/BF/MQ/Kafka) nhưng chưa map rõ hệ thống nào dùng phương thức nào. Quyết định này ảnh hưởng trực tiếp đến kiến trúc pipeline tích hợp và tần suất cập nhật dữ liệu.
 
-### Về định danh và hợp nhất hồ sơ
-
-**Q7. Một khách hàng của TCT được nhận diện bằng gì — mã khách hàng duy nhất (Customer ID) toàn tập đoàn, hay mỗi đơn vị có ID riêng? Hiện có hệ thống Master Data Management (MDM) chưa?**
-> Lý do hỏi: Đây là yếu tố then chốt quyết định độ phức tạp của identity resolution. Nếu chưa có Customer ID thống nhất, đây phải là bài toán giải quyết trước hoặc cùng lúc với CDP.
-
----
-
-### Về mục đích sử dụng và người dùng
-
-**Q8. Ai là người dùng chính của CDP sau khi xây xong — đội Marketing, đội Data/Analytics, hay cả hai? Họ có kỹ năng kỹ thuật ở mức nào (self-service hay cần IT hỗ trợ mỗi lần)?**
-> Lý do hỏi: Ảnh hưởng lớn đến thiết kế UX của giao diện quản trị — CDP kiểu "marketer-friendly" khác hoàn toàn CDP kiểu "engineer-first".
-
-**Q9. Use case ưu tiên số một khi ra mắt CDP là gì — hợp nhất hồ sơ (có dữ liệu đẹp để nhìn), phân khúc cho chiến dịch marketing, hay real-time personalization trên app/web?**
-> Lý do hỏi: Tránh scope creep và xác định MVP. Mỗi use case có yêu cầu kỹ thuật và thời gian xây dựng khác nhau.
+**Q5. TCT đã có chính sách thu thập dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP chưa? CDP có cần tích hợp cơ chế xin đồng ý (consent) không?**
+> Lý do: WBS row 22 ghi "Đánh giá tuân thủ" là một đầu việc riêng — consent management cần được thiết kế từ đầu, không thể thêm vào sau khi hệ thống đã chạy.
 
 ---
 
-### Về tuân thủ và bảo mật
+### MAJOR — Ảnh hưởng lớn đến scope và thiết kế
 
-**Q10. TCT đã có chính sách thu thập và xử lý dữ liệu cá nhân (theo Nghị định 13/2023/NĐ-CP) chưa? Hệ thống CDP có cần tích hợp cơ chế xin đồng ý (consent) của khách hàng không?**
-> Lý do hỏi: Consent management là yêu cầu bắt buộc theo pháp luật VN. Nếu chưa có, cần xây dựng cùng với CDP — không thể thu thập dữ liệu hành vi mà không có cơ sở pháp lý.
+**Q6. Use case ưu tiên MVP là gì — Customer 360 (hồ sơ hợp nhất), phân khúc cho chiến dịch Marketing, hay kết nối real-time cho App/Web?**
+> Lý do: WBS bao gồm cả 3 nhóm (Customer 360 + Analytics + Activation) nhưng không có priority. Cần xác định rõ để tránh scope creep ngay từ đầu.
+
+**Q7. CDP này phục vụ toàn tập đoàn ngay từ đầu hay pilot tại một đơn vị trước?**
+> Lý do: Quyết định này ảnh hưởng đến kiến trúc multi-scope (mỗi đơn vị là một Scope riêng trong Unomi) và phạm vi tích hợp phase 1.
+
+**Q8. Ai là người dùng chính sau khi CDP live — đội Marketing, đội Data/Analytics, hay cả hai? Họ có thể tự dùng không hay cần IT hỗ trợ mỗi lần?**
+> Lý do: Ảnh hưởng đến thiết kế UX giao diện quản trị — "marketer self-service" khác hoàn toàn "engineer-first dashboard".
+
+**Q9. "Lịch sử định vị" trong yêu cầu ban đầu — đây là GPS từ My VNPost App hay từ nguồn bên ngoài (telco, đối tác)? Đã có thỏa thuận pháp lý để sử dụng chưa?**
+> Lý do: Dữ liệu định vị thuộc nhóm dữ liệu nhạy cảm theo Nghị định 13 — cần xác nhận nguồn gốc và tính hợp pháp trước khi thiết kế pipeline.
+
+**Q10. Tại sao dự án CDP được khởi động lúc này — có pain point business cụ thể nào đang xảy ra không (mất khách, không đo được ROI chiến dịch, cần personalization)?**
+> Lý do: Hiểu được lý do thật sự giúp BA prioritize đúng scope và không đề xuất solution rộng hơn mức cần thiết.
 
 ---
 
-### Câu hỏi bổ sung (nếu còn thời gian)
+### MINOR — Có thể assume tạm, hỏi để xác nhận
 
-**Q11. TCT có ưu tiên giải pháp mã nguồn mở (như Apache Unomi) hay thương mại? Đã có vendor nào được cân nhắc chưa?**
+**Q11. Kỳ vọng go-live phase đầu là bao lâu? Có deadline cứng nào không (sự kiện, fiscal year, cam kết với ban lãnh đạo)?**
+> Lý do: Ảnh hưởng đến cách phân kỳ WBS và phạm vi MVP. Có thể assume là 6–12 tháng nếu không có deadline cứng.
 
-**Q12. Kỳ vọng về thời gian go-live của phase đầu tiên là bao lâu? Có deadline cứng không (ra mắt sản phẩm, sự kiện, fiscal year...)?**
+**Q12. IT của TCT tập trung (một đội IT group quản lý tất cả) hay phân tán (mỗi đơn vị có IT riêng)?**
+> Lý do: Ảnh hưởng đến ownership triển khai và ai là đầu mối kỹ thuật ở từng đơn vị. Có thể clarify trong buổi kick-off.
+
+**Q13. TCT đã có Data Team (Data Engineer, Data Analyst) chưa, hay đây là lần đầu xây năng lực dữ liệu?**
+> Lý do: CDP cần đội vận hành sau khi xây xong. Nếu chưa có Data Team, cần tính thêm kế hoạch đào tạo và handover vào scope.
 
 ---
 
@@ -322,4 +323,4 @@ Dựa trên những gì đã research, dưới đây là các câu hỏi tập t
 
 ---
 
-**Bước tiếp theo:** Dùng file này làm input cho `ba-clarification-agent` — tiến hành buổi clarification với BA/PO của TCT, ưu tiên các câu hỏi Q1, Q4, Q7, Q9, Q10 vì đây là những điểm ảnh hưởng lớn nhất đến kiến trúc và phạm vi hệ thống.
+**Bước tiếp theo:** Dùng file này làm input cho `ba-clarification-agent` — tiến hành buổi clarification với BA/PO của TCT. Ưu tiên hỏi 5 câu CRITICAL (Q1–Q5) vì đây là những điểm ảnh hưởng trực tiếp đến kiến trúc và phạm vi hệ thống. WBS dự án (`CDP_BA_WBS`) đã xác nhận scope tổng thể — dùng làm tham chiếu khi clarify chi tiết từng nhóm.
