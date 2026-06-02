@@ -5,5 +5,22 @@
       "Read(//Users/buidung/Documents/workspace/aeh/eduecosystem/cvm-ui/**)",
       "Bash(npm install *)"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=\"$CLAUDE_TOOL_INPUT_FILE_PATH\"; if echo \"$file\" | grep -q 'output/.*urd-srs'; then echo \"\n⚡ URD/SRS vừa được lưu: $file\n→ Nhớ gọi ba-qa-agent để review trước khi tiếp tục.\n\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "file=\"$CLAUDE_TOOL_INPUT_FILE_PATH\"; if echo \"$file\" | grep -q 'output/'; then mkdir -p \"$(dirname \"$file\")\" 2>/dev/null; logfile=\"/Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/output/activity.log\"; mkdir -p \"$(dirname \"$logfile\")\"; echo \"[$(date '+%Y-%m-%d %H:%M')] WRITE $file\" >> \"$logfile\"; fi"
+          }
+        ]
+      }
+    ]
   }
 }

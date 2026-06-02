@@ -14,6 +14,36 @@ Trước khi bắt đầu, **đọc và áp dụng các skill**:
 
 ---
 
+## Pre-flight summary
+
+Trước khi bắt đầu làm việc thực sự, output block sau để BA xác nhận:
+
+```
+## Pre-flight — ba-clarification-agent
+
+**Tôi hiểu input là:**
+[Tóm tắt 2-3 câu: input thuộc loại gì, nói về dự án/vấn đề gì]
+
+**Loại input:**
+[ ] Mô tả miệng / ý tưởng thô → sẽ dùng problem-framing + requirement-clarification
+[ ] Tài liệu có sẵn (PRD, email, ghi chú...) → sẽ dùng input-analysis trước
+[ ] Kết hợp cả hai
+
+**Tôi sẽ làm:**
+1. [Bước 1 — ví dụ: Trích xuất requirement từ tài liệu]
+2. [Bước 2 — ví dụ: Xác định missing information và assumption]
+3. [Bước 3 — ví dụ: Đặt câu hỏi clarify theo thứ tự CRITICAL → MAJOR → MINOR]
+
+**Assumption ban đầu (nếu có):**
+- [Assumption 1 — hoặc "Chưa có assumption, cần đọc input trước"]
+
+**Confirm để tiếp tục, hoặc chỉnh nếu tôi hiểu sai.**
+```
+
+Chờ BA xác nhận (hoặc không phản đối) trước khi proceed.
+
+---
+
 ## Input
 
 Mọi dạng input đều được chấp nhận:

@@ -19,6 +19,37 @@ Trước khi bắt đầu, **đọc và áp dụng các skill**:
 
 ---
 
+## Pre-flight summary
+
+Trước khi bắt đầu review, output block sau để BA xác nhận:
+
+```
+## Pre-flight — ba-qa-agent
+
+**Tài liệu tôi sẽ review:**
+[Tên tài liệu, version, loại: URD/SRS / Wireframe / Solution / Epic+Story]
+
+**Góc nhìn tôi sẽ áp dụng:**
+[ ] BA Leader — logic nghiệp vụ, assumption chưa xác nhận
+[ ] PO/PM — scope, stakeholder có hiểu không, yêu cầu bị miss
+[ ] Dev — implementability, rule còn mơ hồ, validation đủ chưa
+[ ] Tester — test case viết được không, edge case, thông báo lỗi cụ thể chưa
+
+**Trọng tâm review (nếu BA có yêu cầu đặc biệt):**
+[Ghi rõ nếu BA muốn tập trung vào section cụ thể — hoặc "Review toàn bộ"]
+
+**Skill tôi sẽ dùng:**
+- urd-review-checklist — checklist theo section
+- assumption-risk-analysis — xác định giả định và rủi ro
+- requirement-clarification — phát hiện mâu thuẫn còn sót
+
+**Confirm để tiếp tục, hoặc chỉ định trọng tâm review nếu cần.**
+```
+
+Chờ BA xác nhận trước khi bắt đầu review.
+
+---
+
 ## Input
 
 Tài liệu cần review — bất kỳ dạng nào:
