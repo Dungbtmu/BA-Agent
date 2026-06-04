@@ -19,6 +19,7 @@ Gọi agent bằng cách mô tả yêu cầu — hệ thống tự nhận dạng
 | `ba-research-agent` | Domain mới, chưa có kiến thức — research nghiệp vụ, actor, pain point, thuật ngữ. Output: Domain Brief |
 | `ba-clarification-agent` | Có yêu cầu thô (mô tả miệng, ghi chú, tài liệu chưa đầy đủ) — làm rõ trước khi thiết kế |
 | `ba-solution-agent` | Đã rõ yêu cầu — đề xuất giải pháp, thiết kế user flow, xác định edge cases và trade-offs |
+| `ba-devil-advocate-agent` | Phản biện chéo solution — challenge assumption, tìm lỗ hổng từ 4 góc nhìn độc lập trước khi vào Phase 2 |
 | `ba-backlog-agent` | *(Optional)* Cần chia solution thành Epic + User Stories + AC rõ ràng, testable |
 
 ### Phase 2 — Thiết kế giao diện
@@ -35,6 +36,8 @@ Gọi agent bằng cách mô tả yêu cầu — hệ thống tự nhận dạng
 |---|---|
 | `urd-srs-agent` | Viết tài liệu URD/SRS đầy đủ, dev/test-ready — output chính của hệ thống |
 | `ba-qa-agent` | Review tài liệu — phát hiện logic gaps, missing cases, conflict, risk. Tự động chạy sau `urd-srs-agent` |
+| `ba-postcheck-agent` | Hậu kiểm tự động — audit cấu trúc, traceability, naming, version hygiene sau khi content đã được ba-qa-agent chấp thuận |
+| `ba-process-summary-agent` | Tổng kết quá trình — tạo Decision Log, Assumption Register, Handoff Note cho Dev/Tester |
 
 ---
 
@@ -42,13 +45,17 @@ Gọi agent bằng cách mô tả yêu cầu — hệ thống tự nhận dạng
 
 ```
 Phase 1 — Làm rõ & Giải pháp
-  [0] ba-research-agent    (optional — chỉ khi domain mới)
+  [0] ba-research-agent         (optional — chỉ khi domain mới)
    ↓
   [1] ba-clarification-agent
    ↓
   [2] ba-solution-agent
    ↓
-  [3] ba-backlog-agent     (optional — chỉ khi BA cần Epic/Story/AC)
+  [2b] ba-devil-advocate-agent  (optional nhưng khuyến nghị — phản biện solution)
+        → BLOCK: quay lại [2] sửa solution
+        → PASS/PASS WITH CONDITIONS: tiếp tục
+   ↓
+  [3] ba-backlog-agent          (optional — chỉ khi BA cần Epic/Story/AC)
 
 Phase 2 — Thiết kế giao diện (vòng lặp đến khi chốt)
   [4] ba-wireframe-agent   ←→ song song với
@@ -62,6 +69,12 @@ Phase 3 — Tài liệu (vòng lặp đến khi chốt)
   [8] ba-qa-agent → review → CRITICAL: sửa đúng section → lặp lại
                            → MAJOR/MINOR: báo BA quyết định
                            → Không issue: chốt, lưu file version cuối
+   ↓ (tự động sau khi chốt)
+  [9] ba-postcheck-agent → audit cấu trúc + traceability
+        → NEEDS FIX: sửa đúng chỗ → chạy lại
+        → READY FOR HANDOFF: tiếp tục
+   ↓
+  [10] ba-process-summary-agent → tạo Decision Log + Assumption Register + Handoff Note
 ```
 
 Có thể bắt đầu từ bất kỳ phase nào nếu đã có input phù hợp.
@@ -75,6 +88,5 @@ Các quy tắc được tách thành file riêng trong `.claude/rules/`:
 - [`project-context.md`](.claude/rules/project-context.md) — Bối cảnh hệ thống, phạm vi BA, team, cấu trúc thư mục
 - [`ba-persona.md`](.claude/rules/ba-persona.md) — Phong cách, tư duy, năng lực BA Senior
 - [`language.md`](.claude/rules/language.md) — Quy tắc ngôn ngữ (tiếng Việt có dấu bắt buộc)
-- [`ba-workflow.md`](.claude/rules/ba-workflow.md) — Quy trình GENERATE / REFINE / REVIEW
-- [`agent-workflow.md`](.claude/rules/agent-workflow.md) — Quy trình phối hợp subagent, intent recognition, Phase 1-2-3
+- [`agent-workflow.md`](.claude/rules/agent-workflow.md) — Pipeline Phase 1-2-3, intent recognition, chế độ GENERATE/REFINE/REVIEW
 - [`output-schema.md`](.claude/rules/output-schema.md) — Tiêu chuẩn chất lượng URD/SRS (output chính) + Epic, Story, Wireframe (phụ trợ)

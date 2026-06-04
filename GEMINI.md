@@ -19,6 +19,7 @@ Dưới đây là các vai trò/subagent được định nghĩa trong thư mụ
 | `ba-research-agent` | [ba-research-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-research-agent.md) | [domain-research.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/domain-research.md) | Khi nghiên cứu domain mới, chưa có kiến thức — nghiên cứu nghiệp vụ, actor, pain point, thuật ngữ để tạo Domain Brief. |
 | `ba-clarification-agent` | [ba-clarification-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-clarification-agent.md) | [problem-framing.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/problem-framing.md), [requirement-clarification.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/requirement-clarification.md) | Khi có yêu cầu thô (mô tả sơ lược, ghi chú rời rạc) — làm rõ yêu cầu trước khi thiết kế. |
 | `ba-solution-agent` | [ba-solution-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-solution-agent.md) | [user-persona-identification.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/user-persona-identification.md), [stakeholder-mapping.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/stakeholder-mapping.md), [assumption-risk-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/assumption-risk-analysis.md), [context-constraint-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/context-constraint-analysis.md) | Khi yêu cầu đã rõ — đề xuất giải pháp, thiết kế user flow, xác định edge cases và trade-offs. |
+| `ba-devil-advocate-agent` | [ba-devil-advocate-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-devil-advocate-agent.md) | [solution-critique.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/solution-critique.md), [assumption-risk-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/assumption-risk-analysis.md) | Phản biện chéo solution từ 4 góc nhìn (User / PO / Dev / Risk) — chạy sau `ba-solution-agent`, trước Phase 2. |
 | `ba-backlog-agent` | [ba-backlog-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-backlog-agent.md) | [requirement-clarification.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/requirement-clarification.md), [user-persona-identification.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/user-persona-identification.md) | *(Optional)* Khi cần chia nhỏ giải pháp thành Epic, User Stories và AC rõ ràng, có khả năng kiểm thử. |
 
 ### Phase 2 — Thiết kế giao diện
@@ -35,6 +36,8 @@ Dưới đây là các vai trò/subagent được định nghĩa trong thư mụ
 |---|---|---|---|
 | `urd-srs-agent` | [urd-srs-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/urd-srs-agent.md) | [urd-srs-structure.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/urd-srs-structure.md) cùng với các kỹ năng chi tiết theo phần ([workflow-diagram](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/urd-workflow-diagram.md), [function-tree](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/urd-function-tree.md), [permission-matrix](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/urd-permission-matrix.md), [sequence-diagram](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/urd-sequence-diagram.md), [use-case](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/urd-use-case.md), [screen-spec](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/urd-screen-spec.md)) | Viết tài liệu URD/SRS hoàn chỉnh, sẵn sàng cho đội ngũ Dev/Test — đây là sản phẩm đầu ra chính. |
 | `ba-qa-agent` | [ba-qa-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-qa-agent.md) | [urd-review-checklist.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/urd-review-checklist.md), [assumption-risk-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/assumption-risk-analysis.md), [requirement-clarification.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/requirement-clarification.md) | Đánh giá chất lượng tài liệu — phát hiện các lỗ hổng logic, trường hợp bị thiếu, xung đột, rủi ro. Tự động chạy sau khi `urd-srs-agent` hoàn thành. |
+| `ba-postcheck-agent` | [ba-postcheck-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-postcheck-agent.md) | [document-integrity-check.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/document-integrity-check.md) | Hậu kiểm tự động — audit cấu trúc, traceability, naming và version hygiene sau khi `ba-qa-agent` chấp thuận content. |
+| `ba-process-summary-agent` | [ba-process-summary-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-process-summary-agent.md) | [process-log.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/process-log.md), [assumption-risk-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/assumption-risk-analysis.md) | Tổng kết toàn bộ BA session — tạo Decision Log, Assumption Register và Handoff Note cho Dev/Tester. |
 
 ---
 
@@ -42,13 +45,17 @@ Dưới đây là các vai trò/subagent được định nghĩa trong thư mụ
 
 ```
 Phase 1 — Làm rõ & Giải pháp
-  [0] ba-research-agent    (optional — chỉ khi gặp domain mới)
+  [0] ba-research-agent         (optional — chỉ khi gặp domain mới)
    ↓
   [1] ba-clarification-agent
    ↓
   [2] ba-solution-agent
    ↓
-  [3] ba-backlog-agent     (optional — chỉ khi BA yêu cầu rõ về Epic/Story/AC)
+  [2b] ba-devil-advocate-agent  (optional nhưng khuyến nghị — phản biện solution)
+        → BLOCK: quay lại [2] sửa đúng điểm bị challenge
+        → PASS/PASS WITH CONDITIONS: tiếp tục
+   ↓
+  [3] ba-backlog-agent          (optional — chỉ khi BA yêu cầu rõ về Epic/Story/AC)
 
 Phase 2 — Thiết kế giao diện (vòng lặp đến khi thống nhất)
   [4] ba-wireframe-agent   ←→ hoạt động song song/phối hợp với
@@ -62,6 +69,12 @@ Phase 3 — Tài liệu (vòng lặp đến khi hoàn thiện)
   [8] ba-qa-agent → rà soát chất lượng → CRITICAL: bắt buộc sửa đổi đúng phần lỗi → lặp lại
                                         → MAJOR/MINOR: ghi nhận và báo cáo BA quyết định
                                         → Đạt yêu cầu: chốt tài liệu, lưu phiên bản chính thức
+   ↓ (tự động sau khi chốt)
+  [9] ba-postcheck-agent → audit cấu trúc + traceability
+        → NEEDS FIX: sửa đúng chỗ → chạy lại [9]
+        → READY FOR HANDOFF: tiếp tục
+   ↓
+  [10] ba-process-summary-agent → tạo Decision Log + Assumption Register + Handoff Note
 ```
 
 Có thể linh hoạt bắt đầu từ bất kỳ phase nào nếu đã có sẵn thông tin đầu vào phù hợp (ví dụ: đã có wireframe thì có thể bắt đầu luôn Phase 3).
@@ -71,7 +84,7 @@ Có thể linh hoạt bắt đầu từ bất kỳ phase nào nếu đã có s�
 ## 3. Quy tắc & Chỉ dẫn dành riêng cho Gemini (Antigravity)
 
 ### Nạp Chỉ dẫn Nghiệp vụ & Kỹ năng
-- Trước khi thực hiện bất kỳ tác vụ nào liên quan đến BA, Gemini **bắt buộc** phải đọc file [AGENTS.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/AGENTS.md) và các quy tắc chung trong thư mục [.claude/rules/](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/rules/).
+- Trước khi thực hiện bất kỳ tác vụ nào liên quan đến BA, Gemini **bắt buộc** phải đọc file [AGENTS.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/AGENTS.md) và các quy tắc chung trong thư mục [.claude/rules/](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/rules/). Lưu ý: `ba-workflow.md` đã được gộp vào `agent-workflow.md` — không còn tồn tại riêng.
 - Đọc đúng file kỹ năng tương ứng trong thư mục [.claude/skills/](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/) trước khi bắt đầu tạo hoặc chỉnh sửa bất kỳ phần nào của tài liệu đầu ra.
 
 ### Quy định về Ngôn ngữ & Định dạng

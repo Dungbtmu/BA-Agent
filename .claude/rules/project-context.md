@@ -27,29 +27,36 @@ Loại tài liệu đầu ra đa dạng, tùy theo yêu cầu: Backlog, Epic, Us
 ```
 .claude/
 ├── agents/                    ← Định nghĩa các subagent BA chuyên biệt
+│   ├── ba-research-agent.md
 │   ├── ba-clarification-agent.md
 │   ├── ba-solution-agent.md
+│   ├── ba-devil-advocate-agent.md
 │   ├── ba-backlog-agent.md
 │   ├── ba-wireframe-agent.md
-│   ├── ba-qa-agent.md
 │   ├── ui-react-agent.md
 │   ├── ui-feedback-agent.md
-│   └── urd-srs-agent.md
+│   ├── urd-srs-agent.md
+│   ├── ba-qa-agent.md
+│   ├── ba-postcheck-agent.md
+│   └── ba-process-summary-agent.md
 ├── rules/                     ← Quy tắc bắt buộc, load mọi session
 │   ├── project-context.md
 │   ├── ba-persona.md
 │   ├── language.md
-│   ├── ba-workflow.md
-│   ├── agent-workflow.md
+│   ├── agent-workflow.md      ← pipeline + intent recognition + chế độ vận hành
 │   └── output-schema.md
 ├── skills/                    ← Skill chuyên biệt, agent đọc khi cần
-│   ├── [BA skills]            ← problem-framing, requirement-clarification, stakeholder-mapping...
-│   ├── [UI skills]            ← react-ui-generation, ui-feedback-triage, wireframe-iteration
+│   ├── [BA skills]            ← problem-framing, requirement-clarification, stakeholder-mapping,
+│   │                             assumption-risk-analysis, context-constraint-analysis,
+│   │                             user-persona-identification, domain-research, solution-critique
+│   ├── [UI skills]            ← react-ui-generation, ui-feedback-triage, wireframe-design-system
 │   └── [URD skills]           ← urd-srs-structure (orchestrator) + 6 skill con theo từng section
+│                                 + urd-review-checklist, document-integrity-check, process-log
 ├── input/                     ← Tài liệu đầu vào từ PO/stakeholder
 └── output/                    ← Tài liệu BA tạo ra, tổ chức theo dự án
     └── [tên_dự_án]/
         ├── wireframe/
         ├── urd/
-        └── solution/
+        ├── solution/
+        └── process-summary.md
 ```

@@ -7,13 +7,18 @@
 ```
 Input (mọi dạng: mô tả thô, ghi chú, tài liệu chưa đầy đủ...)
    ↓
-[0] ba-research-agent       → research domain mới, tạo Domain Brief  *(optional — chỉ khi BA chưa biết domain)*
+[0] ba-research-agent          → research domain mới, tạo Domain Brief  *(optional — chỉ khi BA chưa biết domain)*
    ↓
-[1] ba-clarification-agent  → làm rõ yêu cầu, đặt câu hỏi clarify
+[1] ba-clarification-agent     → làm rõ yêu cầu, đặt câu hỏi clarify
    ↓ (nếu còn câu hỏi CRITICAL → dừng hỏi BA/PO trước)
-[2] ba-solution-agent       → đề xuất solution + user flow
+[2] ba-solution-agent          → đề xuất solution + user flow
    ↓
-[3] ba-backlog-agent        → Epic + User Stories + AC  *(optional — chỉ khi BA yêu cầu)*
+[2b] ba-devil-advocate-agent   → phản biện chéo solution từ 4 góc nhìn *(optional nhưng khuyến nghị)*
+      ├─ BLOCK → quay lại [2], sửa đúng điểm bị challenge
+      ├─ PASS WITH CONDITIONS → ghi nhận conditions, tiếp tục
+      └─ PASS → tiếp tục
+   ↓
+[3] ba-backlog-agent           → Epic + User Stories + AC  *(optional — chỉ khi BA yêu cầu)*
 ```
 
 ## Phase 2 — Thiết kế giao diện (vòng lặp đến khi chốt)
@@ -37,7 +42,14 @@ Input (mọi dạng: mô tả thô, ghi chú, tài liệu chưa đầy đủ...)
    ├─ Có CRITICAL → xác định đúng section bị lỗi → quay lại [7] sửa đúng chỗ đó
    ├─ Chỉ MAJOR/MINOR → báo cáo cho BA quyết định có sửa không
    └─ Không có issue → chốt tài liệu, lưu file version cuối
-   ↓ (lặp lại [7][8] cho đến khi không còn CRITICAL)
+   ↓ (tự động sau khi chốt, không cần BA nhắc)
+[9] ba-postcheck-agent      → audit cấu trúc + traceability + naming + version hygiene
+   ↓
+   ├─ NEEDS FIX → sửa đúng chỗ bị flag → chạy lại [9]
+   └─ READY FOR HANDOFF → tiếp tục
+   ↓
+[10] ba-process-summary-agent → tổng kết quá trình, tạo Decision Log + Assumption Register + Handoff Note
+      → lưu file `process-summary.md` tại `output/[tên_dự_án]/`
 ```
 
 **Quy tắc vòng lặp Phase 3:**
@@ -45,6 +57,8 @@ Input (mọi dạng: mô tả thô, ghi chú, tài liệu chưa đầy đủ...)
 - Mỗi lần sửa chỉ sửa đúng section có CRITICAL — không viết lại toàn bộ tài liệu
 - MAJOR/MINOR: liệt kê trong báo cáo, BA quyết định sửa ngay hay để version sau
 - Chốt khi không còn CRITICAL issue — lưu file với version tăng (`urd-srs-v[N+1].md`)
+- Sau khi chốt → **tự động** gọi `ba-postcheck-agent` audit, không cần BA nhắc
+- `ba-process-summary-agent` chạy sau `ba-postcheck-agent` báo READY FOR HANDOFF
 
 ## Nhận dạng intent — tự dispatch agent
 
@@ -55,11 +69,14 @@ Khi BA không mention agent cụ thể, nhận dạng intent từ input và tự
 | "tôi chưa biết gì về domain này", "research", "tìm hiểu lĩnh vực", "dự án mới chưa có kiến thức" | `ba-research-agent` |
 | Mô tả dự án mới, yêu cầu chưa rõ, "tôi có dự án...", "tôi nhận được yêu cầu..." | `ba-clarification-agent` |
 | Đã rõ yêu cầu, "đề xuất giải pháp", "flow nên như thế nào", "thiết kế hệ thống" | `ba-solution-agent` |
+| "phản biện solution", "challenge giải pháp", "kiểm tra solution", "có vấn đề gì không" | `ba-devil-advocate-agent` |
 | "viết wireframe", "phác thảo màn hình", "UI flow", "layout" | `ba-wireframe-agent` |
 | "code React", "prototype", "xem trực quan", "chạy thử" | `ui-react-agent` |
 | Feedback từ stakeholder, "họ comment...", "sửa UI", "góp ý về giao diện" | `ui-feedback-agent` |
 | "viết URD", "viết SRS", "tài liệu đặc tả", "đặc tả yêu cầu" | `urd-srs-agent` |
 | "review lại", "check quality", "còn thiếu gì", "kiểm tra tài liệu" | `ba-qa-agent` |
+| "kiểm tra file", "audit cấu trúc", "traceability", "sẵn sàng bàn giao chưa" | `ba-postcheck-agent` |
+| "tổng kết", "handoff note", "decision log", "tóm tắt quá trình" | `ba-process-summary-agent` |
 | "viết Epic", "viết User Story", "chia backlog", "AC" | `ba-backlog-agent` |
 
 Nếu input không khớp rõ → hỏi BA muốn làm gì trước khi dispatch.
@@ -73,3 +90,21 @@ Nếu input không khớp rõ → hỏi BA muốn làm gì trước khi dispatch
 - Nếu input thiếu thông tin → nêu assumption rõ ràng, tiếp tục dựa trên những gì đã có
 - Phase 2 và Phase 3 là vòng lặp — không có số lần cố định, chốt khi stakeholder confirm
 - Feedback từ Phase 2 chỉ ảnh hưởng wireframe/UI — không tự thay đổi Epic/Story trừ khi BA yêu cầu
+
+---
+
+## Chế độ vận hành
+
+**GENERATE — Tạo mới:**
+- Output chính là URD/SRS. Epic/Story/AC/Wireframe là phụ trợ, chỉ tạo khi BA yêu cầu rõ
+- Không chặn workflow vì thiếu tài liệu — nêu assumption và tiếp tục
+- KHÔNG bịa thông tin kỹ thuật (Architecture, API, Data, ERD...)
+- Lưu tại `output/[tên_dự_án]/`, version đầu là `v1`, các lần sau tăng `v[N+1]`
+
+**REFINE — Chỉnh sửa:**
+- Chỉ sửa **đúng phần được yêu cầu** — KHÔNG tái tạo toàn bộ tài liệu
+- Giữ nguyên toàn bộ nội dung không liên quan
+
+**REVIEW — Kiểm tra:**
+- Phân loại CRITICAL / MAJOR / MINOR, mỗi vấn đề kèm khuyến nghị có thể hành động được
+- CRITICAL → phải sửa trước khi tiếp tục; quay lại đúng bước có vấn đề, không làm lại toàn bộ

@@ -21,8 +21,12 @@ Trước khi bắt đầu wireframe, kiểm tra file `output/[tên_dự_án]/des
 
 ## Input
 
-- User Stories + Acceptance Criteria (bắt buộc)
+Một trong các dạng sau (không cần đầy đủ):
+- User Stories + Acceptance Criteria (nếu đã có backlog)
+- Solution design + user flow (nếu bỏ qua ba-backlog-agent)
 - Persona / user segment (nếu có từ bước trước)
+
+Nếu input thiếu → nêu assumption rõ, wireframe dựa trên những gì đã có.
 
 ## Nhiệm vụ
 

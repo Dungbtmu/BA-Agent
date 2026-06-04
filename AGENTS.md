@@ -21,30 +21,32 @@ Trước khi tạo hoặc review tài liệu BA, đọc và áp dụng các file
 - `.claude/rules/project-context.md` — bối cảnh BA Agent System, phạm vi BA, cấu trúc thư mục
 - `.claude/rules/ba-persona.md` — tư duy và phong cách Senior BA
 - `.claude/rules/language.md` — yêu cầu về ngôn ngữ tiếng Việt
-- `.claude/rules/ba-workflow.md` — workflow GENERATE / REFINE / REVIEW
-- `.claude/rules/agent-workflow.md` — trình tự phối hợp các BA subagent
-- `.claude/rules/output-schema.md` — tiêu chuẩn đầu ra cho URD/SRS, Wireframe, Epic, User Story và artifact phụ trợ
+- `.claude/rules/agent-workflow.md` — pipeline Phase 1-2-3, intent recognition, chế độ GENERATE/REFINE/REVIEW
+- `.claude/rules/output-schema.md` — danh sách artifact, ID format, traceability chain
 
 Khi tác vụ tương ứng với một vai trò BA chuyên biệt, đọc thêm file phù hợp trong `.claude/agents/`:
 
+- `.claude/agents/ba-research-agent.md`
 - `.claude/agents/ba-clarification-agent.md`
 - `.claude/agents/ba-solution-agent.md`
+- `.claude/agents/ba-devil-advocate-agent.md`
 - `.claude/agents/ba-backlog-agent.md`
 - `.claude/agents/ba-wireframe-agent.md`
-- `.claude/agents/ba-research-agent.md`
 - `.claude/agents/ui-react-agent.md`
 - `.claude/agents/ui-feedback-agent.md`
-- `.claude/agents/ba-qa-agent.md`
 - `.claude/agents/urd-srs-agent.md`
+- `.claude/agents/ba-qa-agent.md`
+- `.claude/agents/ba-postcheck-agent.md`
+- `.claude/agents/ba-process-summary-agent.md`
 
 ## Chế Độ Vận Hành
 
 Với yêu cầu BA mới, đi theo 3 phase sau trừ khi user yêu cầu rõ một phạm vi hẹp hơn:
 
 ```text
-Phase 1: Clarification -> Solution -> [Backlog/Epic/User Story/AC nếu BA yêu cầu]
+Phase 1: Clarification -> Solution -> [Devil's Advocate] -> [Backlog/Epic/User Story/AC nếu BA yêu cầu]
 Phase 2: Wireframe -> React Prototype -> Feedback Triage -> Refine UI
-Phase 3: URD/SRS -> QA Review -> Refine đúng section có issue
+Phase 3: URD/SRS -> QA Review -> Refine đúng section có issue -> Post-check -> Process Summary
 ```
 
 Nguyên tắc xử lý input thiếu:
@@ -64,12 +66,15 @@ Các file `.claude/agents/*.md` là prompt định nghĩa vai trò BA/UI chuyên
 | `ba-research-agent` | `.claude/agents/ba-research-agent.md` | Research domain mới, tạo Domain Brief khi BA chưa biết domain hoặc cần bối cảnh trước khi phân tích |
 | `ba-clarification-agent` | `.claude/agents/ba-clarification-agent.md` | Làm rõ requirement, xác định missing information, assumptions, risks và câu hỏi cho stakeholder |
 | `ba-solution-agent` | `.claude/agents/ba-solution-agent.md` | Đề xuất solution, user flow, edge cases, dependencies và trade-offs |
+| `ba-devil-advocate-agent` | `.claude/agents/ba-devil-advocate-agent.md` | Phản biện chéo solution từ 4 góc nhìn độc lập (User / PO / Dev / Risk) trước khi vào Phase 2 |
 | `ba-backlog-agent` | `.claude/agents/ba-backlog-agent.md` | Chia Epic, User Stories, Acceptance Criteria và dependencies khi BA yêu cầu |
 | `ba-wireframe-agent` | `.claude/agents/ba-wireframe-agent.md` | Phác thảo màn hình, layout, UI flow, component, state và interaction |
 | `ui-react-agent` | `.claude/agents/ui-react-agent.md` | Tạo React prototype để xem trực quan và lấy feedback giao diện |
 | `ui-feedback-agent` | `.claude/agents/ui-feedback-agent.md` | Triage feedback UI, phân loại góp ý và chỉ định sửa đúng phần cần sửa |
 | `urd-srs-agent` | `.claude/agents/urd-srs-agent.md` | Viết tài liệu URD/SRS đầy đủ, dev/test ready |
 | `ba-qa-agent` | `.claude/agents/ba-qa-agent.md` | Review chất lượng, phát hiện issue, kiểm tra traceability và consistency |
+| `ba-postcheck-agent` | `.claude/agents/ba-postcheck-agent.md` | Audit cấu trúc, traceability, naming và version hygiene sau khi ba-qa-agent chấp thuận content |
+| `ba-process-summary-agent` | `.claude/agents/ba-process-summary-agent.md` | Tổng kết quá trình: tạo Decision Log, Assumption Register và Handoff Note cho Dev/Tester |
 
 Nguyên tắc điều phối:
 
@@ -80,7 +85,10 @@ Nguyên tắc điều phối:
 - Nếu subagent phát hiện thông tin thiếu hoặc mâu thuẫn nghiêm trọng, agent chính phải tổng hợp lại thành câu hỏi hoặc finding trước khi tiếp tục.
 - Không dùng subagent để bỏ qua quy trình bắt buộc trong `BA Workflow`.
 - `ba-backlog-agent` là optional. Không tự tạo Epic/User Story/AC nếu BA không yêu cầu và các thông tin hiện có đã đủ để đi tiếp.
+- `ba-devil-advocate-agent` là optional nhưng khuyến nghị sau `ba-solution-agent`. Nếu phán quyết là BLOCK, quay lại `ba-solution-agent` sửa đúng điểm bị challenge; không làm lại toàn bộ solution.
 - Sau khi `urd-srs-agent` viết URD/SRS xong, tự động dùng `ba-qa-agent` review; nếu còn `CRITICAL` thì quay lại sửa đúng section có vấn đề, không viết lại toàn bộ.
+- Sau khi `ba-qa-agent` chốt tài liệu, tự động chạy `ba-postcheck-agent` audit cấu trúc; nếu NEEDS FIX thì sửa đúng chỗ và chạy lại.
+- Sau khi `ba-postcheck-agent` báo READY FOR HANDOFF, chạy `ba-process-summary-agent` để tạo Decision Log, Assumption Register và Handoff Note.
 
 Ví dụ user prompt có thể kích hoạt subagent:
 
@@ -131,6 +139,9 @@ Khi agent hoặc task yêu cầu skill, phải đọc skill tương ứng trư�
 - `.claude/skills/urd-use-case.md` — viết Use Case Specification chi tiết cho URD/SRS section III
 - `.claude/skills/urd-screen-spec.md` — viết đặc tả giao diện chức năng cho URD/SRS section IV
 - `.claude/skills/urd-review-checklist.md` — checklist review chất lượng URD/SRS trước khi chốt
+- `.claude/skills/solution-critique.md` — framework phản biện solution 4 lens (User / Business / Feasibility / Risk)
+- `.claude/skills/document-integrity-check.md` — kiểm tra cấu trúc, traceability, naming và version hygiene của tài liệu
+- `.claude/skills/process-log.md` — trích xuất decision, assumption, scope delta và tạo handoff note
 
 Mapping bắt buộc:
 
@@ -143,6 +154,9 @@ Mapping bắt buộc:
 - `ui-feedback-agent` phải đọc `ui-feedback-triage`.
 - `urd-srs-agent` phải đọc `urd-srs-structure` trước, sau đó đọc các skill section-level tương ứng: `urd-workflow-diagram`, `urd-function-tree`, `urd-permission-matrix`, `urd-sequence-diagram`, `urd-use-case`, `urd-screen-spec`.
 - `ba-qa-agent` phải đọc `urd-review-checklist`, `assumption-risk-analysis` và `requirement-clarification`.
+- `ba-devil-advocate-agent` phải đọc `solution-critique` và `assumption-risk-analysis`.
+- `ba-postcheck-agent` phải đọc `document-integrity-check`.
+- `ba-process-summary-agent` phải đọc `process-log` và `assumption-risk-analysis`.
 
 ## BA Workflow
 

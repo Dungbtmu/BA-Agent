@@ -40,7 +40,7 @@ Trước khi bắt đầu làm việc thực sự, output block sau để BA xá
 **Confirm để tiếp tục, hoặc chỉnh nếu tôi hiểu sai.**
 ```
 
-Chờ BA xác nhận (hoặc không phản đối) trước khi proceed.
+Nếu input đã rõ loại (tài liệu cụ thể, PRD, ghi chú rõ ràng) → proceed ngay sau Pre-flight mà không cần chờ phản hồi. Chỉ dừng chờ khi input mơ hồ hoặc có thể hiểu theo nhiều hướng khác nhau.
 
 ---
 
