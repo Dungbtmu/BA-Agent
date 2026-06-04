@@ -25,12 +25,14 @@ Input (mọi dạng: mô tả thô, ghi chú, tài liệu chưa đầy đủ...)
 
 ```
 [4] ba-wireframe-agent      → phác thảo màn hình + UI flow (text-based)
-    ↕ song song
+   ↓ (wireframe/solution đủ rõ → mới tiếp tục)
 [5] ui-react-agent          → gen React prototype để xem trực quan
    ↓
 [6] ui-feedback-agent       → nhận feedback thô → phân loại → chỉ định sửa đúng chỗ
    ↓ (lặp lại [4][5][6] cho đến khi stakeholder chốt giao diện)
 ```
+
+**Lưu ý Phase 2:** `ui-react-agent` [5] phụ thuộc vào wireframe hoặc solution đã đủ rõ từ [4] hoặc Phase 1 — không chạy song song với [4] ngay từ đầu. Chỉ cho phép chạy song song ở các bước review độc lập (ví dụ: review wireframe và review backlog cùng lúc), không phải bước tạo mới phụ thuộc nhau.
 
 ## Phase 3 — Tài liệu (vòng lặp đến khi chốt)
 

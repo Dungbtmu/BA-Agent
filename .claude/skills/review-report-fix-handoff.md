@@ -6,7 +6,9 @@ Skill này hướng dẫn cách parse bảng handoff trong review report và con
 
 ## Schema finding hợp lệ
 
-Mỗi finding trong section `## Fix Handoff For Target Agent` phải có đủ các trường sau:
+Skill này chấp nhận **2 dạng schema** từ Agent Review Agent:
+
+### Schema 8 cột (đầy đủ)
 
 ```
 Finding ID:          F-001
@@ -19,7 +21,27 @@ Fix Instruction:     [Hướng dẫn cụ thể cần làm]
 Acceptance Criteria: [Điều kiện để xác nhận đã sửa đúng]
 ```
 
-**Trường bắt buộc để APPLY:** `Target File` + `Action Type` + `Fix Instruction` + `Acceptance Criteria`
+### Schema 7 cột (không có cột `Severity`)
+
+```
+Finding ID:          CRITICAL-001 / MAJOR-001 / MINOR-001
+Target Agent System: ba-agent
+Target File:         .claude/agents/[tên-agent].md
+Target Section:      [Tên section hoặc dòng tham chiếu]
+Action Type:         UPDATE / ADD / DELETE / MOVE / ASK_CONFIRM
+Fix Instruction:     [Hướng dẫn cụ thể cần làm]
+Acceptance Criteria: [Điều kiện để xác nhận đã sửa đúng]
+```
+
+Khi gặp schema 7 cột, **derive severity từ prefix của `Finding ID`**:
+- Prefix `CRITICAL-` → Severity = CRITICAL
+- Prefix `MAJOR-` → Severity = MAJOR
+- Prefix `MINOR-` → Severity = MINOR
+- Finding ID không có prefix rõ ràng → đánh dấu ASK_CONFIRM, hỏi BA xác nhận severity trước khi sort.
+
+**Thứ tự sort sau khi derive:** CRITICAL → MAJOR → MINOR → theo Finding ID trong cùng severity.
+
+**Trường bắt buộc để APPLY (áp dụng cho cả 2 dạng):** `Target File` + `Action Type` + `Fix Instruction` + `Acceptance Criteria`
 
 Finding thiếu bất kỳ trường bắt buộc nào → SKIPPED, báo lý do.
 

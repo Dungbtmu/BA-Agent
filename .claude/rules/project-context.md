@@ -38,21 +38,26 @@ Loại tài liệu đầu ra đa dạng, tùy theo yêu cầu: Backlog, Epic, Us
 │   ├── urd-srs-agent.md
 │   ├── ba-qa-agent.md
 │   ├── ba-postcheck-agent.md
-│   └── ba-process-summary-agent.md
+│   ├── ba-process-summary-agent.md
+│   └── ba-agent-fix-agent.md  ← Apply review report từ Agent Review Agent
 ├── rules/                     ← Quy tắc bắt buộc, load mọi session
 │   ├── project-context.md
 │   ├── ba-persona.md
 │   ├── language.md
 │   ├── agent-workflow.md      ← pipeline + intent recognition + chế độ vận hành
-│   └── output-schema.md
+│   ├── output-schema.md
+│   └── review-handoff-policy.md  ← Quy tắc phạm vi sửa khi apply review report
 ├── skills/                    ← Skill chuyên biệt, agent đọc khi cần
 │   ├── [BA skills]            ← problem-framing, requirement-clarification, stakeholder-mapping,
 │   │                             assumption-risk-analysis, context-constraint-analysis,
 │   │                             user-persona-identification, domain-research, solution-critique
 │   ├── [UI skills]            ← react-ui-generation, ui-feedback-triage, wireframe-design-system
-│   └── [URD skills]           ← urd-srs-structure (orchestrator) + 6 skill con theo từng section
-│                                 + urd-review-checklist, document-integrity-check, process-log
+│   ├── [URD skills]           ← urd-srs-structure (orchestrator) + 6 skill con theo từng section
+│   │                             + urd-review-checklist, document-integrity-check, process-log
+│   └── review-report-fix-handoff.md  ← Schema và quy trình parse bảng handoff từ review report
 ├── input/                     ← Tài liệu đầu vào từ PO/stakeholder
+│   └── review-reports/        ← Inbox nhận review report từ Agent Review Agent
+│       └── [tên-report].md
 └── output/                    ← Tài liệu BA tạo ra, tổ chức theo dự án
     └── [tên_dự_án]/
         ├── wireframe/
@@ -60,3 +65,13 @@ Loại tài liệu đầu ra đa dạng, tùy theo yêu cầu: Backlog, Epic, Us
         ├── solution/
         └── process-summary.md
 ```
+
+## Review/Fix Bridge
+
+Hệ thống có bridge để nhận và apply review report từ Agent Review Agent:
+
+- **Inbox report:** `.claude/input/review-reports/[tên-report].md`
+- **Agent xử lý:** `ba-agent-fix-agent` — đọc report, convert thành patch plan, sửa đúng file
+- **Policy:** `.claude/rules/review-handoff-policy.md` — quy tắc allowlist file, điều kiện ASK_CONFIRM
+- **Skill parse:** `.claude/skills/review-report-fix-handoff.md` — schema finding, xử lý từng Action Type
+- **Output:** `.claude/input/review-reports/fix-summary-[tên-report].md` — báo cáo kết quả sau khi apply

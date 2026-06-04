@@ -13,7 +13,14 @@ Quy tắc bắt buộc áp dụng khi `ba-agent-fix-agent` đọc và xử lý r
 ## Phạm vi sửa
 
 - Chỉ sửa file có trong cột `Target File` của bảng handoff
-- Chỉ sửa file thuộc ba-agent system (`.claude/agents/`, `.claude/skills/`, `.claude/rules/`)
+- Chỉ sửa file thuộc ba-agent system theo allowlist sau:
+  - `.claude/agents/` — agent prompt files
+  - `.claude/skills/` — skill prompt files
+  - `.claude/rules/` — rule files
+  - `AGENTS.md` — entrypoint chính của ba-agent system
+  - `README.md` — tài liệu mô tả repo
+  - `CLAUDE.md` — instructions cho Claude Code
+  - `GEMINI.md` — instructions cho Gemini
 - Chỉ xử lý finding có `Target Agent System = ba-agent` — bỏ qua finding nhắm đến agent system khác
 - Không tự mở rộng scope ngoài những gì bảng handoff chỉ định
 - Không tự sửa finding ngoài bảng handoff dù phát hiện vấn đề khác trong quá trình đọc file

@@ -67,6 +67,14 @@ Chờ BA xác nhận trước khi bắt đầu apply.
 Đọc section `## Fix Handoff For Target Agent`. Extract từng finding theo schema 8 trường:
 `Finding ID · Severity · Target Agent System · Target File · Target Section · Action Type · Fix Instruction · Acceptance Criteria`
 
+**Chấp nhận 2 dạng schema:**
+- **Schema 8 cột** (đầy đủ): có cột `Severity` riêng biệt — đọc trực tiếp.
+- **Schema 7 cột** (không có cột `Severity`): derive severity từ prefix của `Finding ID`:
+  - Prefix `CRITICAL-` → Severity = CRITICAL
+  - Prefix `MAJOR-` → Severity = MAJOR
+  - Prefix `MINOR-` → Severity = MINOR
+  - Không có prefix rõ → đánh dấu ASK_CONFIRM, hỏi BA xác nhận severity trước khi sort.
+
 Lọc ngay: bỏ qua finding có `Target Agent System ≠ ba-agent`.
 
 ### Bước 2 — Validate và phân loại
@@ -74,9 +82,12 @@ Lọc ngay: bỏ qua finding có `Target Agent System ≠ ba-agent`.
 Với mỗi finding còn lại:
 - Kiểm tra đủ 4 trường bắt buộc: `Target File` + `Action Type` + `Fix Instruction` + `Acceptance Criteria`
 - Kiểm tra `Target File` tồn tại
+- Kiểm tra `Target File` nằm trong allowlist hợp lệ (xem `review-handoff-policy.md`): `.claude/agents/`, `.claude/skills/`, `.claude/rules/`, `AGENTS.md`, `README.md`, `CLAUDE.md`, `GEMINI.md`
 - Phân loại: **APPLY** / **ASK_CONFIRM** / **SKIPPED**
 
 `DELETE` và `MOVE` tự động là ASK_CONFIRM — không bao giờ thực thi trực tiếp.
+
+Finding có `Target File` tồn tại và nằm trong allowlist → không bị SKIPPED chỉ vì là root file.
 
 ### Bước 3 — Xử lý ASK_CONFIRM trước
 
@@ -112,9 +123,9 @@ Lưu tại: `.claude/input/review-reports/fix-summary-[tên-report].md`
 
 | Finding ID | Severity | Target File | Action Type | Acceptance Criteria | Kết quả |
 |---|---|---|---|---|---|
-| F-001 | CRITICAL | .claude/agents/xxx.md | UPDATE | [Tiêu chí] | MET |
-| F-002 | MAJOR | .claude/skills/yyy.md | ADD | [Tiêu chí] | MET |
-| F-003 | MINOR | .claude/rules/zzz.md | UPDATE | [Tiêu chí] | NOT_MET — [lý do] |
+| F-001 | CRITICAL | <target-agent-file> | UPDATE | [Tiêu chí] | MET |
+| F-002 | MAJOR | <target-skill-file> | ADD | [Tiêu chí] | MET |
+| F-003 | MINOR | <target-rule-file> | UPDATE | [Tiêu chí] | NOT_MET — [lý do] |
 
 ---
 

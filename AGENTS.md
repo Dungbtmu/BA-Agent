@@ -182,7 +182,7 @@ URD/SRS -> QA Review -> Refine đúng section có issue -> Lặp đến khi khô
 - Không chặn workflow chỉ vì thiếu PRD chuẩn; chấp nhận mô tả thô, ghi chú rời, bullet points, PRD, wireframe, backlog hoặc output từ agent khác.
 - Không bịa thông tin kỹ thuật như Architecture, API, Data, Event, ERD chi tiết hoặc infrastructure.
 - Đầu ra mặc định lưu tại `.claude/output/[tên_dự_án]/`; nếu chưa xác định dự án thì hỏi user hoặc dùng tên thư mục phù hợp với input.
-- Với các vòng lặp version, ưu tiên pattern hiện có trong thư mục dự án, ví dụ `output/v1/`, `output/v2/` hoặc `wireframe-v[N].md`, `urd-srs-v[N].md`.
+- Với các vòng lặp version, ưu tiên pattern hiện có trong thư mục dự án, ví dụ `.claude/output/[tên_dự_án]/v1/`, `.claude/output/[tên_dự_án]/v2/` hoặc `wireframe-v[N].md`, `urd-srs-v[N].md`. Nếu dự án hiện hữu đang dùng pattern cũ `output/v1/` thì giữ nguyên pattern đó và chỉ tăng version theo cách đang dùng.
 
 Với tác vụ `REFINE`:
 
