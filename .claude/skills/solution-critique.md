@@ -123,7 +123,7 @@ Với mỗi lens, áp dụng tư duy **"Điều gì có thể sai?"** thay vì *
 
 ## Rules
 
-- Phán biện phải bám vào nội dung solution thực tế — không phán biện giả định
+- Phản biện phải bám vào nội dung solution thực tế — không phản biện giả định
 - Câu hỏi phải cụ thể, có thể trả lời được — không hỏi kiểu "có chắc không?"
 - Mỗi issue phải có khuyến nghị hành động — không chỉ nêu vấn đề
 - Không đánh giá chất lượng kỹ thuật (code, DB, infra) — đó là phạm vi SA/Dev

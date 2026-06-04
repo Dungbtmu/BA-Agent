@@ -49,7 +49,7 @@ Input (mọi dạng: mô tả thô, ghi chú, tài liệu chưa đầy đủ...)
    └─ READY FOR HANDOFF → tiếp tục
    ↓
 [10] ba-process-summary-agent → tổng kết quá trình, tạo Decision Log + Assumption Register + Handoff Note
-      → lưu file `process-summary.md` tại `output/[tên_dự_án]/`
+      → lưu file `process-summary.md` tại `.claude/output/[tên_dự_án]/`
 ```
 
 **Quy tắc vòng lặp Phase 3:**
@@ -78,6 +78,7 @@ Khi BA không mention agent cụ thể, nhận dạng intent từ input và tự
 | "kiểm tra file", "audit cấu trúc", "traceability", "sẵn sàng bàn giao chưa" | `ba-postcheck-agent` |
 | "tổng kết", "handoff note", "decision log", "tóm tắt quá trình" | `ba-process-summary-agent` |
 | "viết Epic", "viết User Story", "chia backlog", "AC" | `ba-backlog-agent` |
+| "apply review report", "sửa theo report", "fix theo review", "ba-agent-fix" | `ba-agent-fix-agent` |
 
 Nếu input không khớp rõ → hỏi BA muốn làm gì trước khi dispatch.
 
@@ -99,7 +100,7 @@ Nếu input không khớp rõ → hỏi BA muốn làm gì trước khi dispatch
 - Output chính là URD/SRS. Epic/Story/AC/Wireframe là phụ trợ, chỉ tạo khi BA yêu cầu rõ
 - Không chặn workflow vì thiếu tài liệu — nêu assumption và tiếp tục
 - KHÔNG bịa thông tin kỹ thuật (Architecture, API, Data, ERD...)
-- Lưu tại `output/[tên_dự_án]/`, version đầu là `v1`, các lần sau tăng `v[N+1]`
+- Lưu tại `.claude/output/[tên_dự_án]/`, version đầu là `v1`, các lần sau tăng `v[N+1]`
 
 **REFINE — Chỉnh sửa:**
 - Chỉ sửa **đúng phần được yêu cầu** — KHÔNG tái tạo toàn bộ tài liệu

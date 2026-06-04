@@ -8,7 +8,7 @@ tools: []
 
 ## Mục tiêu
 
-Đảm bảo wireframe và React prototype nhất quán về layout, component, naming và states — bất kể dự án nào. Chuẩn này áp dụng mặc định; dự án có thể override bằng file `output/[tên_dự_án]/design-guideline.md`.
+Đảm bảo wireframe và React prototype nhất quán về layout, component, naming và states — bất kể dự án nào. Chuẩn này áp dụng mặc định; dự án có thể override bằng file `.claude/output/[tên_dự_án]/design-guideline.md`.
 
 ---
 
@@ -16,7 +16,7 @@ tools: []
 
 Trước khi bắt đầu wireframe hoặc gen React prototype:
 
-1. Kiểm tra `output/[tên_dự_án]/design-guideline.md` có tồn tại không
+1. Kiểm tra `.claude/output/[tên_dự_án]/design-guideline.md` có tồn tại không
 2. Nếu **có** → đọc file đó, dùng làm chuẩn chính; chuẩn chung bên dưới chỉ áp dụng cho phần không được override
 3. Nếu **không có** → áp dụng toàn bộ chuẩn chung bên dưới
 
@@ -223,7 +223,7 @@ Mọi màn hình/component phải mô tả đủ các state sau (nếu áp dụn
 ## Cách Dùng
 
 1. Đọc skill này trước khi bắt đầu wireframe hoặc gen React prototype
-2. Kiểm tra `output/[tên_dự_án]/design-guideline.md` — nếu có thì ưu tiên file đó
+2. Kiểm tra `.claude/output/[tên_dự_án]/design-guideline.md` — nếu có thì ưu tiên file đó
 3. Áp dụng chuẩn chung cho mọi phần không được override
 4. Khi mô tả component trong wireframe: phải ghi đủ states theo bảng States Bắt Buộc
 5. Khi gen React: dùng naming convention và component patterns ở trên

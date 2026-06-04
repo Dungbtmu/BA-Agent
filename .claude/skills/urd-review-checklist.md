@@ -64,7 +64,7 @@ Cung cấp checklist có cấu trúc để review URD/SRS một cách toàn di�
 ### Section IV — Giao diện chức năng
 
 - [ ] Mỗi UC có ít nhất 1 màn hình tương ứng không?
-- [ ] Bảng component có đủ 4 cột: Định dạng, Bắt buộc, Mặc định, Mô tả không?
+- [ ] Bảng component có đủ 6 cột: TT, Tên thành phần, Định dạng, Bắt buộc, Mặc định, Mô tả không?
 - [ ] Validation rule có đủ từ **cơ bản** đến **nâng cao** không?
   - Cơ bản: bắt buộc, định dạng, độ dài tối thiểu/tối đa
   - Nâng cao: ràng buộc liên field, điều kiện nghiệp vụ, phụ thuộc trạng thái

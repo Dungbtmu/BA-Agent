@@ -50,8 +50,8 @@ C.    Yêu cầu phi chức năng
 
 Quét toàn bộ tài liệu tìm chuỗi `[Cần xác nhận`:
 - Mỗi lần xuất hiện = 1 mục chưa được giải quyết
-- FAIL nếu còn bất kỳ `[Cần xác nhận: ...]` nào trong tài liệu
-- Liệt kê đầy đủ: section chứa nó, nội dung của placeholder
+- WARN (không phải FAIL) nếu còn `[Cần xác nhận: ...]` trong tài liệu — đây là placeholder hợp lệ, để BA quyết định có handoff với các mục chưa xác nhận không
+- Liệt kê đầy đủ: section chứa nó, nội dung của placeholder, số lượng
 
 ### Rules
 
@@ -101,7 +101,7 @@ Quản lý thanh toán             ← KHÔNG phải lá (có con)
       2.1.2 Thanh toán COD      ← LÁ
   2.2 Hoàn tiền                ← LÁ
 
-→ Tổng chức năng lá: 5 (1.1, 1.2, 1.3, 2.1.1, 2.1.2, 2.2)
+→ Tổng chức năng lá: 6 (1.1, 1.2, 1.3, 2.1.1, 2.1.2, 2.2)
 ```
 
 ### Đếm Permission Matrix

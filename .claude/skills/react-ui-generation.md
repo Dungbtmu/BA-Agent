@@ -13,7 +13,7 @@ Chuyển wireframe text-based của BA thành React component có thể chạy �
 ## Input
 
 - `wireframe`: nội dung wireframe text-based (component list, layout, interactions, states)
-- `design_system`: optional — tên thư viện UI đang dùng (Tailwind, shadcn/ui, MUI, Ant Design...) — nếu không có, xem `output/[tên_dự_án]/design-guideline.md` hoặc dùng chuẩn từ `wireframe-design-system.md`
+- `design_system`: optional — tên thư viện UI đang dùng (Tailwind, shadcn/ui, MUI, Ant Design...) — nếu không có, xem `.claude/output/[tên_dự_án]/design-guideline.md` hoặc dùng chuẩn từ `wireframe-design-system.md`
 - `existing_components`: optional — danh sách component đã có để tái sử dụng
 
 ## Output

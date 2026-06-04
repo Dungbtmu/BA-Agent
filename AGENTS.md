@@ -23,6 +23,7 @@ Trước khi tạo hoặc review tài liệu BA, đọc và áp dụng các file
 - `.claude/rules/language.md` — yêu cầu về ngôn ngữ tiếng Việt
 - `.claude/rules/agent-workflow.md` — pipeline Phase 1-2-3, intent recognition, chế độ GENERATE/REFINE/REVIEW
 - `.claude/rules/output-schema.md` — danh sách artifact, ID format, traceability chain
+- `.claude/rules/review-handoff-policy.md` — quy tắc phạm vi sửa khi apply review report từ Agent Review Agent
 
 Khi tác vụ tương ứng với một vai trò BA chuyên biệt, đọc thêm file phù hợp trong `.claude/agents/`:
 
@@ -38,6 +39,7 @@ Khi tác vụ tương ứng với một vai trò BA chuyên biệt, đọc thêm
 - `.claude/agents/ba-qa-agent.md`
 - `.claude/agents/ba-postcheck-agent.md`
 - `.claude/agents/ba-process-summary-agent.md`
+- `.claude/agents/ba-agent-fix-agent.md`
 
 ## Chế Độ Vận Hành
 
@@ -75,6 +77,7 @@ Các file `.claude/agents/*.md` là prompt định nghĩa vai trò BA/UI chuyên
 | `ba-qa-agent` | `.claude/agents/ba-qa-agent.md` | Review chất lượng, phát hiện issue, kiểm tra traceability và consistency |
 | `ba-postcheck-agent` | `.claude/agents/ba-postcheck-agent.md` | Audit cấu trúc, traceability, naming và version hygiene sau khi ba-qa-agent chấp thuận content |
 | `ba-process-summary-agent` | `.claude/agents/ba-process-summary-agent.md` | Tổng kết quá trình: tạo Decision Log, Assumption Register và Handoff Note cho Dev/Tester |
+| `ba-agent-fix-agent` | `.claude/agents/ba-agent-fix-agent.md` | Apply review report từ Agent Review Agent: đọc report tại `.claude/input/review-reports/`, convert thành patch plan, sửa đúng file, báo cáo kết quả |
 
 Nguyên tắc điều phối:
 
@@ -157,6 +160,7 @@ Mapping bắt buộc:
 - `ba-devil-advocate-agent` phải đọc `solution-critique` và `assumption-risk-analysis`.
 - `ba-postcheck-agent` phải đọc `document-integrity-check`.
 - `ba-process-summary-agent` phải đọc `process-log` và `assumption-risk-analysis`.
+- `ba-agent-fix-agent` phải đọc `review-handoff-policy` (rules) và `review-report-fix-handoff` (skill).
 
 ## BA Workflow
 

@@ -77,6 +77,10 @@ Nếu input chưa đủ rõ → nêu assumption rõ ràng trước khi đề xu�
 - [A1] Giả định rằng [...]. Nếu sai, cần điều chỉnh [...].
 ```
 
+## Lưu file
+
+Sau khi hoàn thành, lưu output tại: `.claude/output/[tên_dự_án]/solution/solution-design.md`
+
 ## Nguyên tắc
 
 - Không đề xuất solution khi chưa rõ user — phải có persona hoặc ghi assumption rõ

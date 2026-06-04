@@ -68,6 +68,8 @@ Mọi dạng input đều được chấp nhận:
 - Những gì chưa rõ
 - Danh sách câu hỏi cần hỏi (ưu tiên câu hỏi critical trước)
 
+Lưu output tại: `.claude/output/[tên_dự_án]/solution/clarification.md`
+
 ## Nguyên tắc
 
 - KHÔNG đưa solution vội

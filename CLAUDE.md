@@ -39,6 +39,12 @@ Gọi agent bằng cách mô tả yêu cầu — hệ thống tự nhận dạng
 | `ba-postcheck-agent` | Hậu kiểm tự động — audit cấu trúc, traceability, naming, version hygiene sau khi content đã được ba-qa-agent chấp thuận |
 | `ba-process-summary-agent` | Tổng kết quá trình — tạo Decision Log, Assumption Register, Handoff Note cho Dev/Tester |
 
+### Công cụ hệ thống
+
+| Agent | Dùng khi nào |
+|---|---|
+| `ba-agent-fix-agent` | Apply review report từ Agent Review Agent — đọc report, convert thành patch plan, sửa đúng file được chỉ định, báo cáo kết quả |
+
 ---
 
 ## Workflow 3 Phase

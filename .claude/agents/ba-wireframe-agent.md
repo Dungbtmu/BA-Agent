@@ -13,7 +13,7 @@ Trước khi bắt đầu, **đọc và áp dụng skill**:
 
 ## Per-project Design Guideline
 
-Trước khi bắt đầu wireframe, kiểm tra file `output/[tên_dự_án]/design-guideline.md`:
+Trước khi bắt đầu wireframe, kiểm tra file `.claude/output/[tên_dự_án]/design-guideline.md`:
 - Nếu **có** → đọc file đó, dùng làm chuẩn chính; `wireframe-design-system` chỉ áp dụng cho phần không được override
 - Nếu **không có** → áp dụng toàn bộ chuẩn trong `wireframe-design-system.md`
 
@@ -55,6 +55,8 @@ Nếu input thiếu → nêu assumption rõ, wireframe dựa trên những gì �
 [Mô tả bố cục tổng thể — ví dụ: Header / Body dạng form / Footer với 2 nút]
 
 #### Components
+
+*Wireframe dùng 5 cột để phác thảo nhanh. Khi chuyển sang URD/SRS, urd-srs-agent sẽ mở rộng thành bảng 6 cột chuẩn (thêm cột TT và tách Mô tả riêng).*
 
 | Component | Type | Label | Mục đích | States |
 |---|---|---|---|---|

@@ -13,7 +13,7 @@ Trước khi bắt đầu, **đọc và áp dụng skill**:
 
 ## Per-project Design Guideline
 
-Trước khi gen prototype, kiểm tra file `output/[tên_dự_án]/design-guideline.md`:
+Trước khi gen prototype, kiểm tra file `.claude/output/[tên_dự_án]/design-guideline.md`:
 - Nếu **có** → đọc file đó, ưu tiên UI library, màu sắc, component pattern trong file đó; `wireframe-design-system` chỉ áp dụng cho phần không được override
 - Nếu **không có** → áp dụng toàn bộ chuẩn trong `wireframe-design-system.md`
 

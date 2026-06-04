@@ -69,6 +69,10 @@ Nếu input thiếu → nêu assumption rõ, viết backlog dựa trên những 
 - Blocks: [Story nào phụ thuộc vào Story này]
 ```
 
+## Lưu file
+
+Lưu output tại: `.claude/output/[tên_dự_án]/backlog/backlog.md`
+
 ## Nguyên tắc
 
 - Tên Actor phải nhất quán xuyên suốt — không lúc "Giáo viên" lúc "Teacher"

@@ -14,7 +14,7 @@ tools: []
 
 ## Nguồn dữ liệu và cách đọc từng artifact
 
-### 1. Domain Brief (`output/[dự_án]/research/domain-brief.md`)
+### 1. Domain Brief (`.claude/output/[tên_dự_án]/research/domain-brief.md`)
 
 **Đọc để tìm:**
 - Assumption ban đầu về domain mà BA chấp nhận để bắt đầu
@@ -25,7 +25,7 @@ tools: []
 
 ---
 
-### 2. Clarification output (`output/[dự_án]/solution/` hoặc notes từ ba-clarification-agent)
+### 2. Clarification output (`.claude/output/[tên_dự_án]/solution/` hoặc notes từ ba-clarification-agent)
 
 **Đọc để tìm:**
 - **Scope ban đầu** — tính năng nào được đề cập lần đầu; đây là baseline để so sánh scope delta
@@ -37,7 +37,7 @@ tools: []
 
 ---
 
-### 3. Solution design (`output/[dự_án]/solution/`)
+### 3. Solution design (`.claude/output/[tên_dự_án]/solution/`)
 
 **Đọc để tìm:**
 - **Quyết định về hướng giải pháp** — BA chọn approach A, từ chối approach B → ghi vào Decision Log
@@ -49,7 +49,7 @@ tools: []
 
 ---
 
-### 4. Wireframe (`output/[dự_án]/wireframe/`)
+### 4. Wireframe (`.claude/output/[tên_dự_án]/wireframe/`)
 
 **Đọc để tìm:**
 - **Màn hình bị defer** — có trong wireframe v1 nhưng biến mất ở version sau
@@ -61,7 +61,7 @@ tools: []
 
 ---
 
-### 5. URD/SRS version cuối (`output/[dự_án]/urd/urd-srs-v[N].md`)
+### 5. URD/SRS version cuối (`.claude/output/[tên_dự_án]/urd/urd-srs-v[N].md`)
 
 **Đọc để tìm:**
 - **Scope thực tế** — Function Tree là nguồn scope cuối chuẩn nhất
@@ -78,7 +78,7 @@ tools: []
 
 ---
 
-### 6. QA report (`output/[dự_án]/urd/qa-report-v[N].md`)
+### 6. QA report (`.claude/output/[tên_dự_án]/urd/qa-report-v[N].md`)
 
 **Đọc để tìm:**
 - **CRITICAL issues đã được sửa** → xác nhận tài liệu đã update
@@ -88,7 +88,7 @@ tools: []
 
 ---
 
-### 7. Postcheck report (`output/[dự_án]/urd/postcheck-report.md`)
+### 7. Postcheck report (`.claude/output/[tên_dự_án]/urd/postcheck-report.md`)
 
 **Đọc để tìm:**
 - **Kết luận READY FOR HANDOFF** — xác nhận điều kiện bàn giao đã đủ chưa

@@ -39,6 +39,12 @@ Dưới đây là các vai trò/subagent được định nghĩa trong thư mụ
 | `ba-postcheck-agent` | [ba-postcheck-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-postcheck-agent.md) | [document-integrity-check.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/document-integrity-check.md) | Hậu kiểm tự động — audit cấu trúc, traceability, naming và version hygiene sau khi `ba-qa-agent` chấp thuận content. |
 | `ba-process-summary-agent` | [ba-process-summary-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-process-summary-agent.md) | [process-log.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/process-log.md), [assumption-risk-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/assumption-risk-analysis.md) | Tổng kết toàn bộ BA session — tạo Decision Log, Assumption Register và Handoff Note cho Dev/Tester. |
 
+### Công cụ hệ thống
+
+| Vai trò | File hướng dẫn | Kỹ năng liên quan (Skills) | Dùng khi nào |
+|---|---|---|---|
+| `ba-agent-fix-agent` | [ba-agent-fix-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-agent-fix-agent.md) | [review-report-fix-handoff.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/review-report-fix-handoff.md) | Apply review report từ Agent Review Agent — đọc report tại `.claude/input/review-reports/`, sửa đúng file được chỉ định, báo cáo kết quả. |
+
 ---
 
 ## 2. Quy trình Phối hợp 3 Phase
@@ -84,7 +90,7 @@ Có thể linh hoạt bắt đầu từ bất kỳ phase nào nếu đã có s�
 ## 3. Quy tắc & Chỉ dẫn dành riêng cho Gemini (Antigravity)
 
 ### Nạp Chỉ dẫn Nghiệp vụ & Kỹ năng
-- Trước khi thực hiện bất kỳ tác vụ nào liên quan đến BA, Gemini **bắt buộc** phải đọc file [AGENTS.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/AGENTS.md) và các quy tắc chung trong thư mục [.claude/rules/](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/rules/). Lưu ý: `ba-workflow.md` đã được gộp vào `agent-workflow.md` — không còn tồn tại riêng.
+- Trước khi thực hiện bất kỳ tác vụ nào liên quan đến BA, Gemini **bắt buộc** phải đọc file [AGENTS.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/AGENTS.md) và các quy tắc chung trong thư mục [.claude/rules/](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/rules/).
 - Đọc đúng file kỹ năng tương ứng trong thư mục [.claude/skills/](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/) trước khi bắt đầu tạo hoặc chỉnh sửa bất kỳ phần nào của tài liệu đầu ra.
 
 ### Quy định về Ngôn ngữ & Định dạng

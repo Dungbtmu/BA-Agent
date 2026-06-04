@@ -41,7 +41,7 @@ Trước khi bắt đầu phản biện, output block sau để BA xác nhận:
 **Confirm để tiếp tục, hoặc chỉ định phạm vi nếu cần.**
 ```
 
-Chờ BA xác nhận trước khi bắt đầu phản biện.
+Nếu solution đã rõ ràng và BA không yêu cầu giới hạn phạm vi → proceed ngay sau Pre-flight mà không cần chờ phản hồi. Chỉ dừng chờ khi BA chỉ định phạm vi phản biện hẹp hơn.
 
 ---
 
@@ -54,7 +54,7 @@ Output từ `ba-solution-agent` — bao gồm:
 - Trade-offs & Alternatives
 - Assumptions
 
-Nếu input chưa có solution rõ ràng → yêu cầu BA chạy `ba-solution-agent` trước. Không phán biện input thô chưa qua solution design.
+Nếu input chưa có solution rõ ràng → yêu cầu BA chạy `ba-solution-agent` trước. Không phản biện input thô chưa qua solution design.
 
 ## Nhiệm vụ
 
@@ -113,7 +113,7 @@ Nếu input chưa có solution rõ ràng → yêu cầu BA chạy `ba-solution-a
 
 ## Danh sách Issues
 
-### BLOCKING — Không thể tiếp tục Phase 2 nếu chưa giải quyết
+### BLOCK — Không thể tiếp tục Phase 2 nếu chưa giải quyết
 
 **[BL-01]** [Mô tả vấn đề cụ thể]
 - Phát hiện từ góc nhìn: [Người dùng / PO / Dev / Risk]
@@ -156,7 +156,7 @@ Nếu input chưa có solution rõ ràng → yêu cầu BA chạy `ba-solution-a
 
 ## Rules
 
-- Phán biện phải cụ thể và dựa trên evidence từ solution — không phán biện chung chung
+- Phản biện phải cụ thể và dựa trên evidence từ solution — không phản biện chung chung
 - Mỗi issue phải có khuyến nghị hành động cụ thể — không chỉ nêu vấn đề
 - BLOCKING chỉ dùng khi solution sẽ fail hoặc không thể triển khai nếu bỏ qua — không escalate MAJOR thành BLOCKING
 - Không đề xuất redesign toàn bộ solution — chỉ chỉ ra điểm cụ thể cần điều chỉnh

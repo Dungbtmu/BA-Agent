@@ -39,7 +39,8 @@ Trước khi bắt đầu, output block sau để BA xác nhận:
 **Confirm để tiếp tục.**
 ```
 
-Chờ BA xác nhận trước khi bắt đầu audit.
+Nếu được gọi tự động sau `ba-qa-agent` (trong pipeline Phase 3) → bỏ qua bước Pre-flight, bắt đầu audit ngay với file URD/SRS phiên bản mới nhất.
+Nếu BA gọi trực tiếp → hiển thị Pre-flight và chờ xác nhận.
 
 ---
 
@@ -163,6 +164,10 @@ Quét toàn bộ tài liệu tìm:
 ```
 
 ---
+
+## Lưu file
+
+Sau khi audit xong, lưu report tại: `.claude/output/[tên_dự_án]/urd/postcheck-report.md`
 
 ## Nguyên tắc
 

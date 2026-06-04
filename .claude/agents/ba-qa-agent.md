@@ -46,7 +46,8 @@ Trước khi bắt đầu review, output block sau để BA xác nhận:
 **Confirm để tiếp tục, hoặc chỉ định trọng tâm review nếu cần.**
 ```
 
-Chờ BA xác nhận trước khi bắt đầu review.
+Nếu được gọi tự động sau `urd-srs-agent` (trong pipeline Phase 3) → bỏ qua bước Pre-flight, bắt đầu review ngay với file URD/SRS vừa tạo.
+Nếu BA gọi trực tiếp → hiển thị Pre-flight và chờ xác nhận.
 
 ---
 
@@ -112,6 +113,11 @@ Review toàn bộ theo các chiều sau:
 - MINOR: [số lượng] issues
 - Đánh giá tổng thể: [Sẵn sàng tiếp tục / Cần sửa trước / Cần làm lại]
 ```
+
+## Lưu file
+
+Sau khi review xong, lưu report tại: `.claude/output/[tên_dự_án]/urd/qa-report-v[N].md`
+(N tương ứng với version URD/SRS đang review)
 
 ## Nguyên tắc
 
