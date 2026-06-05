@@ -89,4 +89,7 @@ Dựa trên những gì đã research, đề xuất 5–10 câu hỏi BA nên h�
 - **Thực tế** — ưu tiên thông tin áp dụng được cho dự án VN/SEA, không chỉ lý thuyết global
 - **Ngắn gọn** — Domain Brief không phải báo cáo học thuật; mỗi mục tối đa 5–7 bullet points
 - **Dẫn nguồn** — ghi URL nguồn cho thông tin quan trọng để BA có thể đọc thêm
-- **Kết nối sang bước tiếp** — cuối file ghi rõ: "Bước tiếp theo: dùng file này làm input cho `ba-clarification-agent`"
+- **Kết nối sang bước tiếp** — cuối file ghi rõ:
+
+> "Bước tiếp theo: đưa file này **cùng với input từ client** (mô tả dự án, PRD sơ bộ, ghi chú buổi họp...) vào `ba-clarification-agent` cùng một lúc.
+> `ba-clarification-agent` sẽ tự động chạy `domain-gap-analysis` để so sánh domain điển hình với yêu cầu thực tế của client trước khi đặt câu hỏi clarify."

@@ -60,6 +60,9 @@ Loại tài liệu đầu ra đa dạng, tùy theo yêu cầu: Backlog, Epic, Us
 │       └── [tên-report].md
 └── output/                    ← Tài liệu BA tạo ra, tổ chức theo dự án
     └── [tên_dự_án]/
+        ├── research/          ← Output từ ba-research-agent và domain-gap-analysis
+        │   ├── domain-brief.md
+        │   └── domain-gap-analysis.md   ← (nếu có Domain Brief + client input)
         ├── wireframe/
         ├── urd/
         ├── solution/

@@ -12,6 +12,14 @@ Trước khi bắt đầu, **đọc và áp dụng các skill**:
 - `.claude/skills/problem-framing.md` — xác định và chuẩn hóa bài toán
 - `.claude/skills/requirement-clarification.md` — phát hiện điểm chưa rõ, thiếu thông tin, mâu thuẫn
 
+## Skill tùy chọn — dùng khi có Domain Brief
+
+Nếu trong input có Domain Brief (file `domain-brief.md` từ `ba-research-agent`), **đọc và chạy thêm**:
+- `.claude/skills/domain-gap-analysis.md` — so sánh domain điển hình vs yêu cầu thực tế của client; output là danh sách gap có độ ưu tiên, dùng để định hướng câu hỏi clarify
+
+Thứ tự áp dụng khi có Domain Brief: `domain-gap-analysis` → `problem-framing` → `requirement-clarification`
+Gap CRITICAL từ `domain-gap-analysis` phải được đưa vào danh sách câu hỏi CRITICAL, không được bỏ qua.
+
 ---
 
 ## Pre-flight summary
@@ -29,10 +37,15 @@ Trước khi bắt đầu làm việc thực sự, output block sau để BA xá
 [ ] Tài liệu có sẵn (PRD, email, ghi chú...) → sẽ dùng input-analysis trước
 [ ] Kết hợp cả hai
 
+**Domain Brief:**
+[ ] Có — sẽ chạy domain-gap-analysis trước để tìm gap giữa domain điển hình và yêu cầu client
+[ ] Không có — bỏ qua bước này
+
 **Tôi sẽ làm:**
-1. [Bước 1 — ví dụ: Trích xuất requirement từ tài liệu]
-2. [Bước 2 — ví dụ: Xác định missing information và assumption]
-3. [Bước 3 — ví dụ: Đặt câu hỏi clarify theo thứ tự CRITICAL → MAJOR → MINOR]
+1. [Bước 1 — ví dụ: Phân tích gap Domain Brief vs yêu cầu client (nếu có Domain Brief)]
+2. [Bước 2 — ví dụ: Trích xuất requirement từ tài liệu]
+3. [Bước 3 — ví dụ: Xác định missing information và assumption]
+4. [Bước 4 — ví dụ: Đặt câu hỏi clarify theo thứ tự CRITICAL → MAJOR → MINOR]
 
 **Assumption ban đầu (nếu có):**
 - [Assumption 1 — hoặc "Chưa có assumption, cần đọc input trước"]

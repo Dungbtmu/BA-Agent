@@ -8,8 +8,8 @@
 Input (mọi dạng: mô tả thô, ghi chú, tài liệu chưa đầy đủ...)
    ↓
 [0] ba-research-agent          → research domain mới, tạo Domain Brief  *(optional — chỉ khi BA chưa biết domain)*
-   ↓
-[1] ba-clarification-agent     → làm rõ yêu cầu, đặt câu hỏi clarify
+   ↓ (đưa Domain Brief + input từ client vào cùng lúc)
+[1] ba-clarification-agent     → nếu có Domain Brief: chạy domain-gap-analysis trước → làm rõ yêu cầu, đặt câu hỏi clarify dựa trên gap
    ↓ (nếu còn câu hỏi CRITICAL → dừng hỏi BA/PO trước)
 [2] ba-solution-agent          → đề xuất solution + user flow
    ↓

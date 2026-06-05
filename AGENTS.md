@@ -127,6 +127,7 @@ Khi agent hoặc task yêu cầu skill, phải đọc skill tương ứng trư�
 - `.claude/skills/requirement-clarification.md` — làm rõ requirement
 - `.claude/skills/problem-framing.md` — đóng khung bài toán
 - `.claude/skills/domain-research.md` — research domain mới, tổng hợp bối cảnh và thuật ngữ nghiệp vụ
+- `.claude/skills/domain-gap-analysis.md` — so sánh domain điển hình (từ Domain Brief) với yêu cầu thực tế của client; output là danh sách gap CRITICAL/MAJOR/MINOR để định hướng câu hỏi clarify
 - `.claude/skills/stakeholder-mapping.md` — xác định stakeholder
 - `.claude/skills/context-constraint-analysis.md` — phân tích context và ràng buộc
 - `.claude/skills/assumption-risk-analysis.md` — xác định assumption và risk
@@ -149,7 +150,7 @@ Khi agent hoặc task yêu cầu skill, phải đọc skill tương ứng trư�
 Mapping bắt buộc:
 
 - `ba-research-agent` phải đọc `domain-research`.
-- `ba-clarification-agent` phải đọc `input-analysis` (khi input là tài liệu có sẵn), `problem-framing` và `requirement-clarification`.
+- `ba-clarification-agent` phải đọc `input-analysis` (khi input là tài liệu có sẵn), `problem-framing` và `requirement-clarification`. Khi có Domain Brief, phải đọc thêm `domain-gap-analysis` và chạy trước các skill còn lại.
 - `ba-solution-agent` phải đọc `user-persona-identification`, `stakeholder-mapping`, `assumption-risk-analysis`, `context-constraint-analysis`.
 - `ba-backlog-agent` phải đọc `requirement-clarification` và `user-persona-identification`.
 - `ba-wireframe-agent` phải đọc `wireframe-design-system` và `ui-feedback-triage`.

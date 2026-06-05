@@ -25,6 +25,18 @@ tools: []
 
 ---
 
+### 1b. Domain Gap Analysis (`.claude/output/[tên_dự_án]/research/domain-gap-analysis.md`) *(nếu có)*
+
+**Đọc để tìm:**
+- **Gap CRITICAL đã được resolve** — quyết định BA chọn hướng nào để xử lý gap → ghi vào Decision Log
+- **Gap CRITICAL chưa được resolve** → ghi vào open questions
+- **Assumption phát sinh từ gap** — những gì BA giả định để lấp gap mà không có xác nhận từ client → ghi vào Assumption Register (loại Unverified hoặc Risky)
+- **Sub-domain cần research thêm** đã được note nhưng chưa thực hiện → ghi vào open questions
+
+**Không đọc để tìm:** Nội dung mô tả domain điển hình (chỉ quan tâm đến kết quả gap, không phải bảng so sánh)
+
+---
+
 ### 2. Clarification output (`.claude/output/[tên_dự_án]/solution/` hoặc notes từ ba-clarification-agent)
 
 **Đọc để tìm:**

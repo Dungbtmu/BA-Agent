@@ -70,6 +70,7 @@ Chờ BA xác nhận trước khi bắt đầu.
 | Artifact | Đọc để trích xuất |
 |---|---|
 | `research/domain-brief.md` | Assumption ban đầu về domain; thuật ngữ đã được xác lập |
+| `research/domain-gap-analysis.md` *(nếu có)* | Gap giữa domain điển hình và yêu cầu client; quyết định resolve gap như thế nào; assumption phát sinh từ gap |
 | `solution/` (clarification output) | Scope ban đầu; câu hỏi CRITICAL đã được trả lời và chưa trả lời; assumption đầu kỳ |
 | `solution/` (solution design) | Quyết định về hướng giải pháp; trade-off đã được chọn; alternatives bị từ chối |
 | `wireframe/` | Quyết định về UI/UX; màn hình bị defer; thay đổi so với wireframe ban đầu |
