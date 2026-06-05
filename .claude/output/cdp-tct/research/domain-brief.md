@@ -192,11 +192,11 @@ CDP không chỉ là "lưu dữ liệu" — 6 use case sau đây có giá trị 
 
 ### UC-02: Phân khúc và giữ chân khách hàng TMĐT (Anti-Churn)
 
-**Vấn đề:** VNPost không biết shipper TMĐT nào đang có xu hướng chuyển sang GHN/GHTK cho đến khi họ đã rời đi.
+**Vấn đề:** VNPost không biết doanh nghiệp TMĐT (KHL) nào đang có xu hướng chuyển sang GHN/GHTK cho đến khi họ đã rời đi.
 
 **CDP làm gì:** Phát hiện dấu hiệu sớm — sụt giảm sản lượng gửi hàng so với 4–8 tuần trước; tăng tỷ lệ khiếu nại; dừng tạo đơn trên Portal KHL. Tự động đưa vào phân khúc "at-risk" và kích hoạt chiến dịch giữ chân (ưu đãi cước, gọi điện chăm sóc).
 
-**Outcome:** Nghiên cứu toàn cầu cho thấy tăng 5% tỷ lệ giữ chân có thể tăng 25–95% lợi nhuận. Với VNPost: mỗi shipper TMĐT lớn mang giá trị hàng trăm triệu VND/tháng.
+**Outcome:** Nghiên cứu toàn cầu cho thấy tăng 5% tỷ lệ giữ chân có thể tăng 25–95% lợi nhuận. Với VNPost: mỗi doanh nghiệp TMĐT (KHL) lớn mang giá trị hàng trăm triệu VND/tháng.
 
 ---
 
@@ -216,8 +216,8 @@ CDP không chỉ là "lưu dữ liệu" — 6 use case sau đây có giá trị 
 
 **CDP làm gì:**
 - Phân tích lịch sử người nhận: địa chỉ có hay xảy ra không phát được không? SĐT có thay đổi thường xuyên không?
-- Phân tích người gửi: tỷ lệ hoàn của shipper cụ thể có cao bất thường không? (dấu hiệu hàng kém chất lượng hoặc fraud)
-- Tạo "địa chỉ rủi ro cao" và "shipper rủi ro cao" để cảnh báo trước khi nhận đơn hoặc điều chỉnh điều khoản
+- Phân tích người gửi: tỷ lệ hoàn của người gửi/doanh nghiệp cụ thể có cao bất thường không? (dấu hiệu hàng kém chất lượng hoặc fraud)
+- Tạo "địa chỉ rủi ro cao" và "người gửi rủi ro cao" để cảnh báo trước khi nhận đơn hoặc điều chỉnh điều khoản
 
 **Outcome:** Giảm 1% tỷ lệ hoàn tương đương tiết kiệm hàng tỷ VND chi phí vận hành/năm ở quy mô VNPost.
 
@@ -343,7 +343,10 @@ Apache Unomi (nếu được chọn làm nền tảng) có module consent manage
 | **Bưu tá** | Nhân viên VNPost thực hiện thu gom và phát bưu gửi | Internal actor — dữ liệu GPS bưu tá là dữ liệu nhạy cảm |
 | **COD (Cash on Delivery)** | Thu tiền hộ người bán khi phát hàng đến tay người nhận | Nguồn dữ liệu tài chính quan trọng nhất trong CDP |
 | **Chuyển hoàn** | Bưu gửi không phát được, trả lại người gửi | Chỉ số chất lượng — high return rate là dấu hiệu churn |
-| **KHL** | Khách Hàng Lớn — doanh nghiệp TMĐT gửi khối lượng cao | Phân khúc khách hàng quan trọng nhất cần giữ chân |
+| **Người gửi** | Khách hàng đem hàng ra bưu cục hoặc đặt lịch thu gom để gửi đi — bao gồm cả cá nhân lẫn doanh nghiệp TMĐT | Chủ thể dữ liệu chính trong CDP — người tạo ra giao dịch và trả cước |
+| **Người nhận** | Người nhận hàng ở đầu kia của bưu gửi — thường không có tài khoản VNPost | Chủ thể dữ liệu thứ hai — xuất hiện trong hàng triệu giao dịch nhưng chưa rõ consent |
+| **Shipper (bưu tá)** | Nhân viên VNPost (bưu tá) thực hiện việc thu gom hoặc phát bưu gửi từ kho/bưu cục đến tay người nhận — là **internal actor của VNPost**, **không phải khách hàng** | Nguồn dữ liệu GPS và kết quả phát — không phải đối tượng xây hồ sơ CDP |
+| **KHL** | Khách Hàng Lớn — doanh nghiệp TMĐT gửi khối lượng cao (Shopee Seller, sàn TMĐT, shop online lớn) | Phân khúc người gửi quan trọng nhất cần giữ chân |
 | **Bưu cục** | Điểm giao dịch/tiếp nhận/phát của VNPost (~13.000 điểm) | Touchpoint vật lý — dữ liệu giao dịch tại quầy |
 | **BD6, BD10, BD13** | Bảng kê giao nhận nội bộ (dùng trong khai thác và phát) | Dữ liệu vận hành nội bộ, ít liên quan trực tiếp đến CDP |
 | **MPITS** | Modernization of Postal IT Systems — nền tảng IT tích hợp trung tâm của VNPost | Likely là hub dữ liệu quan trọng nhất để CDP kết nối |
