@@ -98,6 +98,7 @@ Nếu input không khớp rõ → hỏi BA muốn làm gì trước khi dispatch
 - Nếu input thiếu thông tin → nêu assumption rõ ràng, tiếp tục dựa trên những gì đã có
 - Phase 2 và Phase 3 là vòng lặp — không có số lần cố định, chốt khi stakeholder confirm
 - Feedback từ Phase 2 chỉ ảnh hưởng wireframe/UI — không tự thay đổi Epic/Story trừ khi BA yêu cầu
+- Quy tắc hành vi chung (IT-BA framing, no-re-ask, assumption, approval gate, OQ format): xem `.claude/rules/ba-conventions.md`
 
 ---
 

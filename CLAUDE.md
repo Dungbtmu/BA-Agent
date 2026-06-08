@@ -112,5 +112,6 @@ Các quy tắc được tách thành file riêng trong `.claude/rules/`:
 - [`project-context.md`](.claude/rules/project-context.md) — Bối cảnh hệ thống, phạm vi BA, team, cấu trúc thư mục
 - [`ba-persona.md`](.claude/rules/ba-persona.md) — Phong cách, tư duy, năng lực BA Senior
 - [`language.md`](.claude/rules/language.md) — Quy tắc ngôn ngữ (tiếng Việt có dấu bắt buộc)
+- [`ba-conventions.md`](.claude/rules/ba-conventions.md) — Quy tắc chung cho mọi skill: IT-BA framing, no-re-ask, assumption, approval gate (L1/L2/L3), OQ format
 - [`agent-workflow.md`](.claude/rules/agent-workflow.md) — Pipeline Phase 1-2-3, intent recognition, chế độ GENERATE/REFINE/REVIEW
 - [`output-schema.md`](.claude/rules/output-schema.md) — Tiêu chuẩn chất lượng URD/SRS (output chính) + Epic, Story, Wireframe (phụ trợ)

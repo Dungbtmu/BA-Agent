@@ -107,7 +107,9 @@ Chế độ SYNC yêu cầu Traceability Map phải tồn tại tại `.claude/o
 
 ### Nạp Chỉ dẫn Nghiệp vụ & Kỹ năng
 - Trước khi thực hiện bất kỳ tác vụ nào liên quan đến BA, Gemini **bắt buộc** phải đọc file [AGENTS.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/AGENTS.md) và các quy tắc chung trong thư mục [.claude/rules/](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/rules/).
+- **Bắt buộc** đọc [ba-conventions.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/rules/ba-conventions.md) — đây là quy tắc nền cho mọi skill: IT-BA framing, no-re-ask, assumption, approval gate L1/L2/L3, OQ format.
 - Đọc đúng file kỹ năng tương ứng trong thư mục [.claude/skills/](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/) trước khi bắt đầu tạo hoặc chỉnh sửa bất kỳ phần nào của tài liệu đầu ra.
+- Sau khi Write doc, chạy [resolve-oqs.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/resolve-oqs.md) để collect + track Open Questions trước khi suggest bước tiếp theo.
 
 ### Quy định về Ngôn ngữ & Định dạng
 - **Ngôn ngữ:** Tất cả các câu trả lời, tài liệu phân tích nghiệp vụ, wireframe, và mô tả phải được viết bằng **tiếng Việt có dấu chuẩn chỉnh**.

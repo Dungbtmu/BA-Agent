@@ -12,6 +12,8 @@ Entry point duy nhất cho toàn bộ nhóm Clarification. Nhận input ở bấ
 
 **`ba-clarification-agent` chỉ cần đọc skill này — không cần đọc 4 sub-skill riêng lẻ.**
 
+> Quy tắc chung (IT-BA framing, no-re-ask, assumption, approval gate, OQ format): xem `ba-conventions.md`. Skill này không lặp lại.
+
 ---
 
 ## Sub-skills và khi nào gọi
@@ -128,16 +130,22 @@ dẫn đến [hậu quả cụ thể].
 
 ## Rules
 
-- Không hỏi lại những gì As-Is Summary đã liệt kê trong phần "Đã biết"
-- Không hỏi câu kỹ thuật (API, DB, infrastructure)
-- Không chặn workflow vì còn câu hỏi MINOR — assume và ghi chú
+- Không hỏi lại những gì As-Is Summary đã liệt kê trong phần "Đã biết" — xem thêm no-re-ask rule trong `ba-conventions.md`
+- Không hỏi câu kỹ thuật (API, DB, infrastructure) — xem IT-BA framing trong `ba-conventions.md`
+- Không chặn workflow vì còn câu hỏi MINOR — assume và ghi chú theo format `ba-conventions.md`
 - Assumption phải explicit, không để ẩn trong output
 - Nếu không có câu hỏi CRITICAL → tiếp tục phân tích ngay, không chờ
+- Sau khi output Clarification → chạy `resolve-oqs` skill để track OQ trước khi suggest downstream
 
 ## Failure Cases
 
 - Gọi tất cả sub-skill mà không kiểm tra điều kiện → tốn thời gian, sinh câu hỏi thừa
 - Không gộp câu hỏi trùng từ nhiều sub-skill → BA nhận 2 câu hỏi giống nhau
-- Hỏi lại điều As-Is đã trả lời → mất uy tín, lãng phí
+- Hỏi lại điều As-Is đã trả lời → vi phạm no-re-ask rule
 - Không ghi assumption → agent tiếp theo không biết đang dựa trên gì
 - Chạy sub-skill sai thứ tự → output kém chất lượng (ví dụ: domain-gap trước as-is thì không biết loại câu hỏi nào đã được trả lời)
+
+## References
+
+- @../rules/ba-conventions.md — IT-BA framing, no-re-ask, assumption format, approval gate, OQ format
+- @./resolve-oqs.md — OQ tracking + cascade scan sau khi output

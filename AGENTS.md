@@ -21,6 +21,7 @@ Trước khi tạo hoặc review tài liệu BA, đọc và áp dụng các file
 - `.claude/rules/project-context.md` — bối cảnh BA Agent System, phạm vi BA, cấu trúc thư mục
 - `.claude/rules/ba-persona.md` — tư duy và phong cách Senior BA
 - `.claude/rules/language.md` — yêu cầu về ngôn ngữ tiếng Việt
+- `.claude/rules/ba-conventions.md` — quy tắc chung cho mọi skill: IT-BA framing, no-re-ask, assumption, approval gate (L1/L2/L3), OQ format
 - `.claude/rules/agent-workflow.md` — pipeline Phase 1-2-3, intent recognition, chế độ GENERATE/REFINE/REVIEW
 - `.claude/rules/output-schema.md` — danh sách artifact, ID format, traceability chain
 - `.claude/rules/review-handoff-policy.md` — quy tắc phạm vi sửa khi apply review report từ Agent Review Agent
@@ -152,6 +153,7 @@ Khi agent hoặc task yêu cầu skill, phải đọc skill tương ứng trư�
 - `.claude/skills/impact-analysis.md` — tính artifact bị ảnh hưởng khi requirement thay đổi; output Impact Report cho orchestrator
 - `.claude/skills/change-handler.md` — parse trigger thay đổi từ BA mô tả hoặc file PO mới; output Change Set chuẩn hóa
 - `.claude/skills/artifact-patch.md` — patch đúng phần bị ảnh hưởng trong từng artifact theo Impact Report; không viết lại toàn bộ
+- `.claude/skills/resolve-oqs.md` — collect + resolve Open Questions sau mỗi Write doc; cascade scan section bị ảnh hưởng; chạy trước suggest downstream
 
 Mapping bắt buộc:
 
