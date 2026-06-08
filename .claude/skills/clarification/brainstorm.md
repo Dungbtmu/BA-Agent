@@ -222,3 +222,4 @@ Bỏ qua Phase B multi-section. Hỏi 1 batch 6 câu. Bỏ qua mandatory artifac
 
 - `@../../../.claude/rules/ba-conventions.md`
 - `@../shared/resolve-oqs.md`
+- `@./brainstorm-example.md` — ví dụ output Brainstorm Board hoàn chỉnh (payment checkout)
