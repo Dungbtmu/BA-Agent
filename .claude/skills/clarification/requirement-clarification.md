@@ -147,5 +147,5 @@ dẫn đến [hậu quả cụ thể].
 
 ## References
 
-- @../rules/ba-conventions.md — IT-BA framing, no-re-ask, assumption format, approval gate, OQ format
+- @.claude/rules/ba-conventions.md — IT-BA framing, no-re-ask, assumption format, approval gate, OQ format
 - @../shared/resolve-oqs.md — OQ tracking + cascade scan sau khi output

@@ -40,6 +40,7 @@ Loại tài liệu đầu ra đa dạng, tùy theo yêu cầu: Backlog, Epic, Us
 │   ├── ba-qa-agent.md
 │   ├── ba-postcheck-agent.md
 │   ├── ba-process-summary-agent.md
+│   ├── ba-orchestrator-agent.md  ← Điều phối pipeline GENERATE + SYNC mode
 │   └── ba-agent-fix-agent.md  ← Apply review report từ Agent Review Agent
 ├── rules/                     ← Quy tắc bắt buộc, load mọi session
 │   ├── project-context.md
@@ -88,16 +89,22 @@ Loại tài liệu đầu ra đa dạng, tùy theo yêu cầu: Backlog, Epic, Us
 │   │   └── review-report-fix-handoff.md
 │   └── diagram/               ← Skill vẽ diagram (Excalidraw) — cấu trúc riêng
 ├── input/                     ← Tài liệu đầu vào từ PO/stakeholder
-│   └── review-reports/        ← Inbox nhận review report từ Agent Review Agent
-│       └── [tên-report].md
+│   ├── review-reports/        ← Inbox nhận review report từ Agent Review Agent
+│   │   └── [tên-report].md
+│   └── change-requests/       ← Inbox PO update/change request phục vụ SYNC mode
+│       └── [tên-file].[md|txt|pdf]
 └── output/                    ← Tài liệu BA tạo ra, tổ chức theo dự án
     └── [tên_dự_án]/
+        ├── brainstorm/        ← Output từ ba-brainstorm-agent (Phase 0)
+        │   └── {idea-slug}.md
         ├── research/          ← Output từ ba-research-agent và domain-gap-analysis
         │   ├── domain-brief.md
         │   └── domain-gap-analysis.md   ← (nếu có Domain Brief + client input)
         ├── wireframe/
         ├── urd/
         ├── solution/
+        ├── backlog/           ← Output từ ba-backlog-agent
+        │   └── backlog-v[N].md
         └── process-summary.md
 ```
 

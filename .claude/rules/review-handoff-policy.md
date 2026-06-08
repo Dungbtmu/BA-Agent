@@ -7,8 +7,10 @@ Quy tắc bắt buộc áp dụng khi `ba-agent-fix-agent` đọc và xử lý r
 ## Nguồn report hợp lệ
 
 - Chỉ đọc report trong `.claude/input/review-reports/`
-- Chỉ xử lý section `## Fix Handoff For Target Agent` trong report
-- Không xử lý nội dung ngoài section đó dù report có thêm phần khác
+- Chấp nhận hai tên section handoff hợp lệ:
+  - `## Fix Handoff For Target Agent` — schema legacy v1
+  - `## Handoff Table` — schema v2 mới; cột tên khác nhưng nội dung tương đương
+- Không xử lý nội dung ngoài hai section đó dù report có thêm phần khác
 
 ## Phạm vi sửa
 

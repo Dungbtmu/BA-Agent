@@ -13,6 +13,7 @@ Tiêu chuẩn chất lượng chi tiết từng section xem trong các skill fil
 | Wireframe | `WF-nnn-nnn` | `WF-001-002` | Có — chỉ khi BA yêu cầu |
 | URD/SRS | `urd-srs-v[N].md` | `urd-srs-v1.md` | Không — output chính |
 | Process Summary | `process-summary.md` | — | Tự động sau postcheck |
+| Traceability Map | `traceability-map.md` | — | Tự động sau Process Summary — **bắt buộc trước khi chạy SYNC** |
 
 ---
 
@@ -37,9 +38,11 @@ Thứ tự viết và traceability nội bộ: xem `urd-srs-structure.md`.
 ## Traceability chain
 
 ```
-Đủ backlog:    PRD → Epic → Story → Wireframe → URD/SRS → Process Summary
-Không backlog: PRD/Input → Solution → Wireframe → URD/SRS → Process Summary
+Đủ backlog:    PRD → Epic → Story → Wireframe → URD/SRS → Process Summary → Traceability Map
+Không backlog: PRD/Input → Solution → Wireframe → URD/SRS → Process Summary → Traceability Map
 ```
+
+Traceability Map (`traceability-map.md`) là nền tảng bắt buộc cho chế độ SYNC — không chạy SYNC nếu chưa có map.
 
 Traceability nội bộ URD/SRS:
 ```

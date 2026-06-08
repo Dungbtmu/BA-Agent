@@ -72,7 +72,9 @@ Xác nhận tất cả section bắt buộc có mặt trong tài liệu:
 | IV | Giao diện chức năng | PASS / FAIL |
 | C | Yêu cầu phi chức năng | PASS / FAIL |
 
-Ngoài ra kiểm tra: có section nào còn `[Cần xác nhận: ...]` không? Nếu có → WARN (không phải FAIL), liệt kê vị trí cụ thể và số lượng. Để BA quyết định có chấp nhận handoff với các mục chưa xác nhận đó không.
+Ngoài ra kiểm tra: có section nào còn `[Cần xác nhận: ...]` không? Phân loại theo rule trong skill `document-integrity-check`:
+- **Critical confirmation** (actor, phân quyền, quy trình chính, scope) còn mở → NEEDS FIX, không được handoff
+- **Non-critical confirmation** còn mở → có thể READY FOR HANDOFF nhưng phải warning rõ, liệt kê đầy đủ vị trí và nội dung
 
 ### Kiểm tra 2 — Traceability Audit
 
@@ -154,13 +156,16 @@ Quét toàn bộ tài liệu tìm:
 
 ### Phán quyết
 
-**[READY FOR HANDOFF / NEEDS FIX]**
+**[READY FOR HANDOFF / READY FOR HANDOFF WITH WARNING / NEEDS FIX]**
 
 [Nếu READY FOR HANDOFF]:
 > Tài liệu đã vượt qua toàn bộ 5 kiểm tra hậu kỳ. Sẵn sàng handoff cho Dev/Tester.
 
+[Nếu READY FOR HANDOFF WITH WARNING]:
+> Tài liệu qua được 5 kiểm tra cấu trúc. Tuy nhiên còn [N] mục `[Cần xác nhận]` non-critical chưa giải quyết (liệt kê bên dưới). Dev/Tester cần lưu ý các mục này khi triển khai.
+
 [Nếu NEEDS FIX]:
-> Phát hiện [N] lỗi cần sửa trước khi handoff. Các lỗi trên KHÔNG ảnh hưởng nội dung nghiệp vụ — chỉ cần sửa cấu trúc/metadata. Sau khi sửa, chạy lại ba-postcheck-agent để xác nhận.
+> Phát hiện [N] lỗi cần sửa trước khi handoff. [Nếu có critical confirmation]: Còn [N] mục `[Cần xác nhận]` critical (actor/phân quyền/quy trình chính) chưa được giải quyết — bắt buộc sửa trước khi handoff. Sau khi sửa, chạy lại ba-postcheck-agent để xác nhận.
 ```
 
 ---
@@ -174,6 +179,6 @@ Sau khi audit xong, lưu report tại: `.claude/output/[tên_dự_án]/urd/postc
 - **Chỉ kiểm tra cấu trúc và metadata** — không đánh giá logic nghiệp vụ, không bình luận về chất lượng nội dung
 - **Đếm chính xác** — dùng đúng thuật toán đếm chức năng lá trong skill, không ước tính
 - **Báo cáo đủ vị trí** — mỗi lỗi phải ghi rõ section và vị trí cụ thể để người sửa tìm ngay được
-- **Phán quyết nhị phân** — chỉ có READY FOR HANDOFF hoặc NEEDS FIX, không có trạng thái trung gian
+- **Phán quyết rõ ràng** — READY FOR HANDOFF (sạch hoàn toàn), READY FOR HANDOFF WITH WARNING (còn non-critical confirmation), hoặc NEEDS FIX (có FAIL hoặc critical confirmation còn mở)
 - **Không tự sửa** — phát hiện và báo cáo, KHÔNG tự ý sửa tài liệu; để BA hoặc urd-srs-agent thực hiện sửa
 - **Không overlap với ba-qa-agent** — nếu phát hiện vấn đề nghiệp vụ trong quá trình audit → ghi chú riêng "Lưu ý ngoài phạm vi audit" và đề nghị BA chạy ba-qa-agent nếu cần

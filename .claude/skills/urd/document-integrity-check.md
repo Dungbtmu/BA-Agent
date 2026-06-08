@@ -50,9 +50,15 @@ C.    Yêu cầu phi chức năng
 
 Quét toàn bộ tài liệu tìm chuỗi `[Cần xác nhận`:
 - Mỗi lần xuất hiện = 1 mục chưa được giải quyết
-- **Trong URD/SRS:** WARN (không phải FAIL) nếu còn `[Cần xác nhận: ...]` — placeholder này hợp lệ trong tài liệu đang làm việc, miễn là được liệt kê rõ trong danh sách "Mục cần xác nhận" cuối tài liệu
-- **Trong tài liệu handoff cuối cho Dev/Test:** FAIL nếu còn mục critical chưa xác nhận (ví dụ: actor, phân quyền, quy trình chính còn `[Cần xác nhận]`)
-- Liệt kê đầy đủ: section chứa nó, nội dung của placeholder, số lượng, phân loại WARN hay FAIL
+- Phân loại thành 2 nhóm:
+  - **Critical confirmation**: liên quan đến actor, phân quyền, quy trình chính, scope, điều kiện quyết định nghiệp vụ
+  - **Non-critical confirmation**: liên quan đến thông tin mô tả thêm, con số ước lượng, note giải thích — không ảnh hưởng đến implement hoặc test
+- **Trong URD/SRS (tài liệu đang làm việc):**
+  - WARN cho tất cả `[Cần xác nhận]` — không phải FAIL, miễn là được liệt kê rõ trong danh sách "Mục cần xác nhận" cuối tài liệu
+- **Trong tài liệu handoff cuối cho Dev/Test:**
+  - **Critical confirmation còn mở → NEEDS FIX** — không được handoff khi actor, phân quyền, quy trình chính, scope còn chưa xác nhận
+  - **Non-critical confirmation còn mở → READY FOR HANDOFF với WARNING** — có thể handoff nhưng phải liệt kê rõ các mục chưa xác nhận để Dev/Test biết
+- Liệt kê đầy đủ: section chứa nó, nội dung của placeholder, số lượng, phân loại critical hay non-critical, phân loại NEEDS FIX hay WARNING
 
 ### Rules
 

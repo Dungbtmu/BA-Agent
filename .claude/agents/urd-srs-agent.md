@@ -143,4 +143,4 @@ Liệt kê rõ:
 - **Không viết chung chung** — mọi rule phải cụ thể, có thể test được
 - **Không bỏ section** — thiếu thông tin thì ghi `[Cần xác nhận]`, không bỏ trống
 - **Nhất quán tuyệt đối** — cùng 1 khái niệm dùng cùng 1 từ xuyên suốt
-- **Dev/Test ready** — đọc xong là implement và viết test case được, không cần hỏi thêm
+- **Dev/Test ready** — đọc xong là implement và viết test case được, không cần hỏi thêm; điều kiện này chỉ đúng khi không còn `[Cần xác nhận]` critical (actor, phân quyền, quy trình chính, scope) — nếu còn, phải giải quyết trước khi tuyên bố Dev/Test ready

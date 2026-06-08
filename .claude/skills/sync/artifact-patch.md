@@ -152,6 +152,11 @@ Chỉ patch khi thay đổi liên quan đến performance, bảo mật, hoặc c
 
 **File**: `.claude/output/[tên_dự_án]/backlog/backlog-v[N].md`
 
+Nếu dự án đang dùng file `backlog.md` (legacy không có version number):
+1. Đổi tên thành `backlog-v1.md` trước khi patch
+2. Sau khi patch, lưu thành `backlog-v2.md`
+3. Không tự tìm hay patch file `backlog.md` trực tiếp — phải version hóa trước
+
 #### Sửa Acceptance Criteria
 
 Khi rule nghiệp vụ thay đổi:

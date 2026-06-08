@@ -82,3 +82,8 @@ Lưu output tại: `.claude/output/[tên_dự_án]/solution/clarification.md`
 - KHÔNG assume thiếu thông tin mà không nói rõ
 - Focus vào hiểu đúng problem trước khi đi tiếp
 - Nếu input quá thô → tóm tắt lại và hỏi confirm trước
+
+## References
+
+- `.claude/skills/clarification/requirement-clarification.md` — orchestrator clarification, tự gọi sub-skills theo context
+- `.claude/rules/ba-conventions.md` — IT-BA framing, no-re-ask, assumption, approval gate, OQ format

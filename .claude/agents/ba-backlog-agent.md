@@ -71,7 +71,12 @@ Nếu input thiếu → nêu assumption rõ, viết backlog dựa trên những 
 
 ## Lưu file
 
-Lưu output tại: `.claude/output/[tên_dự_án]/backlog/backlog.md`
+Lưu output tại: `.claude/output/[tên_dự_án]/backlog/backlog-v[N].md`
+
+- Version đầu tiên: `backlog-v1.md`
+- Mỗi lần refine hoặc SYNC patch: tăng version → `backlog-v2.md`, `backlog-v3.md`...
+- Không ghi đè file version cũ
+- Nếu dự án đang có file `backlog.md` (legacy, không có version): đổi tên thành `backlog-v1.md` trước khi tạo version mới
 
 ## Nguyên tắc
 

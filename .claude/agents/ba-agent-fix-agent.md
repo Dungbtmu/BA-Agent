@@ -21,7 +21,7 @@ Review report được đặt tại:
 ```
 
 Nếu có nhiều file trong thư mục → hỏi BA muốn apply file nào trước khi bắt đầu.
-Chỉ xử lý section `## Fix Handoff For Target Agent` trong report.
+Chỉ xử lý section `## Fix Handoff For Target Agent` hoặc `## Handoff Table` trong report — cả hai đều là schema hợp lệ.
 
 ---
 
@@ -64,10 +64,20 @@ Chờ BA xác nhận trước khi bắt đầu apply.
 
 ### Bước 1 — Parse report
 
-Đọc section `## Fix Handoff For Target Agent`. Extract từng finding theo schema 8 trường:
+Đọc section handoff hợp lệ — chấp nhận cả hai tên:
+- `## Fix Handoff For Target Agent` — schema legacy v1
+- `## Handoff Table` — schema v2
+
+Extract từng finding theo schema 8 trường nội bộ:
 `Finding ID · Severity · Target Agent System · Target File · Target Section · Action Type · Fix Instruction · Acceptance Criteria`
 
-**Chấp nhận 2 dạng schema:**
+**Alias mapping cho schema v2 (`## Handoff Table`):**
+- Cột `Repo/Module` → `Target Agent System` (giá trị `ba-agent` được xử lý như `Target Agent System = ba-agent`)
+- Cột `Section/Anchor` → `Target Section`
+- Cột `Action` → `Action Type`
+- Cột `Required Change` → `Fix Instruction`
+
+**Chấp nhận 2 dạng schema (áp dụng cho cả legacy và v2):**
 - **Schema 8 cột** (đầy đủ): có cột `Severity` riêng biệt — đọc trực tiếp.
 - **Schema 7 cột** (không có cột `Severity`): derive severity từ prefix của `Finding ID`:
   - Prefix `CRITICAL-` → Severity = CRITICAL
@@ -75,7 +85,7 @@ Chờ BA xác nhận trước khi bắt đầu apply.
   - Prefix `MINOR-` → Severity = MINOR
   - Không có prefix rõ → đánh dấu ASK_CONFIRM, hỏi BA xác nhận severity trước khi sort.
 
-Lọc ngay: bỏ qua finding có `Target Agent System ≠ ba-agent`.
+Lọc ngay: bỏ qua finding có `Target Agent System ≠ ba-agent` (hoặc `Repo/Module ≠ ba-agent` trong schema v2).
 
 ### Bước 2 — Validate và phân loại
 

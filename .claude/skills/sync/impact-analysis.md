@@ -49,11 +49,14 @@ Từ input (free text hoặc diff), extract:
   "change_type": "MODIFY | ADD | REMOVE",
   "change_summary": "Mô tả ngắn gọn thay đổi",
   "old_value": "...",                     // nếu là MODIFY
-  "new_value": "..."                      // nếu là MODIFY hoặc ADD
+  "new_value": "...",                     // nếu là MODIFY hoặc ADD
+  "match_status": "MATCHED | NEW_CONFIRMED | AMBIGUOUS"  // từ Change Set của change-handler
 }
 ```
 
 Nếu BA mô tả free text mà không mention REQ ID: tra cứu Traceability Map để tìm REQ ID tương ứng. Nếu không tìm được → hỏi BA confirm trước khi tiếp tục.
+
+**Quy tắc bắt buộc:** Nếu Change Set còn bất kỳ thay đổi nào có `match_status = AMBIGUOUS` → **dừng ngay, hỏi BA xác nhận REQ ID** trước khi phân tích impact. Không được tự suy luận và tiếp tục khi còn AMBIGUOUS — sẽ dẫn đến patch sai artifact.
 
 ### Bước 2 — Tra cứu Traceability Map
 

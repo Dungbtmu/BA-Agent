@@ -53,8 +53,13 @@ Từ mô tả của BA, xác định:
 Đọc `.claude/output/[tên_dự_án]/traceability-map.md`:
 
 1. Tìm REQ có mô tả khớp với nội dung BA đề cập
-2. Nếu tìm được → dùng REQ ID đó
-3. Nếu không tìm được (ADD mới hoặc không match) → tạo REQ ID mới theo schema
+2. Ghi `match_status` cho từng thay đổi:
+   - `MATCHED` — tìm được REQ ID rõ ràng trong Traceability Map
+   - `NEW_CONFIRMED` — Change Type = ADD và BA đã xác nhận đây là requirement mới
+   - `AMBIGUOUS` — không tìm được REQ ID và chưa được BA xác nhận
+3. **Chỉ tạo REQ ID mới khi Change Type = ADD và BA đã xác nhận** — không tự tạo REQ mới cho MODIFY hoặc REMOVE không match
+4. Nếu MODIFY hoặc REMOVE không match được REQ ID → đánh dấu `AMBIGUOUS`, hỏi BA xác nhận trước khi tiếp tục
+5. SYNC không được chạy sang bước impact-analysis khi còn bất kỳ thay đổi nào có `match_status = AMBIGUOUS`
 
 ### Bước 3 — Clarify nếu mơ hồ
 
@@ -72,10 +77,10 @@ Không hỏi quá 2 câu — nếu vẫn chưa rõ, ghi assumption và tiếp t�
 ```markdown
 ## Change Set — [Ngày]
 
-| # | REQ ID | Change Type | Old Value | New Value | Confidence |
-|---|---|---|---|---|---|
-| 1 | REQ-CDP-003 | MODIFY | Supervisor duyệt đơn không giới hạn | Supervisor chỉ duyệt đơn ≤ 500M | HIGH |
-| 2 | REQ-CDP-015 | ADD | N/A | Export báo cáo PDF module Quản lý đơn | MEDIUM |
+| # | REQ ID | Change Type | Old Value | New Value | Confidence | match_status |
+|---|---|---|---|---|---|---|
+| 1 | REQ-CDP-003 | MODIFY | Supervisor duyệt đơn không giới hạn | Supervisor chỉ duyệt đơn ≤ 500M | HIGH | MATCHED |
+| 2 | REQ-CDP-015 | ADD | N/A | Export báo cáo PDF module Quản lý đơn | MEDIUM | NEW_CONFIRMED |
 
 **Assumption** (nếu có):
 - [ASS-01] Giới hạn 500M áp dụng cho tất cả loại đơn, không phân biệt module
@@ -171,11 +176,11 @@ ba_confirmed: true
 
 ## Change Set
 
-| # | REQ ID | Change Type | Old Value | New Value | Confidence | Note |
-|---|---|---|---|---|---|---|
-| 1 | REQ-XXX-003 | MODIFY | ... | ... | HIGH | |
-| 2 | REQ-XXX-015 | ADD | N/A | ... | MEDIUM | Assumption: ... |
-| 3 | REQ-XXX-011 | REMOVE | ... | N/A | HIGH | BA confirmed |
+| # | REQ ID | Change Type | Old Value | New Value | Confidence | match_status | Note |
+|---|---|---|---|---|---|---|---|
+| 1 | REQ-XXX-003 | MODIFY | ... | ... | HIGH | MATCHED | |
+| 2 | REQ-XXX-015 | ADD | N/A | ... | MEDIUM | NEW_CONFIRMED | Assumption: ... |
+| 3 | REQ-XXX-011 | REMOVE | ... | N/A | HIGH | MATCHED | BA confirmed |
 ```
 
 ---

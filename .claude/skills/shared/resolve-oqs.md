@@ -174,4 +174,4 @@ Nếu BA skip Phase E:
 
 ## References
 
-- @../rules/ba-conventions.md — Section 5 (OQ format chuẩn)
+- @.claude/rules/ba-conventions.md — Section 5 (OQ format chuẩn)

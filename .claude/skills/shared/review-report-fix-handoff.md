@@ -6,9 +6,9 @@ Skill này hướng dẫn cách parse bảng handoff trong review report và con
 
 ## Schema finding hợp lệ
 
-Skill này chấp nhận **2 dạng schema** từ Agent Review Agent:
+Skill này chấp nhận **3 dạng schema** từ Agent Review Agent:
 
-### Schema 8 cột (đầy đủ)
+### Schema 8 cột — legacy v1 (section `## Fix Handoff For Target Agent`)
 
 ```
 Finding ID:          F-001
@@ -21,7 +21,7 @@ Fix Instruction:     [Hướng dẫn cụ thể cần làm]
 Acceptance Criteria: [Điều kiện để xác nhận đã sửa đúng]
 ```
 
-### Schema 7 cột (không có cột `Severity`)
+### Schema 7 cột — legacy v1 (không có cột `Severity`)
 
 ```
 Finding ID:          CRITICAL-001 / MAJOR-001 / MINOR-001
@@ -33,7 +33,31 @@ Fix Instruction:     [Hướng dẫn cụ thể cần làm]
 Acceptance Criteria: [Điều kiện để xác nhận đã sửa đúng]
 ```
 
-Khi gặp schema 7 cột, **derive severity từ prefix của `Finding ID`**:
+### Schema v2 (section `## Handoff Table`, 8 cột tên khác)
+
+```
+Finding ID:          CRITICAL-001 / MAJOR-001 / MINOR-001
+Severity:            CRITICAL / MAJOR / MINOR
+Repo/Module:         ba-agent         ← alias của Target Agent System
+Target File:         .claude/agents/[tên-agent].md
+Section/Anchor:      [Tên section]    ← alias của Target Section
+Action:              UPDATE / ADD / ...  ← alias của Action Type
+Required Change:     [Hướng dẫn]     ← alias của Fix Instruction
+Acceptance Criteria: [Điều kiện]
+```
+
+**Alias mapping v2 → schema nội bộ:**
+
+| Tên cột v2 | Map sang |
+|---|---|
+| `Repo/Module` | `Target Agent System` |
+| `Section/Anchor` | `Target Section` |
+| `Action` | `Action Type` |
+| `Required Change` | `Fix Instruction` |
+
+**Backward compatibility:** Report dùng schema legacy v1 vẫn parse được bình thường — không breaking change.
+
+Khi gặp schema 7 cột (legacy) hoặc schema v2 không có cột `Severity`, **derive severity từ prefix của `Finding ID`**:
 - Prefix `CRITICAL-` → Severity = CRITICAL
 - Prefix `MAJOR-` → Severity = MAJOR
 - Prefix `MINOR-` → Severity = MINOR
@@ -67,7 +91,7 @@ Finding có `Target Agent System ≠ ba-agent` → bỏ qua hoàn toàn, không 
 
 ### Bước 1 — Đọc và lọc
 
-Đọc toàn bộ section `## Fix Handoff For Target Agent`. Với mỗi finding:
+Đọc toàn bộ section `## Fix Handoff For Target Agent` (schema legacy v1) hoặc `## Handoff Table` (schema v2) — cả hai đều hợp lệ. Với mỗi finding:
 
 1. Kiểm tra `Target Agent System = ba-agent` — nếu không, bỏ qua
 2. Kiểm tra đủ 4 trường bắt buộc

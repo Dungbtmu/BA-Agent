@@ -2,7 +2,7 @@
 
 > Skill này chạy **trước** `ba-clarification-agent` khi BA có idea thô hoặc yêu cầu mơ hồ cần khai thác sâu trước khi phân tích chính thức. Output là Brainstorm Board — checkpoint bắt buộc trước khi chuyển sang clarification.
 
-Quy tắc chung (IT-BA framing, no-re-ask, assumption, approval gate L1/L2/L3, OQ format): xem `@../shared/../../../.claude/rules/ba-conventions.md`.
+Quy tắc chung (IT-BA framing, no-re-ask, assumption, approval gate L1/L2/L3, OQ format): xem `.claude/rules/ba-conventions.md`.
 
 ---
 
@@ -177,7 +177,7 @@ Nếu chưa xác định tên dự án → hỏi BA hoặc dùng tên thư mục
 
 ## Phase E — Resolve Open Questions
 
-Sau khi Write → chạy `resolve-oqs` skill (`@../shared/resolve-oqs.md`):
+Sau khi Write → chạy `resolve-oqs` skill (`.claude/skills/shared/resolve-oqs.md`):
 - Collect tất cả OQ trong doc
 - Prompt BA: resolve all / skip / chọn IDs
 - Loop 1-by-1 → cascade scan section bị ảnh hưởng
@@ -220,6 +220,6 @@ Bỏ qua Phase B multi-section. Hỏi 1 batch 6 câu. Bỏ qua mandatory artifac
 
 ## References
 
-- `@../../../.claude/rules/ba-conventions.md`
-- `@../shared/resolve-oqs.md`
-- `@./brainstorm-example.md` — ví dụ output Brainstorm Board hoàn chỉnh (payment checkout)
+- `.claude/rules/ba-conventions.md` — IT-BA framing, no-re-ask, assumption format, approval gate L1/L2/L3, OQ format
+- `.claude/skills/shared/resolve-oqs.md` — OQ tracking + cascade scan sau khi write
+- `.claude/skills/clarification/brainstorm-example.md` — ví dụ output Brainstorm Board hoàn chỉnh (payment checkout)

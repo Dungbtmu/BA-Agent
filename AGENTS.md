@@ -28,6 +28,7 @@ Trước khi tạo hoặc review tài liệu BA, đọc và áp dụng các file
 
 Khi tác vụ tương ứng với một vai trò BA chuyên biệt, đọc thêm file phù hợp trong `.claude/agents/`:
 
+- `.claude/agents/ba-brainstorm-agent.md`
 - `.claude/agents/ba-research-agent.md`
 - `.claude/agents/ba-clarification-agent.md`
 - `.claude/agents/ba-solution-agent.md`
@@ -40,6 +41,7 @@ Khi tác vụ tương ứng với một vai trò BA chuyên biệt, đọc thêm
 - `.claude/agents/ba-qa-agent.md`
 - `.claude/agents/ba-postcheck-agent.md`
 - `.claude/agents/ba-process-summary-agent.md`
+- `.claude/agents/ba-orchestrator-agent.md`
 - `.claude/agents/ba-agent-fix-agent.md`
 
 ## Chế Độ Vận Hành
@@ -156,6 +158,7 @@ Khi agent hoặc task yêu cầu skill, phải đọc skill tương ứng trư�
 - `.claude/skills/sync/change-handler.md` — parse trigger thay đổi từ BA mô tả hoặc file PO mới; output Change Set chuẩn hóa
 - `.claude/skills/sync/artifact-patch.md` — patch đúng phần bị ảnh hưởng trong từng artifact theo Impact Report; không viết lại toàn bộ
 - `.claude/skills/shared/resolve-oqs.md` — collect + resolve Open Questions sau mỗi Write doc; cascade scan section bị ảnh hưởng; chạy trước suggest downstream
+- `.claude/skills/diagram/SKILL.md` — vẽ diagram dạng Excalidraw (flowchart, architecture, sequence, mindmap, ERD...); bắt buộc đọc khi có intent vẽ sơ đồ; skill có mandatory render-verify loop
 
 Mapping bắt buộc:
 

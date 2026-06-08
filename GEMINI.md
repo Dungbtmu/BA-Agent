@@ -55,7 +55,7 @@ Dưới đây là các vai trò/subagent được định nghĩa trong thư mụ
 
 | Vai trò | File hướng dẫn | Kỹ năng liên quan (Skills) | Dùng khi nào |
 |---|---|---|---|
-| `ba-agent-fix-agent` | [ba-agent-fix-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-agent-fix-agent.md) | [review-report-fix-handoff.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/shared/review-report-fix-handoff.md) | Apply review report từ Agent Review Agent — đọc report tại `.claude/input/review-reports/`, sửa đúng file được chỉ định, báo cáo kết quả. |
+| `ba-agent-fix-agent` | [ba-agent-fix-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-agent-fix-agent.md) | [review-report-fix-handoff.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/shared/review-report-fix-handoff.md), [review-handoff-policy.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/rules/review-handoff-policy.md) *(policy bắt buộc — allowlist file, điều kiện ASK_CONFIRM)* | Apply review report từ Agent Review Agent — đọc report tại `.claude/input/review-reports/`, sửa đúng file được chỉ định, báo cáo kết quả. |
 
 ---
 
@@ -79,8 +79,9 @@ Phase 1 — Làm rõ & Giải pháp
   [3] ba-backlog-agent          (optional — chỉ khi BA yêu cầu rõ về Epic/Story/AC)
 
 Phase 2 — Thiết kế giao diện (vòng lặp đến khi thống nhất)
-  [4] ba-wireframe-agent   ←→ hoạt động song song/phối hợp với
-  [5] ui-react-agent
+  [4] ba-wireframe-agent → wireframe đủ rõ
+   ↓
+  [5] ui-react-agent → React prototype (phụ thuộc wireframe/solution đã rõ; không chạy song song với [4])
    ↓
   [6] ui-feedback-agent → phân loại (triage) → sửa đổi đúng vùng → lặp lại
 

@@ -57,6 +57,10 @@ Gọi agent bằng cách mô tả yêu cầu — hệ thống tự nhận dạng
 |---|---|
 | `ba-agent-fix-agent` | Apply review report từ Agent Review Agent — đọc report, convert thành patch plan, sửa đúng file được chỉ định, báo cáo kết quả |
 
+### Diagram Skill
+
+Khi có intent vẽ sơ đồ (flowchart, architecture, sequence, mindmap, org chart, ERD, timeline...), phải đọc `.claude/skills/diagram/SKILL.md` trước khi bắt đầu. Skill này bắt buộc có vòng render-verify. Xem thêm intent recognition tại `agent-workflow.md`.
+
 ---
 
 ## Workflow 3 Phase
@@ -81,10 +85,12 @@ Phase 1 — Làm rõ & Giải pháp
   [3] ba-backlog-agent          (optional — chỉ khi BA cần Epic/Story/AC)
 
 Phase 2 — Thiết kế giao diện (vòng lặp đến khi chốt)
-  [4] ba-wireframe-agent   ←→ song song với
-  [5] ui-react-agent
+  [4] ba-wireframe-agent → wireframe đủ rõ
+   ↓
+  [5] ui-react-agent → React prototype (phụ thuộc wireframe/solution đã rõ)
    ↓
   [6] ui-feedback-agent → triage → sửa đúng chỗ → lặp lại
+  (Chỉ cho phép song song ở các bước review độc lập, không phải bước tạo mới phụ thuộc nhau)
 
 Phase 3 — Tài liệu (vòng lặp đến khi chốt)
   [7] urd-srs-agent → viết URD/SRS
@@ -124,3 +130,4 @@ Các quy tắc được tách thành file riêng trong `.claude/rules/`:
 - [`ba-conventions.md`](.claude/rules/ba-conventions.md) — Quy tắc chung cho mọi skill: IT-BA framing, no-re-ask, assumption, approval gate (L1/L2/L3), OQ format
 - [`agent-workflow.md`](.claude/rules/agent-workflow.md) — Pipeline Phase 1-2-3, intent recognition, chế độ GENERATE/REFINE/REVIEW
 - [`output-schema.md`](.claude/rules/output-schema.md) — Tiêu chuẩn chất lượng URD/SRS (output chính) + Epic, Story, Wireframe (phụ trợ)
+- [`review-handoff-policy.md`](.claude/rules/review-handoff-policy.md) — Quy tắc allowlist file, điều kiện ASK_CONFIRM khi apply review report từ Agent Review Agent
