@@ -69,6 +69,30 @@ C.       Non-functional       → tự viết dựa trên constraint đã xác �
 
 ---
 
+## Điều kiện skip từng section
+
+Không phải dự án nào cũng cần đủ 9 section. Dùng bảng này để quyết định bỏ qua section nào — nhưng nếu skip thì **phải ghi rõ lý do** trong tài liệu (không bỏ trắng).
+
+| Section | Skip khi | Bắt buộc khi |
+|---|---|---|
+| I.4 Kiến trúc tổng thể | Dự án nhỏ, single-layer, không có tích hợp ngoài | Có ≥ 2 hệ thống tích hợp hoặc nhiều layer |
+| II.1 Workflow Diagram | Hệ thống chỉ có 1 actor, không có quy trình duyệt/phê duyệt | Có ≥ 2 actor tương tác nhau hoặc có flow phê duyệt |
+| II.3–II.4 Permission + RBAC | Chỉ có 1 role duy nhất, không có phân quyền | Có ≥ 2 role với quyền khác nhau |
+| II.5 Sequence Diagram | Không có tích hợp API ngoài, không có async flow phức tạp | Có call API ngoài, message queue, hoặc flow multi-step phức tạp |
+| C. Non-functional | Prototype nội bộ, không deploy production | Bất kỳ hệ thống nào deploy cho user thực |
+
+**Không được skip:**
+- II.2 Function Tree — luôn cần để đảm bảo traceability với Permission Matrix và Use Case
+- III. Use Case — luôn cần; đây là core của URD/SRS
+- IV. Screen Spec — luôn cần nếu có giao diện người dùng
+
+**Khi skip section:** thay vì bỏ trắng, viết:
+```
+> **[Không áp dụng]** — [Lý do cụ thể: ví dụ "Hệ thống chỉ có 1 actor duy nhất, không có phân quyền"]
+```
+
+---
+
 ## Section I — Giới thiệu (tự viết)
 
 ### I.1 Mục đích tài liệu

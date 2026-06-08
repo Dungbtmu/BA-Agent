@@ -17,7 +17,7 @@ Dưới đây là các vai trò/subagent được định nghĩa trong thư mụ
 | Vai trò | File hướng dẫn | Kỹ năng liên quan (Skills) | Dùng khi nào |
 |---|---|---|---|
 | `ba-research-agent` | [ba-research-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-research-agent.md) | [domain-research.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/domain-research.md) | Khi nghiên cứu domain mới, chưa có kiến thức — nghiên cứu nghiệp vụ, actor, pain point, thuật ngữ để tạo Domain Brief. |
-| `ba-clarification-agent` | [ba-clarification-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-clarification-agent.md) | [problem-framing.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/problem-framing.md), [requirement-clarification.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/requirement-clarification.md), [domain-gap-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/domain-gap-analysis.md) *(khi có Domain Brief)* | Khi có yêu cầu thô (mô tả sơ lược, ghi chú rời rạc) — làm rõ yêu cầu trước khi thiết kế. Nếu có Domain Brief, chạy thêm `domain-gap-analysis` để so sánh domain điển hình vs yêu cầu client trước khi đặt câu hỏi clarify. |
+| `ba-clarification-agent` | [ba-clarification-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-clarification-agent.md) | [requirement-clarification.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/requirement-clarification.md) *(orchestrator — tự gọi input-analysis, as-is-analysis, domain-gap-analysis, problem-framing theo context)* | Khi có yêu cầu thô — làm rõ yêu cầu trước khi thiết kế. Chỉ cần đọc `requirement-clarification.md`; skill này tự quyết định gọi sub-skill nào và theo thứ tự nào dựa trên context. |
 | `ba-solution-agent` | [ba-solution-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-solution-agent.md) | [user-persona-identification.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/user-persona-identification.md), [stakeholder-mapping.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/stakeholder-mapping.md), [assumption-risk-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/assumption-risk-analysis.md), [context-constraint-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/context-constraint-analysis.md) | Khi yêu cầu đã rõ — đề xuất giải pháp, thiết kế user flow, xác định edge cases và trade-offs. |
 | `ba-devil-advocate-agent` | [ba-devil-advocate-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-devil-advocate-agent.md) | [solution-critique.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/solution-critique.md), [assumption-risk-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/assumption-risk-analysis.md) | Phản biện chéo solution từ 4 góc nhìn (User / PO / Dev / Risk) — chạy sau `ba-solution-agent`, trước Phase 2. |
 | `ba-backlog-agent` | [ba-backlog-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-backlog-agent.md) | [requirement-clarification.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/requirement-clarification.md), [user-persona-identification.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/user-persona-identification.md) | *(Optional)* Khi cần chia nhỏ giải pháp thành Epic, User Stories và AC rõ ràng, có khả năng kiểm thử. |
@@ -38,6 +38,12 @@ Dưới đây là các vai trò/subagent được định nghĩa trong thư mụ
 | `ba-qa-agent` | [ba-qa-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-qa-agent.md) | [urd-review-checklist.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/urd-review-checklist.md), [assumption-risk-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/assumption-risk-analysis.md), [requirement-clarification.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/requirement-clarification.md) | Đánh giá chất lượng tài liệu — phát hiện các lỗ hổng logic, trường hợp bị thiếu, xung đột, rủi ro. Tự động chạy sau khi `urd-srs-agent` hoàn thành. |
 | `ba-postcheck-agent` | [ba-postcheck-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-postcheck-agent.md) | [document-integrity-check.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/document-integrity-check.md) | Hậu kiểm tự động — audit cấu trúc, traceability, naming và version hygiene sau khi `ba-qa-agent` chấp thuận content. |
 | `ba-process-summary-agent` | [ba-process-summary-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-process-summary-agent.md) | [process-log.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/process-log.md), [assumption-risk-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/assumption-risk-analysis.md) | Tổng kết toàn bộ BA session — tạo Decision Log, Assumption Register và Handoff Note cho Dev/Tester. |
+
+### Orchestration & Sync
+
+| Vai trò | File hướng dẫn | Kỹ năng liên quan (Skills) | Dùng khi nào |
+|---|---|---|---|
+| `ba-orchestrator-agent` | [ba-orchestrator-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-orchestrator-agent.md) | [traceability-map.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/traceability-map.md), [impact-analysis.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/impact-analysis.md), [change-handler.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/change-handler.md), [artifact-patch.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/artifact-patch.md) | Điều phối toàn bộ BA pipeline (GENERATE) hoặc đồng bộ artifact khi requirement thay đổi (SYNC). |
 
 ### Công cụ hệ thống
 
@@ -81,9 +87,19 @@ Phase 3 — Tài liệu (vòng lặp đến khi hoàn thiện)
         → READY FOR HANDOFF: tiếp tục
    ↓
   [10] ba-process-summary-agent → tạo Decision Log + Assumption Register + Handoff Note
+   ↓ (tự động sau [10])
+  [T] Tạo Traceability Map → link REQ → UC → WF → URD Section → Story
+
+Chế độ SYNC — khi requirement thay đổi (chạy độc lập sau khi đã có Traceability Map):
+  [S1] change-handler    → parse trigger (BA mô tả / file PO mới) → Delta Summary → BA confirm
+  [S2] impact-analysis   → tra Traceability Map → Impact Report (artifact + thứ tự patch)
+  [S3] artifact-patch    → patch đúng phần bị ảnh hưởng → Patch Summary
+  [S4] ba-qa-agent       → verify không có conflict mới
+  [S5] ba-postcheck-agent → audit cấu trúc sau patch
 ```
 
 Có thể linh hoạt bắt đầu từ bất kỳ phase nào nếu đã có sẵn thông tin đầu vào phù hợp (ví dụ: đã có wireframe thì có thể bắt đầu luôn Phase 3).
+Chế độ SYNC yêu cầu Traceability Map phải tồn tại tại `.claude/output/[tên_dự_án]/traceability-map.md`.
 
 ---
 

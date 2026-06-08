@@ -39,6 +39,12 @@ Gọi agent bằng cách mô tả yêu cầu — hệ thống tự nhận dạng
 | `ba-postcheck-agent` | Hậu kiểm tự động — audit cấu trúc, traceability, naming, version hygiene sau khi content đã được ba-qa-agent chấp thuận |
 | `ba-process-summary-agent` | Tổng kết quá trình — tạo Decision Log, Assumption Register, Handoff Note cho Dev/Tester |
 
+### Orchestration & Sync
+
+| Agent | Dùng khi nào |
+|---|---|
+| `ba-orchestrator-agent` | Chạy toàn bộ pipeline tự động (GENERATE) hoặc đồng bộ artifact khi requirement thay đổi (SYNC) — điều phối các agent con theo thứ tự, dừng tại checkpoint cần BA confirm |
+
 ### Công cụ hệ thống
 
 | Agent | Dùng khi nào |
@@ -54,6 +60,8 @@ Phase 1 — Làm rõ & Giải pháp
   [0] ba-research-agent         (optional — chỉ khi domain mới)
    ↓
   [1] ba-clarification-agent
+      + as-is-analysis    (optional — khi BA cung cấp hiện trạng thực tế)
+      + domain-gap-analysis (optional — khi có Domain Brief)
    ↓
   [2] ba-solution-agent
    ↓
@@ -81,9 +89,19 @@ Phase 3 — Tài liệu (vòng lặp đến khi chốt)
         → READY FOR HANDOFF: tiếp tục
    ↓
   [10] ba-process-summary-agent → tạo Decision Log + Assumption Register + Handoff Note
+   ↓ (tự động sau [10])
+  [T] Tạo Traceability Map → link REQ → UC → WF → URD Section → Story
+
+Chế độ SYNC — khi requirement thay đổi (chạy độc lập, không cần chạy lại toàn bộ pipeline):
+  [S1] change-handler    → parse trigger (BA mô tả / file PO mới) → Delta Summary → BA confirm
+  [S2] impact-analysis   → tra Traceability Map → tính artifact bị ảnh hưởng → Impact Report
+  [S3] artifact-patch    → patch đúng phần bị ảnh hưởng theo thứ tự → Patch Summary
+  [S4] ba-qa-agent       → verify không có conflict mới
+  [S5] ba-postcheck-agent → audit cấu trúc sau patch
 ```
 
 Có thể bắt đầu từ bất kỳ phase nào nếu đã có input phù hợp.
+Chế độ SYNC yêu cầu Traceability Map đã được tạo từ bước [T] trước đó.
 
 ---
 

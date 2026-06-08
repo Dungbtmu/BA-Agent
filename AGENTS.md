@@ -77,6 +77,7 @@ Các file `.claude/agents/*.md` là prompt định nghĩa vai trò BA/UI chuyên
 | `ba-qa-agent` | `.claude/agents/ba-qa-agent.md` | Review chất lượng, phát hiện issue, kiểm tra traceability và consistency |
 | `ba-postcheck-agent` | `.claude/agents/ba-postcheck-agent.md` | Audit cấu trúc, traceability, naming và version hygiene sau khi ba-qa-agent chấp thuận content |
 | `ba-process-summary-agent` | `.claude/agents/ba-process-summary-agent.md` | Tổng kết quá trình: tạo Decision Log, Assumption Register và Handoff Note cho Dev/Tester |
+| `ba-orchestrator-agent` | `.claude/agents/ba-orchestrator-agent.md` | Điều phối toàn bộ BA pipeline (GENERATE) hoặc đồng bộ artifact khi requirement thay đổi (SYNC); dispatch agent con, đọc output, dừng tại checkpoint cần BA confirm |
 | `ba-agent-fix-agent` | `.claude/agents/ba-agent-fix-agent.md` | Apply review report từ Agent Review Agent: đọc report tại `.claude/input/review-reports/`, convert thành patch plan, sửa đúng file, báo cáo kết quả |
 
 Nguyên tắc điều phối:
@@ -128,6 +129,7 @@ Khi agent hoặc task yêu cầu skill, phải đọc skill tương ứng trư�
 - `.claude/skills/problem-framing.md` — đóng khung bài toán
 - `.claude/skills/domain-research.md` — research domain mới, tổng hợp bối cảnh và thuật ngữ nghiệp vụ
 - `.claude/skills/domain-gap-analysis.md` — so sánh domain điển hình (từ Domain Brief) với yêu cầu thực tế của client; output là danh sách gap CRITICAL/MAJOR/MINOR để định hướng câu hỏi clarify
+- `.claude/skills/as-is-analysis.md` — phân tích hiện trạng thực tế dự án (hệ thống cũ, quy trình đang chạy, constraint); xác định đã biết gì và còn mở gì để thu hẹp phạm vi Clarification
 - `.claude/skills/stakeholder-mapping.md` — xác định stakeholder
 - `.claude/skills/context-constraint-analysis.md` — phân tích context và ràng buộc
 - `.claude/skills/assumption-risk-analysis.md` — xác định assumption và risk
@@ -146,12 +148,16 @@ Khi agent hoặc task yêu cầu skill, phải đọc skill tương ứng trư�
 - `.claude/skills/solution-critique.md` — framework phản biện solution 4 lens (User / Business / Feasibility / Risk)
 - `.claude/skills/document-integrity-check.md` — kiểm tra cấu trúc, traceability, naming và version hygiene của tài liệu
 - `.claude/skills/process-log.md` — trích xuất decision, assumption, scope delta và tạo handoff note
+- `.claude/skills/traceability-map.md` — xây dựng và duy trì Traceability Map; link REQ → UC → WF → URD Section → Story
+- `.claude/skills/impact-analysis.md` — tính artifact bị ảnh hưởng khi requirement thay đổi; output Impact Report cho orchestrator
+- `.claude/skills/change-handler.md` — parse trigger thay đổi từ BA mô tả hoặc file PO mới; output Change Set chuẩn hóa
+- `.claude/skills/artifact-patch.md` — patch đúng phần bị ảnh hưởng trong từng artifact theo Impact Report; không viết lại toàn bộ
 
 Mapping bắt buộc:
 
 - `ba-research-agent` phải đọc `domain-research`.
-- `ba-clarification-agent` phải đọc `input-analysis` (khi input là tài liệu có sẵn), `problem-framing` và `requirement-clarification`. Khi có Domain Brief, phải đọc thêm `domain-gap-analysis` và chạy trước các skill còn lại.
-- `ba-solution-agent` phải đọc `user-persona-identification`, `stakeholder-mapping`, `assumption-risk-analysis`, `context-constraint-analysis`.
+- `ba-clarification-agent` chỉ cần đọc `requirement-clarification` — skill này là orchestrator, tự quyết định gọi `input-analysis`, `as-is-analysis`, `domain-gap-analysis`, `problem-framing` theo đúng thứ tự dựa trên context.
+- `ba-solution-agent` phải đọc `user-persona-identification`, `stakeholder-mapping`, `assumption-risk-analysis`, `context-constraint-analysis`. Đây là agent duy nhất chạy `stakeholder-mapping` và `user-persona-identification` — không chạy ở phase Clarification.
 - `ba-backlog-agent` phải đọc `requirement-clarification` và `user-persona-identification`.
 - `ba-wireframe-agent` phải đọc `wireframe-design-system` và `ui-feedback-triage`.
 - `ui-react-agent` phải đọc `wireframe-design-system` và `react-ui-generation`.
@@ -162,6 +168,7 @@ Mapping bắt buộc:
 - `ba-postcheck-agent` phải đọc `document-integrity-check`.
 - `ba-process-summary-agent` phải đọc `process-log` và `assumption-risk-analysis`.
 - `ba-agent-fix-agent` phải đọc `review-handoff-policy` (rules) và `review-report-fix-handoff` (skill).
+- `ba-orchestrator-agent` phải đọc `traceability-map`, `impact-analysis`, `change-handler`, `artifact-patch` khi chạy chế độ SYNC.
 
 ## BA Workflow
 
@@ -176,7 +183,20 @@ Wireframe -> React prototype -> Feedback triage -> Refine đúng phần được
 
 Phase 3 — Tài liệu:
 URD/SRS -> QA Review -> Refine đúng section có issue -> Lặp đến khi không còn CRITICAL
+-> Post-check -> Process Summary -> [T] Tạo Traceability Map
 ```
+
+Với tác vụ `SYNC` (requirement thay đổi sau khi đã có Traceability Map):
+
+```text
+[S1] change-handler  -> parse trigger (BA mô tả / file PO mới) -> Delta Summary -> BA confirm
+[S2] impact-analysis -> tra Traceability Map -> Impact Report (danh sách artifact + thứ tự patch)
+[S3] artifact-patch  -> patch đúng phần bị ảnh hưởng -> Patch Summary
+[S4] ba-qa-agent     -> verify không có conflict mới
+[S5] ba-postcheck-agent -> audit cấu trúc sau patch
+```
+
+Điều kiện SYNC: Traceability Map phải tồn tại tại `.claude/output/[tên_dự_án]/traceability-map.md`. Nếu chưa có, phải tạo từ URD/SRS hiện tại trước khi SYNC.
 
 - URD/SRS là output chính.
 - Epic, User Story và AC là optional; chỉ tạo khi BA yêu cầu rõ hoặc khi agent chính xác định thật sự cần để làm rõ yêu cầu.

@@ -11,6 +11,9 @@ Input (mọi dạng: mô tả thô, ghi chú, tài liệu chưa đầy đủ...)
    ↓ (đưa Domain Brief + input từ client vào cùng lúc)
 [1] ba-clarification-agent     → nếu có Domain Brief: chạy domain-gap-analysis trước → làm rõ yêu cầu, đặt câu hỏi clarify dựa trên gap
    ↓ (nếu còn câu hỏi CRITICAL → dừng hỏi BA/PO trước)
+[1b] as-is-analysis            → phân tích hiện trạng thực tế *(optional — chỉ khi BA cung cấp hiện trạng)*
+     → output As-Is Summary: đã biết gì, còn mở gì, constraint cứng
+     → ba-clarification-agent dùng As-Is Summary để loại câu hỏi thừa, tập trung vào điểm thực sự chưa biết
 [2] ba-solution-agent          → đề xuất solution + user flow
    ↓
 [2b] ba-devil-advocate-agent   → phản biện chéo solution từ 4 góc nhìn *(optional nhưng khuyến nghị)*
@@ -69,6 +72,7 @@ Khi BA không mention agent cụ thể, nhận dạng intent từ input và tự
 | Dấu hiệu trong input | Agent phù hợp |
 |---|---|
 | "tôi chưa biết gì về domain này", "research", "tìm hiểu lĩnh vực", "dự án mới chưa có kiến thức" | `ba-research-agent` |
+| "hiện trạng", "hệ thống cũ", "đang chạy như này", "quy trình hiện tại", "as-is", "khảo sát hiện trạng" | `as-is-analysis` skill (chạy trong ba-clarification-agent) |
 | Mô tả dự án mới, yêu cầu chưa rõ, "tôi có dự án...", "tôi nhận được yêu cầu..." | `ba-clarification-agent` |
 | Đã rõ yêu cầu, "đề xuất giải pháp", "flow nên như thế nào", "thiết kế hệ thống" | `ba-solution-agent` |
 | "phản biện solution", "challenge giải pháp", "kiểm tra solution", "có vấn đề gì không" | `ba-devil-advocate-agent` |
@@ -81,6 +85,7 @@ Khi BA không mention agent cụ thể, nhận dạng intent từ input và tự
 | "tổng kết", "handoff note", "decision log", "tóm tắt quá trình" | `ba-process-summary-agent` |
 | "viết Epic", "viết User Story", "chia backlog", "AC" | `ba-backlog-agent` |
 | "apply review report", "sửa theo report", "fix theo review", "ba-agent-fix" | `ba-agent-fix-agent` |
+| "chạy tự động", "pipeline đầy đủ", "orchestrate", "requirement thay đổi", "sync artifact", "đồng bộ tài liệu", "PO vừa cập nhật" | `ba-orchestrator-agent` |
 
 Nếu input không khớp rõ → hỏi BA muốn làm gì trước khi dispatch.
 
@@ -103,6 +108,14 @@ Nếu input không khớp rõ → hỏi BA muốn làm gì trước khi dispatch
 - Không chặn workflow vì thiếu tài liệu — nêu assumption và tiếp tục
 - KHÔNG bịa thông tin kỹ thuật (Architecture, API, Data, ERD...)
 - Lưu tại `.claude/output/[tên_dự_án]/`, version đầu là `v1`, các lần sau tăng `v[N+1]`
+- Sau khi hoàn tất Phase 3: tự động tạo Traceability Map tại `.claude/output/[tên_dự_án]/traceability-map.md`
+
+**SYNC — Đồng bộ artifact khi requirement thay đổi:**
+- Yêu cầu Traceability Map đã tồn tại — không chạy SYNC nếu chưa có map
+- Luồng: change-handler → impact-analysis → artifact-patch → ba-qa-agent → ba-postcheck-agent
+- Chỉ patch artifact bị ảnh hưởng — không chạy lại toàn bộ pipeline
+- Dừng checkpoint khi có REMOVE requirement hoặc ambiguity MAJOR trong impact report
+- `ba-orchestrator-agent` là agent điều phối chế độ SYNC
 
 **REFINE — Chỉnh sửa:**
 - Chỉ sửa **đúng phần được yêu cầu** — KHÔNG tái tạo toàn bộ tài liệu
