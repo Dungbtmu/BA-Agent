@@ -2,10 +2,20 @@
 
 **Output chính của hệ thống là URD/SRS.** Epic, User Story, AC là artifact phụ trợ — chỉ tạo khi BA yêu cầu rõ.
 
+## Phase 0 — Brainstorm (optional — khi idea thô, chưa đủ để clarification)
+
+```
+Input thô / idea mơ hồ
+   ↓
+[0b] ba-brainstorm-agent       → phỏng vấn sâu 7 section, khai thác edge case/validation/wording/flow
+     → output Brainstorm Board → BA approve → chuyển sang Phase 1
+     (shallow mode --shallow cho feature nhỏ, prototype scope)
+```
+
 ## Phase 1 — Làm rõ & Giải pháp
 
 ```
-Input (mọi dạng: mô tả thô, ghi chú, tài liệu chưa đầy đủ...)
+Input (mọi dạng: mô tả thô, ghi chú, tài liệu chưa đầy đủ, Brainstorm Board từ [0b]...)
    ↓
 [0] ba-research-agent          → research domain mới, tạo Domain Brief  *(optional — chỉ khi BA chưa biết domain)*
    ↓ (đưa Domain Brief + input từ client vào cùng lúc)
@@ -71,6 +81,7 @@ Khi BA không mention agent cụ thể, nhận dạng intent từ input và tự
 
 | Dấu hiệu trong input | Agent phù hợp |
 |---|---|
+| "brainstorm", "khai thác idea", "tôi có ý tưởng về...", "capture ý tưởng", "ý tưởng thô", idea mơ hồ chưa đủ để clarify | `ba-brainstorm-agent` |
 | "tôi chưa biết gì về domain này", "research", "tìm hiểu lĩnh vực", "dự án mới chưa có kiến thức" | `ba-research-agent` |
 | "hiện trạng", "hệ thống cũ", "đang chạy như này", "quy trình hiện tại", "as-is", "khảo sát hiện trạng" | `as-is-analysis` skill (chạy trong ba-clarification-agent) |
 | Mô tả dự án mới, yêu cầu chưa rõ, "tôi có dự án...", "tôi nhận được yêu cầu..." | `ba-clarification-agent` |
@@ -93,6 +104,7 @@ Nếu input không khớp rõ → hỏi BA muốn làm gì trước khi dispatch
 
 - Chấp nhận mọi dạng input — không yêu cầu PRD chuẩn
 - Output của bước trước = input của bước sau
+- `ba-brainstorm-agent` là optional (Phase 0) — chỉ dùng khi BA có idea thô cần khai thác sâu trước clarification; output Brainstorm Board phải được BA approve trước khi sang Phase 1
 - `ba-backlog-agent` là optional — chỉ dùng khi BA cần viết Epic/User Story/AC; có thể bỏ qua và đi thẳng sang Phase 2
 - Có thể skip bước nếu BA yêu cầu rõ (ví dụ: đã có wireframe rồi, bắt đầu từ Phase 3)
 - Nếu input thiếu thông tin → nêu assumption rõ ràng, tiếp tục dựa trên những gì đã có

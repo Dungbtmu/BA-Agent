@@ -66,6 +66,7 @@ Các file `.claude/agents/*.md` là prompt định nghĩa vai trò BA/UI chuyên
 
 | Subagent | File hướng dẫn | Phạm vi chịu trách nhiệm |
 |---|---|---|
+| `ba-brainstorm-agent` | `.claude/agents/ba-brainstorm-agent.md` | Khai thác idea thô qua phỏng vấn sâu 7 section (Phase 0) — output Brainstorm Board làm input cho Phase 1; chạy khi BA có ý tưởng mơ hồ chưa đủ để clarification |
 | `ba-research-agent` | `.claude/agents/ba-research-agent.md` | Research domain mới, tạo Domain Brief khi BA chưa biết domain hoặc cần bối cảnh trước khi phân tích |
 | `ba-clarification-agent` | `.claude/agents/ba-clarification-agent.md` | Làm rõ requirement, xác định missing information, assumptions, risks và câu hỏi cho stakeholder |
 | `ba-solution-agent` | `.claude/agents/ba-solution-agent.md` | Đề xuất solution, user flow, edge cases, dependencies và trade-offs |
@@ -125,6 +126,7 @@ Tạo React prototype từ wireframe và dùng ui-feedback-agent để xử lý 
 
 Khi agent hoặc task yêu cầu skill, phải đọc skill tương ứng trước khi viết output:
 
+- `.claude/skills/clarification/brainstorm.md` — khai thác idea thô qua phỏng vấn 7 section; phát hiện complexity, tạo Brainstorm Board với flow, edge case, validation, wording chính xác
 - `.claude/skills/clarification/input-analysis.md` — đọc và trích xuất requirement từ tài liệu có sẵn (PRD, email, ghi chú); phân loại rõ/chưa rõ/mâu thuẫn
 - `.claude/skills/clarification/requirement-clarification.md` — làm rõ requirement
 - `.claude/skills/clarification/problem-framing.md` — đóng khung bài toán
@@ -157,6 +159,7 @@ Khi agent hoặc task yêu cầu skill, phải đọc skill tương ứng trư�
 
 Mapping bắt buộc:
 
+- `ba-brainstorm-agent` phải đọc `brainstorm` (`.claude/skills/clarification/brainstorm.md`) và `ba-conventions.md`.
 - `ba-research-agent` phải đọc `domain-research`.
 - `ba-clarification-agent` chỉ cần đọc `requirement-clarification` — skill này là orchestrator, tự quyết định gọi `input-analysis`, `as-is-analysis`, `domain-gap-analysis`, `problem-framing` theo đúng thứ tự dựa trên context.
 - `ba-solution-agent` phải đọc `user-persona-identification`, `stakeholder-mapping`, `assumption-risk-analysis`, `context-constraint-analysis`. Đây là agent duy nhất chạy `stakeholder-mapping` và `user-persona-identification` — không chạy ở phase Clarification.
@@ -177,6 +180,9 @@ Mapping bắt buộc:
 Với tác vụ `GENERATE`:
 
 ```text
+Phase 0 — Brainstorm (optional — khi idea thô chưa đủ để clarification):
+Input thô / idea mơ hồ -> Brainstorm (phỏng vấn 7 section) -> Brainstorm Board -> BA approve -> Phase 1
+
 Phase 1 — Làm rõ & Giải pháp:
 Input -> [Research domain nếu cần] -> Clarification -> Solution -> [Epic/User Story/AC nếu BA yêu cầu]
 

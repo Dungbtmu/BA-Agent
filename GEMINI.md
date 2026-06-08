@@ -12,6 +12,12 @@ BA agent tập trung vào **nghiệp vụ và giao diện ở mức độ BA** (
 
 Dưới đây là các vai trò/subagent được định nghĩa trong thư mục [.claude/agents/](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/). Hãy đọc file định nghĩa tương ứng trước khi đóng vai subagent hoặc xử lý các tác vụ thuộc phạm vi tương ứng.
 
+### Phase 0 — Brainstorm (optional)
+
+| Vai trò | File hướng dẫn | Kỹ năng liên quan (Skills) | Dùng khi nào |
+|---|---|---|---|
+| `ba-brainstorm-agent` | [ba-brainstorm-agent.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/agents/ba-brainstorm-agent.md) | [brainstorm.md](file:///Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/skills/clarification/brainstorm.md) | Khi BA có idea thô hoặc mô tả mơ hồ — khai thác sâu qua phỏng vấn 7 section trước khi clarification chính thức. Output: Brainstorm Board. |
+
 ### Phase 1 — Làm rõ & Giải pháp
 
 | Vai trò | File hướng dẫn | Kỹ năng liên quan (Skills) | Dùng khi nào |
@@ -56,6 +62,9 @@ Dưới đây là các vai trò/subagent được định nghĩa trong thư mụ
 ## 2. Quy trình Phối hợp 3 Phase
 
 ```
+Phase 0 — Brainstorm (optional — khi idea thô chưa đủ để clarification)
+  [0b] ba-brainstorm-agent      → phỏng vấn 7 section → Brainstorm Board → BA approve → sang Phase 1
+
 Phase 1 — Làm rõ & Giải pháp
   [0] ba-research-agent         (optional — chỉ khi gặp domain mới)
    ↓ (đưa Domain Brief + input từ client vào cùng lúc)

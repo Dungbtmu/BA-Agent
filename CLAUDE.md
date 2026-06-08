@@ -12,6 +12,12 @@ BA agent tập trung vào **nghiệp vụ và giao diện mức BA** — bao g�
 
 Gọi agent bằng cách mô tả yêu cầu — hệ thống tự nhận dạng intent và dispatch đúng agent. Chi tiết keyword → agent xem trong `agent-workflow.md`.
 
+### Phase 0 — Brainstorm (optional)
+
+| Agent | Dùng khi nào |
+|---|---|
+| `ba-brainstorm-agent` | Có idea thô hoặc mô tả mơ hồ — khai thác sâu qua phỏng vấn 7 section trước khi clarification chính thức. Output: Brainstorm Board |
+
 ### Phase 1 — Làm rõ & Giải pháp
 
 | Agent | Dùng khi nào |
@@ -56,6 +62,9 @@ Gọi agent bằng cách mô tả yêu cầu — hệ thống tự nhận dạng
 ## Workflow 3 Phase
 
 ```
+Phase 0 — Brainstorm (optional — khi idea thô cần khai thác sâu trước)
+  [0b] ba-brainstorm-agent      → phỏng vấn 7 section → Brainstorm Board → BA approve → sang Phase 1
+
 Phase 1 — Làm rõ & Giải pháp
   [0] ba-research-agent         (optional — chỉ khi domain mới)
    ↓

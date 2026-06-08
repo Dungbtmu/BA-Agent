@@ -27,6 +27,7 @@ Loại tài liệu đầu ra đa dạng, tùy theo yêu cầu: Backlog, Epic, Us
 ```
 .claude/
 ├── agents/                    ← Định nghĩa các subagent BA chuyên biệt
+│   ├── ba-brainstorm-agent.md ← Phase 0: khai thác idea thô qua phỏng vấn 7 section
 │   ├── ba-research-agent.md
 │   ├── ba-clarification-agent.md
 │   ├── ba-solution-agent.md
@@ -48,7 +49,8 @@ Loại tài liệu đầu ra đa dạng, tùy theo yêu cầu: Backlog, Epic, Us
 │   ├── output-schema.md
 │   └── review-handoff-policy.md  ← Quy tắc phạm vi sửa khi apply review report
 ├── skills/                    ← Skill chuyên biệt, agent đọc khi cần — tổ chức theo nhóm
-│   ├── clarification/         ← Phase 1: làm rõ yêu cầu
+│   ├── clarification/         ← Phase 0+1: brainstorm + làm rõ yêu cầu
+│   │   ├── brainstorm.md             ← Phase 0: phỏng vấn 7 section, khai thác idea thô
 │   │   ├── requirement-clarification.md  ← orchestrator
 │   │   ├── input-analysis.md
 │   │   ├── as-is-analysis.md
