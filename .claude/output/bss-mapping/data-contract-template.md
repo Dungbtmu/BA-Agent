@@ -141,6 +141,8 @@
 **Yêu cầu kỹ thuật:** OCS gọi API CVM ngay khi lưu lượng data trong ngày vượt ngưỡng 80% hạn mức. CVM phải xử lý và gửi USSD trong vòng 2 giờ sau khi nhận event.
 **Timing:** Ngay khi vượt ngưỡng 80%
 
+> **Lưu ý ngưỡng cảnh báo:** Tỷ lệ 80% (hoặc x%) là ngưỡng do **CVM cấu hình**, không cứng trong OCS. OCS chỉ cần expose API nhận ngưỡng từ CVM và fire event khi vượt ngưỡng đó. Khi CVM muốn thay đổi ngưỡng cảnh báo (ví dụ: từ 80% xuống 70%), chỉ cần cập nhật cấu hình CVM mà không cần BSS/OCS thay đổi logic.
+
 | Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
 | `event_type` | string | ✅ | Loại sự kiện | OCS — event name cố định | `DATA_THRESHOLD_80` |
@@ -235,19 +237,21 @@
 
 ---
 
-#### Event: HẾT_PHÚT_THOẠI (E_VOICE_100)
+#### Event: HẾT_PHÚT_THOẠI_NỘI_MẠNG (E_VOICE_100_ONNET)
 
 **Trigger bởi:** OCS
-**Yêu cầu kỹ thuật:** OCS gọi API CVM ngay khi quota thoại trong gói về 0. CVM phải gửi USSD trong vòng 2 phút để KH thấy ngay sau cuộc gọi cuối.
-**Timing:** Ngay khi hết 100% quota thoại trong gói
+**Yêu cầu kỹ thuật:** OCS gọi API CVM ngay khi quota thoại **nội mạng** trong gói về 0. CVM phải gửi USSD trong vòng 2 phút để KH thấy ngay sau cuộc gọi cuối.
+**Timing:** Ngay khi hết 100% quota thoại nội mạng trong gói
+
+> **Phân biệt với E_VOICE_100_OFFNET:** Thoại nội mạng và ngoại mạng thường có quota riêng trong gói. OCS cần tách 2 event để CVM gợi ý đúng loại gói bổ sung (gói nội mạng vs gói ngoại mạng). Nếu gói không tách quota nội/ngoại mà gộp chung thì dùng 1 event với trường `call_type = BOTH`.
 
 | Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
-| `event_type` | string | ✅ | Loại sự kiện | OCS — event name cố định | `VOICE_QUOTA_100` |
+| `event_type` | string | ✅ | Loại sự kiện | OCS — event name cố định | `VOICE_ONNET_QUOTA_100` |
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
-| `event_timestamp` | datetime | ✅ | Thời điểm hết quota thoại | OCS — thời điểm quota về 0 | `2026-06-03 14:22:00` |
+| `event_timestamp` | datetime | ✅ | Thời điểm hết quota thoại nội mạng | OCS — thời điểm quota về 0 | `2026-06-03 14:22:00` |
 | `current_plan` | string | ✅ | Tên gói đang dùng | OCS — tên gói đang active | `GOI_THOAI_50K` |
-| `voice_quota_min` | integer | ✅ | Tổng quota thoại của gói (phút) | OCS — theo định nghĩa gói | `300` |
+| `onnet_quota_min` | integer | ✅ | Tổng quota thoại nội mạng của gói (phút) | OCS — theo định nghĩa gói | `300` |
 | `days_remaining` | integer | ✅ | Số ngày còn lại trong chu kỳ gói | OCS — số ngày còn lại | `8` |
 | `balance` | integer | ✅ | Số dư tài khoản hiện tại (đồng) | OCS — số dư realtime | `25000` |
 
@@ -255,13 +259,49 @@
 
 | Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
 |---|---|---|---|---|---|---|
-| `{{so_dien_thoai}}` | ✅ | Số điện thoại thuê bao hết quota thoại | Văn bản | Payload `msisdn` | — | `0901234567` |
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại thuê bao hết quota thoại nội mạng | Văn bản | Payload `msisdn` | — | `0901234567` |
 | `{{ten_goi}}` | ✅ | Tên gói đang dùng để làm ngữ cảnh gợi ý gói mới | Văn bản | Payload `current_plan` | — | `GOI_THOAI_50K` |
-| `{{quota_thoai_phut}}` | ✅ | Tổng quota thoại của gói — để KH hiểu đã dùng hết bao nhiêu | Số | Payload `voice_quota_min` | — | `300 phút` |
+| `{{quota_thoai_noi_mang_phut}}` | ✅ | Tổng quota thoại nội mạng của gói — để KH hiểu đã dùng hết bao nhiêu | Số | Payload `onnet_quota_min` | — | `300 phút` |
 | `{{so_ngay_con_lai}}` | ✅ | Số ngày còn lại trong chu kỳ — tạo cảm giác cấp bách | Số | Payload `days_remaining` | — | `8 ngày` |
 | `{{so_du_tai_khoan}}` | ✅ | Số dư tài khoản — để KH biết có đủ tiền mua gói bổ sung không | Tiền (VND) | Payload `balance` | — | `25.000 VNĐ` |
 | `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin nhắn cảnh báo | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
-| `{{goi_thoai_bo_sung}}` | ❌ | Tên gói bổ sung thoại NBO đề xuất | Văn bản | CVM NBO | không hiện gợi ý | `GOI_THOAI_NGAY_5K` |
+| `{{goi_thoai_noi_mang_bo_sung}}` | ❌ | Tên gói bổ sung thoại nội mạng NBO đề xuất | Văn bản | CVM NBO | không hiện gợi ý | `GOI_THOAI_NOIM_NGAY_5K` |
+
+---
+
+---
+
+#### Event: HẾT_PHÚT_THOẠI_NGOẠI_MẠNG (E_VOICE_100_OFFNET)
+
+**Trigger bởi:** OCS
+**Yêu cầu kỹ thuật:** OCS gọi API CVM ngay khi quota thoại **ngoại mạng** trong gói về 0. CVM phải gửi USSD trong vòng 2 phút để KH thấy ngay sau cuộc gọi cuối.
+**Timing:** Ngay khi hết 100% quota thoại ngoại mạng trong gói
+
+> **Lưu ý:** Thoại ngoại mạng hết quota thường nhạy cảm hơn về chi phí (cước tính ngoài gói cao hơn nội mạng). CVM nên gợi ý gói bổ sung ngoại mạng riêng hoặc cảnh báo mức phí phát sinh nếu KH tiếp tục gọi. Cần xác nhận với OCS xem quota nội/ngoại mạng có tách riêng trong tất cả các gói không.
+
+| Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+|---|---|---|---|---|---|
+| `event_type` | string | ✅ | Loại sự kiện | OCS — event name cố định | `VOICE_OFFNET_QUOTA_100` |
+| `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `event_timestamp` | datetime | ✅ | Thời điểm hết quota thoại ngoại mạng | OCS — thời điểm quota về 0 | `2026-06-03 16:45:00` |
+| `current_plan` | string | ✅ | Tên gói đang dùng | OCS — tên gói đang active | `GOI_THOAI_50K` |
+| `offnet_quota_min` | integer | ✅ | Tổng quota thoại ngoại mạng của gói (phút) | OCS — theo định nghĩa gói | `100` |
+| `days_remaining` | integer | ✅ | Số ngày còn lại trong chu kỳ gói | OCS — số ngày còn lại | `8` |
+| `balance` | integer | ✅ | Số dư tài khoản hiện tại (đồng) | OCS — số dư realtime | `25000` |
+| `offnet_rate_per_min` | integer | ❌ | Cước thoại ngoại mạng ngoài gói (đồng/phút) — để CVM hiển thị cảnh báo phí phát sinh | OCS — bảng giá cước | `1500` |
+
+**Param template:**
+
+| Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
+|---|---|---|---|---|---|---|
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại thuê bao hết quota thoại ngoại mạng | Văn bản | Payload `msisdn` | — | `0901234567` |
+| `{{ten_goi}}` | ✅ | Tên gói đang dùng để làm ngữ cảnh gợi ý gói mới | Văn bản | Payload `current_plan` | — | `GOI_THOAI_50K` |
+| `{{quota_thoai_ngoai_mang_phut}}` | ✅ | Tổng quota thoại ngoại mạng của gói — để KH biết đã dùng hết bao nhiêu | Số | Payload `offnet_quota_min` | — | `100 phút` |
+| `{{so_ngay_con_lai}}` | ✅ | Số ngày còn lại trong chu kỳ — tạo cảm giác cấp bách | Số | Payload `days_remaining` | — | `8 ngày` |
+| `{{so_du_tai_khoan}}` | ✅ | Số dư tài khoản — để KH biết có đủ tiền mua gói bổ sung không | Tiền (VND) | Payload `balance` | — | `25.000 VNĐ` |
+| `{{cuoc_ngoai_goi_dong_phut}}` | ❌ | Cước thoại ngoại mạng ngoài gói — cảnh báo KH về chi phí phát sinh nếu tiếp tục gọi | Tiền (VND) | Payload `offnet_rate_per_min` | không hiển thị cước | `1.500 VNĐ/phút` |
+| `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin nhắn cảnh báo | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{goi_thoai_ngoai_mang_bo_sung}}` | ❌ | Tên gói bổ sung thoại ngoại mạng NBO đề xuất | Văn bản | CVM NBO | không hiện gợi ý | `GOI_THOAI_NGOAIM_NGAY_5K` |
 
 ---
 
@@ -418,42 +458,6 @@
 
 ---
 
-#### File: `ngay_30_summary_{YYYYMMDD}.csv` (E11)
-
-**Mô tả:** Tổng kết hành trình 30 ngày đầu của KH
-**Trigger bởi:** OCS → BSS (nightly), theo sự kiện NGAY_0 + 30
-**Thời điểm push:** 02:00–04:00 của ngày NGAY_0 + 30
-
-| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
-|---|---|---|---|---|---|
-| `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
-| `full_name` | string(64) | ✅ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
-| `contact_email` | string | ❌ | Email KH | `crm.customers.contact_email` | `nguyenvana@gmail.com` |
-| `activation_date` | datetime | ✅ | NGAY_0 | `resource.msisdn_status_history.change_date` (lần ACTIVATED đầu tiên) | `2026-04-14 08:00:00` |
-| `total_data_gb` | float | ✅ | Tổng data N1–N30 (GB) | OCS → BSS nightly batch (tổng hợp N1–N30) | `18.5` |
-| `total_voice_min` | float | ✅ | Tổng thoại N1–N30 (phút) | OCS → BSS nightly batch (tổng hợp N1–N30) | `210` |
-| `topup_count` | integer | ✅ | Số lần nạp tiền | OCS → BSS nightly batch | `3` |
-| `plan_change_count` | integer | ✅ | Số lần đổi gói | OCS → BSS nightly batch | `1` |
-| `firebase_token` | string | ❌ | Firebase token | `app_install_log.firebase_token` (SuperApp → Kafka → BSS) | `fMnR8x...` |
-| `current_plan` | string | ✅ | Gói đang dùng hiện tại | OCS → BSS nightly batch | `GOI_DATA_120K` |
-
-**Param template:**
-
-| Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
-|---|---|---|---|---|---|---|
-| `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin tổng kết hành trình 30 ngày | Văn bản | CSV `full_name` | `"Quý khách"` | `Nguyễn Văn A` |
-| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH đến mốc 30 ngày | Văn bản | CSV `msisdn` | — | `0901234567` |
-| `{{tong_data_30_ngay_gb}}` | ✅ | Tổng data KH tiêu thụ 30 ngày đầu — điểm nhấn trong tổng kết | Số | CSV `total_data_gb` | — | `18.5 GB` |
-| `{{tong_thoai_30_ngay_phut}}` | ✅ | Tổng phút thoại 30 ngày đầu — điểm nhấn trong tổng kết | Số | CSV `total_voice_min` | — | `210 phút` |
-| `{{so_lan_nap_tien}}` | ✅ | Số lần nạp tiền — thể hiện mức độ gắn kết với mạng | Số | CSV `topup_count` | — | `3` |
-| `{{so_lan_doi_goi}}` | ✅ | Số lần đổi gói — thể hiện KH chủ động tìm gói phù hợp | Số | CSV `plan_change_count` | — | `1` |
-| `{{ten_goi_hien_tai}}` | ✅ | Gói cước KH đang dùng tại thời điểm tổng kết | Văn bản | CSV `current_plan` | — | `GOI_DATA_120K` |
-| `{{email_kh}}` | ❌ | Email KH để gửi báo cáo tổng kết nếu kênh Email được bật | Văn bản | CSV `contact_email` | không gửi Email, chỉ Banner + Push | `nguyenvana@gmail.com` |
-
----
-
----
-
 #### File: `traffic_spike_{YYYYMMDD}.csv` (E13)
 
 **Mô tả:** Danh sách KH có lưu lượng tăng đột biến > 3x mức nền
@@ -546,21 +550,25 @@
 
 ---
 
-#### File: `billing_2month_{YYYYMM}.csv` (U05)
+#### File: `billing_2month_{YYYYMM}.csv` (U05-A)
 
-**Mô tả:** Danh sách KH hết data sớm (trước ngày 25) trong 2 tháng liên tiếp
+**Mô tả:** Danh sách KH dùng **gói data tháng (MONTHLY)** bị hết data trước ngày N_CUTOFF trong 2 tháng liên tiếp — N_CUTOFF do CVM cấu hình (mặc định: ngày 25)
 **Trigger bởi:** OCS → BSS (nightly), export đầu tháng thứ 3
 **Thời điểm push:** 02:00–04:00 ngày 1 của tháng thứ 3
+
+> **Phạm vi áp dụng:** Chỉ KH đang dùng gói có hạn mức data cố định theo tháng (gói trả trước tháng, gói combo tháng...). Không áp dụng cho gói data/ngày — xem file `daily_quota_pattern_{YYYYMM}.csv` (U05-B).
+>
+> **Ngưỡng cấu hình:** Ngày cut-off (mặc định 25) do CVM cấu hình — BSS không hardcode. Khi CVM thay đổi ngưỡng thì BSS cần được notify để export lại đúng điều kiện. Cần thống nhất cơ chế truyền ngưỡng từ CVM sang BSS (config file, API, hay email thông báo thủ công).
 
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
 | `current_plan` | string | ✅ | Gói đang dùng | OCS → BSS nightly batch | `GOI_DATA_70K` |
-| `month1_depleted_date` | date | ✅ | Ngày hết data tháng 1 | OCS → BSS nightly batch (ngày data về 0 tháng 1) | `2026-03-18` |
-| `month2_depleted_date` | date | ✅ | Ngày hết data tháng 2 | OCS → BSS nightly batch (ngày data về 0 tháng 2) | `2026-04-21` |
-| `month1_total_data_gb` | float | ✅ | Tổng data dùng tháng 1 (GB) | OCS → BSS nightly batch | `15.2` |
-| `month2_total_data_gb` | float | ✅ | Tổng data dùng tháng 2 (GB) | OCS → BSS nightly batch | `16.8` |
-| `suggested_plan` | string | ❌ | Gợi ý gói nâng lên (nếu BSS có thể cung cấp) | OCS hoặc CVM tự tính dựa trên mức dùng trung bình | `GOI_DATA_120K` |
+| `month1_depleted_date` | date | ✅ | Ngày hết data tháng 1 (trước ngày N_CUTOFF) | OCS → BSS nightly batch (ngày data về 0 tháng 1) | `2026-03-18` |
+| `month2_depleted_date` | date | ✅ | Ngày hết data tháng 2 (trước ngày N_CUTOFF) | OCS → BSS nightly batch (ngày data về 0 tháng 2) | `2026-04-21` |
+| `month1_total_data_gb` | float | ✅ | Tổng data KH đã dùng trong tháng 1 (GB) | OCS → BSS nightly batch | `15.2` |
+| `month2_total_data_gb` | float | ✅ | Tổng data KH đã dùng trong tháng 2 (GB) | OCS → BSS nightly batch | `16.8` |
+| `suggested_plan` | string | ❌ | Gợi ý gói tháng nâng lên | OCS hoặc CVM NBO tự tính dựa trên mức dùng trung bình | `GOI_DATA_120K` |
 
 **Param template:**
 
@@ -568,12 +576,62 @@
 |---|---|---|---|---|---|---|
 | `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin gợi ý nâng gói | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
 | `{{so_dien_thoai}}` | ✅ | Số điện thoại KH hết data sớm 2 tháng liên tiếp | Văn bản | CSV `msisdn` | — | `0901234567` |
-| `{{ten_goi_hien_tai}}` | ✅ | Gói đang dùng — làm cơ sở so sánh khi đề xuất nâng gói | Văn bản | CSV `current_plan` | — | `GOI_DATA_70K` |
+| `{{ten_goi_hien_tai}}` | ✅ | Gói tháng đang dùng — làm cơ sở so sánh khi đề xuất nâng | Văn bản | CSV `current_plan` | — | `GOI_DATA_70K` |
 | `{{ngay_het_data_thang_1}}` | ✅ | Ngày hết data tháng trước — minh chứng pattern hết sớm | Ngày (DD/MM/YYYY) | CSV `month1_depleted_date` | — | `18/03/2026` |
 | `{{ngay_het_data_thang_2}}` | ✅ | Ngày hết data tháng gần nhất — xác nhận pattern lặp lại | Ngày (DD/MM/YYYY) | CSV `month2_depleted_date` | — | `21/04/2026` |
 | `{{tong_data_thang_1_gb}}` | ✅ | Tổng data tháng trước KH đã dùng trước khi hết | Số | CSV `month1_total_data_gb` | — | `15.2 GB` |
 | `{{tong_data_thang_2_gb}}` | ✅ | Tổng data tháng gần nhất KH đã dùng trước khi hết | Số | CSV `month2_total_data_gb` | — | `16.8 GB` |
-| `{{goi_nang_de_xuat}}` | ❌ | Tên gói nâng NBO đề xuất dựa trên mức dùng thực tế 2 tháng | Văn bản | CSV `suggested_plan` (optional) hoặc CVM NBO | không hiện tên gói cụ thể | `GOI_DATA_120K` |
+| `{{goi_nang_de_xuat}}` | ❌ | Tên gói tháng NBO đề xuất dựa trên mức dùng thực tế | Văn bản | CSV `suggested_plan` hoặc CVM NBO | không hiện tên gói cụ thể | `GOI_DATA_120K` |
+
+---
+
+---
+
+#### File: `daily_quota_pattern_{YYYYMM}.csv` (U05-B)
+
+**Mô tả:** Danh sách KH dùng **gói data ngày (DAILY)** có pattern hết quota data/ngày thường xuyên — số ngày hết ≥ N_DAYS_THRESHOLD trong M_MONTHS_THRESHOLD tháng liên tiếp; N_DAYS_THRESHOLD và M_MONTHS_THRESHOLD do CVM cấu hình
+**Trigger bởi:** OCS → BSS (nightly), export đầu tháng thứ (M+1)
+**Thời điểm push:** 02:00–04:00 ngày 1 của tháng thứ (M+1)
+
+> **Phạm vi áp dụng:** Chỉ KH đang dùng gói có quota data reset hàng ngày (gói ngày, gói tuần có chia data/ngày...). Không áp dụng cho gói tháng — xem file `billing_2month_{YYYYMM}.csv` (U05-A).
+>
+> **Ngưỡng cấu hình — toàn bộ do CVM cấu hình, BSS không hardcode:**
+> - `N_DAYS_THRESHOLD`: số ngày hết quota/tháng để tính là "thường xuyên" — **[A1] Assumption mặc định: 15 ngày/tháng (≥50%). Cần PO xác nhận.**
+> - `M_MONTHS_THRESHOLD`: số tháng liên tiếp có pattern — **[A2] Assumption mặc định: 2 tháng liên tiếp (nhất quán với U05-A). Cần PO xác nhận.**
+> - `UPSELL_MODE`: chiến lược gợi ý — `DAILY_UPGRADE` (nâng gói ngày lớn hơn), `MONTHLY_UPSELL` (chuyển sang gói tháng), hoặc `BOTH` (đề xuất cả 2, CVM chọn theo NBO) — **[A3] Assumption mặc định: `BOTH`. Cần PO xác nhận.**
+>
+> **⚠️ Vấn đề nguồn dữ liệu (Q21):** Để biết "ngày X KH có hết quota/ngày không", OCS cần có event quota/ngày về 0 hoặc BSS phải tính từ CDR. Nếu OCS không có event này thì compute nặng — cần xác nhận với BSS/Tech trước khi commit schema.
+
+| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+|---|---|---|---|---|---|
+| `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `current_plan` | string | ✅ | Gói ngày đang dùng | OCS → BSS nightly batch | `GOI_DATA_NGAY_10K` |
+| `daily_quota_mb` | integer | ✅ | Hạn mức data/ngày của gói (MB) | OCS — theo định nghĩa gói | `500` |
+| `month1_depleted_days` | integer | ✅ | Số ngày trong tháng 1 mà quota/ngày bị hết | OCS (event quota/ngày = 0) hoặc BSS tính từ CDR — **cần xác nhận nguồn (Q21)** | `18` |
+| `month2_depleted_days` | integer | ✅ | Số ngày trong tháng 2 mà quota/ngày bị hết | OCS (event quota/ngày = 0) hoặc BSS tính từ CDR — **cần xác nhận nguồn (Q21)** | `20` |
+| `month1_avg_depleted_hour` | float | ❌ | Giờ trung bình hết quota trong tháng 1 (0–24) — để CVM hiểu KH hết vào buổi nào | OCS hoặc BSS từ CDR — có thể không có nếu nguồn là event đơn giản | `14.5` |
+| `month2_avg_depleted_hour` | float | ❌ | Giờ trung bình hết quota trong tháng 2 (0–24) | OCS hoặc BSS từ CDR | `13.8` |
+| `month1_total_data_gb` | float | ✅ | Tổng data KH đã dùng trong tháng 1 (GB) | OCS → BSS nightly batch | `14.2` |
+| `month2_total_data_gb` | float | ✅ | Tổng data KH đã dùng trong tháng 2 (GB) | OCS → BSS nightly batch | `15.0` |
+| `suggested_daily_plan` | string | ❌ | Gói ngày lớn hơn được đề xuất (nâng quota/ngày) | OCS hoặc CVM NBO | `GOI_DATA_NGAY_15K` |
+| `suggested_monthly_plan` | string | ❌ | Gói tháng được đề xuất nếu upsell (tính từ avg data/ngày × 30) | CVM NBO tự tính — không lấy từ BSS/OCS | `GOI_DATA_70K` |
+
+**Param template:**
+
+> CVM phân nhánh nội dung theo `UPSELL_MODE` (cấu hình nội bộ CVM): `DAILY_UPGRADE` chỉ gợi ý gói ngày lớn hơn; `MONTHLY_UPSELL` chỉ gợi ý gói tháng; `BOTH` đề xuất cả 2 để KH chọn.
+
+| Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
+|---|---|---|---|---|---|---|
+| `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin gợi ý | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH có pattern hết data/ngày thường xuyên | Văn bản | CSV `msisdn` | — | `0901234567` |
+| `{{ten_goi_hien_tai}}` | ✅ | Gói ngày đang dùng — làm ngữ cảnh cho gợi ý | Văn bản | CSV `current_plan` | — | `GOI_DATA_NGAY_10K` |
+| `{{han_muc_data_ngay_mb}}` | ✅ | Hạn mức data/ngày của gói hiện tại — để KH hiểu tại sao hay hết | Số | CSV `daily_quota_mb` | — | `500 MB` |
+| `{{so_ngay_het_thang_1}}` | ✅ | Số ngày tháng trước KH bị hết quota data/ngày — minh chứng pattern | Số | CSV `month1_depleted_days` | — | `18 ngày` |
+| `{{so_ngay_het_thang_2}}` | ✅ | Số ngày tháng gần nhất KH bị hết quota data/ngày — xác nhận lặp lại | Số | CSV `month2_depleted_days` | — | `20 ngày` |
+| `{{tong_data_thang_1_gb}}` | ✅ | Tổng data tháng trước — để so sánh với gói tháng nếu upsell | Số | CSV `month1_total_data_gb` | — | `14.2 GB` |
+| `{{tong_data_thang_2_gb}}` | ✅ | Tổng data tháng gần nhất — xác nhận mức dùng ổn định | Số | CSV `month2_total_data_gb` | — | `15.0 GB` |
+| `{{goi_ngay_nang_de_xuat}}` | ❌ | Gói ngày lớn hơn NBO đề xuất *(hiển thị khi UPSELL_MODE = DAILY_UPGRADE hoặc BOTH)* | Văn bản | CSV `suggested_daily_plan` hoặc CVM NBO | không hiện nếu không có | `GOI_DATA_NGAY_15K` |
+| `{{goi_thang_upsell_de_xuat}}` | ❌ | Gói tháng NBO đề xuất thay thế *(hiển thị khi UPSELL_MODE = MONTHLY_UPSELL hoặc BOTH)* | Văn bản | CSV `suggested_monthly_plan` hoặc CVM NBO | không hiện nếu không có | `GOI_DATA_70K` |
 
 ---
 
@@ -939,6 +997,53 @@
 
 ---
 
+#### File: `ngay_30_summary_{YYYYMMDD}.csv` (E11)
+
+**Mô tả:** Tổng kết hành trình 30 ngày đầu của KH — bao gồm số liệu viễn thông (data, thoại, nạp tiền, đổi gói) và hành trình trải nghiệm App (nhiệm vụ hoàn thành, điểm tích lũy, giới thiệu bạn bè)
+**Trigger bởi:** BSS (kết hợp OCS + task_log/referral_log từ SuperApp → Kafka → BSS), theo sự kiện NGAY_0 + 30
+**Thời điểm push:** 02:00–04:00 của ngày NGAY_0 + 30
+**Kênh gửi chính:** Banner in-app + Push notification (không phải USSD)
+
+> **Lưu ý nguồn dữ liệu tổng hợp:** E11 là file đa nguồn — BSS phải aggregate cả dữ liệu OCS (viễn thông) lẫn SuperApp (hành trình App) vào cùng 1 file. Cơ chế tương tự E07. Nếu KH chưa cài app thì các trường App (`app_tasks_completed`, `app_points_earned`, `referral_count`) để trống — CVM fallback sang nội dung chỉ có số liệu viễn thông.
+>
+> **⚠️ Cần xác nhận (Q20):** BSS có aggregate được `app_tasks_completed`, `app_points_earned`, `referral_count` lũy kế 30 ngày trong batch nightly không? Hay phải SuperApp cung cấp riêng qua API? Và "giới thiệu thành công" (`referral_count`) được định nghĩa thế nào — bạn bè chỉ cần kích hoạt SIM, hay phải dùng đủ N ngày?
+
+| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+|---|---|---|---|---|---|
+| `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `full_name` | string(64) | ✅ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
+| `activation_date` | datetime | ✅ | NGAY_0 | `resource.msisdn_status_history.change_date` (lần ACTIVATED đầu tiên) | `2026-04-14 08:00:00` |
+| `total_data_gb` | float | ✅ | Tổng data N1–N30 (GB) | OCS → BSS nightly batch (tổng hợp N1–N30) | `18.5` |
+| `total_voice_min` | float | ✅ | Tổng thoại N1–N30 (phút) | OCS → BSS nightly batch (tổng hợp N1–N30) | `210` |
+| `topup_count` | integer | ✅ | Số lần nạp tiền N1–N30 | OCS → BSS nightly batch | `3` |
+| `plan_change_count` | integer | ✅ | Số lần đổi gói N1–N30 | OCS → BSS nightly batch | `1` |
+| `current_plan` | string | ✅ | Gói đang dùng tại ngày N30 | OCS → BSS nightly batch | `GOI_DATA_120K` |
+| `app_tasks_completed` | integer | ❌ ⚠️ | Số nhiệm vụ App KH đã hoàn thành trong 30 ngày | `task_log.completed_task_count` (SuperApp → Kafka → BSS) — cần xác nhận BSS aggregate lũy kế được không | `5` |
+| `app_points_earned` | integer | ❌ ⚠️ | Tổng điểm tích lũy trong App 30 ngày đầu | SuperApp → Kafka → BSS — cần xác nhận nguồn | `350` |
+| `referral_count` | integer | ❌ ⚠️ | Số thuê bao KH đã giới thiệu thành công trong 30 ngày | SuperApp hoặc BSS referral_log — cần xác nhận định nghĩa "thành công" và có tracking không | `2` |
+| `firebase_token` | string | ❌ | Firebase token để gửi Push | `app_install_log.firebase_token` (SuperApp → Kafka → BSS) | `fMnR8x...` |
+| `contact_email` | string | ❌ | Email KH để gửi báo cáo tổng kết | `crm.customers.contact_email` | `nguyenvana@gmail.com` |
+
+**Param template:**
+
+| Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
+|---|---|---|---|---|---|---|
+| `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin tổng kết hành trình 30 ngày | Văn bản | CSV `full_name` | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH đến mốc 30 ngày | Văn bản | CSV `msisdn` | — | `0901234567` |
+| `{{tong_data_30_ngay_gb}}` | ✅ | Tổng data tiêu thụ 30 ngày đầu — điểm nhấn số liệu viễn thông | Số | CSV `total_data_gb` | — | `18.5 GB` |
+| `{{tong_thoai_30_ngay_phut}}` | ✅ | Tổng phút thoại 30 ngày đầu | Số | CSV `total_voice_min` | — | `210 phút` |
+| `{{so_lan_nap_tien}}` | ✅ | Số lần nạp tiền — thể hiện mức độ gắn kết với mạng | Số | CSV `topup_count` | — | `3` |
+| `{{so_lan_doi_goi}}` | ✅ | Số lần đổi gói — thể hiện KH chủ động tìm gói phù hợp | Số | CSV `plan_change_count` | — | `1` |
+| `{{ten_goi_hien_tai}}` | ✅ | Gói cước KH đang dùng tại thời điểm tổng kết | Văn bản | CSV `current_plan` | — | `GOI_DATA_120K` |
+| `{{so_nhiem_vu_hoan_thanh}}` | ❌ ⚠️ | Số nhiệm vụ App đã hoàn thành — điểm nhấn hành trình trải nghiệm App | Số | CSV `app_tasks_completed` — chưa xác nhận nguồn | bỏ phần App nếu trống | `5` |
+| `{{diem_tich_luy}}` | ❌ ⚠️ | Tổng điểm tích lũy trong App 30 ngày — tạo cảm giác thành tựu | Số | CSV `app_points_earned` — chưa xác nhận nguồn | bỏ phần điểm nếu trống | `350 điểm` |
+| `{{so_thuê_bao_gioi_thieu}}` | ❌ ⚠️ | Số bạn bè KH đã giới thiệu dùng mạng — củng cố hành vi advocacy | Số | CSV `referral_count` — chưa xác nhận tracking | bỏ phần giới thiệu nếu trống | `2 bạn` |
+| `{{email_kh}}` | ❌ | Email KH để gửi báo cáo tổng kết nếu kênh Email được bật | Văn bản | CSV `contact_email` | không gửi Email, chỉ Banner + Push | `nguyenvana@gmail.com` |
+
+---
+
+---
+
 ## NHÓM 3 — Gia hạn gói/dịch vụ
 
 ### 3.1 Batch/CSV
@@ -1189,3 +1294,9 @@
 | Q16 | E_LOCK_1C / E_PRE_LOCK_2C / E_LOCK_2C: BSS có sẵn trường ghi thời gian dự kiến chuyển trạng thái không? Hay CVM phải tự tính từ quy định nghiệp vụ? | E_LOCK_1C, E_PRE_LOCK_2C, E_LOCK_2C | 🟡 Quan trọng |
 | Q17 | Rule chặn E_ZERO_BALANCE vs E06: window 12h có đủ không, hay nên dùng window 24h? Ai owns logic chặn — CVM hay BSS? | E_ZERO_BALANCE, E06 | 🟡 Quan trọng |
 | Q18 | U_RENEWAL_STREAK vs U08: có cần đồng bộ điều kiện x (số chu kỳ tối thiểu) giữa hai trigger để tránh KH nhận 2 tin vinh danh cùng lúc không? | U_RENEWAL_STREAK, U08 | 🟢 Nice-to-have |
+| Q19 | E_VOICE_100: OCS có tách quota thoại nội mạng và ngoại mạng riêng không? Nếu gói gộp chung 1 quota thì 2 event ONNET/OFFNET dùng chung 1 event với trường `call_type = BOTH` | E_VOICE_100_ONNET, E_VOICE_100_OFFNET | 🔴 Cần ngay |
+| Q20 | E11 — hành trình App: BSS có aggregate `app_tasks_completed`, `app_points_earned`, `referral_count` trong batch nightly 30 ngày không, hay phải SuperApp cung cấp riêng theo API? | E11 | 🟡 Quan trọng |
+| Q21a | U05-B: OCS có event riêng khi quota data/ngày về 0 không (giống E08 nhưng 100%)? Nếu có thì BSS đếm được số ngày hết/tháng ngay. Nếu không thì BSS phải tính từ CDR — cần xác nhận compute có khả thi không | U05-B | 🔴 Cần ngay |
+| Q21b | U05-B: Ngưỡng N_DAYS_THRESHOLD (số ngày hết/tháng) và M_MONTHS_THRESHOLD (số tháng liên tiếp) là bao nhiêu? Assumption hiện tại: 15 ngày và 2 tháng | U05-B | 🟡 Quan trọng |
+| Q21c | U05-B: UPSELL_MODE mặc định là gì — chỉ gợi ý nâng gói ngày (DAILY_UPGRADE), chuyển hẳn sang gói tháng (MONTHLY_UPSELL), hay đề xuất cả 2 (BOTH)? Assumption hiện tại: BOTH | U05-B | 🟡 Quan trọng |
+| Q21d | U05-A + U05-B: Ngưỡng cut-off ngày 25 (U05-A) và N_DAYS_THRESHOLD (U05-B) do CVM cấu hình — cơ chế truyền ngưỡng từ CVM sang BSS là gì? Config file, API notify, hay thủ công? | U05-A, U05-B | 🟡 Quan trọng |
