@@ -125,35 +125,35 @@ Tạo React prototype từ wireframe và dùng ui-feedback-agent để xử lý 
 
 Khi agent hoặc task yêu cầu skill, phải đọc skill tương ứng trước khi viết output:
 
-- `.claude/skills/input-analysis.md` — đọc và trích xuất requirement từ tài liệu có sẵn (PRD, email, ghi chú); phân loại rõ/chưa rõ/mâu thuẫn
-- `.claude/skills/requirement-clarification.md` — làm rõ requirement
-- `.claude/skills/problem-framing.md` — đóng khung bài toán
-- `.claude/skills/domain-research.md` — research domain mới, tổng hợp bối cảnh và thuật ngữ nghiệp vụ
-- `.claude/skills/domain-gap-analysis.md` — so sánh domain điển hình (từ Domain Brief) với yêu cầu thực tế của client; output là danh sách gap CRITICAL/MAJOR/MINOR để định hướng câu hỏi clarify
-- `.claude/skills/as-is-analysis.md` — phân tích hiện trạng thực tế dự án (hệ thống cũ, quy trình đang chạy, constraint); xác định đã biết gì và còn mở gì để thu hẹp phạm vi Clarification
-- `.claude/skills/stakeholder-mapping.md` — xác định stakeholder
-- `.claude/skills/context-constraint-analysis.md` — phân tích context và ràng buộc
-- `.claude/skills/assumption-risk-analysis.md` — xác định assumption và risk
-- `.claude/skills/user-persona-identification.md` — xác định user/persona
-- `.claude/skills/wireframe-design-system.md` — chuẩn thiết kế chung cho wireframe và React prototype; project có thể override bằng `design-guideline.md`
-- `.claude/skills/react-ui-generation.md` — tạo React prototype từ wireframe/solution
-- `.claude/skills/ui-feedback-triage.md` — phân loại feedback UI và xác định phạm vi sửa
-- `.claude/skills/urd-srs-structure.md` — cấu trúc chuẩn tài liệu URD/SRS
-- `.claude/skills/urd-workflow-diagram.md` — tạo Workflow Diagram/Swimlane và bảng diễn giải cho URD/SRS section II.1
-- `.claude/skills/urd-function-tree.md` — tạo Business Function Diagram/cây phân cấp chức năng cho URD/SRS section II.2
-- `.claude/skills/urd-permission-matrix.md` — tạo Permission Matrix và RBAC Matrix cho URD/SRS section II.3 và II.4
-- `.claude/skills/urd-sequence-diagram.md` — tạo Sequence Diagram và bảng diễn giải cho URD/SRS section II.5
-- `.claude/skills/urd-use-case.md` — viết Use Case Specification chi tiết cho URD/SRS section III
-- `.claude/skills/urd-screen-spec.md` — viết đặc tả giao diện chức năng cho URD/SRS section IV
-- `.claude/skills/urd-review-checklist.md` — checklist review chất lượng URD/SRS trước khi chốt
-- `.claude/skills/solution-critique.md` — framework phản biện solution 4 lens (User / Business / Feasibility / Risk)
-- `.claude/skills/document-integrity-check.md` — kiểm tra cấu trúc, traceability, naming và version hygiene của tài liệu
-- `.claude/skills/process-log.md` — trích xuất decision, assumption, scope delta và tạo handoff note
-- `.claude/skills/traceability-map.md` — xây dựng và duy trì Traceability Map; link REQ → UC → WF → URD Section → Story
-- `.claude/skills/impact-analysis.md` — tính artifact bị ảnh hưởng khi requirement thay đổi; output Impact Report cho orchestrator
-- `.claude/skills/change-handler.md` — parse trigger thay đổi từ BA mô tả hoặc file PO mới; output Change Set chuẩn hóa
-- `.claude/skills/artifact-patch.md` — patch đúng phần bị ảnh hưởng trong từng artifact theo Impact Report; không viết lại toàn bộ
-- `.claude/skills/resolve-oqs.md` — collect + resolve Open Questions sau mỗi Write doc; cascade scan section bị ảnh hưởng; chạy trước suggest downstream
+- `.claude/skills/clarification/input-analysis.md` — đọc và trích xuất requirement từ tài liệu có sẵn (PRD, email, ghi chú); phân loại rõ/chưa rõ/mâu thuẫn
+- `.claude/skills/clarification/requirement-clarification.md` — làm rõ requirement
+- `.claude/skills/clarification/problem-framing.md` — đóng khung bài toán
+- `.claude/skills/clarification/domain-research.md` — research domain mới, tổng hợp bối cảnh và thuật ngữ nghiệp vụ
+- `.claude/skills/clarification/domain-gap-analysis.md` — so sánh domain điển hình (từ Domain Brief) với yêu cầu thực tế của client; output là danh sách gap CRITICAL/MAJOR/MINOR để định hướng câu hỏi clarify
+- `.claude/skills/clarification/as-is-analysis.md` — phân tích hiện trạng thực tế dự án (hệ thống cũ, quy trình đang chạy, constraint); xác định đã biết gì và còn mở gì để thu hẹp phạm vi Clarification
+- `.claude/skills/solution/stakeholder-mapping.md` — xác định stakeholder
+- `.claude/skills/solution/context-constraint-analysis.md` — phân tích context và ràng buộc
+- `.claude/skills/solution/assumption-risk-analysis.md` — xác định assumption và risk
+- `.claude/skills/solution/user-persona-identification.md` — xác định user/persona
+- `.claude/skills/ui/wireframe-design-system.md` — chuẩn thiết kế chung cho wireframe và React prototype; project có thể override bằng `design-guideline.md`
+- `.claude/skills/ui/react-ui-generation.md` — tạo React prototype từ wireframe/solution
+- `.claude/skills/ui/ui-feedback-triage.md` — phân loại feedback UI và xác định phạm vi sửa
+- `.claude/skills/urd/urd-srs-structure.md` — cấu trúc chuẩn tài liệu URD/SRS
+- `.claude/skills/urd/urd-workflow-diagram.md` — tạo Workflow Diagram/Swimlane và bảng diễn giải cho URD/SRS section II.1
+- `.claude/skills/urd/urd-function-tree.md` — tạo Business Function Diagram/cây phân cấp chức năng cho URD/SRS section II.2
+- `.claude/skills/urd/urd-permission-matrix.md` — tạo Permission Matrix và RBAC Matrix cho URD/SRS section II.3 và II.4
+- `.claude/skills/urd/urd-sequence-diagram.md` — tạo Sequence Diagram và bảng diễn giải cho URD/SRS section II.5
+- `.claude/skills/urd/urd-use-case.md` — viết Use Case Specification chi tiết cho URD/SRS section III
+- `.claude/skills/urd/urd-screen-spec.md` — viết đặc tả giao diện chức năng cho URD/SRS section IV
+- `.claude/skills/urd/urd-review-checklist.md` — checklist review chất lượng URD/SRS trước khi chốt
+- `.claude/skills/solution/solution-critique.md` — framework phản biện solution 4 lens (User / Business / Feasibility / Risk)
+- `.claude/skills/urd/document-integrity-check.md` — kiểm tra cấu trúc, traceability, naming và version hygiene của tài liệu
+- `.claude/skills/shared/process-log.md` — trích xuất decision, assumption, scope delta và tạo handoff note
+- `.claude/skills/sync/traceability-map.md` — xây dựng và duy trì Traceability Map; link REQ → UC → WF → URD Section → Story
+- `.claude/skills/sync/impact-analysis.md` — tính artifact bị ảnh hưởng khi requirement thay đổi; output Impact Report cho orchestrator
+- `.claude/skills/sync/change-handler.md` — parse trigger thay đổi từ BA mô tả hoặc file PO mới; output Change Set chuẩn hóa
+- `.claude/skills/sync/artifact-patch.md` — patch đúng phần bị ảnh hưởng trong từng artifact theo Impact Report; không viết lại toàn bộ
+- `.claude/skills/shared/resolve-oqs.md` — collect + resolve Open Questions sau mỗi Write doc; cascade scan section bị ảnh hưởng; chạy trước suggest downstream
 
 Mapping bắt buộc:
 
@@ -229,15 +229,15 @@ Với tác vụ `REVIEW`:
 Khi user yêu cầu tạo URD, SRS, tài liệu đặc tả yêu cầu người dùng hoặc tài liệu dev/test ready:
 
 1. Đọc `.claude/agents/urd-srs-agent.md`.
-2. Đọc `.claude/skills/urd-srs-structure.md`.
+2. Đọc `.claude/skills/urd/urd-srs-structure.md`.
 3. Đọc các skill section-level bắt buộc khi viết URD/SRS:
-   - `.claude/skills/urd-workflow-diagram.md` — II.1 Workflow Diagram
-   - `.claude/skills/urd-function-tree.md` — II.2 Business Function Diagram
-   - `.claude/skills/urd-permission-matrix.md` — II.3 Permission Matrix và II.4 RBAC Matrix
-   - `.claude/skills/urd-sequence-diagram.md` — II.5 Sequence Diagram
-   - `.claude/skills/urd-use-case.md` — III Use Case Specification
-   - `.claude/skills/urd-screen-spec.md` — IV Giao diện chức năng
-4. Nếu có `.claude/skills/urd-review-checklist.md`, đọc trước khi tự review hoặc gọi `ba-qa-agent`.
+   - `.claude/skills/urd/urd-workflow-diagram.md` — II.1 Workflow Diagram
+   - `.claude/skills/urd/urd-function-tree.md` — II.2 Business Function Diagram
+   - `.claude/skills/urd/urd-permission-matrix.md` — II.3 Permission Matrix và II.4 RBAC Matrix
+   - `.claude/skills/urd/urd-sequence-diagram.md` — II.5 Sequence Diagram
+   - `.claude/skills/urd/urd-use-case.md` — III Use Case Specification
+   - `.claude/skills/urd/urd-screen-spec.md` — IV Giao diện chức năng
+4. Nếu có `.claude/skills/urd/urd-review-checklist.md`, đọc trước khi tự review hoặc gọi `ba-qa-agent`.
 5. Nếu có template trong `.claude/input/urd-template.md`, dùng template đó làm tham chiếu format.
 6. Phân tích Actors, chức năng chính, quy trình nghiệp vụ, phân quyền và thông tin còn thiếu.
 7. Nếu thiếu thông tin critical, hỏi lại trước khi viết bản hoàn chỉnh.
@@ -278,8 +278,8 @@ Sau khi tạo hoặc refine URD/SRS:
 Khi user yêu cầu tạo hoặc refine wireframe:
 
 - Đọc `.claude/agents/ba-wireframe-agent.md`.
-- Đọc `.claude/skills/wireframe-design-system.md`.
-- Đọc `.claude/skills/ui-feedback-triage.md`.
+- Đọc `.claude/skills/ui/wireframe-design-system.md`.
+- Đọc `.claude/skills/ui/ui-feedback-triage.md`.
 - Trước khi bắt đầu, kiểm tra design guideline riêng của dự án: `.claude/output/[tên_dự_án]/design-guideline.md` hoặc pattern hiện có tương đương trong thư mục output dự án. Nếu có, dùng file đó làm chuẩn chính; `wireframe-design-system.md` chỉ áp dụng cho phần không override.
 - Bám sát solution/user flow đã có; nếu có User Stories và Acceptance Criteria thì trace về các artifact đó.
 - Lưu version mới theo pattern `.claude/output/[tên_dự_án]/wireframe/wireframe-v[N].md`, hoặc theo pattern hiện có trong thư mục dự án.
@@ -287,8 +287,8 @@ Khi user yêu cầu tạo hoặc refine wireframe:
 Khi user yêu cầu tạo React prototype hoặc xem trực quan:
 
 - Đọc `.claude/agents/ui-react-agent.md`.
-- Đọc `.claude/skills/wireframe-design-system.md`.
-- Đọc `.claude/skills/react-ui-generation.md`.
+- Đọc `.claude/skills/ui/wireframe-design-system.md`.
+- Đọc `.claude/skills/ui/react-ui-generation.md`.
 - Kiểm tra design guideline riêng của dự án trước khi áp dụng chuẩn chung.
 - Tạo prototype dựa trên wireframe/solution đã chốt ở vòng hiện tại.
 - Không biến prototype thành production code; prototype phục vụ review UI/UX và feedback nghiệp vụ.
@@ -296,7 +296,7 @@ Khi user yêu cầu tạo React prototype hoặc xem trực quan:
 Khi user đưa feedback giao diện:
 
 - Đọc `.claude/agents/ui-feedback-agent.md`.
-- Đọc `.claude/skills/ui-feedback-triage.md`.
+- Đọc `.claude/skills/ui/ui-feedback-triage.md`.
 - Triage feedback trước khi sửa: phân loại nội dung nào là lỗi, thay đổi layout, thay đổi copy, thay đổi luồng, hoặc yêu cầu mới.
 - Chỉ sửa đúng phần đã được xác nhận; không tái tạo toàn bộ wireframe/prototype.
 

@@ -8,7 +8,7 @@ Bạn là auditor tài liệu BA — chuyên kiểm tra tính toàn vẹn **cấ
 ## Skill bắt buộc
 
 Trước khi bắt đầu, **đọc và áp dụng**:
-- `.claude/skills/document-integrity-check.md` — 5 kiểm tra toàn vẹn: section completeness, traceability chain, naming consistency, version hygiene, placeholder detection
+- `.claude/skills/urd/document-integrity-check.md` — 5 kiểm tra toàn vẹn: section completeness, traceability chain, naming consistency, version hygiene, placeholder detection
 
 ---
 

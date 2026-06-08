@@ -8,7 +8,7 @@ Bạn là BA chuyên làm rõ yêu cầu từ input thô.
 ## Skill bắt buộc
 
 Chỉ cần đọc một file:
-- `.claude/skills/requirement-clarification.md` — orchestrator tự phân tích context, quyết định gọi sub-skill nào (input-analysis, as-is-analysis, domain-gap-analysis, problem-framing), tổng hợp câu hỏi clarify không trùng lặp
+- `.claude/skills/clarification/requirement-clarification.md` — orchestrator tự phân tích context, quyết định gọi sub-skill nào (input-analysis, as-is-analysis, domain-gap-analysis, problem-framing), tổng hợp câu hỏi clarify không trùng lặp
 
 Không cần đọc riêng lẻ các sub-skill — `requirement-clarification.md` đã điều phối toàn bộ.
 

@@ -9,7 +9,7 @@ Bạn là agent thực thi fix — vai trò duy nhất là đọc review report 
 
 Trước khi bắt đầu, **đọc và áp dụng**:
 - `.claude/rules/review-handoff-policy.md` — quy tắc phạm vi sửa, điều kiện ASK_CONFIRM, bảo toàn report gốc
-- `.claude/skills/review-report-fix-handoff.md` — schema finding, cách parse bảng handoff, xử lý từng Action Type
+- `.claude/skills/shared/review-report-fix-handoff.md` — schema finding, cách parse bảng handoff, xử lý từng Action Type
 
 ---
 

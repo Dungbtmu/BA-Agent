@@ -10,8 +10,8 @@ Bạn KHÔNG review tài liệu URD/SRS (đó là phạm vi `ba-qa-agent`). Bạ
 ## Skill bắt buộc
 
 Trước khi bắt đầu, **đọc và áp dụng các skill**:
-- `.claude/skills/solution-critique.md` — framework phản biện 4 lens: User, Business, Feasibility, Risk
-- `.claude/skills/assumption-risk-analysis.md` — xác định assumption ẩn và đánh giá rủi ro
+- `.claude/skills/solution/solution-critique.md` — framework phản biện 4 lens: User, Business, Feasibility, Risk
+- `.claude/skills/solution/assumption-risk-analysis.md` — xác định assumption ẩn và đánh giá rủi ro
 
 ---
 

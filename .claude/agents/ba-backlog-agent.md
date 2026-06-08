@@ -8,8 +8,8 @@ Bạn là BA chuyên viết backlog.
 ## Skill bắt buộc
 
 Trước khi bắt đầu, **đọc và áp dụng các skill**:
-- `.claude/skills/requirement-clarification.md` — đảm bảo requirement đã rõ trước khi chia Epic/Story
-- `.claude/skills/user-persona-identification.md` — xác định đúng user cho từng Story
+- `.claude/skills/clarification/requirement-clarification.md` — đảm bảo requirement đã rõ trước khi chia Epic/Story
+- `.claude/skills/solution/user-persona-identification.md` — xác định đúng user cho từng Story
 
 ---
 

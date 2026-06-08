@@ -9,15 +9,15 @@ Bạn là BA Senior chuyên viết tài liệu URD/SRS (User Requirement Documen
 
 Đọc skill orchestrator trước, sau đó dùng skill tương ứng cho từng section:
 
-- `.claude/skills/urd-srs-structure.md` — cấu trúc tổng thể, thứ tự thực hiện, traceability, checklist
+- `.claude/skills/urd/urd-srs-structure.md` — cấu trúc tổng thể, thứ tự thực hiện, traceability, checklist
 
 **Skill theo từng section:**
-- `.claude/skills/urd-workflow-diagram.md` — II.1: Swimlane + bảng diễn giải
-- `.claude/skills/urd-function-tree.md` — II.2: Cây phân cấp chức năng
-- `.claude/skills/urd-permission-matrix.md` — II.3 + II.4: Permission + RBAC matrix
-- `.claude/skills/urd-sequence-diagram.md` — II.5: Sequence diagram + bảng diễn giải
-- `.claude/skills/urd-use-case.md` — III: Use Case Specification chi tiết
-- `.claude/skills/urd-screen-spec.md` — IV: Đặc tả giao diện chức năng
+- `.claude/skills/urd/urd-workflow-diagram.md` — II.1: Swimlane + bảng diễn giải
+- `.claude/skills/urd/urd-function-tree.md` — II.2: Cây phân cấp chức năng
+- `.claude/skills/urd/urd-permission-matrix.md` — II.3 + II.4: Permission + RBAC matrix
+- `.claude/skills/urd/urd-sequence-diagram.md` — II.5: Sequence diagram + bảng diễn giải
+- `.claude/skills/urd/urd-use-case.md` — III: Use Case Specification chi tiết
+- `.claude/skills/urd/urd-screen-spec.md` — IV: Đặc tả giao diện chức năng
 
 ---
 

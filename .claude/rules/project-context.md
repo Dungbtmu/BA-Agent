@@ -47,14 +47,44 @@ Loại tài liệu đầu ra đa dạng, tùy theo yêu cầu: Backlog, Epic, Us
 │   ├── agent-workflow.md      ← pipeline + intent recognition + chế độ vận hành
 │   ├── output-schema.md
 │   └── review-handoff-policy.md  ← Quy tắc phạm vi sửa khi apply review report
-├── skills/                    ← Skill chuyên biệt, agent đọc khi cần
-│   ├── [BA skills]            ← problem-framing, requirement-clarification, stakeholder-mapping,
-│   │                             assumption-risk-analysis, context-constraint-analysis,
-│   │                             user-persona-identification, domain-research, solution-critique
-│   ├── [UI skills]            ← react-ui-generation, ui-feedback-triage, wireframe-design-system
-│   ├── [URD skills]           ← urd-srs-structure (orchestrator) + 6 skill con theo từng section
-│   │                             + urd-review-checklist, document-integrity-check, process-log
-│   └── review-report-fix-handoff.md  ← Schema và quy trình parse bảng handoff từ review report
+├── skills/                    ← Skill chuyên biệt, agent đọc khi cần — tổ chức theo nhóm
+│   ├── clarification/         ← Phase 1: làm rõ yêu cầu
+│   │   ├── requirement-clarification.md  ← orchestrator
+│   │   ├── input-analysis.md
+│   │   ├── as-is-analysis.md
+│   │   ├── domain-research.md
+│   │   ├── domain-gap-analysis.md
+│   │   └── problem-framing.md
+│   ├── solution/              ← Phase 1: thiết kế giải pháp
+│   │   ├── stakeholder-mapping.md
+│   │   ├── user-persona-identification.md
+│   │   ├── context-constraint-analysis.md
+│   │   ├── assumption-risk-analysis.md
+│   │   └── solution-critique.md
+│   ├── ui/                    ← Phase 2: giao diện
+│   │   ├── wireframe-design-system.md
+│   │   ├── react-ui-generation.md
+│   │   └── ui-feedback-triage.md
+│   ├── urd/                   ← Phase 3: tài liệu URD/SRS
+│   │   ├── urd-srs-structure.md  ← orchestrator
+│   │   ├── urd-workflow-diagram.md
+│   │   ├── urd-function-tree.md
+│   │   ├── urd-permission-matrix.md
+│   │   ├── urd-sequence-diagram.md
+│   │   ├── urd-use-case.md
+│   │   ├── urd-screen-spec.md
+│   │   ├── urd-review-checklist.md
+│   │   └── document-integrity-check.md
+│   ├── sync/                  ← SYNC mode: đồng bộ artifact khi requirement thay đổi
+│   │   ├── change-handler.md
+│   │   ├── impact-analysis.md
+│   │   ├── artifact-patch.md
+│   │   └── traceability-map.md
+│   ├── shared/                ← Dùng chung xuyên phase
+│   │   ├── resolve-oqs.md
+│   │   ├── process-log.md
+│   │   └── review-report-fix-handoff.md
+│   └── diagram/               ← Skill vẽ diagram (Excalidraw) — cấu trúc riêng
 ├── input/                     ← Tài liệu đầu vào từ PO/stakeholder
 │   └── review-reports/        ← Inbox nhận review report từ Agent Review Agent
 │       └── [tên-report].md
@@ -76,5 +106,5 @@ Hệ thống có bridge để nhận và apply review report từ Agent Review A
 - **Inbox report:** `.claude/input/review-reports/[tên-report].md`
 - **Agent xử lý:** `ba-agent-fix-agent` — đọc report, convert thành patch plan, sửa đúng file
 - **Policy:** `.claude/rules/review-handoff-policy.md` — quy tắc allowlist file, điều kiện ASK_CONFIRM
-- **Skill parse:** `.claude/skills/review-report-fix-handoff.md` — schema finding, xử lý từng Action Type
+- **Skill parse:** `.claude/skills/shared/review-report-fix-handoff.md` — schema finding, xử lý từng Action Type
 - **Output:** `.claude/input/review-reports/fix-summary-[tên-report].md` — báo cáo kết quả sau khi apply

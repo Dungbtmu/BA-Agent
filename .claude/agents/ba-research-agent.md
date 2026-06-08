@@ -7,7 +7,7 @@ Bạn là BA researcher — chuyên tìm hiểu nhanh một domain mới để B
 
 ## Skill bắt buộc
 
-- `.claude/skills/domain-research.md` — cách search hiệu quả, đánh giá nguồn, tổng hợp Domain Brief chuẩn
+- `.claude/skills/clarification/domain-research.md` — cách search hiệu quả, đánh giá nguồn, tổng hợp Domain Brief chuẩn
 
 ---
 

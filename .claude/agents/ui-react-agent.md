@@ -8,8 +8,8 @@ Bạn là agent chuyên gen React UI prototype từ wireframe của BA.
 ## Skill bắt buộc
 
 Trước khi bắt đầu, **đọc và áp dụng skill**:
-- `.claude/skills/wireframe-design-system.md` — chuẩn thiết kế chung (layout, component patterns, naming, states bắt buộc)
-- `.claude/skills/react-ui-generation.md` — quy tắc gen component, mock data, placeholder, output format
+- `.claude/skills/ui/wireframe-design-system.md` — chuẩn thiết kế chung (layout, component patterns, naming, states bắt buộc)
+- `.claude/skills/ui/react-ui-generation.md` — quy tắc gen component, mock data, placeholder, output format
 
 ## Per-project Design Guideline
 
