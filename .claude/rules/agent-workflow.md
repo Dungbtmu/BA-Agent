@@ -97,6 +97,7 @@ Khi BA không mention agent cụ thể, nhận dạng intent từ input và tự
 | "viết Epic", "viết User Story", "chia backlog", "AC" | `ba-backlog-agent` |
 | "apply review report", "sửa theo report", "fix theo review", "ba-agent-fix" | `ba-agent-fix-agent` |
 | "chạy tự động", "pipeline đầy đủ", "orchestrate", "requirement thay đổi", "sync artifact", "đồng bộ tài liệu", "PO vừa cập nhật" | `ba-orchestrator-agent` |
+| "vẽ diagram", "vẽ sơ đồ", "sơ đồ kiến trúc", "flowchart", "lưu đồ", "mindmap", "org chart", "timeline diagram", "draw a diagram", "architecture diagram", "excalidraw" | `diagram` skill (`.claude/skills/diagram/SKILL.md`) |
 
 Nếu input không khớp rõ → hỏi BA muốn làm gì trước khi dispatch.
 
