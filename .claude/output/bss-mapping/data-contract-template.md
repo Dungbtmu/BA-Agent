@@ -769,31 +769,41 @@
 
 #### File: `early_depleted_{YYYYMMDD}.csv` (E_EARLY_DEPLETED)
 
-**Mô tả:** Danh sách KH có nhu cầu lớn hơn gói đăng ký — hết ưu đãi data/thoại trước ngày hết hạn chu kỳ, pattern lặp ≥ 3 chu kỳ liên tiếp
-**Trigger bởi:** OCS → BSS (nightly batch, phân tích pattern 3 chu kỳ)
+**Mô tả:** Danh sách KH cần tư vấn gói cước theo nhu cầu sử dụng thực tế. CVM/BSS phân tích mức sử dụng data/thoại so với gói hiện tại để xác định KH có **nhu cầu lớn** cần tư vấn gói lớn hơn, hoặc **nhu cầu nhỏ** cần tư vấn gói nhỏ/tiết kiệm hơn.
+**Trigger bởi:** OCS → BSS (nightly batch, phân tích mức sử dụng theo chu kỳ)
 **Thời điểm push:** 02:00–04:00 hàng ngày
+
+> **Rule phân loại nhu cầu:** `usage_need_segment = HIGH_NEED` khi mức sử dụng thực tế cao hơn đáng kể so với hạn mức/giá trị gói hiện tại; CVM tư vấn gói lớn hơn. `usage_need_segment = LOW_NEED` khi mức sử dụng thực tế thấp hơn đáng kể so với gói hiện tại; CVM tư vấn gói nhỏ hơn hoặc gói tiết kiệm hơn. Ngưỡng cụ thể do PO/CVM cấu hình theo từng loại tài nguyên và từng nhóm gói, không hard-code trong contract này.
+>
+> **Điều kiện dữ liệu tối thiểu:** Mỗi bản ghi phải có ít nhất một cặp dữ liệu đủ để tính nhu cầu: `avg_data_usage_mb` + `current_plan_data_quota_mb`, hoặc `avg_voice_usage_min` + `current_plan_voice_quota_min`.
 
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
 | `current_plan` | string | ✅ | Gói đang dùng | OCS → BSS nightly batch | `GOI_DATA_70K` |
-| `cycle1_depleted_date` | date | ✅ | Ngày hết ưu đãi chu kỳ 1 | OCS → BSS nightly batch | `2026-04-18` |
-| `cycle2_depleted_date` | date | ✅ | Ngày hết ưu đãi chu kỳ 2 | OCS → BSS nightly batch | `2026-05-16` |
-| `cycle3_depleted_date` | date | ✅ | Ngày hết ưu đãi chu kỳ 3 (gần nhất) | OCS → BSS nightly batch | `2026-06-02` |
-| `avg_days_before_expiry` | float | ✅ | Trung bình số ngày hết sớm trước hạn chu kỳ | BSS tính từ 3 chu kỳ | `12.3` |
-| `depleted_resource` | string | ✅ | Loại tài nguyên hết sớm | OCS phân loại | `DATA` hoặc `VOICE` hoặc `BOTH` |
-| `suggested_plan` | string | ❌ | Gói nâng lên đề xuất | OCS hoặc CVM NBO | `GOI_DATA_120K` |
+| `analysis_period_cycles` | integer | ✅ | Số chu kỳ gần nhất dùng để phân tích nhu cầu | BSS/CVM cấu hình | `3` |
+| `avg_data_usage_mb` | float | ❌ | Data trung bình KH đã dùng trong mỗi chu kỳ phân tích | OCS → BSS nightly batch | `35840` |
+| `avg_voice_usage_min` | float | ❌ | Số phút thoại trung bình KH đã dùng trong mỗi chu kỳ phân tích | OCS → BSS nightly batch | `420` |
+| `current_plan_data_quota_mb` | float | ❌ | Hạn mức data của gói hiện tại trong mỗi chu kỳ | OCS — định nghĩa gói | `20480` |
+| `current_plan_voice_quota_min` | float | ❌ | Hạn mức thoại của gói hiện tại trong mỗi chu kỳ | OCS — định nghĩa gói | `300` |
+| `usage_to_quota_pct` | float | ✅ | Tỷ lệ sử dụng thực tế so với hạn mức/giá trị gói hiện tại, dùng làm cơ sở phân loại nhu cầu | BSS tính từ usage và quota theo tài nguyên chính | `175.0` |
+| `primary_usage_resource` | string | ✅ | Tài nguyên chính dẫn tới phân loại nhu cầu | OCS/BSS phân loại theo mức sử dụng nổi bật nhất | `DATA` hoặc `VOICE` hoặc `BOTH` |
+| `usage_need_segment` | string | ✅ | Phân khúc nhu cầu theo mức sử dụng thực tế | BSS tính theo ngưỡng PO/CVM cấu hình, hoặc CVM tự tính nếu chỉ nhận dữ liệu thô | `HIGH_NEED` hoặc `LOW_NEED` |
+| `recommendation_direction` | string | ✅ | Hướng tư vấn gói cho KH | CVM/BSS mapping từ `usage_need_segment` | `UPSIZE` hoặc `DOWNSIZE` |
+| `suggested_plan` | string | ❌ | Gói đề xuất phù hợp với nhu cầu: gói lớn hơn nếu `HIGH_NEED`, gói nhỏ/tiết kiệm hơn nếu `LOW_NEED` | CVM NBO ưu tiên tự tính; BSS chỉ cung cấp nếu đã có rule thống nhất | `GOI_DATA_120K` hoặc `GOI_DATA_50K` |
 
 **Param template:**
 
 | Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
 |---|---|---|---|---|---|---|
-| `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin nhắn gợi ý nâng gói | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
-| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH có pattern hết sớm | Văn bản | CSV `msisdn` | — | `0901234567` |
-| `{{ten_goi_hien_tai}}` | ✅ | Gói đang dùng — cơ sở so sánh khi gợi ý nâng | Văn bản | CSV `current_plan` | — | `GOI_DATA_70K` |
-| `{{loai_tai_nguyen_het_som}}` | ✅ | Loại tài nguyên hết sớm (data/thoại) để cá nhân hóa nội dung | Văn bản | CSV `depleted_resource` | — | `DATA` |
-| `{{so_ngay_het_som_trung_binh}}` | ✅ | Số ngày trung bình hết sớm trước chu kỳ — bằng chứng pattern | Số | CSV `avg_days_before_expiry` | — | `12 ngày` |
-| `{{goi_nang_de_xuat}}` | ❌ | Tên gói nâng NBO đề xuất phù hợp nhu cầu thực | Văn bản | CSV `suggested_plan` hoặc CVM NBO | không hiện tên gói cụ thể | `GOI_DATA_120K` |
+| `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin nhắn tư vấn gói | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH được phân tích nhu cầu | Văn bản | CSV `msisdn` | — | `0901234567` |
+| `{{ten_goi_hien_tai}}` | ✅ | Gói đang dùng — cơ sở so sánh khi tư vấn gói phù hợp hơn | Văn bản | CSV `current_plan` | — | `GOI_DATA_70K` |
+| `{{phan_khuc_nhu_cau}}` | ✅ | Phân khúc nhu cầu theo mức sử dụng thực tế để CVM phân nhánh nội dung | Văn bản | CSV `usage_need_segment` | — | `HIGH_NEED` |
+| `{{loai_nhu_cau_chinh}}` | ✅ | Loại tài nguyên chính khiến KH cần đổi gói | Văn bản | CSV `primary_usage_resource` | — | `DATA` |
+| `{{ty_le_su_dung_so_voi_goi}}` | ✅ | Tỷ lệ sử dụng so với gói hiện tại — bằng chứng để giải thích vì sao tư vấn đổi gói | Số | CSV `usage_to_quota_pct` | — | `175.0%` |
+| `{{huong_tu_van_goi}}` | ✅ | Hướng tư vấn gói: gói lớn hơn cho nhu cầu lớn, gói nhỏ/tiết kiệm hơn cho nhu cầu nhỏ | Văn bản | CSV `recommendation_direction` | — | `UPSIZE` |
+| `{{goi_de_xuat_theo_nhu_cau}}` | ❌ | Tên gói NBO đề xuất phù hợp với phân khúc nhu cầu | Văn bản | CSV `suggested_plan` hoặc CVM NBO | không hiện tên gói cụ thể | `GOI_DATA_120K` |
 
 ---
 
@@ -1300,3 +1310,4 @@
 | Q21b | U05-B: Ngưỡng N_DAYS_THRESHOLD (số ngày hết/tháng) và M_MONTHS_THRESHOLD (số tháng liên tiếp) là bao nhiêu? Assumption hiện tại: 15 ngày và 2 tháng | U05-B | 🟡 Quan trọng |
 | Q21c | U05-B: UPSELL_MODE mặc định là gì — chỉ gợi ý nâng gói ngày (DAILY_UPGRADE), chuyển hẳn sang gói tháng (MONTHLY_UPSELL), hay đề xuất cả 2 (BOTH)? Assumption hiện tại: BOTH | U05-B | 🟡 Quan trọng |
 | Q21d | U05-A + U05-B: Ngưỡng cut-off ngày 25 (U05-A) và N_DAYS_THRESHOLD (U05-B) do CVM cấu hình — cơ chế truyền ngưỡng từ CVM sang BSS là gì? Config file, API notify, hay thủ công? | U05-A, U05-B | 🟡 Quan trọng |
+| Q22 | E_EARLY_DEPLETED: Ngưỡng phân loại `HIGH_NEED` / `LOW_NEED` là bao nhiêu theo từng loại gói và ai là owner tính phân khúc nhu cầu — BSS tính sẵn trong file hay CVM tự tính từ dữ liệu usage/quota? | E_EARLY_DEPLETED | 🔴 Cần ngay |
