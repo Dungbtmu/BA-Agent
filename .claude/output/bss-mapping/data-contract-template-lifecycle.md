@@ -25,9 +25,9 @@ Tài liệu được tổ chức lại theo sơ đồ vòng đời CVM. Mỗi nh
 |---|---|---|---|
 | NHÓM 1 — Kích hoạt | VIỄN THÔNG | E01 | Không có |
 | NHÓM 1 — Kích hoạt | APP | Không có | E02 |
-| NHÓM 2 — Sử dụng | VIỄN THÔNG | U01, U03, E08, E_DATA_100, E_VOICE_100, E06, E_ZERO_BALANCE, E_CANCEL_PLAN | E05, U04, E13, E_EARLY_DEPLETED, U09, U10, E_SEGMENT_UPDATE, E_NO_PLAN_X_DAYS, E11, U02, U05, U06, U07 |
+| NHÓM 2 — Sử dụng | VIỄN THÔNG | U01, U03, E08, E_DATA_100, E_VOICE_100, E06, E_ZERO_BALANCE, E_CANCEL_PLAN | E05, U04, E13, E_USAGE_NEED_ANALYSIS, U09, U10, E_SEGMENT_UPDATE, E_NO_PLAN_X_DAYS, E11, U02, U05, U06, U07 |
 | NHÓM 2 — Sử dụng | APP | E03, E_CONTENT_FAIL, E_APP_RATING | E04, E07, E09, E_APP_INACTIVE_X_DAYS |
-| NHÓM 3 — Gia hạn gói/dịch vụ | GIA HẠN | Không có | U08, U_RENEWAL_STREAK, U_PRE_EXPIRY, U_POST_EXPIRY |
+| NHÓM 3 — Gia hạn gói/dịch vụ | GIA HẠN | Không có | U08, U_PRE_EXPIRY, U_POST_EXPIRY |
 | NHÓM 4 — Khóa 1c/Khóa 2c | KHÓA 1C/2C | E_LOCK_2C | E_LOCK_1C, E_PRE_LOCK_2C |
 
 > **Bổ sung theo xác nhận BA:** `E_DATA_100` được thêm cho trigger hết 100% data theo NearRealtime; `E_APP_INACTIVE_X_DAYS` được thêm cho trigger X ngày KH không truy cập APP theo Batch/CSV. `E_ZERO_BALANCE` được chuẩn hóa thành API NearRealtime.
@@ -254,7 +254,7 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 **Yêu cầu kỹ thuật:** OCS gọi API CVM ngay khi quota data trong chu kỳ/gói về 0. CVM phải xử lý NearRealtime để gửi thông báo/gợi ý mua gói bổ sung trong vòng 2 phút sau khi nhận event.
 **Timing:** Ngay khi data còn lại của gói về 0
 
-> **Phân biệt với E08 và E_EARLY_DEPLETED:** `E08` là cảnh báo khi dùng tới ngưỡng x%/80% data. `E_DATA_100` là sự kiện hết 100% data tại thời điểm hiện tại. `E_EARLY_DEPLETED` là batch phân tích nhu cầu gói theo mức sử dụng qua nhiều chu kỳ để tư vấn gói lớn hơn hoặc nhỏ hơn.
+> **Phân biệt với E08 và E_USAGE_NEED_ANALYSIS:** `E08` là cảnh báo khi dùng tới ngưỡng x%/80% data. `E_DATA_100` là sự kiện hết 100% data tại thời điểm hiện tại. `E_USAGE_NEED_ANALYSIS` là batch phân tích nhu cầu gói theo mức sử dụng qua nhiều chu kỳ để tư vấn gói lớn hơn hoặc nhỏ hơn.
 
 | Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
@@ -490,7 +490,7 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 
 ---
 
-##### 2.16 File: `early_depleted_{YYYYMMDD}.csv` (E_EARLY_DEPLETED)
+##### 2.16 File: `usage_need_analysis_{YYYYMMDD}.csv` (E_USAGE_NEED_ANALYSIS)
 
 **Mô tả:** Danh sách KH cần tư vấn gói cước theo nhu cầu sử dụng thực tế. CVM/BSS phân tích mức sử dụng data/thoại so với gói hiện tại để xác định KH có **nhu cầu lớn** cần tư vấn gói lớn hơn, hoặc **nhu cầu nhỏ** cần tư vấn gói nhỏ/tiết kiệm hơn.
 **Trigger bởi:** OCS → BSS (nightly batch, phân tích mức sử dụng theo chu kỳ)
@@ -1044,7 +1044,7 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 - x ngày trước khi hết hạn gói
 - x ngày sau khi hết hạn mà KH không gia hạn gói
 
-> **Ghi chú phân biệt:** `U08` dùng cho loyalty/gia hạn đúng hạn dài hạn, ví dụ đủ điều kiện khóa trung thành sau ≥ 3 tháng gia hạn đúng hạn. `U_RENEWAL_STREAK` dùng cho chuỗi gia hạn thành công liên tiếp theo x chu kỳ, bao gồm cả gia hạn sớm trước hạn. Hai trigger được giữ song song nhưng CVM cần rule ưu tiên/chặn trùng để tránh KH nhận hai tin vinh danh trong cùng một chu kỳ.
+> **Ghi chú hợp nhất:** Trigger chuỗi gia hạn `U_RENEWAL_STREAK` đã được gộp vào `U08`. Nhánh GIA HẠN chỉ dùng file `renewal_loyalty_{YYYYMMDD}.csv` để xử lý cả gia hạn đúng hạn và gia hạn sớm theo mốc cấu hình của CVM.
 
 #### Kỹ thuật — NearRealtime
 
@@ -1054,66 +1054,45 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 
 ##### 2.13 File: `renewal_loyalty_{YYYYMMDD}.csv` (U08)
 
-**Mô tả:** Danh sách KH đủ điều kiện khóa trung thành (gia hạn đúng hạn ≥ 3 tháng liên tiếp)
-**Trigger bởi:** OCS → BSS (nightly), theo sự kiện đủ điều kiện
-**Thời điểm push:** 02:00–04:00 khi phát hiện KH đủ điều kiện
+**Mô tả:** Danh sách KH đạt mốc gia hạn liên tiếp để vinh danh trung thành, bao gồm gia hạn đúng hạn và gia hạn sớm theo rule cấu hình của CVM.
+**Trigger bởi:** OCS → BSS (nightly), theo sự kiện đủ điều kiện gia hạn liên tiếp
+**Thời điểm push:** 02:00–04:00 khi phát hiện KH đạt mốc gia hạn liên tiếp
+
+> **Ghi chú hợp nhất:** `U_RENEWAL_STREAK` đã được gộp vào U08. Không tạo file `renewal_streak_{YYYYMMDD}.csv` riêng; mọi case gia hạn liên tiếp, kể cả gia hạn sớm, đi qua file `renewal_loyalty_{YYYYMMDD}.csv`.
 
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
 | `full_name` | string(64) | ✅ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
 | `contact_email` | string | ❌ | Email KH | `crm.customers.contact_email` | `nguyenvana@gmail.com` |
-| `consecutive_renewals` | integer | ✅ | Số lần gia hạn đúng hạn liên tiếp | BSS tính từ lịch sử `resource.msisdns.expiry_date` + OCS renewal log | `3` |
+| `consecutive_renewals` | integer | ✅ | Số chu kỳ gia hạn liên tiếp đủ điều kiện, bao gồm đúng hạn và sớm hạn theo rule CVM | BSS tính từ lịch sử `resource.msisdns.expiry_date` + OCS renewal log | `5` |
+| `includes_early_renewal` | boolean | ✅ | Có ít nhất 1 lần gia hạn sớm trong chuỗi không | OCS → BSS nightly batch | `true` |
+| `renewal_pattern` | string | ✅ | Kiểu chuỗi gia hạn để CVM phân nhánh nội dung | BSS phân loại từ lịch sử gia hạn | `ON_TIME_ONLY` hoặc `EARLY_ONLY` hoặc `MIXED` |
 | `last_renewal_date` | date | ✅ | Ngày gia hạn lần cuối | OCS → BSS nightly batch | `2026-05-13` |
 | `current_plan` | string | ✅ | Gói đang dùng | OCS → BSS nightly batch | `GOI_DATA_120K` |
+| `plan_expiry_date` | date | ✅ | Ngày hết hạn gói hiện tại sau lần gia hạn gần nhất | `resource.msisdns.expiry_date` (BSS) | `2026-07-01` |
+| `loyalty_milestone` | string | ❌ | Mốc trung thành KH vừa đạt được | CVM cấu hình theo `consecutive_renewals` | `M3` hoặc `M6` hoặc `M12` |
+| `reward_type` | string | ❌ | Loại quyền lợi/ưu đãi áp dụng cho mốc gia hạn | CVM cấu hình theo milestone | `LOYALTY_POINTS` hoặc `DATA_BONUS` hoặc `RANK_UP` |
 
 **Param template:**
 
 | Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
 |---|---|---|---|---|---|---|
-| `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin vinh danh trung thành | Văn bản | CSV `full_name` | `"Quý khách"` | `Nguyễn Văn A` |
-| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH đủ điều kiện khóa trung thành | Văn bản | CSV `msisdn` | — | `0901234567` |
-| `{{so_lan_gia_han_lien_tiep}}` | ✅ | Số tháng gia hạn đúng hạn liên tiếp — điểm nhấn để vinh danh | Số | CSV `consecutive_renewals` | — | `3 tháng` |
+| `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin vinh danh gia hạn liên tiếp | Văn bản | CSV `full_name` | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH đạt mốc gia hạn liên tiếp | Văn bản | CSV `msisdn` | — | `0901234567` |
+| `{{so_lan_gia_han_lien_tiep}}` | ✅ | Số chu kỳ gia hạn liên tiếp — điểm nhấn để vinh danh | Số | CSV `consecutive_renewals` | — | `5 tháng` |
+| `{{kieu_chuoi_gia_han}}` | ✅ | Kiểu chuỗi gia hạn để phân nhánh copy: đúng hạn, sớm hạn hoặc hỗn hợp | Văn bản | CSV `renewal_pattern` | — | `EARLY_ONLY` |
 | `{{ngay_gia_han_cuoi}}` | ✅ | Ngày gia hạn lần cuối — xác nhận mốc trung thành gần nhất | Ngày (DD/MM/YYYY) | CSV `last_renewal_date` | — | `13/05/2026` |
 | `{{ten_goi_hien_tai}}` | ✅ | Gói cước KH đang dùng khi đạt mốc trung thành | Văn bản | CSV `current_plan` | — | `GOI_DATA_120K` |
+| `{{moc_trung_thanh}}` | ❌ | Mốc trung thành KH vừa đạt để cá nhân hóa nội dung vinh danh | Văn bản | CSV `loyalty_milestone` hoặc CVM tính nội bộ | không hiển thị mốc cụ thể | `M6` |
+| `{{uu_dai_trung_thanh}}` | ❌ | Ưu đãi đặc biệt dành cho KH gia hạn liên tiếp | Văn bản | CVM cấu hình theo `consecutive_renewals` / `loyalty_milestone` | không hiện ưu đãi | `Tặng 5GB data tháng sau` |
 | `{{diem_trung_thanh}}` | ❌ ⚠️ | Điểm tích lũy trong chương trình loyalty — chưa xác nhận schema | Số | CVM tính nội bộ — chưa xác nhận schema module loyalty | không hiển thị điểm | `350` |
 | `{{hang_trung_thanh_moi}}` | ❌ ⚠️ | Hạng loyalty KH vừa đạt được — để tạo cảm giác thành tựu | Văn bản | CVM tính nội bộ — chưa xác nhận schema | không hiển thị hạng | `Silver` |
 | `{{email_kh}}` | ❌ | Email KH để gửi giấy chứng nhận trung thành qua Email | Văn bản | CSV `contact_email` | không gửi Email | `nguyenvana@gmail.com` |
 
 ---
 
-##### 2.20 File: `renewal_streak_{YYYYMMDD}.csv` (U_RENEWAL_STREAK)
-
-**Mô tả:** Danh sách KH gia hạn thành công liên tiếp x chu kỳ (bao gồm cả gia hạn sớm trước hạn) — x do CVM cấu hình
-**Trigger bởi:** OCS → BSS (nightly batch)
-**Thời điểm push:** 02:00–04:00 hàng ngày
-
-> **Phân biệt với U08:** U08 (`renewal_loyalty`) chỉ tính gia hạn đúng hạn, đo trung thành dài hạn (≥ 3 tháng). U_RENEWAL_STREAK tính cả gia hạn sớm, đo mức độ gắn kết tích cực hơn và có thể trigger từ chu kỳ thấp hơn (ví dụ: 2 chu kỳ). Hai trigger song song, không thay thế nhau.
-
-| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
-|---|---|---|---|---|---|
-| `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
-| `full_name` | string(64) | ✅ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
-| `streak_count` | integer | ✅ | Số chu kỳ gia hạn liên tiếp (đúng hạn + sớm hạn) | OCS → BSS nightly batch | `5` |
-| `includes_early_renewal` | boolean | ✅ | Có ít nhất 1 lần gia hạn sớm không | OCS → BSS nightly batch | `true` |
-| `last_renewal_date` | date | ✅ | Ngày gia hạn lần cuối | OCS → BSS nightly batch | `2026-06-01` |
-| `current_plan` | string | ✅ | Gói đang dùng | OCS → BSS nightly batch | `GOI_DATA_120K` |
-| `plan_expiry_date` | date | ✅ | Ngày hết hạn gói hiện tại | `resource.msisdns.expiry_date` (BSS) | `2026-07-01` |
-| `contact_email` | string | ❌ | Email KH | `crm.customers.contact_email` | `nguyenvana@gmail.com` |
-
-**Param template:**
-
-| Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
-|---|---|---|---|---|---|---|
-| `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin vinh danh chuỗi gia hạn | Văn bản | CSV `full_name` | `"Quý khách"` | `Nguyễn Văn A` |
-| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH đạt chuỗi gia hạn | Văn bản | CSV `msisdn` | — | `0901234567` |
-| `{{so_chu_ky_lien_tiep}}` | ✅ | Số chu kỳ gia hạn liên tiếp — điểm nhấn để vinh danh | Số | CSV `streak_count` | — | `5 tháng` |
-| `{{ten_goi_hien_tai}}` | ✅ | Gói KH đang dùng khi đạt chuỗi gia hạn | Văn bản | CSV `current_plan` | — | `GOI_DATA_120K` |
-| `{{uu_dai_trung_thanh}}` | ❌ | Ưu đãi đặc biệt dành cho KH gia hạn liên tiếp | Văn bản | CVM cấu hình theo `streak_count` | không hiện ưu đãi | `Tặng 5GB data tháng sau` |
-
----
-
-##### 2.21 File: `pre_expiry_{YYYYMMDD}.csv` (U_PRE_EXPIRY)
+##### 2.20 File: `pre_expiry_{YYYYMMDD}.csv` (U_PRE_EXPIRY)
 
 **Mô tả:** Danh sách KH còn x ngày trước khi gói hết hạn (x do CVM cấu hình, thường 3 và 7 ngày)
 **Trigger bởi:** BSS (quét hàng ngày từ `resource.msisdns.expiry_date`)
@@ -1144,7 +1123,7 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 
 ---
 
-##### 2.22 File: `post_expiry_{YYYYMMDD}.csv` (U_POST_EXPIRY)
+##### 2.21 File: `post_expiry_{YYYYMMDD}.csv` (U_POST_EXPIRY)
 
 **Mô tả:** Danh sách KH đã hết hạn gói x ngày mà chưa gia hạn (x do CVM cấu hình, thường 1, 3, 7 ngày)
 **Trigger bởi:** BSS (quét hàng ngày từ `resource.msisdns.expiry_date`)
@@ -1293,4 +1272,4 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 | Q15 | E_CONTENT_FAIL: SuperApp có thể push event mua nội dung thất bại trực tiếp vào CVM không, hay phải qua Kafka → BSS → CSV daily? Nếu qua BSS thì mất tính realtime | E_CONTENT_FAIL | 🔴 Cần ngay |
 | Q16 | E_LOCK_1C / E_PRE_LOCK_2C / E_LOCK_2C: BSS có sẵn trường ghi thời gian dự kiến chuyển trạng thái không? Hay CVM phải tự tính từ quy định nghiệp vụ? | E_LOCK_1C, E_PRE_LOCK_2C, E_LOCK_2C | 🟡 Quan trọng |
 | Q17 | Rule chặn E_ZERO_BALANCE vs E06: window 12h có đủ không, hay nên dùng window 24h? Ai owns logic chặn — CVM hay BSS? | E_ZERO_BALANCE, E06 | 🟡 Quan trọng |
-| Q18 | U_RENEWAL_STREAK vs U08: có cần đồng bộ điều kiện x (số chu kỳ tối thiểu) giữa hai trigger để tránh KH nhận 2 tin vinh danh cùng lúc không? | U_RENEWAL_STREAK, U08 | 🟢 Nice-to-have |
+| Q18 | U08: Sau khi gộp `U_RENEWAL_STREAK` vào U08, ngưỡng `consecutive_renewals` theo từng milestone là bao nhiêu và gia hạn sớm được tính như thế nào trong chuỗi đủ điều kiện? | U08 | 🟡 Quan trọng |

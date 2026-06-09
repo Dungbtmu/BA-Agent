@@ -76,7 +76,8 @@
 | Gói mới (sau khi chuyển) | 🔴 OCS | — | `new_plan`, `new_plan_type` | Push CSV | ⚠️ Cần OCS push | U06 |
 | Ngày hết data tháng 1 & 2 | 🔴 OCS | — | `data_depleted_date` | Push CSV (đầu tháng 3) | ⚠️ Cần OCS push | U05 |
 | Gói đề xuất nâng lên | 🔴 OCS + CVM | — | `suggested_plan` | Push CSV hoặc CVM tự tính | ⚠️ Cần confirm ai tính | U05 |
-| Số lần gia hạn đúng hạn liên tiếp | 🟡 BSS + 🔴 OCS | `resource.msisdns` | `expiry_date` (lịch sử) | Push CSV | ⚠️ BSS tính từ lịch sử OCS | U08 |
+| Số chu kỳ gia hạn liên tiếp đủ điều kiện | 🟡 BSS + 🔴 OCS | `resource.msisdns` | `expiry_date` (lịch sử) + OCS renewal log | Push CSV | ⚠️ BSS tính từ lịch sử OCS; bao gồm đúng hạn và sớm hạn theo rule CVM | U08 |
+| Kiểu chuỗi gia hạn | 🟡 BSS + 🔴 OCS | — | `renewal_pattern`, `includes_early_renewal` | Push CSV | ⚠️ Bổ sung sau khi gộp U_RENEWAL_STREAK vào U08 | U08 |
 | Gói được giữ nguyên sau đổi SIM | 🔴 OCS | — | `current_plan` | Push CSV | ⚠️ Cần OCS push | U07 |
 
 ---
