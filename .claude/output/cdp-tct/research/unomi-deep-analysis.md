@@ -1,327 +1,193 @@
-# Phân tích sâu Apache Unomi — Dự án CDP VNPost/TCT
+# Apache Unomi — CDP VNPost có thể học gì?
 
-**Ngày nghiên cứu:** 2026-06-10  
-**Phương pháp:** Deep research — 101 agent, 19 nguồn, 76 claims, verify adversarial 25 claims  
-**Mục đích:** Trả lời 4 câu hỏi: Unomi là gì → có tính năng gì → VNPost đáp ứng được gì → cần học thêm gì
-
-> Bài này viết cho BA/PO đọc — không dùng jargon kỹ thuật. Khi cần tra lại bằng chứng kỹ thuật, xem `apache-unomi-research.md`.
+**Ngày:** 2026-06-10  
+**Mục đích:** Tìm hiểu Unomi để đánh giá CDP VNPost nên học hỏi và phát triển tính năng gì
 
 ---
 
-## Câu hỏi 1 — Apache Unomi là gì?
+## 1. Unomi là gì
 
-### Một câu tóm gọn
-
-Unomi là phần mềm mã nguồn mở dùng để **gộp dữ liệu khách hàng từ nhiều nơi về một chỗ**, tự động phân loại khách hàng theo nhóm, và kích hoạt hành động (gửi SMS, gắn nhãn, cảnh báo) khi có sự kiện xảy ra.
-
-Nó do tổ chức Apache (cùng tổ chức tạo ra Apache Kafka, Apache Tomcat) phát triển — mã nguồn mở, miễn phí, có thể chỉnh sửa tùy ý.
-
-### Bộ máy bên trong (không cần hiểu chi tiết, biết để hình dung)
-
-Unomi gồm 4 khối chính:
-
-| Khối | Vai trò | Tương tự với VNPost |
-|---|---|---|
-| **Hồ sơ khách hàng (Profile)** | Nơi lưu toàn bộ thông tin của 1 người: tên, lịch sử giao dịch, nhãn phân loại, điểm tín nhiệm | Hồ sơ KHL trong CAS — nhưng gộp thêm từ 7 hệ thống khác |
-| **Phiên làm việc (Session)** | Ghi lại một lần tương tác cụ thể — ví dụ: lần đặt hàng này, lần vào app này | Một vận đơn cụ thể |
-| **Sự kiện (Event)** | Bất kỳ hành động nào xảy ra: giao hàng thất bại, đăng nhập app, tạo đơn | Trạng thái vận đơn thay đổi trong BCCP/PNS |
-| **Quy tắc (Rule)** | Định nghĩa: "nếu sự kiện X xảy ra và điều kiện Y đúng → làm Z" | Quy tắc nghiệp vụ của Marketing |
+Unomi là phần mềm CDP mã nguồn mở của tổ chức Apache — giúp gộp dữ liệu khách hàng từ nhiều hệ thống về một hồ sơ duy nhất, tự động phân loại khách hàng theo nhóm, và kích hoạt hành động tự động khi có sự kiện xảy ra. VNPost **không cần dùng Unomi trực tiếp** — nhưng cách Unomi thiết kế các tính năng là nguồn tham khảo giá trị để xây CDP riêng.
 
 ---
 
-## Câu hỏi 2 — Unomi có những tính năng gì?
+## 2. Tính năng Unomi có giá trị tham khảo cho CDP VNPost
 
-### Tính năng 1: Gộp nhiều ID về 1 hồ sơ (đã xác minh — độ tin cậy cao)
+### 2.1 Gộp nhiều ID của cùng một khách hàng về một hồ sơ
 
-**Unomi làm thế nào:** Khi một khách hàng xuất hiện ở 2 hệ thống khác nhau (ví dụ: cùng số điện thoại nhưng mã khác nhau), Unomi tạo một "cầu nối" (gọi là **alias**) nối hai mã đó về cùng một hồ sơ chính. Hồ sơ bị trùng sẽ được hợp nhất — dữ liệu gộp vào hồ sơ chính, hồ sơ cũ xóa đi, cầu nối giữ lại để tra cứu sau.
+**Bài toán Unomi giải:** Khi cùng một người xuất hiện ở nhiều hệ thống với mã định danh khác nhau, Unomi tạo "cầu nối alias" nối các mã đó về một hồ sơ chính. Hồ sơ trùng được hợp nhất, dữ liệu gộp vào hồ sơ chính, cầu nối giữ lại để tra cứu sau.
 
-**Quan trọng:** Việc gộp không tự động xảy ra — phải có **quy tắc kích hoạt** (ví dụ: "nếu email trùng nhau thì gộp"). Unomi không tự đoán, không tự ghép ngẫu nhiên.
+**Quy tắc gộp phải khai báo rõ** — ví dụ: "nếu số điện thoại trùng nhau thì gộp". Hệ thống không tự đoán, không tự ghép ngẫu nhiên.
 
-**Áp dụng cho VNPost:** Đây chính xác là bài toán VNPost đang có — cùng 1 người gửi nhưng có 4 mã khác nhau (CAS mã KHL, MyVNPost user ID, PayPost mã tài chính, PostID). Pattern gộp alias của Unomi là pattern đúng để học.
-
----
-
-### Tính năng 2: Tự động làm gì đó khi có sự kiện (đã xác minh — độ tin cậy cao)
-
-**Unomi làm thế nào:** Mỗi khi có sự kiện xảy ra (giao hàng thất bại, tạo đơn, đăng nhập), Unomi kiểm tra tất cả quy tắc đang có:
-
-```
-Sự kiện xảy ra
-   → Kiểm tra điều kiện (có đúng không?)
-   → Nếu đúng: thực hiện hành động
-   → Trả về hồ sơ khách hàng đã cập nhật
-```
-
-Các điều kiện Unomi hỗ trợ: loại sự kiện là gì, thuộc tính sự kiện có thỏa mãn không, hồ sơ khách hàng hiện tại có điều kiện gì không.
-
-Các hành động Unomi hỗ trợ: tăng một con số trong hồ sơ (ví dụ: đếm số lần thất bại), gán giá trị mới vào hồ sơ (ví dụ: gán nhãn "at-risk").
-
-**Điểm mạnh:** Quy tắc được cấu hình bằng file JSON — không cần viết code mới, không cần release hệ thống khi thay đổi ngưỡng.
-
-**Áp dụng cho VNPost:** Bốn use case (UC-02 anti-churn, UC-03 win-back, UC-04 COD risk, UC-06 fraud) đều phù hợp với pattern này. Chi tiết xem bảng trong `apache-unomi-research.md` (Mục T2).
+**CDP VNPost học được gì:** Đây chính xác là bài toán VNPost đang có — cùng 1 người gửi nhưng có 4 mã khác nhau ở 4 hệ thống (CAS mã KHL, MyVNPost user ID, PayPost mã tài chính, PostID). Pattern alias của Unomi là cách đúng để giải quyết mà không cần phải hợp nhất database ngay từ đầu.
 
 ---
 
-### Tính năng 3: Quản lý đồng ý dữ liệu (đã được mô tả trong tài liệu chính thức)
+### 2.2 Tự động kích hoạt hành động khi có sự kiện
 
-Unomi có sẵn module quản lý đồng ý — người dùng có thể bật/tắt từng loại đồng ý (marketing, phân tích, vị trí, tài chính). Khi yêu cầu xóa dữ liệu, Unomi xóa được trong hệ thống của mình.
+**Bài toán Unomi giải:** Mỗi khi có sự kiện xảy ra (giao hàng thất bại, tạo đơn, đăng nhập), hệ thống kiểm tra các quy tắc đang có rồi tự động thực hiện hành động tương ứng. Công thức: **Sự kiện xảy ra → Kiểm tra điều kiện → Thực hiện hành động**.
 
-**Điểm cần lưu ý với VNPost:**
-- Unomi xóa dữ liệu trong chính nó — không tự lan sang CAS, PayPost, BCCP
-- VNPost cần thiết kế thêm "bộ lan truyền xóa" để đảm bảo xóa đúng trong 72 giờ theo luật bảo vệ dữ liệu cá nhân mới
+Các hành động hỗ trợ: gắn nhãn khách hàng, cập nhật chỉ số, đẩy tín hiệu ra hàng đợi để hệ thống khác xử lý tiếp. Hệ thống **không gọi trực tiếp SMS hay Zalo** — chỉ phát tín hiệu ra, CRM hay SMS gateway tự lo việc gửi.
+
+**CDP VNPost học được gì:** Bốn use case ưu tiên của VNPost đều phù hợp với pattern này:
+
+| Use case | Sự kiện | Điều kiện | Hành động |
+|---|---|---|---|
+| UC-02 Anti-Churn | Sản lượng KHL giảm | Giảm 30% so với 4 tuần trước | Gắn nhãn "cần chăm sóc" |
+| UC-03 Win-Back | Không có giao dịch mới | Quá 60 ngày im lặng | Đưa vào danh sách win-back |
+| UC-04 COD Risk | Đơn COD thất bại | Thất bại lần thứ 3 | Gắn cờ rủi ro địa chỉ |
+| UC-06 Fraud | Số điện thoại xuất hiện với nhiều tên | Liên kết trên 5 tên khác nhau | Tạo cảnh báo gian lận |
 
 ---
 
-### Tính năng 4: Thêm trường dữ liệu mới vào hồ sơ KH mà không cần sửa code (đã xác minh)
+### 2.3 Marketing tự thay đổi ngưỡng mà không cần IT
 
-**Unomi làm thế nào:** Muốn thêm một trường mới vào hồ sơ KH (ví dụ: "số lần giao thất bại tích lũy", "tỷ lệ hoàn hàng 30 ngày"), chỉ cần khai báo bằng file JSON — không cần IT sửa code lõi, không cần release hệ thống. Trường mới tự động xuất hiện trong hồ sơ của tất cả KH ngay sau khi deploy file.
+**Bài toán Unomi giải:** Tách hệ thống thành 3 tầng rõ ràng:
+- **Tầng lõi** — IT xây một lần, không đụng vào nữa
+- **Tầng cấu hình** — Marketing tự điều chỉnh ngưỡng (60 ngày, 30%, 3 lần thất bại...) bằng file cấu hình, không cần viết code
+- **Tầng kết nối** — cấu hình kênh đầu ra: Zalo, SMS, CRM
 
-**Áp dụng cho VNPost:** Mỗi khi nghiệp vụ cần thêm chỉ số mới để phân tích KH (ví dụ: thêm "điểm tín nhiệm COD", "số tháng hoạt động liên tiếp"), không cần chờ IT. Marketing/BA tự định nghĩa trường mới theo nhu cầu phân tích.
+**CDP VNPost học được gì:** Khi Marketing muốn đổi định nghĩa "inactive" từ 60 ngày sang 45 ngày, không cần nhờ IT sửa code và chờ release. Tự điều chỉnh trong ngày. Đây là yếu tố quyết định tốc độ phản ứng của đội Marketing.
 
 ---
 
-### Tính năng 5: Tính điểm tín nhiệm KH tự động (đã được mô tả trong tài liệu chính thức)
+### 2.4 Thêm chỉ số phân tích khách hàng mà không cần IT
 
-**Unomi làm thế nào:** Mỗi profile KH có thể được gán điểm số tự động theo quy tắc — điểm tăng khi có hành vi tốt (giao hàng thành công, thanh toán đúng hạn), điểm giảm khi có hành vi xấu (từ chối nhận COD, địa chỉ thất bại lặp lại). Điểm tự cập nhật mỗi khi có sự kiện mới xảy ra.
+**Bài toán Unomi giải:** Muốn thêm trường dữ liệu mới vào hồ sơ khách hàng (ví dụ: "tỷ lệ hoàn hàng 30 ngày", "số lần giao thất bại tích lũy"), chỉ cần khai báo bằng file cấu hình — không cần sửa code lõi, không cần release hệ thống.
 
-**Áp dụng cho VNPost:**
+**CDP VNPost học được gì:** Mỗi khi nghiệp vụ cần thêm chỉ số phân tích mới — ví dụ "điểm tín nhiệm COD", "số tháng hoạt động liên tiếp", "tỷ lệ thành công theo tỉnh" — không cần chờ IT. BA hoặc Data Analyst tự định nghĩa và triển khai trong ngày.
+
+---
+
+### 2.5 Tính điểm tín nhiệm tự động theo hành vi
+
+**Bài toán Unomi giải:** Mỗi hồ sơ khách hàng có thể được gán điểm số tự động — điểm tăng khi có hành vi tốt, giảm khi có hành vi xấu, tự cập nhật mỗi khi có sự kiện mới.
+
+**CDP VNPost học được gì:** Điểm số cho phép phân loại chính xác hơn nhãn nhị phân (có/không). Khách hàng điểm 20 và điểm 80 đều có nhãn "rủi ro" nhưng mức độ xử lý khác nhau.
 
 | Hành vi | Tác động điểm | Dùng cho |
 |---|---|---|
-| Giao hàng thành công | +điểm | Xây dựng hồ sơ tín nhiệm tích cực |
-| Từ chối nhận COD | −điểm | UC-04 COD Risk |
-| Địa chỉ giao thất bại lần 2, lần 3 | −điểm mạnh hơn | UC-04 cảnh báo trước khi nhận đơn mới |
-| SĐT liên kết nhiều tên khác nhau | −điểm | UC-06 Fraud Detection |
-| Thanh toán COD đúng hạn nhiều lần | +điểm | KHL uy tín — ưu tiên phục vụ |
-
-**Điểm mạnh so với chỉ dùng nhãn:** Nhãn chỉ có 2 giá trị (có/không). Điểm số cho phép xếp hạng — KH điểm 20 khác KH điểm 80 dù cả 2 đều có nhãn "rủi ro". Phân loại chính xác hơn khi quyết định mức độ cảnh báo.
+| Giao hàng thành công | Tăng điểm | Hồ sơ tín nhiệm tích cực |
+| Từ chối nhận COD | Giảm điểm | UC-04 COD Risk |
+| Địa chỉ giao thất bại lần 2, lần 3 | Giảm điểm mạnh hơn | UC-04 cảnh báo trước khi nhận đơn mới |
+| Số điện thoại liên kết nhiều tên khác nhau | Giảm điểm | UC-06 Fraud Detection |
+| Thanh toán COD đúng hạn nhiều lần | Tăng điểm | KHL uy tín — ưu tiên phục vụ |
 
 ---
 
-### Tính năng chưa được xác minh (cần nghiên cứu thêm)
+### 2.6 Quản lý đồng ý sử dụng dữ liệu
 
-Những tính năng sau **bị bác bỏ trong kiểm tra độ tin cậy** — không phải không tồn tại, mà là chưa có bằng chứng đủ mạnh từ nguồn chính thức:
+**Bài toán Unomi giải:** Người dùng có thể bật/tắt từng loại đồng ý riêng (marketing, phân tích, vị trí, tài chính). Khi yêu cầu xóa, Unomi xóa dữ liệu trong hệ thống của mình.
 
-| Tính năng | Câu hỏi còn mở |
+**CDP VNPost học được gì:** Phân tách đồng ý theo từng mục đích thay vì một nút đồng ý chung. Khách hàng đồng ý cho phân tích vận chuyển nhưng có thể không đồng ý cho marketing — CDP phải tôn trọng sự khác biệt này.
+
+**Điểm VNPost cần tự bổ sung:** Unomi chỉ xóa trong hệ thống của nó — không tự lan sang CAS, PayPost, BCCP. VNPost cần thiết kế thêm cơ chế lan truyền xóa để tuân thủ thời hạn 72 giờ theo Luật BVDLCN 2025.
+
+---
+
+## 3. Tính năng Unomi có nhưng VNPost không cần học
+
+| Tính năng | Lý do VNPost không cần |
 |---|---|
-| Phân vùng dữ liệu theo tỉnh/vùng | Unomi Scope có thực sự ngăn dữ liệu tỉnh A rò sang tỉnh B không? Hay chỉ là nhãn phân loại? |
-| Tính lại phân khúc tức thì | Khi KHL giảm sản lượng, Unomi có cập nhật nhóm "at-risk" ngay lập tức không, hay chờ đến hôm sau? |
-| Danh sách endpoint REST API | Các endpoint cụ thể và cách xác thực chưa được verify đủ tin cậy |
+| Theo dõi hành vi duyệt web theo phiên | VNPost là logistics — khách hàng không "duyệt" như e-commerce |
+| Cá nhân hóa nội dung website theo thời gian thực | Không phải use case ưu tiên hiện tại |
+| Phân tích hành vi trong ứng dụng (tracking) | MyVNPost App đã có sẵn, không cần Unomi làm thêm |
 
 ---
 
-## Câu hỏi 3 — Unomi đáp ứng được gì cho VNPost?
+## 4. Bài toán Unomi không giải được — VNPost phải tự xây
 
-### 3.1 Bản đồ dữ liệu VNPost theo hệ thống
+| Bài toán VNPost cần | Tại sao Unomi không có |
+|---|---|
+| Hồ sơ người nhận không có tài khoản | Unomi được thiết kế cho người dùng đã đăng nhập — không có cấu trúc cho "người nhận bưu kiện không có tài khoản" |
+| Phát hiện gian lận theo mạng lưới địa chỉ | Unomi phân tích từng hồ sơ riêng lẻ — không nhìn được "một cụm địa chỉ cạnh nhau đồng loạt từ chối hàng" |
+| Khách hàng doanh nghiệp có nhiều chi nhánh | Unomi không có cấu trúc B2B tự nhiên (công ty → nhiều tài khoản con) |
+| Dữ liệu từ tương tác vật lý của bưu tá | Unomi chỉ xử lý dữ liệu kỹ thuật số — không có khái niệm "bưu tá gặp mặt trực tiếp" |
+| Gộp dữ liệu khiếu nại từ hai hệ thống riêng | Unomi không tự nhận biết Care Đơn và Cas-HTKH chứa cùng loại dữ liệu — cần pipeline hợp nhất trước |
 
-> Nguồn: tài liệu gốc từ VNPost (sơ đồ kiến trúc MPITS, chức năng phần mềm, quy trình tổng quan). Đây là dữ liệu thực tế — không phải assumption.
+---
 
-#### Nhóm 1 — Điểm tiếp xúc khách hàng (dữ liệu giá trị nhất)
+## 5. Bản đồ hệ thống VNPost và dữ liệu liên quan
 
-| Hệ thống | Dữ liệu KH có | Định danh | Liên quan pattern |
-|---|---|---|---|
-| **MyVietnam Post** (app) | Đơn hàng, tài khoản, người dùng, đối soát, hỗ trợ, hành vi app | User ID, SĐT, email | T1 alias, T2 event hành vi |
-| **vnpost.vn** (web) | Hành vi tìm kiếm, theo dõi đơn, tạo đơn online | Cookie/session, SĐT | T1, T2 |
-| **SmartLocker** ⚠️ | Lịch sử lấy hàng tại tủ khóa, thời điểm lấy | SĐT người nhận | T1 alias bổ sung — **chưa rõ có ID riêng hay chỉ dùng SĐT** |
-| **PostPay / E-Money** ⚠️ | Lịch sử thanh toán, ví điện tử, COD — **dữ liệu tài chính nhạy cảm** | Mã tài chính, SĐT | T1 alias, T4 consent tài chính bắt buộc |
+> Nguồn: tài liệu kiến trúc gốc từ VNPost (sơ đồ MPITS, chức năng phần mềm, quy trình tổng quan).
 
-> ⚠️ SmartLocker và E-Money là 2 hệ thống **phát hiện từ tài liệu gốc VNPost** — chưa có trong Domain Brief v2.1. Cần xác nhận với IT VNPost.
+### Nhóm 1 — Điểm tiếp xúc khách hàng (dữ liệu hành vi)
 
-#### Nhóm 2 — Chấp nhận gửi (dữ liệu đầy đủ nhất về người gửi)
-
-| Hệ thống | Dữ liệu KH có | Định danh | Liên quan pattern |
-|---|---|---|---|
-| **CAS (Counter Acceptance)** | Họ tên, SĐT, địa chỉ người gửi + nhận, loại dịch vụ, cước phí, COD amount, tra cứu, sự vụ | Mã KHL — **alias chính trong T1** | T1 anchor, T2 event tạo đơn |
-| **Portal KHL** | Chấp nhận gửi hàng loạt cho doanh nghiệp, tính cước, in vận đơn | Mã KHL doanh nghiệp | T1, T2 sản lượng KHL |
-| **MPITS** | Hub tổng hợp — nhận dữ liệu từ tất cả hệ thống, kết nối sàn TMĐT, ~30 ứng dụng | Hub — không tạo ID riêng | **T3 tầng lõi** — cổng vào dữ liệu quan trọng nhất nếu có API |
-
-#### Nhóm 3 — Thu gom (tần suất + địa chỉ lấy hàng)
-
-| Hệ thống | Dữ liệu KH có | Định danh | Liên quan pattern |
-|---|---|---|---|
-| **PNS Thu Gom / DingDong** | Tin thu gom, điều tin, chuyển tuyến, thống kê, báo cáo | SĐT người gửi, địa chỉ | T2 event lấy hàng thực tế |
-| **QLTG** | Lịch thu gom, phân công bưu tá | Địa chỉ lấy hàng | Phân tích tần suất gửi |
-
-#### Nhóm 4 — Phát hàng (kết quả — quan trọng nhất cho UC-04, UC-06)
-
-| Hệ thống | Dữ liệu KH có | Định danh | Liên quan pattern |
-|---|---|---|---|
-| **PNS Phát / DingDong** | Kết quả phát (thành công/thất bại/hoàn), gạch nợ, vận đơn, sự vụ, chăm sóc KH, tuyến đường thư | SĐT người nhận, mã vận đơn | **T2 trigger chính** (event phát thất bại), T1 hồ sơ người nhận |
-| **WMS** | Nhập/xuất hàng, tồn kho bưu gửi, lý do không phát | Mã vận đơn | Phân tích hàng tồn — ít liên quan KH trực tiếp |
-| **TMS** | Kế hoạch điều xe, xác nhận chứng từ, giám sát hành trình, báo cáo sản lượng | Mã chuyến thư | Thời gian vận chuyển thực tế — chất lượng dịch vụ |
-
-#### Nhóm 5 — Tài chính COD (nhạy cảm nhất)
-
-| Hệ thống | Dữ liệu KH có | Định danh | Liên quan pattern |
-|---|---|---|---|
-| **PayPost** | Thu COD, gạch nợ, trả tiền người gửi, lịch sử tài chính | Mã tài chính, SĐT, số TK ngân hàng | T1 alias tài chính, T4 consent bắt buộc, **UC-04 COD risk** |
-| **E-Money** ⚠️ | Ví điện tử, giao dịch thanh toán | Mã ví, SĐT | Bổ sung T4 — **tách biệt PayPost, dữ liệu ở 2 chỗ khác nhau** |
-
-> ⚠️ PayPost và E-Money là 2 hệ thống tài chính **riêng biệt** — dữ liệu COD không nằm ở một chỗ. Cần xác nhận phạm vi từng hệ thống với IT VNPost.
-
-#### Nhóm 6 — Quản lý quan hệ khách hàng ⚠️
-
-| Hệ thống | Dữ liệu KH có | Định danh | Liên quan pattern |
-|---|---|---|---|
-| **Care Đơn** | Khiếu nại, sự vụ, chăm sóc KH | SĐT, mã vận đơn | T2 tín hiệu churn, input UC-02 |
-| **CCP / SalesForce / PostSale** ⚠️ | Quan hệ KH doanh nghiệp, sales pipeline, hồ sơ KHL | Mã KHL doanh nghiệp | Hồ sơ KHL đầy đủ nhất — cần kết nối T1 |
-| **Cas-HTKH** ⚠️ | Hỗ trợ KH tại quầy — **tách biệt Care Đơn** | SĐT, mã KHL | Dữ liệu khiếu nại có thể bị phân mảnh giữa 2 hệ thống này |
-
-> ⚠️ CCP/SalesForce/PostSale và Cas-HTKH là 2 hệ thống **phát hiện từ tài liệu gốc** — chưa có trong Domain Brief v2.1. Đặc biệt, có 2 hệ thống hỗ trợ KH riêng biệt → dữ liệu khiếu nại có thể bị phân mảnh.
-
-#### Nhóm 7 — Hệ thống nền (định danh + địa chỉ)
-
-| Hệ thống | Dữ liệu có | Liên quan pattern |
+| Hệ thống | Dữ liệu khách hàng có | Liên quan đến tính năng nào |
 |---|---|---|
-| **PostID** | Định danh người dùng VNPost | **T1 master profile ID — điểm neo trung tâm** |
-| **VPostCode / Địa chỉ số** | Chuẩn hóa địa chỉ Việt Nam | T1 chuẩn hóa địa chỉ người nhận anonymous |
-| **Vmap / Bản đồ số** | Tọa độ, tuyến đường | T2 phân tích địa chỉ rủi ro theo vùng |
+| **MyVietnam Post** (app) | Đơn hàng, tài khoản, hành vi app, đối soát, hỗ trợ | Gộp ID, kích hoạt theo sự kiện hành vi |
+| **vnpost.vn** (web) | Hành vi tìm kiếm, theo dõi đơn, tạo đơn online | Gộp ID |
+| **SmartLocker** ⚠️ | Lịch sử lấy hàng tại tủ khóa, thời điểm lấy | Gộp ID — chưa rõ có mã định danh riêng hay chỉ dùng số điện thoại |
+| **PostPay / E-Money** ⚠️ | Lịch sử thanh toán, ví điện tử, COD | Gộp ID, quản lý đồng ý tài chính bắt buộc |
 
-#### Nhóm 8 — Báo cáo & Phân tích (đã có sẵn)
+> ⚠️ SmartLocker và E-Money phát hiện từ tài liệu gốc VNPost — chưa có trong Domain Brief v2.1. Cần xác nhận với IT VNPost.
+
+### Nhóm 2 — Chấp nhận gửi (dữ liệu đầy đủ nhất về người gửi)
+
+| Hệ thống | Dữ liệu khách hàng có | Liên quan đến tính năng nào |
+|---|---|---|
+| **CAS (Counter Acceptance)** | Họ tên, số điện thoại, địa chỉ người gửi + nhận, loại dịch vụ, COD amount, sự vụ | Mã KHL là điểm neo trung tâm trong gộp ID; nguồn sự kiện tạo đơn |
+| **Portal KHL** | Chấp nhận gửi hàng loạt cho doanh nghiệp, tính cước | Theo dõi sản lượng KHL — phục vụ UC-02 Anti-Churn |
+| **MPITS** | Hub tổng hợp — nhận từ tất cả hệ thống, kết nối sàn thương mại điện tử | Cổng dữ liệu trung tâm nếu có API — không tạo ID riêng |
+
+### Nhóm 3 — Thu gom (tần suất và địa chỉ lấy hàng)
+
+| Hệ thống | Dữ liệu khách hàng có | Liên quan đến tính năng nào |
+|---|---|---|
+| **PNS Thu Gom / DingDong** | Tin thu gom, điều tin, chuyển tuyến | Sự kiện lấy hàng thực tế — tần suất gửi của khách |
+| **QLTG** | Lịch thu gom, phân công bưu tá | Phân tích tần suất gửi theo địa điểm |
+
+### Nhóm 4 — Phát hàng (kết quả — quan trọng nhất cho UC-04, UC-06)
+
+| Hệ thống | Dữ liệu khách hàng có | Liên quan đến tính năng nào |
+|---|---|---|
+| **PNS Phát / DingDong** | Kết quả phát (thành công/thất bại/hoàn), gạch nợ, sự vụ, tuyến đường thư | Nguồn sự kiện chính cho UC-04 và UC-06; hồ sơ người nhận anonymous |
+| **WMS** | Nhập/xuất hàng, tồn kho bưu gửi, lý do không phát | Phân tích hàng tồn — ít liên quan trực tiếp hồ sơ khách hàng |
+| **TMS** | Kế hoạch điều xe, giám sát hành trình, báo cáo sản lượng | Thời gian vận chuyển thực tế — chỉ số chất lượng dịch vụ |
+
+### Nhóm 5 — Tài chính COD (nhạy cảm nhất)
+
+| Hệ thống | Dữ liệu khách hàng có | Liên quan đến tính năng nào |
+|---|---|---|
+| **PayPost** | Thu COD, gạch nợ, trả tiền người gửi, lịch sử tài chính | Gộp ID phía tài chính; quản lý đồng ý bắt buộc; UC-04 COD Risk |
+| **E-Money** ⚠️ | Ví điện tử, giao dịch thanh toán | Tách biệt PayPost — dữ liệu tài chính nằm ở hai chỗ khác nhau |
+
+> ⚠️ PayPost và E-Money là hai hệ thống tài chính riêng biệt — cần xác nhận phạm vi từng hệ thống với IT VNPost.
+
+### Nhóm 6 — Quản lý quan hệ khách hàng ⚠️
+
+| Hệ thống | Dữ liệu khách hàng có | Liên quan đến tính năng nào |
+|---|---|---|
+| **Care Đơn** | Khiếu nại, sự vụ, chăm sóc khách hàng | Tín hiệu churn sớm — đầu vào cho UC-02 |
+| **CCP / SalesForce / PostSale** ⚠️ | Quan hệ KHL doanh nghiệp, sales pipeline | Hồ sơ KHL đầy đủ nhất — cần kết nối vào gộp ID |
+| **Cas-HTKH** ⚠️ | Hỗ trợ khách hàng tại quầy — tách biệt Care Đơn | Dữ liệu khiếu nại có thể bị phân mảnh giữa hai hệ thống này |
+
+> ⚠️ CCP/SalesForce/PostSale và Cas-HTKH phát hiện từ tài liệu gốc — chưa có trong Domain Brief v2.1. Đặc biệt cần làm rõ: hai hệ thống hỗ trợ khách hàng có dữ liệu trùng nhau không?
+
+### Nhóm 7 — Hệ thống nền (định danh và địa chỉ)
+
+| Hệ thống | Dữ liệu có | Vai trò trong CDP |
+|---|---|---|
+| **PostID** | Định danh người dùng VNPost | Điểm neo trung tâm trong gộp ID |
+| **VPostCode / Địa chỉ số** | Chuẩn hóa địa chỉ Việt Nam | Chuẩn hóa địa chỉ người nhận — phục vụ hồ sơ anonymous |
+| **Vmap / Bản đồ số** | Tọa độ, tuyến đường | Phân tích địa chỉ rủi ro theo vùng địa lý |
+
+### Nhóm 8 — Báo cáo và phân tích (đã có sẵn)
 
 | Hệ thống | Dữ liệu có | Ghi chú |
 |---|---|---|
-| **CAS-ReportingDB** | Báo cáo dữ liệu từ CAS | Có thể dùng làm nguồn batch export cho CDP ban đầu |
-| **BI** | Báo cáo phân tích nội bộ | CDP bổ sung chiều dữ liệu KH vào đây |
+| **CAS-ReportingDB** | Báo cáo từ CAS | Có thể dùng làm nguồn xuất dữ liệu hàng ngày cho CDP trong giai đoạn đầu |
+| **BI** | Báo cáo phân tích nội bộ | CDP bổ sung chiều dữ liệu khách hàng vào đây |
 
 ---
 
-### 3.2 Đáp ứng được ngay (học pattern trực tiếp)
+## 6. Câu hỏi còn mở — cần xác nhận với PO và IT VNPost
 
-| VNPost cần | Hệ thống nguồn | Unomi có | Ghi chú |
-|---|---|---|---|
-| Gộp nhiều mã định danh về 1 hồ sơ | CAS, MyVNPost, PayPost, PostID, SmartLocker | **Có** — cơ chế alias đã xác minh | Cần định nghĩa quy tắc gộp: "nếu SĐT trùng thì gộp" |
-| Tự động gắn nhãn KHL sắp rời đi | Portal KHL / CAS (sản lượng) qua MPITS | **Có** — Rule Engine đã xác minh | Cấu hình ngưỡng: giảm 30% trong 4 tuần |
-| Phát hiện địa chỉ giao hàng thất bại lặp lại | PNS Phát / DingDong | **Có** — đếm số lần thất bại qua Rule Engine | Ngưỡng: 3 lần/30 ngày |
-| Quản lý đồng ý dữ liệu | MyVNPost App, CAS quầy, PayPost | **Có** — module consent sẵn có | Cần thêm bộ lan truyền xóa sang hệ thống nguồn |
-| Cấu hình ngưỡng không cần IT release | — | **Có** — quy tắc là file cấu hình | Marketing tự điều chỉnh, không đợi IT |
-
-### 3.3 Cần tùy chỉnh thêm
-
-| VNPost cần | Hệ thống liên quan | Unomi chưa có | Cần làm thêm gì |
-|---|---|---|---|
-| Hồ sơ người nhận (không có tài khoản) | PNS Phát — SĐT + địa chỉ người nhận | Không có pattern này | Thiết kế riêng: hồ sơ "nhẹ" chỉ có SĐT + địa chỉ |
-| Kết nối với từng hệ thống nguồn | CAS, PayPost, MPITS, PNS, Care Đơn... | Không có connector sẵn | Tự viết cầu nối cho từng hệ thống |
-| Gửi cảnh báo qua Zalo OA, SMS | Care Đơn, CRM | Không hỗ trợ trực tiếp | Unomi chỉ đẩy tín hiệu ra — Care Đơn/SMS gateway lo gửi |
-| Phân quyền tỉnh A không xem được tỉnh B | Toàn bộ hệ thống | Chưa xác minh đủ | Cần kiểm tra thêm trước khi quyết định |
-
-### 3.4 Unomi có nhưng VNPost không cần học
-
-| Tính năng Unomi | Lý do không cần học |
+| Câu hỏi | Tại sao cần biết |
 |---|---|
-| Tracking hành vi web/app theo session | VNPost đã có MyVNPost App làm việc này rồi |
-| Phân khúc theo hành vi duyệt web | VNPost là logistics — KH không "duyệt" như e-commerce |
-| Cá nhân hóa nội dung website real-time | Không phải use case ưu tiên của VNPost hiện tại |
-
----
-
-### 3.5 Unomi không giải quyết được
-
-| VNPost cần | Hệ thống liên quan | Lý do Unomi không giải quyết |
-|---|---|---|
-| Thu dữ liệu từ bưu tá gặp mặt (offline) | PNS Phát / DingDong | Unomi chỉ biết dữ liệu kỹ thuật số — không có khái niệm "cuộc gặp vật lý" |
-| KHL doanh nghiệp có nhiều chi nhánh | CCP / SalesForce / Portal KHL | Unomi không có cấu trúc B2B tự nhiên (công ty → nhiều tài khoản con) |
-| Phát hiện fraud theo mạng lưới địa chỉ | PNS Phát + VPostCode | Unomi nhìn từng profile riêng lẻ — không phân tích "cụm địa chỉ cạnh nhau cùng từ chối hàng" |
-| Gộp dữ liệu khiếu nại từ 2 hệ thống riêng | Care Đơn + Cas-HTKH | Unomi không tự biết 2 hệ thống này chứa cùng loại dữ liệu — cần thiết kế pipeline hợp nhất trước |
-
----
-
-## Câu hỏi 4 — Cần tham khảo thêm gì ngoài Unomi?
-
-### 4.1 Vấn đề pháp lý — CẬP NHẬT QUAN TRỌNG
-
-> **Nghị định 13/2023/NĐ-CP đã bị thay thế.** Văn bản pháp lý hiện hành là:
-> - **Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15** — thông qua 26/6/2025
-> - **Nghị định 356/2025/NĐ-CP** — ban hành 31/12/2025
-> - **Cả hai có hiệu lực từ ngày 1/1/2026**
-
-Thay đổi quan trọng nhất so với NĐ 13 cũ:
-
-| Nội dung | NĐ 13/2023 (cũ) | Luật BVDLCN 2025 (mới) |
-|---|---|---|
-| Mức phạt vi phạm thông thường | Thấp hơn | Tối đa 3 tỷ VND (~115.000 USD) |
-| Mức phạt chuyển dữ liệu ra nước ngoài | Thấp hơn | **Tối đa 5% doanh thu năm trước** |
-| Phạm vi áp dụng | Cả gián tiếp lẫn trực tiếp | Chỉ tổ chức **trực tiếp** xử lý dữ liệu |
-
-**Ý nghĩa với VNPost:** Luật mới nghiêm hơn và mức phạt cao hơn nhiều. CDP VNPost phải tuân thủ Luật BVDLCN 2025 — không còn là NĐ 13 nữa. Cần tư vấn pháp lý chính thức trước khi chốt thiết kế Consent Management.
-
-**Câu hỏi pháp lý chưa có câu trả lời (cần hỏi luật sư):** Luật mới có ngoại lệ gì cho ngành bưu chính khi xử lý thông tin người nhận không có tài khoản không?
-
----
-
-### 4.2 Pattern gộp ID cho người nhận anonymous
-
-Đây là bài toán **Unomi không có sẵn** và **nghiên cứu này cũng chưa xác minh được pattern chuẩn**.
-
-Bài toán: Người nhận bưu kiện không có tài khoản VNPost. VNPost biết họ qua SĐT hoặc địa chỉ. Cùng một người nhận có thể nhận hàng hàng chục lần từ nhiều người gửi khác nhau — nhưng VNPost không có ID thống nhất cho họ.
-
-Pattern đề xuất (dựa trên suy luận logic, chưa được xác minh):
-- Tạo hồ sơ "nhẹ" cho người nhận: chỉ có SĐT + địa chỉ + lịch sử giao dịch
-- Không yêu cầu consent đầy đủ — chỉ dùng để phân tích rủi ro địa chỉ (UC-04) và phát hiện fraud (UC-06)
-- Không dùng dữ liệu người nhận cho marketing — đây là ranh giới pháp lý
-
-**Cần nghiên cứu thêm:** Pattern này có precedent (tiền lệ) ở các công ty logistics lớn nào? FedEx, DHL, J&T Express Việt Nam đang làm thế nào?
-
----
-
-### 4.3 Phát hiện gian lận COD — Pattern từ thị trường
-
-Từ nghiên cứu, các hệ thống phát hiện gian lận COD tại logistics Đông Nam Á thường dùng 3 tín hiệu:
-
-| Tín hiệu | Mô tả | Áp dụng cho VNPost |
-|---|---|---|
-| **Tỷ lệ từ chối nhận** của địa chỉ | Địa chỉ này đã có bao nhiêu đơn bị từ chối trong 30 ngày? | Unomi làm được nếu thiết kế đúng |
-| **Tần suất đổi tên** người nhận | SĐT này liên kết với bao nhiêu tên khác nhau? | Cần xây thêm ngoài Unomi |
-| **Mạng lưới địa chỉ** nghi ngờ | Một cụm địa chỉ cạnh nhau có tỷ lệ từ chối đồng thời tăng? | Unomi không làm được — cần công cụ phân tích mạng lưới riêng |
-
-Tín hiệu thứ 3 (mạng lưới địa chỉ) là phức tạp nhất và có giá trị nhất — không phải Unomi, mà cần một công cụ phân tích đồ thị (graph analysis). Đây là phạm vi của giai đoạn sau, không phải MVP.
-
----
-
-### 4.4 Phân quyền tỉnh/vùng — Chưa có pattern đã xác minh
-
-Câu hỏi "tỉnh A không xem được dữ liệu tỉnh B" vẫn chưa có câu trả lời rõ ràng từ Unomi (bị bác bỏ trong kiểm tra độ tin cậy). Cần:
-
-1. Kiểm tra trực tiếp source code Unomi về ScopeService
-2. Hoặc thiết kế riêng: tầng phân quyền ở lớp ngoài Unomi, Unomi chỉ là kho lưu trữ
-
----
-
-## Tóm tắt — Làm gì tiếp theo
-
-### Đã xác nhận — có thể thiết kế ngay
-
-- **Cơ chế gộp ID** theo pattern ProfileAlias → dùng cho T1 (Identity Layer VNPost)
-- **Rule Engine** Event→Condition→Action → dùng cho T2 (Trigger Engine, 4 use case)
-- **Cấu hình ngưỡng không cần IT** → dùng cho T3 (Business Logic Layer tách biệt)
-- **Luật bảo vệ dữ liệu mới** là Luật 91/2025 + NĐ 356/2025 (không còn là NĐ 13/2023)
-
-### Cần làm rõ thêm trước khi thiết kế
-
-| Câu hỏi | Tại sao quan trọng | Cách làm rõ |
-|---|---|---|
-| Scope của Unomi có thực sự phân vùng dữ liệu tỉnh/vùng không? | Ảnh hưởng trực tiếp đến T5 và Q9 | Đọc source code ScopeService trên GitHub |
-| Segment có tính lại tức thì hay cần chờ? | UC-06 fraud cần phát hiện trong vài phút — nếu batch thì không đủ | Test trực tiếp trên môi trường Unomi |
-| Luật BVDLCN 2025 có ngoại lệ cho bưu chính không? | Người nhận không có tài khoản — VNPost có được lưu thông tin họ không? | Hỏi luật sư/chuyên gia pháp lý |
-| Pattern hồ sơ người nhận anonymous — logistics lớn làm thế nào? | VNPost cần thiết kế riêng phần này | Nghiên cứu bổ sung FedEx/DHL/J&T |
-| SmartLocker có ID định danh riêng không, hay chỉ dùng SĐT? | Nếu có ID riêng → thêm 1 alias nữa vào T1; nếu chỉ SĐT → gộp được ngay | Hỏi IT VNPost về SmartLocker system |
-| PayPost và E-Money có phải 2 hệ thống độc lập không? | Nếu độc lập → dữ liệu tài chính bị phân mảnh thêm, cần 2 connector riêng | Hỏi IT VNPost về phạm vi từng hệ thống |
-| Care Đơn và Cas-HTKH có dữ liệu khiếu nại trùng nhau không? | Nếu trùng → phải dedup trước khi đưa vào CDP; nếu tách biệt → cần hợp nhất | Hỏi đội CSKH về quy trình xử lý sự vụ |
-
-### Vẫn cần câu trả lời từ PO/client
-
-Năm câu CRITICAL trong [Domain Brief](domain-brief.md) vẫn còn nguyên — đặc biệt Q9 (phân quyền tỉnh/TCT) và Q4 (chính sách bảo vệ dữ liệu theo luật mới).
-
----
-
-## Nguồn đã kiểm tra
-
-| Nguồn | Loại | Kết quả |
-|---|---|---|
-| unomi.apache.org/manual/latest/ | Chính thức | Xác nhận cơ chế alias + Rule Engine |
-| github.com/apache/unomi/blob/master/manual/src/main/asciidoc/datamodel.adoc | Chính thức | Xác nhận cấu trúc ProfileAlias |
-| downloads.apache.org/unomi/2.7.0/unomi-manual-2_7_x.pdf | Chính thức | Nguồn gốc, nhiều claims bị bác |
-| tilleke.com — luật BVDLCN 2025 | Công ty luật | Xác nhận thay thế NĐ 13, mức phạt mới |
-| dfdl.com — luật BVDLCN 2025 | Công ty luật | Xác nhận độc lập — Luật 91/2025 + NĐ 356/2025 |
-
-*Tổng cộng: 101 agent, 19 nguồn, 76 claims trích xuất, 25 claims kiểm tra, 9 xác nhận, 16 bị bác bỏ.*
+| Luật BVDLCN 2025 có ngoại lệ gì cho ngành bưu chính khi lưu thông tin người nhận không có tài khoản? | Quyết định phạm vi hồ sơ người nhận anonymous — được phép lưu gì, không được lưu gì |
+| SmartLocker có mã định danh riêng không, hay chỉ dùng số điện thoại? | Nếu có mã riêng → thêm một alias nữa vào cơ chế gộp ID; nếu chỉ số điện thoại → gộp được ngay |
+| PayPost và E-Money là hai hệ thống độc lập hay liên thông? | Nếu độc lập → dữ liệu tài chính bị phân mảnh, cần hai cầu nối riêng; ảnh hưởng thiết kế UC-04 |
+| Care Đơn và Cas-HTKH có lưu cùng loại dữ liệu khiếu nại không, hay hoàn toàn tách biệt? | Nếu trùng → phải hợp nhất trước khi đưa vào CDP; nếu tách biệt → cần gộp thủ công |
+| CCP/SalesForce/PostSale là hệ thống nội bộ VNPost hay phần mềm bên thứ ba? | Nếu bên thứ ba → cần thỏa thuận tích hợp riêng; ảnh hưởng lộ trình kết nối dữ liệu |
+| Phân quyền tỉnh/vùng trong CDP: tỉnh A có được xem dữ liệu khách hàng của tỉnh B không? | Quyết định kiến trúc phân quyền — cần chốt với lãnh đạo trước khi thiết kế |
