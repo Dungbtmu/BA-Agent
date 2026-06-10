@@ -179,7 +179,17 @@ Những tính năng sau **bị bác bỏ trong kiểm tra độ tin cậy** — 
 | Gửi cảnh báo qua Zalo OA, SMS | Care Đơn, CRM | Không hỗ trợ trực tiếp | Unomi chỉ đẩy tín hiệu ra — Care Đơn/SMS gateway lo gửi |
 | Phân quyền tỉnh A không xem được tỉnh B | Toàn bộ hệ thống | Chưa xác minh đủ | Cần kiểm tra thêm trước khi quyết định |
 
-### 3.4 Unomi không giải quyết được
+### 3.4 Unomi có nhưng VNPost không cần học
+
+| Tính năng Unomi | Lý do không cần học |
+|---|---|
+| Tracking hành vi web/app theo session | VNPost đã có MyVNPost App làm việc này rồi |
+| Phân khúc theo hành vi duyệt web | VNPost là logistics — KH không "duyệt" như e-commerce |
+| Cá nhân hóa nội dung website real-time | Không phải use case ưu tiên của VNPost hiện tại |
+
+---
+
+### 3.5 Unomi không giải quyết được
 
 | VNPost cần | Hệ thống liên quan | Lý do Unomi không giải quyết |
 |---|---|---|
