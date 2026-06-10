@@ -151,12 +151,63 @@ Trước khi output, kiểm tra:
 
 ---
 
+## Quy tắc viết dễ đọc, dễ hiểu
+
+Tài liệu URD/SRS được đọc bởi Dev, Tester, PO — không phải chỉ BA. Mỗi đoạn mô tả phải tự giải thích được mà không cần hỏi lại.
+
+### 1. Phân tầng mô tả — luồng chính trước, exception sau
+
+**ĐÚNG:**
+> Người dùng nhập số điện thoại → hệ thống kiểm tra định dạng → lưu thành công.
+>
+> **Exception:** Sai định dạng → hiển thị "Số điện thoại không hợp lệ — phải có đúng 10 chữ số bắt đầu bằng 0".
+
+**SAI (nhồi tất cả vào 1 đoạn):**
+> Người dùng nhập số điện thoại; nếu đúng 10 chữ số bắt đầu bằng 0 thì lưu, nếu không thì báo lỗi; không chấp nhận dấu cách, dấu gạch ngang...
+
+Ô bảng có trên 4 rule → tách thành sub-list (`-` hoặc đánh số), không để thành 1 khối text liên tục.
+
+### 2. Viết từ góc nhìn người dùng — không viết theo góc kỹ thuật
+
+Mô tả **điều user thấy / làm**, không mô tả cơ chế kỹ thuật bên trong.
+
+| Tránh | Dùng thay |
+|---|---|
+| "Hệ thống parse file CSV" | "Sau khi chọn file, màn hình hiển thị preview số dòng hợp lệ / sai định dạng / trùng lặp" |
+| "Debounce 300ms trước khi gọi API" | "Kết quả tìm kiếm cập nhật sau khi người dùng dừng gõ" |
+| "Backend validate token expiry" | "Nếu phiên đăng nhập hết hạn, người dùng được chuyển về màn hình đăng nhập" |
+
+Thông tin kỹ thuật (debounce, timeout, retry) chỉ viết ở **Section C — Yêu cầu phi chức năng**, không lẫn vào mô tả nghiệp vụ.
+
+### 3. Dùng ví dụ minh họa khi mô tả trừu tượng
+
+Bất kỳ rule nào có thể hiểu sai → thêm ví dụ cụ thể kèm theo.
+
+> **Độ ưu tiên**: số nhỏ = ưu tiên cao hơn. *Ví dụ: Campaign A có độ ưu tiên 1 sẽ được gửi trước Campaign B có độ ưu tiên 5.*
+
+Ví dụ dùng dữ liệu thực tế gần với domain dự án — không dùng `foo/bar`, `A/B`, hay số ngẫu nhiên vô nghĩa.
+
+### 4. Giải thích thuật ngữ nghiệp vụ lạ ngay lần đầu xuất hiện
+
+Thuật ngữ domain-specific hoặc viết tắt nội bộ → giải thích inline lần đầu, sau đó dùng bình thường.
+
+> **T-ALL** (Tất cả khách hàng — không lọc phân khúc): khi QTV không chọn phân khúc nào, hệ thống mặc định gửi đến T-ALL.
+
+Đồng thời bổ sung vào bảng **I.3 Định nghĩa thuật ngữ**.
+
+---
+
 ## Checklist chất lượng trước khi output
 
 **Nội dung:**
 - [ ] Business Rules trong UC cụ thể, testable — không viết chung chung
 - [ ] Validation rule đủ từ cơ bản (bắt buộc, định dạng, độ dài) đến nâng cao (ràng buộc liên field, điều kiện nghiệp vụ)
 - [ ] Thông báo lỗi cụ thể — không phải "dữ liệu không hợp lệ"
+- [ ] Mỗi đoạn mô tả: luồng chính trước, exception sau — không nhồi thành 1 khối text
+- [ ] Ô bảng > 4 rule → tách thành sub-list
+- [ ] Mô tả viết từ góc nhìn user — không lẫn mô tả kỹ thuật nội bộ vào nghiệp vụ
+- [ ] Rule trừu tượng hoặc dễ hiểu sai → có ví dụ minh họa kèm theo
+- [ ] Thuật ngữ domain-specific lạ → giải thích inline lần đầu + bổ sung vào I.3
 - [ ] Sequence Diagram có đủ `alt/else` (nhánh hợp lệ + lỗi)
 - [ ] Bảng component giao diện đủ: Định dạng, Bắt buộc, Mặc định, Mô tả
 - [ ] Log requirement được ghi trong bảng component
