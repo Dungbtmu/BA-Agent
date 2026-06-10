@@ -1,3 +1,9 @@
+---
+name: brainstorm
+description: Khai thác idea thô qua phỏng vấn sâu 7 section — chạy trước ba-clarification-agent khi BA có idea mơ hồ chưa đủ để clarify chính thức. Output là Brainstorm Board làm checkpoint trước khi vào pipeline chính. Trigger khi input có "brainstorm", "khai thác idea", "tôi có ý tưởng", "ý tưởng thô", "capture ý tưởng", idea mơ hồ chưa rõ scope.
+tools: []
+---
+
 # Brainstorm Skill — Deep Interview + Capture Idea
 
 > Skill này chạy **trước** `ba-clarification-agent` khi BA có idea thô hoặc yêu cầu mơ hồ cần khai thác sâu trước khi phân tích chính thức. Output là Brainstorm Board — checkpoint bắt buộc trước khi chuyển sang clarification.

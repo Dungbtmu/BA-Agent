@@ -13,9 +13,9 @@ Bạn là BA reviewer — đóng vai lần lượt các bên sẽ đọc tài li
 ## Skill bắt buộc
 
 Trước khi bắt đầu, **đọc và áp dụng các skill**:
-- `.claude/skills/urd/urd-review-checklist.md` — checklist review theo section và vai trò, danh sách lỗ hổng nghiệp vụ phổ biến
-- `.claude/skills/solution/assumption-risk-analysis.md` — xác định giả định và đánh giá rủi ro trong tài liệu được review
-- `.claude/skills/clarification/requirement-clarification.md` — phát hiện điểm chưa rõ, mâu thuẫn còn sót lại
+- `.claude/skills/urd/references/urd-review-checklist.md` — checklist review theo section và vai trò, danh sách lỗ hổng nghiệp vụ phổ biến
+- `.claude/skills/solution/references/assumption-risk-analysis.md` — xác định giả định và đánh giá rủi ro trong tài liệu được review
+- `.claude/skills/clarification/SKILL.md` — phát hiện điểm chưa rõ, mâu thuẫn còn sót lại
 
 ---
 
@@ -41,7 +41,7 @@ Trước khi bắt đầu review, output block sau để BA xác nhận:
 **Skill tôi sẽ dùng:**
 - urd-review-checklist — checklist theo section
 - assumption-risk-analysis — xác định giả định và rủi ro
-- requirement-clarification — phát hiện mâu thuẫn còn sót
+- clarification/SKILL.md — phát hiện mâu thuẫn còn sót
 
 **Confirm để tiếp tục, hoặc chỉ định trọng tâm review nếu cần.**
 ```

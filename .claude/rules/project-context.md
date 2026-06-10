@@ -50,39 +50,48 @@ Loại tài liệu đầu ra đa dạng, tùy theo yêu cầu: Backlog, Epic, Us
 │   ├── output-schema.md
 │   └── review-handoff-policy.md  ← Quy tắc phạm vi sửa khi apply review report
 ├── skills/                    ← Skill chuyên biệt, agent đọc khi cần — tổ chức theo nhóm
-│   ├── clarification/         ← Phase 0+1: brainstorm + làm rõ yêu cầu
-│   │   ├── brainstorm.md             ← Phase 0: phỏng vấn 7 section, khai thác idea thô
-│   │   ├── requirement-clarification.md  ← orchestrator
-│   │   ├── input-analysis.md
-│   │   ├── as-is-analysis.md
-│   │   ├── domain-research.md
-│   │   ├── domain-gap-analysis.md
-│   │   └── problem-framing.md
+│   ├── clarification/         ← Phase 1: làm rõ yêu cầu
+│   │   ├── SKILL.md               ← orchestrator — entry point duy nhất
+│   │   ├── brainstorm.md          ← Phase 0: phỏng vấn 7 section, khai thác idea thô
+│   │   ├── brainstorm-example.md
+│   │   └── references/            ← L3: sub-skills, agent navigate khi cần
+│   │       ├── input-analysis.md
+│   │       ├── as-is-analysis.md
+│   │       ├── domain-research.md
+│   │       ├── domain-gap-analysis.md
+│   │       └── problem-framing.md
 │   ├── solution/              ← Phase 1: thiết kế giải pháp
-│   │   ├── stakeholder-mapping.md
-│   │   ├── user-persona-identification.md
-│   │   ├── context-constraint-analysis.md
-│   │   ├── assumption-risk-analysis.md
-│   │   └── solution-critique.md
+│   │   ├── SKILL.md               ← orchestrator — entry point duy nhất
+│   │   └── references/
+│   │       ├── stakeholder-mapping.md
+│   │       ├── user-persona-identification.md
+│   │       ├── context-constraint-analysis.md
+│   │       ├── assumption-risk-analysis.md
+│   │       └── solution-critique.md
 │   ├── ui/                    ← Phase 2: giao diện
-│   │   ├── wireframe-design-system.md
-│   │   ├── react-ui-generation.md
-│   │   └── ui-feedback-triage.md
+│   │   ├── SKILL.md               ← orchestrator — entry point duy nhất
+│   │   └── references/
+│   │       ├── wireframe-design-system.md
+│   │       ├── react-ui-generation.md
+│   │       └── ui-feedback-triage.md
 │   ├── urd/                   ← Phase 3: tài liệu URD/SRS
-│   │   ├── urd-srs-structure.md  ← orchestrator
-│   │   ├── urd-workflow-diagram.md
-│   │   ├── urd-function-tree.md
-│   │   ├── urd-permission-matrix.md
-│   │   ├── urd-sequence-diagram.md
-│   │   ├── urd-use-case.md
-│   │   ├── urd-screen-spec.md
-│   │   ├── urd-review-checklist.md
-│   │   └── document-integrity-check.md
+│   │   ├── SKILL.md               ← orchestrator — entry point duy nhất
+│   │   └── references/
+│   │       ├── urd-workflow-diagram.md
+│   │       ├── urd-function-tree.md
+│   │       ├── urd-permission-matrix.md
+│   │       ├── urd-sequence-diagram.md
+│   │       ├── urd-use-case.md
+│   │       ├── urd-screen-spec.md
+│   │       ├── urd-review-checklist.md
+│   │       └── document-integrity-check.md
 │   ├── sync/                  ← SYNC mode: đồng bộ artifact khi requirement thay đổi
-│   │   ├── change-handler.md
-│   │   ├── impact-analysis.md
-│   │   ├── artifact-patch.md
-│   │   └── traceability-map.md
+│   │   ├── SKILL.md               ← orchestrator — entry point duy nhất
+│   │   └── references/
+│   │       ├── change-handler.md
+│   │       ├── impact-analysis.md
+│   │       ├── artifact-patch.md
+│   │       └── traceability-map.md
 │   ├── shared/                ← Dùng chung xuyên phase
 │   │   ├── resolve-oqs.md
 │   │   ├── process-log.md

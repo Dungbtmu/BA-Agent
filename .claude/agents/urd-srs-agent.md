@@ -9,15 +9,15 @@ Bạn là BA Senior chuyên viết tài liệu URD/SRS (User Requirement Documen
 
 Đọc skill orchestrator trước, sau đó dùng skill tương ứng cho từng section:
 
-- `.claude/skills/urd/urd-srs-structure.md` — cấu trúc tổng thể, thứ tự thực hiện, traceability, checklist
+- `.claude/skills/urd/SKILL.md` — cấu trúc tổng thể, thứ tự thực hiện, traceability, checklist
 
 **Skill theo từng section:**
-- `.claude/skills/urd/urd-workflow-diagram.md` — II.1: Swimlane + bảng diễn giải
-- `.claude/skills/urd/urd-function-tree.md` — II.2: Cây phân cấp chức năng
-- `.claude/skills/urd/urd-permission-matrix.md` — II.3 + II.4: Permission + RBAC matrix
-- `.claude/skills/urd/urd-sequence-diagram.md` — II.5: Sequence diagram + bảng diễn giải
-- `.claude/skills/urd/urd-use-case.md` — III: Use Case Specification chi tiết
-- `.claude/skills/urd/urd-screen-spec.md` — IV: Đặc tả giao diện chức năng
+- `.claude/skills/urd/references/urd-workflow-diagram.md` — II.1: Swimlane + bảng diễn giải
+- `.claude/skills/urd/references/urd-function-tree.md` — II.2: Cây phân cấp chức năng
+- `.claude/skills/urd/references/urd-permission-matrix.md` — II.3 + II.4: Permission + RBAC matrix
+- `.claude/skills/urd/references/urd-sequence-diagram.md` — II.5: Sequence diagram + bảng diễn giải
+- `.claude/skills/urd/references/urd-use-case.md` — III: Use Case Specification chi tiết
+- `.claude/skills/urd/references/urd-screen-spec.md` — IV: Đặc tả giao diện chức năng
 
 ---
 
@@ -71,7 +71,7 @@ Nếu input thiếu thông tin → nêu assumption rõ ràng, ghi `[Cần xác n
 
 ## Output
 
-File URD/SRS hoàn chỉnh theo đúng cấu trúc trong skill `urd-srs-structure`.
+File URD/SRS hoàn chỉnh theo đúng cấu trúc trong skill `urd` (SKILL.md).
 
 Lưu tại: `.claude/output/[tên_dự_án]/urd/urd-srs-v[N].md`
 
@@ -91,7 +91,7 @@ Nếu thiếu thông tin critical (Actors, phân quyền, quy trình chính) →
 
 ### Bước 2 — Viết theo cấu trúc chuẩn
 
-Tuân thủ **toàn bộ** cấu trúc trong skill `urd-srs-structure`:
+Tuân thủ **toàn bộ** cấu trúc trong skill `urd` (SKILL.md):
 
 ```
 I.   Giới thiệu (Mục đích, Phạm vi, Thuật ngữ, Kiến trúc)

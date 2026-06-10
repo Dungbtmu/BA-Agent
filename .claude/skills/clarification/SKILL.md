@@ -20,10 +20,10 @@ Entry point duy nhất cho toàn bộ nhóm Clarification. Nhận input ở bấ
 
 | Sub-skill | Gọi khi | Không gọi khi |
 |---|---|---|
-| `input-analysis.md` | Input là tài liệu có sẵn (PRD, email, ghi chú, file cũ) | Input là mô tả miệng thuần túy |
-| `as-is-analysis.md` | BA cung cấp hiện trạng thực tế (hệ thống cũ, quy trình đang chạy) | Không có thông tin hiện trạng |
-| `domain-gap-analysis.md` | Có Domain Brief từ `ba-research-agent` | Không có Domain Brief |
-| `problem-framing.md` | Input mơ hồ, mô tả solution thay vì problem, hoặc thiếu business objective | Input đã có problem statement rõ ràng |
+| `references/input-analysis.md` | Input là tài liệu có sẵn (PRD, email, ghi chú, file cũ) | Input là mô tả miệng thuần túy |
+| `references/as-is-analysis.md` | BA cung cấp hiện trạng thực tế (hệ thống cũ, quy trình đang chạy) | Không có thông tin hiện trạng |
+| `references/domain-gap-analysis.md` | Có Domain Brief từ `ba-research-agent` | Không có Domain Brief |
+| `references/problem-framing.md` | Input mơ hồ, mô tả solution thay vì problem, hoặc thiếu business objective | Input đã có problem statement rõ ràng |
 
 ---
 

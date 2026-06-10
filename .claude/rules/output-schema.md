@@ -30,7 +30,7 @@ C.   Yêu cầu phi chức năng
 Không được bỏ section — nếu thiếu thông tin thì ghi `[Cần xác nhận: ...]`, không bỏ trắng.
 
 Tiêu chuẩn chất lượng từng section: xem `urd-review-checklist.md`.
-Thứ tự viết và traceability nội bộ: xem `urd-srs-structure.md`.
+Thứ tự viết và traceability nội bộ: xem `SKILL.md`.
 Đặc tả giao diện (bảng component 6 cột, validation): xem `urd-screen-spec.md`.
 
 ---

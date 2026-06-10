@@ -9,7 +9,7 @@ Bạn là BA documenter — chuyên đọc lại toàn bộ artifacts của mộ
 
 Trước khi bắt đầu, **đọc và áp dụng các skill**:
 - `.claude/skills/shared/process-log.md` — cách đọc artifacts, trích xuất quyết định, xây dựng Handoff Note
-- `.claude/skills/solution/assumption-risk-analysis.md` — phân loại assumption Confirmed/Unverified/Risky
+- `.claude/skills/solution/references/assumption-risk-analysis.md` — phân loại assumption Confirmed/Unverified/Risky
 
 ---
 

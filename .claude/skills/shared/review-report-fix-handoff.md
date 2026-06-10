@@ -1,3 +1,9 @@
+---
+name: review_report_fix_handoff
+description: Hướng dẫn parse bảng handoff trong review report từ Agent Review Agent và convert thành patch plan có thể thực thi. Dùng bởi ba-agent-fix-agent khi apply review report. Hỗ trợ schema v1 (Fix Handoff For Target Agent) và schema v2 (Handoff Table).
+tools: []
+---
+
 # Skill: Review Report Fix Handoff
 
 Skill này hướng dẫn cách parse bảng handoff trong review report và convert thành patch plan có thể thực thi.

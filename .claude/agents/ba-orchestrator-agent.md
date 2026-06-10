@@ -217,7 +217,7 @@ Khi READY FOR HANDOFF:
 #### Bước [T] — Tạo Traceability Map (tự động)
 
 ```
-→ Đọc skill: .claude/skills/sync/traceability-map.md
+→ Đọc skill: .claude/skills/sync/references/traceability-map.md
 → Từ URD/SRS đã chốt, trích xuất tất cả REQ, UC, WF, Story
 → Tạo file: .claude/output/[dự_án]/traceability-map.md
 → Báo BA: "Pipeline hoàn tất. Traceability Map đã được tạo — sẵn sàng cho chế độ SYNC khi requirement thay đổi."
@@ -252,7 +252,7 @@ BA xác nhận để bắt đầu?
 #### S1 — Change Handler
 
 ```
-→ Đọc skill: .claude/skills/sync/change-handler.md
+→ Đọc skill: .claude/skills/sync/references/change-handler.md
 → Parse trigger (free text hoặc file PO mới)
 → Output: Delta Summary + Change Set draft
 
@@ -264,7 +264,7 @@ BA xác nhận để bắt đầu?
 #### S2 — Impact Analysis
 
 ```
-→ Đọc skill: .claude/skills/sync/impact-analysis.md
+→ Đọc skill: .claude/skills/sync/references/impact-analysis.md
 → Tra cứu Traceability Map
 → Output: Impact Report với danh sách artifact + thứ tự patch
 
@@ -276,7 +276,7 @@ BA xác nhận để bắt đầu?
 #### S3 — Artifact Patch
 
 ```
-→ Đọc skill: .claude/skills/sync/artifact-patch.md
+→ Đọc skill: .claude/skills/sync/references/artifact-patch.md
 → Patch từng artifact theo thứ tự trong Impact Report
 → Tự động: CRITICAL và MINOR patch (không hỏi)
 → MAJOR với ambiguity: dừng hỏi BA → tiếp tục sau khi có câu trả lời

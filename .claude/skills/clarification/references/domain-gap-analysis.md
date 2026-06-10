@@ -23,7 +23,7 @@ Output là danh sách gap có độ ưu tiên, dùng trực tiếp để định
 - Domain Brief (file `.claude/output/[tên_dự_án]/research/domain-brief.md`)
 - Input từ client (mô tả miệng, PRD sơ bộ, ghi chú, hoặc kết quả buổi họp đầu)
 
-Nếu thiếu một trong hai → không chạy skill này, dùng `requirement-clarification.md` thay thế.
+Nếu thiếu một trong hai → không chạy skill này, dùng `SKILL.md` thay thế.
 
 ---
 

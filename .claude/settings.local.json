@@ -3,7 +3,8 @@
     "allow": [
       "Bash(export PATH=\"/usr/local/bin:/opt/homebrew/bin:$PATH\")",
       "Read(//Users/buidung/Documents/workspace/aeh/eduecosystem/cvm-ui/**)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "WebFetch(domain:unomi.apache.org)"
     ]
   },
   "hooks": {

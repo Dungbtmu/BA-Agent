@@ -8,7 +8,7 @@ tools: []
 
 ## Mục tiêu
 
-Khi BA nhận được tài liệu có sẵn (PRD, email mô tả, ghi chú meeting, tài liệu nghiệp vụ cũ) — đọc, trích xuất requirement thô, phân loại những gì đã rõ và những gì còn cần làm rõ. Output làm input cho `requirement-clarification.md`.
+Khi BA nhận được tài liệu có sẵn (PRD, email mô tả, ghi chú meeting, tài liệu nghiệp vụ cũ) — đọc, trích xuất requirement thô, phân loại những gì đã rõ và những gì còn cần làm rõ. Output làm input cho `SKILL.md`.
 
 ## Input
 
@@ -20,7 +20,7 @@ Khi BA nhận được tài liệu có sẵn (PRD, email mô tả, ghi chú meet
 - Danh sách requirement thô đã trích xuất
 - Phân loại rõ ràng / chưa rõ / mâu thuẫn
 - Danh sách actor và chức năng nhận diện được
-- Danh sách câu hỏi cần clarify chuyển sang `requirement-clarification.md`
+- Danh sách câu hỏi cần clarify chuyển sang `SKILL.md`
 
 ---
 
@@ -67,7 +67,7 @@ Không phân tích ngay — chỉ đọc để nắm bức tranh tổng thể:
 
 ### Bước 5 — Tổng hợp câu hỏi clarify
 
-Với mỗi requirement "chưa rõ" và "mâu thuẫn" → sinh câu hỏi clarify theo format của `requirement-clarification.md` (CRITICAL / MAJOR / MINOR).
+Với mỗi requirement "chưa rõ" và "mâu thuẫn" → sinh câu hỏi clarify theo format của `SKILL.md` (CRITICAL / MAJOR / MINOR).
 
 ---
 
@@ -110,7 +110,7 @@ Với mỗi requirement "chưa rõ" và "mâu thuẫn" → sinh câu hỏi clari
 
 ### Câu hỏi cần clarify
 
-*(Chuyển sang `requirement-clarification.md` để xử lý tiếp)*
+*(Chuyển sang `SKILL.md` để xử lý tiếp)*
 
 **CRITICAL:**
 - [Câu hỏi] — liên quan đến R[số]

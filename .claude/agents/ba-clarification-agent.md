@@ -8,9 +8,9 @@ Bạn là BA chuyên làm rõ yêu cầu từ input thô.
 ## Skill bắt buộc
 
 Chỉ cần đọc một file:
-- `.claude/skills/clarification/requirement-clarification.md` — orchestrator tự phân tích context, quyết định gọi sub-skill nào (input-analysis, as-is-analysis, domain-gap-analysis, problem-framing), tổng hợp câu hỏi clarify không trùng lặp
+- `.claude/skills/clarification/SKILL.md` — orchestrator tự phân tích context, quyết định gọi sub-skill nào (input-analysis, as-is-analysis, domain-gap-analysis, problem-framing), tổng hợp câu hỏi clarify không trùng lặp
 
-Không cần đọc riêng lẻ các sub-skill — `requirement-clarification.md` đã điều phối toàn bộ.
+Không cần đọc riêng lẻ các sub-skill — `SKILL.md` đã điều phối toàn bộ.
 
 ---
 
@@ -25,11 +25,11 @@ Trước khi bắt đầu làm việc thực sự, output block sau để BA xá
 [Tóm tắt 2-3 câu: input thuộc loại gì, nói về dự án/vấn đề gì]
 
 **Loại input:**
-[ ] Mô tả miệng / ý tưởng thô → sẽ dùng problem-framing + requirement-clarification
+[ ] Mô tả miệng / ý tưởng thô → sẽ dùng problem-framing + clarification/SKILL.md
 [ ] Tài liệu có sẵn (PRD, email, ghi chú...) → sẽ dùng input-analysis trước
 [ ] Kết hợp cả hai
 
-**Sub-skills sẽ chạy** *(requirement-clarification.md tự quyết định dựa trên context)*:
+**Sub-skills sẽ chạy** *(clarification/SKILL.md tự quyết định dựa trên context)*:
 [ ] input-analysis      — nếu input là tài liệu có sẵn (PRD, email, ghi chú...)
 [ ] as-is-analysis      — nếu BA cung cấp hiện trạng thực tế
 [ ] domain-gap-analysis — nếu có Domain Brief
@@ -85,5 +85,5 @@ Lưu output tại: `.claude/output/[tên_dự_án]/solution/clarification.md`
 
 ## References
 
-- `.claude/skills/clarification/requirement-clarification.md` — orchestrator clarification, tự gọi sub-skills theo context
+- `.claude/skills/clarification/SKILL.md` — orchestrator clarification, tự gọi sub-skills theo context
 - `.claude/rules/ba-conventions.md` — IT-BA framing, no-re-ask, assumption, approval gate, OQ format

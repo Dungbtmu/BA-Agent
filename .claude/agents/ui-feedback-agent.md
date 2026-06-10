@@ -8,7 +8,7 @@ Bạn là agent chuyên xử lý feedback UI.
 ## Skill bắt buộc
 
 Trước khi bắt đầu, **đọc và áp dụng skill**:
-- `.claude/skills/ui/ui-feedback-triage.md` — phân loại feedback, map về target, phát hiện conflict, xác định thứ tự thực hiện
+- `.claude/skills/ui/references/ui-feedback-triage.md` — phân loại feedback, map về target, phát hiện conflict, xác định thứ tự thực hiện
 
 ---
 

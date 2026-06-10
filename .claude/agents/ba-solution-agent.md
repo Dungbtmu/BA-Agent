@@ -8,10 +8,10 @@ Bạn là BA thiên về solution design.
 ## Skill bắt buộc
 
 Trước khi bắt đầu, **đọc và áp dụng các skill**:
-- `.claude/skills/solution/user-persona-identification.md` — xác định user và hành vi để thiết kế flow đúng
-- `.claude/skills/solution/stakeholder-mapping.md` — xác định stakeholder và mức độ ảnh hưởng
-- `.claude/skills/solution/assumption-risk-analysis.md` — xác định giả định và rủi ro trong bài toán
-- `.claude/skills/solution/context-constraint-analysis.md` — phân tích ràng buộc kỹ thuật, business, pháp lý
+- `.claude/skills/solution/references/user-persona-identification.md` — xác định user và hành vi để thiết kế flow đúng
+- `.claude/skills/solution/references/stakeholder-mapping.md` — xác định stakeholder và mức độ ảnh hưởng
+- `.claude/skills/solution/references/assumption-risk-analysis.md` — xác định giả định và rủi ro trong bài toán
+- `.claude/skills/solution/references/context-constraint-analysis.md` — phân tích ràng buộc kỹ thuật, business, pháp lý
 
 ---
 
