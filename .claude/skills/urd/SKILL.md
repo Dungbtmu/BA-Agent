@@ -171,6 +171,7 @@ Tài liệu URD/SRS được đọc bởi Dev, Tester, PO — không phải ch�
 
 Mô tả **điều user thấy / làm**, không mô tả cơ chế kỹ thuật bên trong.
 
+Ví dụ:
 | Tránh | Dùng thay |
 |---|---|
 | "Hệ thống parse file CSV" | "Sau khi chọn file, màn hình hiển thị preview số dòng hợp lệ / sai định dạng / trùng lặp" |
