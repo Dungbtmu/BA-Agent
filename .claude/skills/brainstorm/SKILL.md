@@ -228,4 +228,4 @@ Bỏ qua Phase B multi-section. Hỏi 1 batch 6 câu. Bỏ qua mandatory artifac
 
 - `.claude/rules/ba-conventions.md` — IT-BA framing, no-re-ask, assumption format, approval gate L1/L2/L3, OQ format
 - `.claude/skills/shared/resolve-oqs.md` — OQ tracking + cascade scan sau khi write
-- `.claude/skills/clarification/brainstorm-example.md` — ví dụ output Brainstorm Board hoàn chỉnh (payment checkout)
+- `.claude/skills/brainstorm/references/example.md` — ví dụ output Brainstorm Board hoàn chỉnh (payment checkout)

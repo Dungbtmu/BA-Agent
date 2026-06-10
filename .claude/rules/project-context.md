@@ -50,10 +50,12 @@ Loại tài liệu đầu ra đa dạng, tùy theo yêu cầu: Backlog, Epic, Us
 │   ├── output-schema.md
 │   └── review-handoff-policy.md  ← Quy tắc phạm vi sửa khi apply review report
 ├── skills/                    ← Skill chuyên biệt, agent đọc khi cần — tổ chức theo nhóm
+│   ├── brainstorm/            ← Phase 0 (optional): khai thác idea thô
+│   │   ├── SKILL.md               ← entry point duy nhất
+│   │   └── references/
+│   │       └── example.md
 │   ├── clarification/         ← Phase 1: làm rõ yêu cầu
 │   │   ├── SKILL.md               ← orchestrator — entry point duy nhất
-│   │   ├── brainstorm.md          ← Phase 0: phỏng vấn 7 section, khai thác idea thô
-│   │   ├── brainstorm-example.md
 │   │   └── references/            ← L3: sub-skills, agent navigate khi cần
 │   │       ├── input-analysis.md
 │   │       ├── as-is-analysis.md
