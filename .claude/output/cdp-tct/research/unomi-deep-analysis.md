@@ -72,6 +72,32 @@ Unomi có sẵn module quản lý đồng ý — người dùng có thể bật/
 
 ---
 
+### Tính năng 4: Thêm trường dữ liệu mới vào hồ sơ KH mà không cần sửa code (đã xác minh)
+
+**Unomi làm thế nào:** Muốn thêm một trường mới vào hồ sơ KH (ví dụ: "số lần giao thất bại tích lũy", "tỷ lệ hoàn hàng 30 ngày"), chỉ cần khai báo bằng file JSON — không cần IT sửa code lõi, không cần release hệ thống. Trường mới tự động xuất hiện trong hồ sơ của tất cả KH ngay sau khi deploy file.
+
+**Áp dụng cho VNPost:** Mỗi khi nghiệp vụ cần thêm chỉ số mới để phân tích KH (ví dụ: thêm "điểm tín nhiệm COD", "số tháng hoạt động liên tiếp"), không cần chờ IT. Marketing/BA tự định nghĩa trường mới theo nhu cầu phân tích.
+
+---
+
+### Tính năng 5: Tính điểm tín nhiệm KH tự động (đã được mô tả trong tài liệu chính thức)
+
+**Unomi làm thế nào:** Mỗi profile KH có thể được gán điểm số tự động theo quy tắc — điểm tăng khi có hành vi tốt (giao hàng thành công, thanh toán đúng hạn), điểm giảm khi có hành vi xấu (từ chối nhận COD, địa chỉ thất bại lặp lại). Điểm tự cập nhật mỗi khi có sự kiện mới xảy ra.
+
+**Áp dụng cho VNPost:**
+
+| Hành vi | Tác động điểm | Dùng cho |
+|---|---|---|
+| Giao hàng thành công | +điểm | Xây dựng hồ sơ tín nhiệm tích cực |
+| Từ chối nhận COD | −điểm | UC-04 COD Risk |
+| Địa chỉ giao thất bại lần 2, lần 3 | −điểm mạnh hơn | UC-04 cảnh báo trước khi nhận đơn mới |
+| SĐT liên kết nhiều tên khác nhau | −điểm | UC-06 Fraud Detection |
+| Thanh toán COD đúng hạn nhiều lần | +điểm | KHL uy tín — ưu tiên phục vụ |
+
+**Điểm mạnh so với chỉ dùng nhãn:** Nhãn chỉ có 2 giá trị (có/không). Điểm số cho phép xếp hạng — KH điểm 20 khác KH điểm 80 dù cả 2 đều có nhãn "rủi ro". Phân loại chính xác hơn khi quyết định mức độ cảnh báo.
+
+---
+
 ### Tính năng chưa được xác minh (cần nghiên cứu thêm)
 
 Những tính năng sau **bị bác bỏ trong kiểm tra độ tin cậy** — không phải không tồn tại, mà là chưa có bằng chứng đủ mạnh từ nguồn chính thức:
