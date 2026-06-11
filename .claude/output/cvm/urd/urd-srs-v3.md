@@ -2051,7 +2051,7 @@ Quản lý Blacklist CVM per campaign per kênh.
 
 | STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |-----|----------------|-----------|----------|----------|-------|
-| 1 | Campaign | Text input | Có | Trống | Nhập tên hoặc mã campaign; placeholder: `"Tên hoặc mã campaign"`; **Thời điểm validate**: chưa có validate — trường chấp nhận mọi giá trị nhập tự do |
+| 1 | Campaign | Dropdown | Có | Trống | Chọn từ danh sách campaign hiện có trong hệ thống; hiển thị tên campaign + mã (ví dụ: "Nhắc nạp tiền (CVM-202506-0001)"); placeholder: `"-- Chọn campaign --"`; **Validate**: bắt buộc chọn trước khi cho phép xác nhận tải lên; nút [Xác nhận Tải lên] bị khoá khi chưa chọn campaign |
 | 2 | Kênh | Dropdown | Có | Push | Options: Push / Zalo OA / SMS / USSD / Banner / Email; mặc định chọn sẵn Push |
 | 3 | Vùng chọn file (Drop zone) | Drop zone | Có | Trống | Hỗ trợ kéo thả file vào vùng hoặc nhấn **[Chọn file]** để mở hộp thoại chọn file; chỉ chấp nhận định dạng `.csv`; **Validate định dạng**: nếu file không phải `.csv` → hiện thông báo lỗi "Chỉ chấp nhận file .csv"; **Validate kích thước**: tối đa 10MB — nếu vượt: "File quá lớn — tối đa 10MB"; sau khi chọn file hợp lệ → chuyển sang trạng thái STT 4 |
 | 4 | Khung hướng dẫn format CSV | Text (info box) | – | Hiển thị sẵn | Luôn hiển thị phía dưới vùng drop zone khi chưa có file; nội dung gồm: <br>• `ℹ Yêu cầu file CSV:` (tiêu đề) <br>• `1 cột so_dien_thoai`, có hoặc không cần header <br>• Mỗi dòng 1 số — 10 chữ số, bắt đầu bằng `0` <br>• Hợp lệ: `0901234567` <br>• Sai (hiển thị màu đỏ): `+84901234567` · `090-123-4567` · `901234567` <br>• Tối đa 100.000 dòng · Encoding UTF-8 |
@@ -2059,7 +2059,7 @@ Quản lý Blacklist CVM per campaign per kênh.
 | 6 | Trạng thái đang kiểm tra file | Loading | – | – | Xuất hiện thay thế vùng drop zone sau khi chọn file hợp lệ; hiển thị "Đang kiểm tra file..."; người dùng không thể tương tác với [Xác nhận Tải lên] trong lúc này |
 | 7 | Kết quả kiểm tra file | Text | – | – | Hiển thị sau khi kiểm tra xong; nội dung: tên file đã chọn + 3 dòng thống kê: `Hợp lệ: N` (màu xanh) · `Trùng: N` (màu cam) · `Sai định dạng: N` (màu đỏ); nếu có dòng sai → hiển thị ghi chú lý do sai (ví dụ: "Sai định dạng: không phải 10 chữ số / không bắt đầu bằng 0"); nút **[Thay file]** để quay lại chọn file khác; **Định nghĩa "Trùng"**: số đã tồn tại trong blacklist với cùng Campaign + Kênh — bị bỏ qua khi tải lên |
 | 8 | Nút [Hủy] | Button | – | – | Đóng modal, không tải lên; không cần confirm khi hủy |
-| 9 | Nút [Xác nhận Tải lên] | Button | – | – | **Bị khoá khi**: chưa có kết quả kiểm tra file; hoặc số hợp lệ = 0; **Khi nhấn và hợp lệ**: nút bị khoá + đang xử lý → khi hệ thống phản hồi thành công: đóng modal + cập nhật bảng danh sách + toast "Đã tải lên N số vào blacklist ✓" (N = số hợp lệ thực sự được thêm, không tính trùng); nếu hệ thống lỗi: toast "Tải lên thất bại — vui lòng thử lại" + modal giữ nguyên + nút mở khóa lại |
+| 9 | Nút [Xác nhận Tải lên] | Button | – | – | **Bị khoá khi**: chưa chọn campaign; hoặc chưa có kết quả kiểm tra file; hoặc số hợp lệ = 0; **Khi nhấn và hợp lệ**: nút bị khoá + đang xử lý → khi hệ thống phản hồi thành công: đóng modal + cập nhật bảng danh sách + toast "Đã tải lên N số vào blacklist ✓" (N = số hợp lệ thực sự được thêm, không tính trùng); nếu hệ thống lỗi: toast "Tải lên thất bại — vui lòng thử lại" + modal giữ nguyên + nút mở khóa lại |
 
 ---
 
