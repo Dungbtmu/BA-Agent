@@ -1,35 +1,28 @@
 # Apache Unomi — CDP VNPost có thể học gì?
 
 **Ngày:** 2026-06-10  
-**Mục đích:** Tìm hiểu Unomi để đánh giá CDP VNPost nên học hỏi và phát triển tính năng gì
+**Mục đích:** Đánh giá CDP VNPost nên học hỏi và phát triển tính năng gì từ Unomi  
+**Xem thêm:** Tài liệu Unomi thuần (kiến trúc, cơ chế, verify source code) tại [unomi-reference.md](unomi-reference.md)
 
 ---
 
 ## 1. Unomi là gì
 
-Unomi là phần mềm CDP mã nguồn mở của tổ chức Apache — giúp gộp dữ liệu khách hàng từ nhiều hệ thống về một hồ sơ duy nhất, tự động phân loại khách hàng theo nhóm, và kích hoạt hành động tự động khi có sự kiện xảy ra. VNPost **không cần dùng Unomi trực tiếp** — nhưng cách Unomi thiết kế các tính năng là nguồn tham khảo giá trị để xây CDP riêng.
+Unomi là CDP mã nguồn mở của Apache — gộp dữ liệu khách hàng từ nhiều hệ thống, phân nhóm tự động, kích hoạt hành động theo sự kiện. VNPost **không cần dùng Unomi trực tiếp** — nhưng cách Unomi thiết kế là nguồn tham khảo để xây CDP riêng.
 
 ---
 
 ## 2. Tính năng Unomi có giá trị tham khảo cho CDP VNPost
 
-### 2.1 Gộp nhiều ID của cùng một khách hàng về một hồ sơ
+### 2.1 Gộp nhiều ID về một hồ sơ
 
-**Bài toán Unomi giải:** Khi cùng một người xuất hiện ở nhiều hệ thống với mã định danh khác nhau, Unomi tạo "cầu nối alias" nối các mã đó về một hồ sơ chính. Hồ sơ trùng được hợp nhất, dữ liệu gộp vào hồ sơ chính, cầu nối giữ lại để tra cứu sau.
-
-**Quy tắc gộp phải khai báo rõ** — ví dụ: "nếu số điện thoại trùng nhau thì gộp". Hệ thống không tự đoán, không tự ghép ngẫu nhiên.
-
-**CDP VNPost học được gì:** Đây chính xác là bài toán VNPost đang có — cùng 1 người gửi nhưng có 4 mã khác nhau ở 4 hệ thống (CAS mã KHL, MyVNPost user ID, PayPost mã tài chính, PostID). Pattern alias của Unomi là cách đúng để giải quyết mà không cần phải hợp nhất database ngay từ đầu.
+**VNPost học được gì:** Cùng 1 người gửi đang có 4 mã khác nhau ở 4 hệ thống (CAS mã KHL, MyVNPost user ID, PayPost mã tài chính, PostID). Pattern alias của Unomi cho phép nối các mã này về một hồ sơ mà không cần hợp nhất database — chỉ cần khai báo quy tắc gộp ("nếu số điện thoại trùng thì nối").
 
 ---
 
 ### 2.2 Tự động kích hoạt hành động khi có sự kiện
 
-**Bài toán Unomi giải:** Mỗi khi có sự kiện xảy ra (giao hàng thất bại, tạo đơn, đăng nhập), hệ thống kiểm tra các quy tắc đang có rồi tự động thực hiện hành động tương ứng. Công thức: **Sự kiện xảy ra → Kiểm tra điều kiện → Thực hiện hành động**.
-
-Các hành động hỗ trợ: gắn nhãn khách hàng, cập nhật chỉ số, đẩy tín hiệu ra hàng đợi để hệ thống khác xử lý tiếp. Hệ thống **không gọi trực tiếp SMS hay Zalo** — chỉ phát tín hiệu ra, CRM hay SMS gateway tự lo việc gửi.
-
-**CDP VNPost học được gì:** Bốn use case ưu tiên của VNPost đều phù hợp với pattern này:
+**VNPost học được gì:** Bốn use case ưu tiên đều phù hợp với pattern Sự kiện → Điều kiện → Hành động:
 
 | Use case | Sự kiện | Điều kiện | Hành động |
 |---|---|---|---|
@@ -38,32 +31,25 @@ Các hành động hỗ trợ: gắn nhãn khách hàng, cập nhật chỉ số
 | UC-04 COD Risk | Đơn COD thất bại | Thất bại lần thứ 3 | Gắn cờ rủi ro địa chỉ |
 | UC-06 Fraud | Số điện thoại xuất hiện với nhiều tên | Liên kết trên 5 tên khác nhau | Tạo cảnh báo gian lận |
 
+Thiết kế quan trọng cần giữ: hệ thống chỉ đẩy tín hiệu ra — không gọi trực tiếp SMS/Zalo, để CRM hay gateway tự lo.
+
 ---
 
 ### 2.3 Marketing tự thay đổi ngưỡng mà không cần IT
 
-**Bài toán Unomi giải:** Tách hệ thống thành 3 tầng rõ ràng:
-- **Tầng lõi** — IT xây một lần, không đụng vào nữa
-- **Tầng cấu hình** — Marketing tự điều chỉnh ngưỡng (60 ngày, 30%, 3 lần thất bại...) bằng file cấu hình, không cần viết code
-- **Tầng kết nối** — cấu hình kênh đầu ra: Zalo, SMS, CRM
-
-**CDP VNPost học được gì:** Khi Marketing muốn đổi định nghĩa "inactive" từ 60 ngày sang 45 ngày, không cần nhờ IT sửa code và chờ release. Tự điều chỉnh trong ngày. Đây là yếu tố quyết định tốc độ phản ứng của đội Marketing.
+**VNPost học được gì:** Tách 3 tầng rõ ràng — tầng lõi IT xây một lần, tầng cấu hình Marketing tự điều chỉnh ngưỡng (60 ngày, 30%, 3 lần...), tầng kết nối cấu hình kênh output. Khi cần đổi định nghĩa "inactive" từ 60 ngày sang 45 ngày, Marketing tự làm trong ngày, không chờ IT release.
 
 ---
 
 ### 2.4 Thêm chỉ số phân tích khách hàng mà không cần IT
 
-**Bài toán Unomi giải:** Muốn thêm trường dữ liệu mới vào hồ sơ khách hàng (ví dụ: "tỷ lệ hoàn hàng 30 ngày", "số lần giao thất bại tích lũy"), chỉ cần khai báo bằng file cấu hình — không cần sửa code lõi, không cần release hệ thống.
-
-**CDP VNPost học được gì:** Mỗi khi nghiệp vụ cần thêm chỉ số phân tích mới — ví dụ "điểm tín nhiệm COD", "số tháng hoạt động liên tiếp", "tỷ lệ thành công theo tỉnh" — không cần chờ IT. BA hoặc Data Analyst tự định nghĩa và triển khai trong ngày.
+**VNPost học được gì:** Mỗi khi cần thêm chỉ số mới ("điểm tín nhiệm COD", "số tháng hoạt động liên tiếp", "tỷ lệ thành công theo tỉnh"), BA hoặc Data Analyst tự khai báo bằng file cấu hình — không cần sửa code lõi, không cần release.
 
 ---
 
 ### 2.5 Tính điểm tín nhiệm tự động theo hành vi
 
-**Bài toán Unomi giải:** Mỗi hồ sơ khách hàng có thể được gán điểm số tự động — điểm tăng khi có hành vi tốt, giảm khi có hành vi xấu, tự cập nhật mỗi khi có sự kiện mới.
-
-**CDP VNPost học được gì:** Điểm số cho phép phân loại chính xác hơn nhãn nhị phân (có/không). Khách hàng điểm 20 và điểm 80 đều có nhãn "rủi ro" nhưng mức độ xử lý khác nhau.
+**VNPost học được gì:** Điểm số phân loại chính xác hơn nhãn nhị phân — khách hàng điểm 20 và điểm 80 đều có nhãn "rủi ro" nhưng mức xử lý khác nhau.
 
 | Hành vi | Tác động điểm | Dùng cho |
 |---|---|---|
@@ -77,11 +63,9 @@ Các hành động hỗ trợ: gắn nhãn khách hàng, cập nhật chỉ số
 
 ### 2.6 Quản lý đồng ý sử dụng dữ liệu
 
-**Bài toán Unomi giải:** Người dùng có thể bật/tắt từng loại đồng ý riêng (marketing, phân tích, vị trí, tài chính). Khi yêu cầu xóa, Unomi xóa dữ liệu trong hệ thống của mình.
+**VNPost học được gì:** Phân tách đồng ý theo từng mục đích thay vì một nút chung — khách hàng có thể đồng ý cho phân tích vận chuyển nhưng không đồng ý cho marketing.
 
-**CDP VNPost học được gì:** Phân tách đồng ý theo từng mục đích thay vì một nút đồng ý chung. Khách hàng đồng ý cho phân tích vận chuyển nhưng có thể không đồng ý cho marketing — CDP phải tôn trọng sự khác biệt này.
-
-**Điểm VNPost cần tự bổ sung:** Unomi chỉ xóa trong hệ thống của nó — không tự lan sang CAS, PayPost, BCCP. VNPost cần thiết kế thêm cơ chế lan truyền xóa để tuân thủ thời hạn 72 giờ theo Luật BVDLCN 2025.
+**Điểm VNPost phải tự xây thêm:** Unomi chỉ xóa dữ liệu trong chính nó — không tự lan sang CAS, PayPost, BCCP. VNPost cần thiết kế riêng cơ chế lan truyền xóa để đảm bảo tuân thủ thời hạn 72 giờ theo Luật BVDLCN 2025.
 
 ---
 
