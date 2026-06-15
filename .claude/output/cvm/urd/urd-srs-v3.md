@@ -20,6 +20,7 @@ Hà Nội – Tháng 05/2026
 | 26/05/2026 | Jun | Khối 3 — Trigger; I.2; Screen 5; Screen Admin | U | Tái thiết kế mô hình Trigger: Trigger là danh mục cố định (Read-only Catalog) do Dev/SA quản lý qua deployment — không tạo/sửa trên UI. Xóa UC-TRG-01 (Thêm) và UC-TRG-03 (Sửa) và UC-TRG-04 (Bật/Tắt). Cập nhật UC-TRG-00: Admin và QTV đều chỉ có [Xem], không có hành động chỉnh sửa. Cập nhật UC-TRG-02: modal chi tiết 3 nhóm A/B/C (bỏ nhóm Điều kiện kích hoạt, giữ Định danh + Tham số đầu ra + Thông tin vận hành); bổ sung ví dụ giá trị per param, kênh hỗ trợ. Thêm policy PARAM_INVALID: khi param bị xóa/đổi qua deployment, campaign dùng param đó tự động Paused + gắn cờ + thông báo QTV. Cập nhật I.2 phạm vi. Xóa Modal 5B. Cập nhật Screen Admin bỏ tab Cấu hình Trigger. | V3.0 |
 | 05/06/2026 | Jun | Screen 4A, 4B, 4C; UC-TPL-01, UC-TPL-02 | U | Đồng bộ với thay đổi UI thực tế: (1) Xóa "Giá trị mẫu / Sample Params" khỏi Template Editor — preview hiển thị tham số nguyên dạng `{{ten_kh}}`; (2) Thêm nút [Xem] vào Template List → navigate `/templates/:id/view`; (3) Cập nhật UC-TPL-02 + thêm Screen 4C đặc tả đầy đủ màn xem chi tiết template (layout 2 cột, input disabled, ẩn THAM SỐ ĐỘNG/hướng dẫn/nút xóa kênh); (4) Bổ sung behavior preview Email — banner hiển thị phía trên Subject nếu đã upload, placeholder xám nếu chưa có; (5) Bổ sung nút [Sửa] và [Sao chép] trên header màn xem chi tiết — nghiệp vụ giống UC-TPL-03 và UC-TPL-04. | V3.1 |
 | 12/06/2026 | Jun | UC-CAM-04; Screen 2B (STT 8) | U | Đơn giản hóa modal preview BL/WL trong Campaign Detail: bỏ hiển thị thống kê hợp lệ/trùng/sai định dạng — chỉ hiển thị danh sách số điện thoại thuộc danh sách đó kèm tổng số lượng; bổ sung nút [Xem] cho Whitelist (trước chỉ có Blacklist). | V3.2 |
+| 15/06/2026 | Jun | Khối 3 — Trigger; Screen 5; Screen Admin (Tab Trigger) | U | Thay đổi mô hình Trigger: Admin Hệ thống có thể khai báo trigger và tham số đầu ra trực tiếp trên UI (không còn chỉ qua deployment). Cập nhật UC-TRG-00: Admin thấy [Xem / Sửa] và [+ Thêm trigger]; QTV vẫn chỉ [Xem]. Cập nhật UC-TRG-02: bỏ Nhóm C (thông tin vận hành), giữ Nhóm A + B; Nhóm B đơn giản hóa xuống 2 cột (Tên tham số + Mô tả); Admin thấy [+ Thêm tham số] và icon Xóa per dòng. Thêm UC-TRG-03 (Khai báo trigger mới) và UC-TRG-04 (Thêm/Xóa tham số đầu ra). Cập nhật Screen 5: bỏ Nhóm C, bổ sung A6 Kênh hỗ trợ vào Nhóm A, cập nhật Nhóm B xuống 2 cột. Cập nhật Tab Trigger trong Screen Admin. Cập nhật mô tả role Admin_HT. | V3.3 |
 
 ---
 
@@ -549,7 +550,7 @@ Hệ thống Quản lý Giá trị Khách hàng (CVM)
 
 | Role Code | Tên vai trò | Mô tả |
 |-----------|-------------|-------|
-| ADMIN_HT | Admin Hệ thống | Quản trị toàn hệ thống: duyệt/từ chối campaign, xem toàn bộ dữ liệu; không tạo campaign và template; trigger catalog chỉ đọc (quản lý qua deployment) |
+| ADMIN_HT | Admin Hệ thống | Quản trị toàn hệ thống: duyệt/từ chối campaign, xem toàn bộ dữ liệu; không tạo campaign và template; khai báo trigger mới và quản lý tham số đầu ra của trigger |
 | QTV_MKT | Quản trị viên Marketing | Vận hành campaign hàng ngày: tạo, sửa, gửi duyệt campaign; quản lý template, blacklist; xem report và customer 360 |
 
 ### II.4.2. Quy ước quyền
@@ -1204,22 +1205,22 @@ CVM query thông tin này từ BSS qua Integration Layer khi tải trang — kh�
 
 ---
 
-## Khối 3: Tra cứu Sự kiện kích hoạt
+## Khối 3: Quản lý Sự kiện kích hoạt
 
-> **Mô hình Trigger Catalog**: Trigger là danh mục cố định do Dev/SA định nghĩa và quản lý qua deployment — không tạo, không sửa, không bật/tắt trên UI. Giao diện chỉ phục vụ tra cứu. Để thêm hoặc điều chỉnh trigger, liên hệ Team Kỹ thuật.
+> **Mô hình Trigger**: Trigger do Admin Hệ thống khai báo trên UI. QTV Marketing chỉ tra cứu — không tạo, không sửa, không xóa trigger hay tham số.
 
 ### UC-TRG-00: Xem danh sách Sự kiện kích hoạt
 
 | Nội dung | Mô tả |
 |----------|-------|
 | **Tên** | Xem danh sách Sự kiện kích hoạt |
-| **Mục tiêu** | Cho phép người dùng xem toàn bộ danh sách trigger catalog nhóm theo kiểu chạy; tìm kiếm nhanh và điều hướng sang xem chi tiết |
+| **Mục tiêu** | Cho phép người dùng xem toàn bộ danh sách trigger nhóm theo kiểu chạy; tìm kiếm nhanh và điều hướng sang xem chi tiết |
 | **Tác nhân** | Admin Hệ thống, QTV Marketing |
 | **Trigger** | Người dùng click nav "Trigger" → /triggers |
 | **Tiền điều kiện** | - Người dùng đã đăng nhập |
 | **Hậu điều kiện** | - Danh sách trigger hiển thị đúng trạng thái hiện tại; không thay đổi dữ liệu |
-| **Hoạt động** | 1. Hệ thống tải và hiển thị danh sách trigger nhóm thành 3 collapsible groups: Realtime / Near Realtime / Offline <br>1a. Mỗi dòng hiển thị: Trigger code, Tên, Source, Trạng thái, Hành động ([Xem]) — giống nhau với cả Admin và QTV <br>2. Người dùng tùy chọn click header group → collapse/expand nhóm <br>3. Người dùng tùy chọn nhập từ khóa tìm kiếm (tên hoặc trigger code) <br>3a. Hệ thống lọc realtime, highlight kết quả khớp, tự động expand group chứa kết quả <br>4. Người dùng click [Xem] → UC-TRG-02 |
-| **Quy tắc nghiệp vụ** | - Loại trigger quyết định nhóm hiển thị: Realtime / Near Realtime / Offline <br>- Trigger Inactive hiển thị grayed out với label "Không còn sử dụng"; vẫn hiển thị trong danh sách, không bị ẩn — để QTV có thể tra cứu thông tin params <br>- Trigger Inactive không xuất hiện trong dropdown khi QTV tạo campaign mới <br>- Không có nút [+ Thêm], [Sửa], [Bật], [Tắt] với bất kỳ role nào; trạng thái trigger được quản lý qua deployment |
+| **Hoạt động** | 1. Hệ thống tải và hiển thị danh sách trigger nhóm thành 3 collapsible groups: Realtime / Near Realtime / Offline <br>1a. Mỗi dòng hiển thị: Trigger code, Tên, Source, Trạng thái, Hành động <br>2. Người dùng tùy chọn click header group → collapse/expand nhóm <br>3. Người dùng tùy chọn nhập từ khóa tìm kiếm (tên hoặc trigger code) <br>3a. Hệ thống lọc realtime, highlight kết quả khớp, tự động expand group chứa kết quả <br>4a. **QTV** click [Xem] → UC-TRG-02 (chỉ đọc) <br>4b. **Admin** click [Xem / Sửa] → UC-TRG-02 với quyền chỉnh sửa tham số; click [+ Thêm trigger] → UC-TRG-03 |
+| **Quy tắc nghiệp vụ** | - Loại trigger quyết định nhóm hiển thị: Realtime / Near Realtime / Offline <br>- Trigger Inactive hiển thị grayed out với label "Không còn sử dụng"; vẫn hiển thị trong danh sách, không bị ẩn — để QTV có thể tra cứu thông tin params <br>- Trigger Inactive không xuất hiện trong dropdown khi QTV tạo campaign mới <br>- QTV: cột Hành động chỉ có [Xem]; Admin: cột Hành động có [Xem / Sửa] và nút [+ Thêm trigger] phía trên bảng |
 
 ---
 
@@ -1228,13 +1229,43 @@ CVM query thông tin này từ BSS qua Integration Layer khi tải trang — kh�
 | Nội dung | Mô tả |
 |----------|-------|
 | **Tên** | Xem chi tiết Sự kiện kích hoạt |
-| **Mục tiêu** | Cho phép người dùng xem đầy đủ thông tin của một trigger: định danh, tham số đầu ra, kênh hỗ trợ và danh sách campaign đang dùng |
-| **Tác nhân** | Admin Hệ thống, QTV Marketing |
-| **Trigger** | Người dùng click [Xem] trên trigger trong danh sách → mở Modal chi tiết chỉ đọc |
+| **Mục tiêu** | Cho phép người dùng xem thông tin định danh và tham số đầu ra của một trigger; Admin có thể thêm/xóa tham số |
+| **Tác nhân** | Admin Hệ thống (xem + sửa params), QTV Marketing (chỉ đọc) |
+| **Trigger** | QTV click [Xem] / Admin click [Xem / Sửa] trên trigger trong danh sách → mở Modal chi tiết |
 | **Tiền điều kiện** | - Người dùng đã đăng nhập <br>- Trigger tồn tại trong hệ thống |
-| **Hậu điều kiện** | - Không thay đổi dữ liệu |
-| **Hoạt động** | 1. Hệ thống load và hiển thị **Nhóm A — Định danh**: Trigger code, Tên, Kiểu chạy (Realtime / Near Realtime / Offline), Nguồn sự kiện (BSS / OCS / SuperApp), Trạng thái <br>2. Hệ thống hiển thị **Nhóm B — Tham số đầu ra**: bảng 5 cột — Tên tham số, Mô tả, Định dạng, Nguồn (BSS/OCS), Ví dụ giá trị; QTV dùng bảng này để biết cú pháp `{{tham_so}}` khi soạn nội dung message <br>3. Hệ thống hiển thị **Nhóm C — Thông tin vận hành**: danh sách kênh hỗ trợ; danh sách campaign đang dùng trigger này (tên + trạng thái) <br>4. Người dùng click [Đóng] → quay về danh sách |
-| **Quy tắc nghiệp vụ** | - Toàn bộ nội dung chỉ đọc — không có ô nhập liệu, không có nút [Sửa] với bất kỳ role nào <br>- Danh sách campaign đang dùng hiển thị tất cả trạng thái (Active, Paused, Pending, Draft) <br>- Bảng Tham số đầu ra (Nhóm C) hiển thị đầy đủ 5 cột: Tên tham số, Mô tả, Định dạng, Nguồn, Ví dụ giá trị — cột "Ví dụ giá trị" là dữ liệu tĩnh được định nghĩa sẵn theo từng trigger <br>- Trigger Inactive vẫn hiển thị đầy đủ thông tin (không grayout nội dung modal) — QTV vẫn cần tra cứu params của trigger đã deprecated |
+| **Hậu điều kiện** | - QTV: không thay đổi dữ liệu <br>- Admin: tham số đầu ra được cập nhật nếu có thêm/xóa |
+| **Hoạt động** | 1. Hệ thống load và hiển thị **Nhóm A — Định danh**: Trigger code, Tên, Kiểu chạy (Realtime / Near Realtime / Offline), Nguồn sự kiện (BSS / OCS / SuperApp), Trạng thái, Kênh hỗ trợ — toàn bộ chỉ đọc với mọi role <br>2. Hệ thống hiển thị **Nhóm B — Tham số đầu ra**: bảng 2 cột — Tên tham số, Mô tả; QTV dùng bảng này để biết cú pháp `{{tham_so}}` khi soạn nội dung message <br>2a. **Admin**: hiển thị thêm nút [+ Thêm tham số] phía trên bảng và icon [Xóa] inline per dòng → UC-TRG-04 <br>3. Người dùng click [Đóng] → quay về danh sách |
+| **Quy tắc nghiệp vụ** | - Nhóm A chỉ đọc với mọi role — không có ô nhập liệu, không có nút [Sửa] <br>- Nhóm B: QTV chỉ đọc; Admin có thể thêm và xóa tham số <br>- Trigger Inactive vẫn hiển thị đầy đủ thông tin — QTV vẫn cần tra cứu params của trigger đã deprecated |
+
+---
+
+### UC-TRG-03: Khai báo Trigger mới
+
+| Nội dung | Mô tả |
+|----------|-------|
+| **Tên** | Khai báo Trigger mới |
+| **Mục tiêu** | Cho phép Admin tạo trigger mới với đầy đủ thông tin định danh |
+| **Tác nhân** | Admin Hệ thống |
+| **Trigger** | Admin click [+ Thêm trigger] trên màn hình Trigger (tab Admin) |
+| **Tiền điều kiện** | - Admin đã đăng nhập |
+| **Hậu điều kiện** | - Trigger mới được tạo với trạng thái Active; xuất hiện trong danh sách và dropdown chọn trigger khi tạo campaign |
+| **Hoạt động** | 1. Admin nhập Trigger Code (bắt buộc; chỉ chữ hoa, số, dấu gạch dưới; ví dụ: `SIM_ACTIVATED`) <br>2. Admin nhập Tên trigger (bắt buộc; ví dụ: "Kích hoạt SIM thành công") <br>3. Admin chọn Kiểu chạy: Realtime / Near Realtime / Offline <br>4. Admin chọn Nguồn sự kiện: BSS / OCS / SuperApp <br>5. Admin chọn Kênh hỗ trợ: tích chọn từ danh sách Push / Zalo OA / SMS / Banner / Email / USSD (có thể chọn nhiều, không bắt buộc) <br>6. Admin click [Lưu trigger] → hệ thống validate → lưu; toast "Đã thêm trigger ✓"; trigger hiển thị ngay trong danh sách <br>**[Exception — Code trùng]**: Inline error "Code đã tồn tại" <br>**[Exception — Code sai định dạng]**: Inline error "Chỉ dùng chữ hoa, số, dấu gạch dưới" |
+| **Quy tắc nghiệp vụ** | - Trigger Code là định danh duy nhất; hệ thống tự động convert sang chữ hoa <br>- Trạng thái mặc định khi tạo: Active <br>- Tham số đầu ra được thêm sau khi trigger đã được tạo (UC-TRG-04) |
+
+---
+
+### UC-TRG-04: Thêm / Xóa tham số đầu ra
+
+| Nội dung | Mô tả |
+|----------|-------|
+| **Tên** | Thêm / Xóa tham số đầu ra |
+| **Mục tiêu** | Cho phép Admin khai báo tham số đầu ra của trigger để QTV có thể dùng cú pháp `{{tham_so}}` khi soạn nội dung tin nhắn |
+| **Tác nhân** | Admin Hệ thống |
+| **Trigger** | Admin click [+ Thêm tham số] hoặc icon [Xóa] trong Nhóm B của modal UC-TRG-02 |
+| **Tiền điều kiện** | - Admin đã đăng nhập <br>- Trigger đã được tạo (UC-TRG-03) |
+| **Hậu điều kiện** | - Danh sách tham số của trigger được cập nhật; thay đổi phản ánh ngay trong PARAMS chips của Campaign Builder và Template Editor |
+| **Hoạt động** | **Thêm tham số:** <br>1. Admin click [+ Thêm tham số] → inline form hiển thị ngay trong modal <br>2. Admin nhập Tên tham số (bắt buộc; chỉ chữ thường, số, dấu gạch dưới; ví dụ: `ten_kh`) <br>3. Admin nhập Mô tả (bắt buộc; ví dụ: "Họ tên đầy đủ của khách hàng") <br>4. Admin click [Lưu] → hệ thống validate → thêm vào bảng; toast "Đã thêm tham số ✓" <br>**Xóa tham số:** <br>1. Admin hover vào dòng tham số → icon [Xóa] hiển thị <br>2. Admin click [Xóa] → hệ thống xóa ngay; toast "Đã xóa tham số" <br>**[Exception — Tên tham số trùng]**: Inline error "Tham số đã tồn tại" <br>**[Exception — Tên sai định dạng]**: Inline error "Chỉ dùng chữ thường, số, dấu gạch dưới" |
+| **Quy tắc nghiệp vụ** | - Tên tham số là định danh duy nhất trong phạm vi 1 trigger <br>- Chỉ cần 2 trường khi khai báo: Tên tham số + Mô tả <br>- Sau khi thêm param, param mới xuất hiện ngay trong PARAMS chips của Campaign Builder (với trigger đó) và trong Global Params của Template Editor |
 
 ---
 
@@ -1957,62 +1988,52 @@ Xem chi tiết template ở chế độ chỉ đọc. Layout giống Screen 4B n
 
 ## Screen 5: Trigger Management _(UC-TRG-00, UC-TRG-02)_
 
-Tra cứu danh sách trigger catalog. Mọi role đều chỉ đọc — không có hành động chỉnh sửa.
+Tra cứu danh sách trigger. QTV Marketing chỉ đọc. Admin Hệ thống có thêm chức năng khai báo trigger và tham số (xem Screen Admin — Tab Trigger).
 
-### 5A — Bảng đặc tả component — Danh sách Trigger
+### 5A — Bảng đặc tả component — Danh sách Trigger (QTV)
 
 | STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |-----|----------------|-----------|----------|----------|-------|
-| 1 | Thông báo catalog | Banner | – | Hiển thị | Text: "Danh sách sự kiện kích hoạt do hệ thống cung cấp. Liên hệ Team Kỹ thuật để thêm hoặc điều chỉnh." — hiển thị cố định phía trên bảng; không có nút đóng |
-| 2 | Ô tìm kiếm | Search | Không | Trống | Tìm theo trigger code hoặc tên; realtime; tự động mở rộng nhóm chứa kết quả; highlight từ khớp |
-| 3 | Filter Trạng thái | Listbox | Không | Tất cả | Options: Tất cả / Active / Inactive; áp dụng đồng thời trên tất cả nhóm |
-| 4 | Header nhóm (Realtime / Near Realtime / Offline) | Collapsible | – | Mở rộng | Click → thu gọn / mở rộng toàn bộ trigger trong nhóm; hiển thị số lượng trigger trong ngoặc |
-| 5 | Cột Code | Text | – | – | Trigger code hiển thị in hoa, font mono |
-| 6 | Cột Tên | Text | – | – | Tên đầy đủ của trigger |
-| 7 | Cột Source | Text | – | – | BSS / OCS / SuperApp |
-| 8 | Cột Trạng thái | Status chip | – | – | Active = chip xanh lá; Inactive = chip xám + label "Không còn sử dụng" |
-| 9 | Cột Hành động | Button | – | – | **[Xem]** → mở Modal 5B chi tiết chỉ đọc; giống nhau với cả Admin và QTV |
+| 1 | Ô tìm kiếm | Search | Không | Trống | Tìm theo trigger code hoặc tên; realtime; tự động mở rộng nhóm chứa kết quả; highlight từ khớp |
+| 2 | Filter Trạng thái | Listbox | Không | Tất cả | Options: Tất cả / Active / Inactive; áp dụng đồng thời trên tất cả nhóm |
+| 3 | Header nhóm (Realtime / Near Realtime / Offline) | Collapsible | – | Mở rộng | Click → thu gọn / mở rộng toàn bộ trigger trong nhóm; hiển thị số lượng trigger trong ngoặc |
+| 4 | Cột Code | Text | – | – | Trigger code hiển thị in hoa, font mono |
+| 5 | Cột Tên | Text | – | – | Tên đầy đủ của trigger |
+| 6 | Cột Source | Text | – | – | BSS / OCS / SuperApp |
+| 7 | Cột Trạng thái | Status chip | – | – | Active = chip xanh lá; Inactive = chip xám + label "Không còn sử dụng" |
+| 8 | Cột Hành động | Button | – | – | **[Xem]** → mở Modal 5B chi tiết chỉ đọc |
 
-### 5B — Bảng đặc tả component — Modal Xem chi tiết Trigger
+### 5B — Bảng đặc tả component — Modal Xem chi tiết Trigger (QTV)
 
-Modal mở khi người dùng nhấn [Xem] trên bất kỳ trigger nào. Toàn bộ chỉ đọc — không có ô nhập liệu, không có nút chỉnh sửa với bất kỳ role nào.
+Modal mở khi QTV nhấn [Xem]. Toàn bộ chỉ đọc.
 
 #### Nhóm A — Định danh
 
 | STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |-----|----------------|-----------|----------|----------|-------|
-| A1 | Trigger code | Text (font mono) | – | – | Hiển thị in hoa, nền vàng nhạt (`bg-amber-50 text-amber-700`); không thể chỉnh sửa |
-| A2 | Tên trigger | Text | – | – | Tên đầy đủ, font thường, kích thước body |
-| A3 | Kiểu chạy | Badge | – | – | 3 giá trị: `Realtime` (chip xanh lá) / `Near Realtime` (chip xanh dương) / `Offline` (chip xám); chỉ đọc |
-| A4 | Nguồn sự kiện | Text | – | – | Giá trị: BSS / OCS / SuperApp; hiển thị dạng text đơn giản |
-| A5 | Trạng thái | Status chip | – | – | `Active` = chip xanh lá "● Active"; `Inactive` = chip xám "○ Không còn sử dụng" |
+| A1 | Trigger code | Text (font mono) | – | – | Hiển thị in hoa, nền vàng nhạt (`bg-amber-50 text-amber-700`) |
+| A2 | Tên trigger | Text | – | – | Tên đầy đủ, font thường |
+| A3 | Kiểu chạy | Badge | – | – | `Realtime` (chip xanh lá) / `Near Realtime` (chip xanh dương) / `Offline` (chip xám) |
+| A4 | Nguồn sự kiện | Text | – | – | BSS / OCS / SuperApp |
+| A5 | Trạng thái | Status chip | – | – | `Active` = "● Active" xanh lá; `Inactive` = "○ Không còn sử dụng" xám |
+| A6 | Kênh hỗ trợ | Tag list | – | – | Danh sách kênh trigger tương thích; mỗi kênh là 1 tag pill; ẩn toàn bộ mục nếu không có kênh nào |
 
 #### Nhóm B — Tham số đầu ra
 
 | STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |-----|----------------|-----------|----------|----------|-------|
-| B1 | Bảng tham số | Table (5 cột) | – | – | Liệt kê toàn bộ tham số của trigger; không phân trang; hiển thị hết tất cả dòng |
-| B1a | — Cột Tham số | Text (font mono) | – | – | Hiển thị dạng `{{tên_tham_số}}`; màu xanh dương; có thể nhấn để copy |
-| B1b | — Cột Mô tả | Text | – | – | Diễn giải ngắn ý nghĩa của tham số; không truncate |
-| B1c | — Cột Định dạng | Text | – | – | Một trong 5 giá trị: `Văn bản` / `Ngày (DD/MM/YYYY)` / `Số` / `Boolean` / `Tiền (VND)` |
-| B1d | — Cột Nguồn | Text | – | – | Hệ thống cung cấp giá trị: BSS / OCS / SuperApp |
-| B1e | — Cột Ví dụ giá trị | Text (font mono) | – | `—` | Giá trị minh họa thực tế; màu xám; hiển thị "—" nếu chưa có dữ liệu mẫu |
-| B2 | Hành động copy tham số | Button (inline) | – | – | Nhấn vào tên tham số (`{{tên_tham_số}}`) → copy cú pháp vào clipboard; icon copy hiện khi hover; sau khi copy → icon đổi thành ✓ trong 1.8 giây |
-| B3 | Ghi chú copy | Text nhỏ | – | Hiển thị | Hiển thị cố định bên dưới bảng: "Nhấn vào tên tham số để copy cú pháp vào clipboard" |
-
-#### Nhóm C — Thông tin vận hành
-
-| STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
-|-----|----------------|-----------|----------|----------|-------|
-| C1 | Kênh hỗ trợ | Tag list | – | – | Danh sách kênh trigger này tương thích; mỗi kênh là 1 tag pill: Push Notification / Zalo OA / SMS / Banner App / Email / USSD; ẩn toàn bộ mục nếu trigger không cấu hình kênh nào |
-| C2 | Danh sách campaign đang dùng | List | – | – | Tiêu đề: "Campaign đang dùng trigger này (N)" — N là tổng số; hiển thị tất cả trạng thái (Active / Paused / Pending / Draft); mỗi dòng: tên campaign + mã campaign (font mono) + chip trạng thái |
-| C3 | Trạng thái rỗng — Campaign | Text | – | – | Hiển thị khi N = 0: "Chưa có campaign nào dùng trigger này." (in nghiêng, màu xám) |
+| B1 | Bảng tham số | Table (2 cột) | – | – | Liệt kê toàn bộ tham số của trigger; không phân trang |
+| B1a | — Cột Tham số | Text (font mono) | – | – | Hiển thị dạng `{{tên_tham_số}}`; màu xanh dương; nhấn để copy cú pháp vào clipboard |
+| B1b | — Cột Mô tả | Text | – | – | Diễn giải ngắn ý nghĩa của tham số |
+| B2 | Hành động copy tham số | Button (inline) | – | – | Nhấn vào tên tham số → copy cú pháp; icon copy hiện khi hover; sau khi copy → icon đổi thành ✓ trong 1.8 giây |
+| B3 | Ghi chú copy | Text nhỏ | – | Hiển thị | "Nhấn vào tên tham số để copy cú pháp vào clipboard" |
+| B4 | Trạng thái rỗng | Text | – | – | Hiển thị khi trigger chưa có tham số nào: "Chưa có tham số nào" (in nghiêng, màu xám) |
 
 #### Hành động Modal
 
 | STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |-----|----------------|-----------|----------|----------|-------|
-| D1 | Nút [Đóng] | Button (outline) | – | – | Đóng modal, quay về danh sách; không thay đổi dữ liệu; cũng đóng khi nhấn phím Escape hoặc click backdrop |
+| D1 | Nút [Đóng] | Button (outline) | – | – | Đóng modal, quay về danh sách; cũng đóng khi nhấn Escape hoặc click backdrop |
 
 ---
 
@@ -2211,7 +2232,7 @@ Màn hình dành riêng cho Admin — truy cập qua nav "Admin" → /admin.
 | 5 | Nút [Duyệt] | Button (success) | – | – | Mở confirm dialog: "Duyệt campaign [tên]? Campaign sẽ chuyển sang Active ngay." [Hủy] / [Duyệt] → sau xác nhận: nút bị khoá + đang xử lý → khi hệ thống phản hồi: campaign chuyển Active + toast "Đã duyệt ✓" + dòng biến mất khỏi bảng |
 | 6 | Nút [Từ chối] | Button (danger) | – | – | Mở dialog nhập lý do từ chối; textarea bắt buộc, placeholder: `"Mô tả rõ lý do để QTV điều chỉnh... (tối thiểu 10 ký tự)"`; tối thiểu 10 ký tự, tối đa 500 ký tự; counter `[X/500]` góc phải dưới; thông báo lỗi khi chưa đủ 10 ký tự: "Vui lòng nhập lý do từ chối (tối thiểu 10 ký tự)" — hiện khi người dùng đã bắt đầu gõ nhưng chưa đủ; nút [Từ chối] trong dialog bị khoá khi chưa đủ 10 ký tự; khi hợp lệ và nhấn: campaign chuyển về Draft + toast "Đã từ chối" + dòng biến mất khỏi bảng |
 | 7 | Trạng thái rỗng | Text | – | – | Hiển thị "Không có campaign nào chờ duyệt." khi danh sách trống (sau tìm kiếm hoặc khi không có Pending nào) |
-| 8 | Tab Trigger | Tab | – | – | Nội dung giống Screen 5 Trigger Management — chỉ đọc, không có hành động chỉnh sửa; Admin xem danh sách và chi tiết trigger từ đây như QTV (xem Screen 5 để biết chi tiết spec từng component) |
+| 8 | Tab Trigger | Tab | – | – | Quản lý trigger — Admin có thêm quyền so với QTV: (1) Nút **[+ Thêm trigger]** phía trên bảng → mở form khai báo trigger mới (UC-TRG-03); (2) Cột Hành động hiển thị **[Xem / Sửa]** thay vì [Xem] → mở modal với Nhóm B có thêm **[+ Thêm tham số]** và icon **[Xóa]** per dòng (UC-TRG-04); Layout danh sách và modal Nhóm A giống Screen 5 |
 
 ---
 
