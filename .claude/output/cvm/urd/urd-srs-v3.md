@@ -2231,7 +2231,84 @@ Màn hình dành riêng cho Admin — truy cập qua nav "Admin" → /admin.
 | 5 | Nút [Duyệt] | Button (success) | – | – | Mở confirm dialog: "Duyệt campaign [tên]? Campaign sẽ chuyển sang Active ngay." [Hủy] / [Duyệt] → sau xác nhận: nút bị khoá + đang xử lý → khi hệ thống phản hồi: campaign chuyển Active + toast "Đã duyệt ✓" + dòng biến mất khỏi bảng |
 | 6 | Nút [Từ chối] | Button (danger) | – | – | Mở dialog nhập lý do từ chối; textarea bắt buộc, placeholder: `"Mô tả rõ lý do để QTV điều chỉnh... (tối thiểu 10 ký tự)"`; tối thiểu 10 ký tự, tối đa 500 ký tự; counter `[X/500]` góc phải dưới; thông báo lỗi khi chưa đủ 10 ký tự: "Vui lòng nhập lý do từ chối (tối thiểu 10 ký tự)" — hiện khi người dùng đã bắt đầu gõ nhưng chưa đủ; nút [Từ chối] trong dialog bị khoá khi chưa đủ 10 ký tự; khi hợp lệ và nhấn: campaign chuyển về Draft + toast "Đã từ chối" + dòng biến mất khỏi bảng |
 | 7 | Trạng thái rỗng | Text | – | – | Hiển thị "Không có campaign nào chờ duyệt." khi danh sách trống (sau tìm kiếm hoặc khi không có Pending nào) |
-| 8 | Tab Trigger | Tab | – | – | Quản lý trigger — Admin có thêm quyền so với QTV: (1) Nút **[+ Thêm trigger]** phía trên bảng → mở form khai báo trigger mới (UC-TRG-03); (2) Cột Hành động hiển thị **[Xem / Sửa]** thay vì [Xem] → mở modal với Nhóm B có thêm **[+ Thêm tham số]** và icon **[Xóa]** per dòng (UC-TRG-04); Layout danh sách và modal Nhóm A giống Screen 5 |
+| 8 | Tab Trigger | Tab | – | – | Quản lý trigger — Admin có đầy đủ quyền khai báo trigger và tham số; xem chi tiết bên dưới |
+
+### Tab Trigger — Danh sách Trigger (Admin)
+
+| STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|-----|----------------|-----------|----------|----------|-------|
+| T1 | Ô tìm kiếm | Search | Không | Trống | Tìm theo trigger code hoặc tên; realtime; highlight từ khớp; tự động mở rộng nhóm chứa kết quả |
+| T2 | Filter Trạng thái | Listbox | Không | Tất cả | Options: Tất cả / Active / Inactive |
+| T3 | Nút [+ Thêm trigger] | Button (primary) | – | – | Mở Modal Tạo trigger mới (xem T-NEW bên dưới) |
+| T4 | Header nhóm (Realtime / Near Realtime / Offline) | Collapsible | – | Mở rộng | Click → thu gọn / mở rộng; hiển thị số lượng trong ngoặc |
+| T5 | Cột Code | Text | – | – | Trigger code in hoa, font mono |
+| T6 | Cột Tên | Text | – | – | Tên đầy đủ của trigger |
+| T7 | Cột Source | Text | – | – | BSS / OCS / SuperApp |
+| T8 | Cột Trạng thái | Status chip | – | – | Active = chip xanh lá; Inactive = chip xám + "Không còn sử dụng" |
+| T9 | Cột Hành động | Button | – | – | **[Xem / Sửa]** → mở Modal Chi tiết (xem T-DETAIL bên dưới) |
+| T10 | Trạng thái rỗng | Text | – | – | "Không có trigger" per nhóm; "Không tìm thấy trigger nào" khi không có kết quả toàn bộ |
+
+### Tab Trigger — Modal Chi tiết Trigger (Admin) _(T-DETAIL)_
+
+Modal mở khi Admin nhấn [Xem / Sửa].
+
+#### Nhóm A — Định danh (chỉ đọc)
+
+| STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|-----|----------------|-----------|----------|----------|-------|
+| A1 | Trigger code | Text (font mono) | – | – | In hoa, nền vàng nhạt (`bg-amber-50 text-amber-700`) |
+| A2 | Tên trigger | Text | – | – | Tên đầy đủ |
+| A3 | Kiểu chạy | Badge | – | – | `Realtime` (xanh lá) / `Near Realtime` (xanh dương) / `Offline` (xám) |
+| A4 | Nguồn sự kiện | Text | – | – | BSS / OCS / SuperApp |
+| A5 | Trạng thái | Status chip | – | – | `Active` = "● Active" xanh lá; `Inactive` = "○ Không còn sử dụng" xám |
+
+#### Nhóm B — Tham số đầu ra (Admin có thể chỉnh sửa)
+
+| STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|-----|----------------|-----------|----------|----------|-------|
+| B1 | Nút [+ Thêm tham số] | Button (text) | – | – | Hiển thị phía trên bảng; nhấn → inline form T-PARAM xuất hiện ngay trong modal |
+| B2 | Inline form thêm tham số _(T-PARAM)_ | Form | – | Ẩn | Hiện khi nhấn [+ Thêm tham số]; gồm 2 trường ngang: **Tên tham số** (bắt buộc; chỉ chữ thường, số, gạch dưới; placeholder "vd: ten_kh") và **Mô tả** (bắt buộc; placeholder "vd: Họ tên đầy đủ của khách hàng"); nút [Lưu] + [Hủy]; validate inline trước khi lưu |
+| B3 | Bảng tham số | Table (2 cột + action) | – | – | Liệt kê toàn bộ tham số; không phân trang |
+| B3a | — Cột Tham số | Text (font mono) | – | – | Hiển thị `{{tên_tham_số}}`; màu xanh dương; nhấn để copy cú pháp |
+| B3b | — Cột Mô tả | Text | – | – | Diễn giải ý nghĩa tham số |
+| B3c | — Cột Hành động | Icon button | – | – | Icon [Xóa] hiện khi hover dòng; nhấn → xóa ngay, toast "Đã xóa tham số" |
+| B4 | Hành động copy | Button (inline) | – | – | Nhấn vào `{{tên_tham_số}}` → copy vào clipboard; icon ✓ trong 1.8 giây |
+| B5 | Ghi chú copy | Text nhỏ | – | Hiển thị | "Nhấn vào tên tham số để copy cú pháp vào clipboard" |
+| B6 | Trạng thái rỗng | Text | – | – | "Chưa có tham số nào" (in nghiêng, màu xám) khi bảng trống |
+
+#### Validate inline form T-PARAM
+
+| Trường | Quy tắc | Thông báo lỗi |
+|--------|---------|---------------|
+| Tên tham số | Bắt buộc; chỉ `[a-z0-9_]` | "Bắt buộc" / "Chỉ dùng chữ thường, số, dấu gạch dưới" |
+| Tên tham số | Không trùng với tham số đã có trong trigger | "Tham số đã tồn tại" |
+| Mô tả | Bắt buộc | "Bắt buộc" |
+
+#### Hành động Modal
+
+| STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|-----|----------------|-----------|----------|----------|-------|
+| D1 | Nút [Đóng] | Button (outline) | – | – | Đóng modal; đóng kèm inline form T-PARAM nếu đang mở; cũng đóng khi nhấn Escape hoặc click backdrop |
+
+### Tab Trigger — Modal Tạo trigger mới (Admin) _(T-NEW)_
+
+| STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|-----|----------------|-----------|----------|----------|-------|
+| N1 | Trigger Code | Text input (font mono) | Có | Trống | Chỉ chữ hoa, số, dấu gạch dưới; tự động convert sang chữ hoa khi gõ; placeholder "vd: SIM_ACTIVATED" |
+| N2 | Tên | Text input | Có | Trống | Placeholder "vd: Kích hoạt SIM thành công" |
+| N3 | Kiểu chạy | Select | Không | Realtime | Options: Realtime / Near Realtime / Offline |
+| N4 | Nguồn sự kiện | Select | Không | BSS | Options: BSS / OCS / SuperApp |
+| N5 | Nút [Lưu trigger] | Button (primary) | – | – | Validate → lưu; toast "Đã thêm trigger ✓"; trigger hiển thị ngay trong danh sách; trạng thái mặc định = Active |
+| N6 | Nút [Hủy] | Button (outline) | – | – | Đóng modal, không lưu |
+
+#### Validate form T-NEW
+
+| Trường | Quy tắc | Thông báo lỗi |
+|--------|---------|---------------|
+| Trigger Code | Bắt buộc | "Bắt buộc" |
+| Trigger Code | Chỉ `[A-Z0-9_]` | "Chỉ dùng chữ hoa, số, dấu gạch dưới" |
+| Trigger Code | Không trùng với code đã có | "Code đã tồn tại" |
+| Tên | Bắt buộc | "Bắt buộc" |
 
 ---
 
