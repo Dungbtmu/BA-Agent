@@ -75,7 +75,7 @@ Vai trò trong vòng đời dự án: tài liệu này là đầu ra của giai 
 **Phạm vi bao gồm:**
 - Quản lý Chiến dịch (tạo, sửa, duyệt, vận hành, dừng, kích hoạt lại)
 - Quản lý Mẫu tin nhắn (tạo, sửa, sao chép, bật/tắt)
-- Tra cứu Sự kiện kích hoạt (xem danh sách catalog, xem chi tiết payload và kênh hỗ trợ)
+- Quản lý Sự kiện kích hoạt (Admin khai báo trigger và tham số đầu ra; QTV tra cứu danh sách và xem chi tiết payload)
 - Quản lý Danh sách chặn (per chiến dịch, per kênh — riêng biệt với danh sách từ chối toàn hệ thống BSS)
 - Tra cứu Khách hàng (danh sách + Customer 360: profile, kênh, lịch sử nhận tin)
 - Báo cáo và phân tích hiệu quả campaign (Delivery, Engagement, Funnel, Segment, Spam)
@@ -475,10 +475,10 @@ Hệ thống Quản lý Giá trị Khách hàng (CVM)
 - Giá trị nghiệp vụ: Tăng tốc độ soạn nội dung; đảm bảo nhất quán thông điệp thương hiệu
 - Các chức năng con: Xem danh sách, Tạo mới, Xem chi tiết/Sửa, Sao chép, Bật/Tắt
 
-**Khối 3 — Tra cứu Sự kiện kích hoạt**
-- Mục đích: Tra cứu danh mục sự kiện kích hoạt do Dev/SA quản lý qua deployment — giao diện chỉ đọc
-- Giá trị nghiệp vụ: QTV cần tra cứu danh sách trigger, thông tin payload và kênh hỗ trợ để cấu hình campaign
-- Các chức năng con: Xem danh sách (nhóm theo loại: Tức thời / Gần tức thời / Theo lô), Xem chi tiết
+**Khối 3 — Quản lý Sự kiện kích hoạt**
+- Mục đích: Admin khai báo trigger và tham số đầu ra trực tiếp trên UI; QTV tra cứu để lấy cú pháp `{{tham_so}}` khi soạn tin
+- Giá trị nghiệp vụ: QTV cần tra cứu danh sách trigger và thông tin payload để cấu hình campaign
+- Các chức năng con: Xem danh sách (nhóm theo loại: Tức thời / Gần tức thời / Theo lô), Xem chi tiết, Khai báo trigger mới (Admin), Thêm/xóa tham số đầu ra (Admin)
 
 **Khối 4 — Quản lý Danh sách chặn (Blacklist Management)**
 - Mục đích: Kiểm soát danh sách số điện thoại bị chặn gửi tin theo từng chiến dịch và kênh cụ thể; đồng bộ 2 chiều với cấu hình Blacklist trong Campaign Builder
@@ -1234,7 +1234,7 @@ CVM query thông tin này từ BSS qua Integration Layer khi tải trang — kh�
 | **Trigger** | QTV click [Xem] / Admin click [Xem / Sửa] trên trigger trong danh sách → mở Modal chi tiết |
 | **Tiền điều kiện** | - Người dùng đã đăng nhập <br>- Trigger tồn tại trong hệ thống |
 | **Hậu điều kiện** | - QTV: không thay đổi dữ liệu <br>- Admin: tham số đầu ra được cập nhật nếu có thêm/xóa |
-| **Hoạt động** | 1. Hệ thống load và hiển thị **Nhóm A — Định danh**: Trigger code, Tên, Kiểu chạy (Realtime / Near Realtime / Offline), Nguồn sự kiện (BSS / OCS / SuperApp), Trạng thái, Kênh hỗ trợ — toàn bộ chỉ đọc với mọi role <br>2. Hệ thống hiển thị **Nhóm B — Tham số đầu ra**: bảng 2 cột — Tên tham số, Mô tả; QTV dùng bảng này để biết cú pháp `{{tham_so}}` khi soạn nội dung message <br>2a. **Admin**: hiển thị thêm nút [+ Thêm tham số] phía trên bảng và icon [Xóa] inline per dòng → UC-TRG-04 <br>3. Người dùng click [Đóng] → quay về danh sách |
+| **Hoạt động** | 1. Hệ thống load và hiển thị **Nhóm A — Định danh**: Trigger code, Tên, Kiểu chạy (Realtime / Near Realtime / Offline), Nguồn sự kiện (BSS / OCS / SuperApp), Trạng thái — toàn bộ chỉ đọc với mọi role <br>2. Hệ thống hiển thị **Nhóm B — Tham số đầu ra**: bảng 2 cột — Tên tham số, Mô tả; QTV dùng bảng này để biết cú pháp `{{tham_so}}` khi soạn nội dung message <br>2a. **Admin**: hiển thị thêm nút [+ Thêm tham số] phía trên bảng và icon [Xóa] inline per dòng → UC-TRG-04 <br>3. Người dùng click [Đóng] → quay về danh sách |
 | **Quy tắc nghiệp vụ** | - Nhóm A chỉ đọc với mọi role — không có ô nhập liệu, không có nút [Sửa] <br>- Nhóm B: QTV chỉ đọc; Admin có thể thêm và xóa tham số <br>- Trigger Inactive vẫn hiển thị đầy đủ thông tin — QTV vẫn cần tra cứu params của trigger đã deprecated |
 
 ---
@@ -1249,7 +1249,7 @@ CVM query thông tin này từ BSS qua Integration Layer khi tải trang — kh�
 | **Trigger** | Admin click [+ Thêm trigger] trên màn hình Trigger (tab Admin) |
 | **Tiền điều kiện** | - Admin đã đăng nhập |
 | **Hậu điều kiện** | - Trigger mới được tạo với trạng thái Active; xuất hiện trong danh sách và dropdown chọn trigger khi tạo campaign |
-| **Hoạt động** | 1. Admin nhập Trigger Code (bắt buộc; chỉ chữ hoa, số, dấu gạch dưới; ví dụ: `SIM_ACTIVATED`) <br>2. Admin nhập Tên trigger (bắt buộc; ví dụ: "Kích hoạt SIM thành công") <br>3. Admin chọn Kiểu chạy: Realtime / Near Realtime / Offline <br>4. Admin chọn Nguồn sự kiện: BSS / OCS / SuperApp <br>5. Admin chọn Kênh hỗ trợ: tích chọn từ danh sách Push / Zalo OA / SMS / Banner / Email / USSD (có thể chọn nhiều, không bắt buộc) <br>6. Admin click [Lưu trigger] → hệ thống validate → lưu; toast "Đã thêm trigger ✓"; trigger hiển thị ngay trong danh sách <br>**[Exception — Code trùng]**: Inline error "Code đã tồn tại" <br>**[Exception — Code sai định dạng]**: Inline error "Chỉ dùng chữ hoa, số, dấu gạch dưới" |
+| **Hoạt động** | 1. Admin nhập Trigger Code (bắt buộc; chỉ chữ hoa, số, dấu gạch dưới; ví dụ: `SIM_ACTIVATED`) <br>2. Admin nhập Tên trigger (bắt buộc; ví dụ: "Kích hoạt SIM thành công") <br>3. Admin chọn Kiểu chạy: Realtime / Near Realtime / Offline <br>4. Admin chọn Nguồn sự kiện: BSS / OCS / SuperApp <br>5. Admin click [Lưu trigger] → hệ thống validate → lưu; toast "Đã thêm trigger ✓"; trigger hiển thị ngay trong danh sách <br>**[Exception — Code trùng]**: Inline error "Code đã tồn tại" <br>**[Exception — Code sai định dạng]**: Inline error "Chỉ dùng chữ hoa, số, dấu gạch dưới" |
 | **Quy tắc nghiệp vụ** | - Trigger Code là định danh duy nhất; hệ thống tự động convert sang chữ hoa <br>- Trạng thái mặc định khi tạo: Active <br>- Tham số đầu ra được thêm sau khi trigger đã được tạo (UC-TRG-04) |
 
 ---
@@ -2016,7 +2016,6 @@ Modal mở khi QTV nhấn [Xem]. Toàn bộ chỉ đọc.
 | A3 | Kiểu chạy | Badge | – | – | `Realtime` (chip xanh lá) / `Near Realtime` (chip xanh dương) / `Offline` (chip xám) |
 | A4 | Nguồn sự kiện | Text | – | – | BSS / OCS / SuperApp |
 | A5 | Trạng thái | Status chip | – | – | `Active` = "● Active" xanh lá; `Inactive` = "○ Không còn sử dụng" xám |
-| A6 | Kênh hỗ trợ | Tag list | – | – | Danh sách kênh trigger tương thích; mỗi kênh là 1 tag pill; ẩn toàn bộ mục nếu không có kênh nào |
 
 #### Nhóm B — Tham số đầu ra
 
