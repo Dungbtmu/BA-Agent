@@ -2299,8 +2299,11 @@ Modal mở khi Admin nhấn [Xem / Sửa].
 | N2 | Tên | Text input | Có | Trống | Placeholder "vd: Kích hoạt SIM thành công" |
 | N3 | Kiểu chạy | Select | Không | Realtime | Options: Realtime / Near Realtime / Offline |
 | N4 | Nguồn sự kiện | Select | Không | BSS | Options: BSS / OCS / SuperApp |
-| N5 | Nút [Lưu trigger] | Button (primary) | – | – | Validate → lưu; toast "Đã thêm trigger ✓"; trigger hiển thị ngay trong danh sách; trạng thái mặc định = Active |
-| N6 | Nút [Hủy] | Button (outline) | – | – | Đóng modal, không lưu |
+| N5 | Section Tham số đầu ra | – | Không | Rỗng | Label "Tham số đầu ra" + nút [+ Thêm tham số] góc phải; nếu chưa có tham số → text mờ "Chưa có tham số — có thể thêm sau khi tạo" |
+| N5a | Inline form thêm tham số | – | – | – | Hiện khi click [+ Thêm tham số]: 2 ô nhập — Tên tham số (font mono, placeholder "vd: ten_kh") + Mô tả (placeholder "vd: Họ tên đầy đủ của khách hàng"); nút [Lưu] và [Hủy]; ẩn khi nhấn [Hủy] hoặc sau khi lưu thành công |
+| N5b | Bảng tham số đã thêm | Table | – | – | Hiện khi có ít nhất 1 tham số; cột: Tên tham số (font mono, dạng `{{ten_kh}}`) / Mô tả / icon [Xóa] (hiện khi hover dòng) |
+| N6 | Nút [Lưu trigger] | Button (primary) | – | – | Validate → lưu; toast "Đã thêm trigger ✓"; trigger hiển thị ngay trong danh sách; trạng thái mặc định = Active; tham số đã khai báo được lưu cùng trigger |
+| N7 | Nút [Hủy] | Button (outline) | – | – | Đóng modal, không lưu |
 
 #### Validate form T-NEW
 
@@ -2310,6 +2313,9 @@ Modal mở khi Admin nhấn [Xem / Sửa].
 | Trigger Code | Chỉ `[A-Z0-9_]` | "Chỉ dùng chữ hoa, số, dấu gạch dưới" |
 | Trigger Code | Không trùng với code đã có | "Code đã tồn tại" |
 | Tên | Bắt buộc | "Bắt buộc" |
+| Tên tham số | Chỉ `[a-z0-9_]` | "Chỉ dùng chữ thường, số, dấu gạch dưới" |
+| Tên tham số | Không trùng trong cùng trigger | "Tham số đã tồn tại" |
+| Mô tả tham số | Bắt buộc | "Bắt buộc" |
 
 ---
 
