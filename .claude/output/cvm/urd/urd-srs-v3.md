@@ -21,6 +21,7 @@ Hà Nội – Tháng 05/2026
 | 05/06/2026 | Jun | Screen 4A, 4B, 4C; UC-TPL-01, UC-TPL-02 | U | Đồng bộ với thay đổi UI thực tế: (1) Xóa "Giá trị mẫu / Sample Params" khỏi Template Editor — preview hiển thị tham số nguyên dạng `{{ten_kh}}`; (2) Thêm nút [Xem] vào Template List → navigate `/templates/:id/view`; (3) Cập nhật UC-TPL-02 + thêm Screen 4C đặc tả đầy đủ màn xem chi tiết template (layout 2 cột, input disabled, ẩn THAM SỐ ĐỘNG/hướng dẫn/nút xóa kênh); (4) Bổ sung behavior preview Email — banner hiển thị phía trên Subject nếu đã upload, placeholder xám nếu chưa có; (5) Bổ sung nút [Sửa] và [Sao chép] trên header màn xem chi tiết — nghiệp vụ giống UC-TPL-03 và UC-TPL-04. | V3.1 |
 | 12/06/2026 | Jun | UC-CAM-04; Screen 2B (STT 8) | U | Đơn giản hóa modal preview BL/WL trong Campaign Detail: bỏ hiển thị thống kê hợp lệ/trùng/sai định dạng — chỉ hiển thị danh sách số điện thoại thuộc danh sách đó kèm tổng số lượng; bổ sung nút [Xem] cho Whitelist (trước chỉ có Blacklist). | V3.2 |
 | 15/06/2026 | Jun | Khối 3 — Trigger; Screen 5; Screen Admin (Tab Trigger) | U | Thay đổi mô hình Trigger: Admin Hệ thống có thể khai báo trigger và tham số đầu ra trực tiếp trên UI (không còn chỉ qua deployment). Cập nhật UC-TRG-00: Admin thấy [Xem / Sửa] và [+ Thêm trigger]; QTV vẫn chỉ [Xem]. Cập nhật UC-TRG-02: bỏ Nhóm C (thông tin vận hành), giữ Nhóm A + B; Nhóm B đơn giản hóa xuống 2 cột (Tên tham số + Mô tả); Admin thấy [+ Thêm tham số] và icon Xóa per dòng. Thêm UC-TRG-03 (Khai báo trigger mới) và UC-TRG-04 (Thêm/Xóa tham số đầu ra). Cập nhật Screen 5: bỏ Nhóm C, bổ sung A6 Kênh hỗ trợ vào Nhóm A, cập nhật Nhóm B xuống 2 cột. Cập nhật Tab Trigger trong Screen Admin. Cập nhật mô tả role Admin_HT. | V3.3 |
+| 16/06/2026 | Jun | UC-TRG-03 | U | Đồng bộ với code thực tế: form tạo trigger mới có section tham số đầu ra — Admin có thể khai báo tham số ngay khi tạo (không bắt buộc) thay vì chỉ thêm sau qua UC-TRG-04. Cập nhật Mục tiêu, Hậu điều kiện, Hoạt động (thêm bước 5 + 4 exception mới), Quy tắc nghiệp vụ. | V3.4 |
 
 ---
 
@@ -1244,13 +1245,13 @@ CVM query thông tin này từ BSS qua Integration Layer khi tải trang — kh�
 | Nội dung | Mô tả |
 |----------|-------|
 | **Tên** | Khai báo Trigger mới |
-| **Mục tiêu** | Cho phép Admin tạo trigger mới với đầy đủ thông tin định danh |
+| **Mục tiêu** | Cho phép Admin tạo trigger mới với đầy đủ thông tin định danh và tùy chọn khai báo tham số đầu ra ngay trong form |
 | **Tác nhân** | Admin Hệ thống |
 | **Trigger** | Admin click [+ Thêm trigger] trên màn hình Trigger (tab Admin) |
 | **Tiền điều kiện** | - Admin đã đăng nhập |
-| **Hậu điều kiện** | - Trigger mới được tạo với trạng thái Active; xuất hiện trong danh sách và dropdown chọn trigger khi tạo campaign |
-| **Hoạt động** | 1. Admin nhập Trigger Code (bắt buộc; chỉ chữ hoa, số, dấu gạch dưới; ví dụ: `SIM_ACTIVATED`) <br>2. Admin nhập Tên trigger (bắt buộc; ví dụ: "Kích hoạt SIM thành công") <br>3. Admin chọn Kiểu chạy: Realtime / Near Realtime / Offline <br>4. Admin chọn Nguồn sự kiện: BSS / OCS / SuperApp <br>5. Admin click [Lưu trigger] → hệ thống validate → lưu; toast "Đã thêm trigger ✓"; trigger hiển thị ngay trong danh sách <br>**[Exception — Code trùng]**: Inline error "Code đã tồn tại" <br>**[Exception — Code sai định dạng]**: Inline error "Chỉ dùng chữ hoa, số, dấu gạch dưới" |
-| **Quy tắc nghiệp vụ** | - Trigger Code là định danh duy nhất; hệ thống tự động convert sang chữ hoa <br>- Trạng thái mặc định khi tạo: Active <br>- Tham số đầu ra được thêm sau khi trigger đã được tạo (UC-TRG-04) |
+| **Hậu điều kiện** | - Trigger mới được tạo với trạng thái Active; xuất hiện trong danh sách và dropdown chọn trigger khi tạo campaign; tham số đầu ra (nếu đã khai báo) có hiệu lực ngay |
+| **Hoạt động** | 1. Admin nhập Trigger Code (bắt buộc; chỉ chữ hoa, số, dấu gạch dưới; ví dụ: `SIM_ACTIVATED`) <br>2. Admin nhập Tên trigger (bắt buộc; ví dụ: "Kích hoạt SIM thành công") <br>3. Admin chọn Kiểu chạy: Realtime / Near Realtime / Offline <br>4. Admin chọn Nguồn sự kiện: BSS / OCS / SuperApp <br>5. **[Tùy chọn]** Admin khai báo tham số đầu ra ngay trong form: click [+ Thêm tham số] → inline form Tên tham số + Mô tả → [Lưu]; có thể thêm nhiều tham số; xóa từng tham số bằng icon [Xóa] trên dòng tương ứng <br>6. Admin click [Lưu trigger] → hệ thống validate → lưu; toast "Đã thêm trigger ✓"; trigger hiển thị ngay trong danh sách <br>**[Exception — Code trùng]**: Inline error "Code đã tồn tại" <br>**[Exception — Code sai định dạng]**: Inline error "Chỉ dùng chữ hoa, số, dấu gạch dưới" <br>**[Exception — Tên tham số trùng]**: Inline error "Tham số đã tồn tại" <br>**[Exception — Tên tham số sai định dạng]**: Inline error "Chỉ dùng chữ thường, số, dấu gạch dưới" |
+| **Quy tắc nghiệp vụ** | - Trigger Code là định danh duy nhất; hệ thống tự động convert sang chữ hoa <br>- Trạng thái mặc định khi tạo: Active <br>- Tham số đầu ra có thể khai báo ngay trong form tạo mới (bước 5) hoặc thêm sau qua UC-TRG-04 — cả hai cách đều hợp lệ <br>- Nếu không khai báo tham số khi tạo, trigger vẫn được lưu bình thường với danh sách tham số rỗng |
 
 ---
 
@@ -2457,4 +2458,4 @@ Màn hình cài đặt hệ thống — chỉ Admin có quyền thay đổi; QTV
 ---
 
 *Tài liệu được cập nhật dựa trên Wireframe CVM v10 + QA Audit toàn bộ component — Tháng 05/2026*
-*Phiên bản: V2.2 | Ngày: 21/05/2026 | Tác giả: Jun (BA)*
+*Phiên bản: V3.4 | Ngày: 16/06/2026 | Tác giả: Jun (BA)*
