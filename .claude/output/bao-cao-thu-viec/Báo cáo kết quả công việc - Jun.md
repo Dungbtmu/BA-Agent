@@ -45,7 +45,7 @@ Thời gian: từ ngày ….đến hết ngày ….
 
 ## 1. Dự án CVM — Hệ thống Quản lý Giá trị Khách hàng
 
-- *Tình trạng công việc:* **Hoàn thành giai đoạn phân tích và bàn giao** — tài liệu đặc tả yêu cầu và giao diện đã được bàn giao cho đội phát triển, sản phẩm đang trong giai đoạn triển khai.
+- *Tình trạng công việc:* **Hoàn thành giai đoạn phân tích và bàn giao** — tài liệu đặc tả yêu cầu và giao diện đã được bàn giao cho đội phát triển. Đội phát triển đã dựng xong môi trường UAT; BA đang phối hợp kiểm tra nghiệp vụ trên môi trường này.
 
 - *Nội dung thực hiện:*
 
@@ -84,7 +84,7 @@ Thời gian: từ ngày ….đến hết ngày ….
 
 ## 2. Dự án CDP — Nền tảng Dữ liệu Khách hàng cho VNPost
 
-- *Tình trạng công việc:* **Hoàn thành giai đoạn nghiên cứu** — đang chờ phản hồi từ phía VNPost để chuyển sang giai đoạn phân tích và thiết kế chính thức.
+- *Tình trạng công việc:* **Hoàn thành giai đoạn nghiên cứu** — bản tổng hợp nghiên cứu domain đã được hoàn thiện và gửi nội bộ để team review trước khi trình VNPost; bước tiếp theo là tổ chức buổi làm việc chính thức với đầu mối VNPost để chốt các vấn đề nghiệp vụ cốt lõi.
 
 - *Nội dung thực hiện:*
   - Nghiên cứu toàn diện về nghiệp vụ bưu chính và hệ sinh thái công nghệ của VNPost: 8+ hệ thống IT đang vận hành, 8 giai đoạn trong chuỗi bưu chính chuyển phát, đặc điểm dữ liệu khách hàng.
