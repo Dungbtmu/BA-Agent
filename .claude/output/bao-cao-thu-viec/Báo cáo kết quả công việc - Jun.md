@@ -75,10 +75,20 @@ Thời gian: từ ngày ….đến hết ngày ….
   - Xác nhận các tình huống chưa rõ, bổ sung đặc tả khi cần thiết để đảm bảo sản phẩm đúng nghiệp vụ đã chốt với Ban VTDĐ.
   - Đối chiếu sản phẩm đang phát triển với yêu cầu đã thống nhất, phát hiện và làm rõ kịp thời các điểm chưa khớp.
 
+  **e. Phối hợp hoàn thiện Tờ trình chủ chương trình phương án và kế hoạch triển khai hệ thống**
+  - Tham gia soạn thảo và rà soát nội dung Tờ trình phương án triển khai hệ thống CVM trình cấp có thẩm quyền phê duyệt.
+  - Đảm bảo nội dung Tờ trình phản ánh đúng phạm vi, mục tiêu nghiệp vụ và lộ trình triển khai đã thống nhất.
+
+  **f. Phối hợp hoàn thiện 02 Quy trình vận hành hệ thống CVM**
+  - **Quy trình Phối hợp và Xử lý lỗi** — quy định cách thức phối hợp giữa các bên và xử lý sự cố trong quá trình vận hành.
+  - **Quy trình Tiếp nhận và Phát triển tính năng mới** — quy định luồng tiếp nhận yêu cầu, đánh giá và triển khai tính năng bổ sung sau khi hệ thống đi vào vận hành.
+
 - *Kết quả công việc:*
   - **Bản giao diện hoàn chỉnh** đã được Ban VTDĐ chốt — bao phủ 12 màn hình, 6 kênh giao tiếp (SMS, Zalo OA, Thông báo đẩy, Biểu ngữ App/Web, USSD, Email).
   - **Tài liệu đặc tả yêu cầu (URD/SRS) hoàn chỉnh** — sẵn sàng cho đội phát triển và kiểm thử làm việc trực tiếp không cần hỏi thêm.
   - **Bộ tài liệu phân tích tích hợp dữ liệu BSS ↔ CVM** gồm 5 tài liệu thành phần — nền tảng để đội phát triển thiết kế giải pháp kết nối hệ thống nguồn.
+  - **Tờ trình chủ chương trình phương án và kế hoạch triển khai hệ thống CVM** đã được hoàn thiện và trình duyệt.
+  - **02 Quy trình vận hành** (Xử lý lỗi; Tiếp nhận và Phát triển tính năng mới) đã được hoàn thiện, sẵn sàng áp dụng khi hệ thống đi vào vận hành.
 
 - *Đề xuất:*
   - Thiết lập quy trình xác nhận chính thức giữa BA và Ban VTDĐ trước khi bàn giao tài liệu cho đội phát triển — đảm bảo tài liệu có chữ ký phê duyệt từ bên nghiệp vụ.
