@@ -37,7 +37,11 @@ Thời gian: từ ngày ….đến hết ngày ….
 
 4. **Hỗ trợ đội phát triển trong quá trình xây dựng sản phẩm** — giải đáp thắc mắc về nghiệp vụ, xác nhận các tình huống chưa rõ để đảm bảo sản phẩm đúng với yêu cầu đã thống nhất.
 
-5. **Nghiên cứu domain và xây dựng tài liệu đầu vào** cho dự án Nền tảng Dữ liệu Khách hàng (CDP) của Tổng Công Ty Bưu Điện Việt Nam (VNPost).
+5. **Phối hợp hoàn thiện Tờ trình chủ chương trình phương án và kế hoạch triển khai hệ thống CVM** — hỗ trợ soạn thảo và rà soát nội dung trình cấp có thẩm quyền phê duyệt.
+
+6. **Phối hợp hoàn thiện 02 quy trình vận hành hệ thống CVM** — Quy trình Phối hợp và Xử lý lỗi; Quy trình Tiếp nhận và Phát triển tính năng mới.
+
+7. **Nghiên cứu domain và xây dựng tài liệu đầu vào** cho dự án Nền tảng Dữ liệu Khách hàng (CDP) của Tổng Công Ty Bưu Điện Việt Nam (VNPost).
 
 ---
 
@@ -110,7 +114,7 @@ Thời gian: từ ngày ….đến hết ngày ….
 
 2. **Chờ phản hồi từ phía đối tác/khách hàng** — dự án CDP phụ thuộc vào thông tin từ phía VNPost để tiến tiếp. Một số câu hỏi nghiệp vụ quan trọng chưa nhận được phản hồi, khiến dự án chưa thể chuyển sang giai đoạn phân tích chính thức. Hướng xử lý: ghi rõ các điểm còn chờ xác nhận, tiếp tục phần việc có thể làm độc lập, chuẩn bị sẵn tài liệu để có thể khởi động ngay khi nhận được phản hồi.
 
-3. **Tiếp cận domain hoàn toàn mới** — dự án CDP yêu cầu hiểu sâu về nghiệp vụ bưu chính và hệ sinh thái công nghệ của VNPost — lĩnh vực chưa có kinh nghiệm trước. Hướng xử lý: tự nghiên cứu có hệ thống từ tài liệu nghiệp vụ, tài liệu công nghệ, kết hợp phân tích đặc thù của thị trường Việt Nam.
+3. **Tiếp cận domain hoàn toàn mới** — dự án CDP yêu cầu hiểu sâu về nghiệp vụ bưu chính và hệ sinh thái công nghệ của VNPost — lĩnh vực chưa có kinh nghiệm trước. Hướng xử lý: phối hợp nghiên cứu có hệ thống từ tài liệu nghiệp vụ và tài liệu công nghệ được cung cấp, kết hợp phân tích đặc thù vận hành và quy mô của VNPost tại thị trường Việt Nam.
 
 4. **Đảm bảo tài liệu đặc tả và sản phẩm thực tế luôn đồng bộ trong quá trình phát triển** — đây là thách thức phổ biến khi đội phát triển triển khai nhanh. Hướng xử lý: thiết lập điểm kiểm tra định kỳ giữa BA và đội phát triển để phát hiện sớm và xử lý kịp thời các điểm chưa khớp, đảm bảo tài liệu luôn là nguồn tham chiếu chính xác.
 
