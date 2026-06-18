@@ -29,20 +29,17 @@
     flex-shrink: 0;
   }
 
-  /* Network background pattern */
   .slide::before {
     content: '';
     position: absolute;
     bottom: 0; left: 0; right: 0;
     height: 55%;
-    background-image:
-      radial-gradient(circle, #cccccc 1.5px, transparent 1.5px);
+    background-image: radial-gradient(circle, #cccccc 1.5px, transparent 1.5px);
     background-size: 60px 60px;
     opacity: 0.25;
     pointer-events: none;
   }
 
-  /* Header bar */
   .header {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -63,7 +60,7 @@
   }
 
   .header h1 {
-    font-size: 34px;
+    font-size: 32px;
     font-weight: 900;
     color: #1B2A4A;
     letter-spacing: -0.3px;
@@ -89,11 +86,6 @@
     line-height: 1.3;
   }
 
-  .logo-icon {
-    margin-right: 8px;
-  }
-
-  /* Content area */
   .content {
     position: absolute;
     top: 104px;
@@ -102,7 +94,6 @@
     z-index: 5;
   }
 
-  /* Slide number badge */
   .slide-num {
     position: absolute;
     bottom: 16px; right: 48px;
@@ -111,10 +102,7 @@
     z-index: 10;
   }
 
-  /* ========== SLIDE 0 — BÌA ========== */
-  .slide-cover .header {
-    background: linear-gradient(90deg, #F5A623 0%, #F5A623 78%, #1B2A4A 78%);
-  }
+  /* Cover */
   .slide-cover .cover-body {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -144,10 +132,7 @@
     line-height: 2;
     text-align: center;
   }
-  .slide-cover .cover-info span {
-    font-weight: 700;
-    color: #1B2A4A;
-  }
+  .slide-cover .cover-info span { font-weight: 700; color: #1B2A4A; }
   .slide-cover .cover-accent {
     width: 80px; height: 5px;
     background: #F5A623;
@@ -155,24 +140,12 @@
     border-radius: 3px;
   }
 
-  /* ========== TEXT STYLES ========== */
-  .section-label {
-    font-size: 14px;
-    font-weight: 700;
-    color: #F5A623;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 6px;
-  }
-
-  ul.main-list {
-    list-style: none;
-    padding: 0;
-  }
+  /* Text styles */
+  ul.main-list { list-style: none; padding: 0; }
   ul.main-list > li {
     padding: 5px 0 5px 20px;
     position: relative;
-    font-size: 17px;
+    font-size: 16px;
     color: #222;
     line-height: 1.5;
   }
@@ -185,233 +158,84 @@
     top: 7px;
   }
 
-  ul.sub-list {
-    list-style: none;
-    padding: 0 0 0 20px;
-    margin-top: 3px;
-  }
+  ul.sub-list { list-style: none; padding: 0 0 0 20px; margin-top: 3px; }
   ul.sub-list > li {
     padding: 2px 0 2px 16px;
     position: relative;
-    font-size: 15px;
+    font-size: 14px;
     color: #444;
     line-height: 1.45;
   }
-  ul.sub-list > li::before {
-    content: '–';
-    position: absolute;
-    left: 0;
-    color: #aaa;
-  }
+  ul.sub-list > li::before { content: '–'; position: absolute; left: 0; color: #aaa; }
 
-  .highlight {
-    font-weight: 700;
-    color: #1B2A4A;
-  }
-
-  .tag {
-    display: inline-block;
-    background: #1B2A4A;
-    color: #F5A623;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 3px;
-    margin-left: 6px;
-    vertical-align: middle;
-  }
-
+  .tag { display: inline-block; background: #1B2A4A; color: #F5A623; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
   .tag-done { background: #1B7A4A; color: #fff; }
   .tag-wip  { background: #C0830A; color: #fff; }
 
-  /* Two-column layout */
-  .two-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    margin-top: 8px;
-  }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 8px; }
 
   .col-title {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: #1B2A4A;
     border-bottom: 2px solid #F5A623;
     padding-bottom: 4px;
     margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
-  /* Table */
-  table.spec {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14.5px;
-    margin-top: 10px;
-  }
-  table.spec th {
-    background: #1B2A4A;
-    color: #F5A623;
-    padding: 7px 10px;
-    text-align: left;
-    font-weight: 700;
-  }
-  table.spec td {
-    padding: 6px 10px;
-    border-bottom: 1px solid #eee;
-    color: #333;
-    vertical-align: top;
-  }
+  table.spec { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 6px; }
+  table.spec th { background: #1B2A4A; color: #F5A623; padding: 7px 10px; text-align: left; font-weight: 700; }
+  table.spec td { padding: 6px 10px; border-bottom: 1px solid #eee; color: #333; vertical-align: top; }
   table.spec tr:nth-child(even) td { background: #f9f9f9; }
 
-  /* Stat boxes */
-  .stat-row {
-    display: flex;
-    gap: 16px;
-    margin: 16px 0;
-  }
-  .stat-box {
-    flex: 1;
-    background: #1B2A4A;
-    color: #fff;
-    border-radius: 8px;
-    padding: 14px 16px;
-    text-align: center;
-  }
-  .stat-box .num {
-    font-size: 30px;
-    font-weight: 900;
-    color: #F5A623;
-    line-height: 1;
-  }
-  .stat-box .lbl {
-    font-size: 12px;
-    margin-top: 4px;
-    color: #ccc;
-    line-height: 1.3;
-  }
+  .stat-row { display: flex; gap: 12px; margin: 10px 0; }
+  .stat-box { flex: 1; background: #1B2A4A; color: #fff; border-radius: 8px; padding: 12px 16px; text-align: center; }
+  .stat-box .num { font-size: 28px; font-weight: 900; color: #F5A623; line-height: 1; }
+  .stat-box .lbl { font-size: 11px; margin-top: 4px; color: #ccc; line-height: 1.3; }
 
-  /* Pro/Con layout */
-  .procon {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-top: 10px;
-  }
-  .procon-box {
-    border-radius: 8px;
-    padding: 16px 20px;
-  }
+  .procon { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 10px; }
+  .procon-box { border-radius: 8px; padding: 16px 20px; }
   .procon-box.pro { background: #e8f5ee; border-left: 4px solid #1B7A4A; }
   .procon-box.con { background: #fff5e8; border-left: 4px solid #C0830A; }
-  .procon-box .box-title {
-    font-size: 14px;
-    font-weight: 800;
-    margin-bottom: 10px;
-  }
+  .procon-box .box-title { font-size: 14px; font-weight: 800; margin-bottom: 10px; }
   .procon-box.pro .box-title { color: #1B7A4A; }
   .procon-box.con .box-title { color: #C0830A; }
 
   .check-list { list-style: none; padding: 0; }
-  .check-list li {
-    font-size: 15px;
-    color: #333;
-    padding: 3px 0 3px 22px;
-    position: relative;
-    line-height: 1.4;
-  }
+  .check-list li { font-size: 15px; color: #333; padding: 4px 0 4px 22px; position: relative; line-height: 1.45; }
   .check-list.pro-list li::before { content: '✓'; position: absolute; left: 0; color: #1B7A4A; font-weight: 700; }
   .check-list.con-list li::before { content: '△'; position: absolute; left: 0; color: #C0830A; font-weight: 700; }
 
-  /* Difficulty table */
-  .diff-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
-  .diff-table td { padding: 9px 12px; border-bottom: 1px solid #eee; vertical-align: top; }
+  .diff-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 15px; }
+  .diff-table td { padding: 10px 14px; border-bottom: 1px solid #eee; vertical-align: top; }
   .diff-table td:first-child { width: 42%; font-weight: 600; color: #1B2A4A; border-right: 3px solid #F5A623; }
   .diff-table td:last-child { color: #444; }
   .diff-table tr:nth-child(even) td { background: #f9f9f9; }
 
-  /* Pipeline flow */
-  .pipeline {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    margin: 18px 0;
-    flex-wrap: wrap;
-  }
-  .pipe-step {
-    background: #1B2A4A;
-    color: #fff;
-    padding: 8px 14px;
-    font-size: 13px;
-    font-weight: 600;
-    border-radius: 4px;
-    white-space: nowrap;
-  }
-  .pipe-arrow {
-    color: #F5A623;
-    font-size: 18px;
-    padding: 0 6px;
-    font-weight: 700;
-  }
-
-  /* Proposal items */
-  .proposal-list { list-style: none; padding: 0; margin-top: 8px; }
-  .proposal-list li {
-    display: flex;
-    gap: 14px;
-    padding: 10px 0;
-    border-bottom: 1px solid #f0f0f0;
-    align-items: flex-start;
-    font-size: 16px;
-    color: #333;
-    line-height: 1.5;
-  }
+  .proposal-list { list-style: none; padding: 0; margin-top: 6px; }
+  .proposal-list li { display: flex; gap: 14px; padding: 9px 0; border-bottom: 1px solid #f0f0f0; align-items: flex-start; font-size: 15.5px; color: #333; line-height: 1.5; }
   .proposal-list li:last-child { border-bottom: none; }
-  .proposal-num {
-    min-width: 28px; height: 28px;
-    background: #F5A623;
-    color: #1B2A4A;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 14px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
+  .proposal-num { min-width: 28px; height: 28px; background: #F5A623; color: #1B2A4A; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0; margin-top: 1px; }
 
-  /* Closing slide */
-  .closing-body {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-  }
-  .closing-title {
-    font-size: 46px;
-    font-weight: 900;
-    color: #1B2A4A;
-  }
-  .closing-sub {
-    font-size: 20px;
-    color: #666;
-  }
-  .closing-bar {
-    width: 100px; height: 5px;
-    background: #F5A623;
-    border-radius: 3px;
-  }
+  .step-flow { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+  .step-row { display: flex; gap: 12px; align-items: flex-start; }
+  .step-num { min-width: 28px; height: 28px; background: #1B2A4A; color: #F5A623; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex-shrink: 0; }
+  .step-done { min-width: 28px; height: 28px; background: #1B7A4A; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex-shrink: 0; }
+  .step-text { font-size: 14.5px; color: #333; padding-top: 4px; line-height: 1.45; }
 
-  /* Print hint */
-  .print-hint {
-    color: #aaa;
-    font-size: 13px;
-    text-align: center;
-    padding: 8px 0 0;
-  }
+  .banner-done { background: #e8f5ee; border-left: 4px solid #1B7A4A; padding: 8px 14px; border-radius: 4px; font-size: 13.5px; color: #1B7A4A; font-weight: 700; margin-bottom: 10px; }
+  .banner-wip  { background: #fff5e8; border-left: 4px solid #C0830A; padding: 8px 14px; border-radius: 4px; font-size: 13.5px; color: #7a4a00; font-weight: 600; margin-bottom: 10px; }
+  .banner-uat  { background: #eef2ff; border-left: 4px solid #3b5bdb; padding: 8px 14px; border-radius: 4px; font-size: 13.5px; color: #1e3a8a; font-weight: 600; margin-bottom: 10px; }
+
+  .info-box { padding: 10px 14px; background: #f0f4fa; border-left: 3px solid #1B2A4A; border-radius: 4px; font-size: 13.5px; color: #444; line-height: 1.55; }
+
+  .output-box { padding: 12px 16px; background: #f0f4fa; border-left: 4px solid #1B2A4A; border-radius: 4px; }
+  .output-box .ob-title { font-size: 13px; font-weight: 700; color: #1B2A4A; margin-bottom: 6px; }
+  .output-list { list-style: none; padding: 0; margin: 0; }
+  .output-list li { font-size: 13.5px; color: #333; padding: 3px 0 3px 18px; position: relative; line-height: 1.4; }
+  .output-list li::before { content: '✓'; position: absolute; left: 0; color: #1B7A4A; font-weight: 700; }
 
   @media print {
     body { background: white; padding: 0; gap: 0; }
@@ -422,11 +246,11 @@
 </head>
 <body>
 
-<p class="print-hint">💡 Ctrl+P để in / xuất PDF — mỗi slide 1 trang. Hoặc chụp màn hình từng slide.</p>
+<p style="color:#aaa;font-size:13px;text-align:center;padding:8px 0 0;">💡 Ctrl+P để in / xuất PDF — mỗi slide 1 trang.</p>
 
-<!-- ======================================================
-     SLIDE 0 — BÌA
-     ====================================================== -->
+<!-- ============================================================
+     SLIDE 1 — BÌA
+     ============================================================ -->
 <div class="slide slide-cover">
   <div class="header" style="background: linear-gradient(90deg,#F5A623 0%,#F5A623 78%,#1B2A4A 78%);">
     <div class="logo-area">
@@ -446,143 +270,112 @@
       Đơn vị: <span>Trung tâm Đổi mới sáng tạo</span>
     </div>
   </div>
-  <span class="slide-num">1 / 11</span>
+  <span class="slide-num">1 / 15</span>
 </div>
 
-<!-- ======================================================
-     SLIDE 1 — NỘI DUNG CÔNG VIỆC ĐƯỢC GIAO
-     ====================================================== -->
+<!-- ============================================================
+     SLIDE 2 — NỘI DUNG CÔNG VIỆC ĐƯỢC GIAO
+     ============================================================ -->
 <div class="slide">
   <div class="header">
     <h1>I. Nội dung công việc được giao</h1>
-    <div class="logo-area">
-      <div style="text-align:center;">
-        <div style="font-size:22px;color:#F5A623;">✈</div>
-        <div class="logo-text">VIETNAM POST</div>
-      </div>
-    </div>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
   </div>
   <div class="content" style="top:100px;">
     <ul class="proposal-list" style="margin-top:0;">
       <li>
         <div class="proposal-num">1</div>
-        <div>
-          <strong>Làm việc với Ban Viễn thông Di động để làm rõ và chốt yêu cầu nghiệp vụ</strong> — dự án CVM (Hệ thống Quản lý Giá trị Khách hàng)<br>
-          <span style="font-size:14.5px;color:#555;">Tham gia các buổi làm việc để nắm bắt, hệ thống hóa và chốt toàn bộ yêu cầu vận hành campaign marketing tự động; xác định quyền hạn từng nhóm người dùng; làm rõ các quy tắc nghiệp vụ cốt lõi trước khi bàn giao cho đội phát triển.</span>
-        </div>
+        <div><strong>Làm việc với Ban Viễn thông Di động để làm rõ và chốt yêu cầu nghiệp vụ</strong> — dự án CVM (Hệ thống Quản lý Giá trị Khách hàng)<br>
+        <span style="font-size:13.5px;color:#555;">Xác định quyền hạn từng nhóm người dùng, làm rõ các quy tắc nghiệp vụ cốt lõi trước khi bàn giao cho đội phát triển.</span></div>
       </li>
       <li>
         <div class="proposal-num">2</div>
-        <div>
-          <strong>Thiết kế và trình bày giao diện hệ thống CVM để Ban chốt phương án</strong><br>
-          <span style="font-size:14.5px;color:#555;">Thiết kế giao diện trực quan cho toàn bộ 12 màn hình chức năng; trình bày để Ban xem xét, góp ý và chốt; điều chỉnh theo phản hồi cho đến khi được phê duyệt.</span>
-        </div>
+        <div><strong>Thiết kế và trình bày giao diện hệ thống CVM để Ban chốt phương án</strong><br>
+        <span style="font-size:13.5px;color:#555;">Thiết kế 12 màn hình chức năng; trình bày, tiếp nhận góp ý và điều chỉnh đến khi được phê duyệt.</span></div>
       </li>
       <li>
         <div class="proposal-num">3</div>
-        <div>
-          <strong>Lập tài liệu đặc tả yêu cầu phục vụ đội phát triển triển khai hệ thống CVM</strong><br>
-          <span style="font-size:14.5px;color:#555;">Lập tài liệu đầy đủ, chi tiết bao gồm quy trình nghiệp vụ, phân quyền hệ thống, đặc tả từng màn hình và từng tình huống sử dụng; xây dựng thêm tài liệu phân tích dữ liệu phục vụ đội kỹ thuật thiết kế giải pháp kết nối hệ thống nguồn.</span>
-        </div>
+        <div><strong>Lập tài liệu đặc tả yêu cầu phục vụ đội phát triển triển khai hệ thống CVM</strong><br>
+        <span style="font-size:13.5px;color:#555;">Bao gồm quy trình nghiệp vụ, phân quyền, đặc tả từng màn hình, từng tình huống sử dụng và bộ tài liệu phân tích tích hợp dữ liệu BSS ↔ CVM.</span></div>
       </li>
       <li>
         <div class="proposal-num">4</div>
-        <div>
-          <strong>Hỗ trợ đội phát triển trong quá trình xây dựng sản phẩm CVM</strong><br>
-          <span style="font-size:14.5px;color:#555;">Giải đáp thắc mắc nghiệp vụ; xác nhận các tình huống chưa rõ; đối chiếu sản phẩm đang xây dựng với yêu cầu đã chốt, phát hiện và làm rõ kịp thời các điểm chưa khớp.</span>
-        </div>
+        <div><strong>Hỗ trợ đội phát triển trong quá trình xây dựng sản phẩm CVM</strong><br>
+        <span style="font-size:13.5px;color:#555;">Giải đáp thắc mắc nghiệp vụ, xác nhận tình huống chưa rõ, đối chiếu sản phẩm với yêu cầu đã chốt.</span></div>
       </li>
       <li>
         <div class="proposal-num">5</div>
-        <div>
-          <strong>Phối hợp hoàn thiện Tờ trình chủ chương trình phương án và kế hoạch triển khai hệ thống CVM</strong><br>
-          <span style="font-size:14.5px;color:#555;">Tham gia soạn thảo và rà soát nội dung Tờ trình trình cấp có thẩm quyền phê duyệt; đảm bảo nội dung phản ánh đúng phạm vi, mục tiêu nghiệp vụ và lộ trình triển khai đã thống nhất.</span>
-        </div>
+        <div><strong>Phối hợp hoàn thiện Tờ trình chủ chương trình phương án và kế hoạch triển khai hệ thống CVM</strong><br>
+        <span style="font-size:13.5px;color:#555;">Soạn thảo và rà soát nội dung trình cấp có thẩm quyền phê duyệt.</span></div>
       </li>
       <li>
         <div class="proposal-num">6</div>
-        <div>
-          <strong>Phối hợp hoàn thiện 02 Quy trình vận hành hệ thống CVM</strong><br>
-          <span style="font-size:14.5px;color:#555;">Quy trình Phối hợp và Xử lý lỗi; Quy trình Tiếp nhận và Phát triển tính năng mới — chuẩn bị nền tảng vận hành khi hệ thống đi vào hoạt động chính thức.</span>
-        </div>
+        <div><strong>Phối hợp hoàn thiện 02 Quy trình vận hành hệ thống CVM</strong><br>
+        <span style="font-size:13.5px;color:#555;">Quy trình Phối hợp và Xử lý lỗi; Quy trình Tiếp nhận và Phát triển tính năng mới.</span></div>
       </li>
       <li>
         <div class="proposal-num">7</div>
-        <div>
-          <strong>Nghiên cứu domain và xây dựng tài liệu đầu vào cho dự án CDP</strong> — Nền tảng Dữ liệu Khách hàng cho VNPost<br>
-          <span style="font-size:14.5px;color:#555;">Tìm hiểu toàn diện nghiệp vụ bưu chính, hệ sinh thái công nghệ và bối cảnh pháp lý; đánh giá các phương án triển khai; chuẩn bị nền tảng để bước vào giai đoạn phân tích chính thức.</span>
-        </div>
+        <div><strong>Nghiên cứu domain và xây dựng tài liệu đầu vào cho dự án CDP</strong> — Nền tảng Dữ liệu Khách hàng cho VNPost<br>
+        <span style="font-size:13.5px;color:#555;">Tìm hiểu nghiệp vụ bưu chính, hệ sinh thái công nghệ, khung pháp lý; đánh giá phương án triển khai; chuẩn bị nền tảng cho giai đoạn phân tích chính thức.</span></div>
       </li>
     </ul>
   </div>
-  <span class="slide-num">2 / 11</span>
+  <span class="slide-num">2 / 15</span>
 </div>
 
-<!-- ======================================================
-     SLIDE 2 — KẾT QUẢ: CVM TỔNG QUAN
-     ====================================================== -->
+<!-- ============================================================
+     SLIDE 3 — KẾT QUẢ CVM: TỔNG QUAN HỆ THỐNG
+     ============================================================ -->
 <div class="slide">
   <div class="header">
-    <h1>II. Kết quả thực hiện — Dự án CVM</h1>
-    <div class="logo-area">
-      <div style="text-align:center;">
-        <div style="font-size:22px;color:#F5A623;">✈</div>
-        <div class="logo-text">VIETNAM POST</div>
-      </div>
-    </div>
+    <h1>II. Kết quả — CVM: Tổng quan hệ thống</h1>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
   </div>
   <div class="content">
-    <div style="margin-bottom:10px; background:#e8f5ee; border-left:4px solid #1B7A4A; padding:8px 14px; border-radius:4px; font-size:14px; color:#1B7A4A; font-weight:700;">
-      ✓ Hoàn thành giai đoạn phân tích và bàn giao — giao diện và tài liệu đã bàn giao cho đội phát triển, sản phẩm đang trong giai đoạn triển khai
-    </div>
-    <div style="display:grid; grid-template-columns:1.15fr 0.85fr; gap:20px;">
+    <div class="banner-done">✓ Hoàn thành giai đoạn phân tích và bàn giao — giao diện và tài liệu đã bàn giao cho đội phát triển</div>
+    <div style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:20px;">
       <div>
         <div class="col-title">Hệ thống CVM vận hành như thế nào</div>
-        <table class="spec" style="font-size:13.5px;">
+        <table class="spec">
           <tr><th>Thành phần</th><th>Vai trò trong nghiệp vụ</th></tr>
-          <tr><td>Tiếp nhận sự kiện</td><td>Nhận tín hiệu từ hệ thống nguồn khi khách hàng phát sinh sự kiện (sinh nhật, hết data, nạp tiền, đăng ký gói mới...)</td></tr>
-          <tr><td>Lọc đối tượng</td><td>Xác định đúng nhóm khách hàng thỏa điều kiện campaign đã thiết lập</td></tr>
-          <tr><td>Điều phối chiến dịch</td><td>Quản lý toàn bộ vòng đời: tạo → phê duyệt → kích hoạt → theo dõi → báo cáo</td></tr>
-          <tr><td>Quản lý nội dung</td><td>Soạn thảo và lưu trữ mẫu tin nhắn đa kênh, tự động điền thông tin cá nhân hoá</td></tr>
-          <tr><td>Kiểm soát gửi tin</td><td>Đảm bảo không gửi quá tần suất cho phép, không gửi trùng cùng một khách hàng</td></tr>
-          <tr><td>Gửi thông báo</td><td>Phân phối đến đúng kênh: SMS, Zalo OA, Thông báo đẩy, Biểu ngữ App/Web, USSD, Email</td></tr>
+          <tr><td><strong>Tiếp nhận sự kiện</strong></td><td>Nhận tín hiệu từ hệ thống nguồn khi khách hàng phát sinh sự kiện (sinh nhật, hết data, nạp tiền, đăng ký gói mới...)</td></tr>
+          <tr><td><strong>Lọc đối tượng</strong></td><td>Xác định đúng nhóm khách hàng thỏa điều kiện campaign đã thiết lập</td></tr>
+          <tr><td><strong>Điều phối chiến dịch</strong></td><td>Quản lý toàn bộ vòng đời: tạo → phê duyệt → kích hoạt → theo dõi → báo cáo</td></tr>
+          <tr><td><strong>Quản lý nội dung</strong></td><td>Soạn thảo mẫu tin nhắn đa kênh, tự động điền thông tin cá nhân hoá</td></tr>
+          <tr><td><strong>Kiểm soát gửi tin</strong></td><td>Đảm bảo không gửi quá tần suất cho phép, không gửi trùng cùng một khách hàng</td></tr>
+          <tr><td><strong>Gửi thông báo</strong></td><td>Phân phối đến đúng kênh: SMS, Zalo OA, Thông báo đẩy, Biểu ngữ App/Web, USSD, Email</td></tr>
         </table>
       </div>
       <div>
-        <div class="col-title">Kết quả bàn giao</div>
-        <div class="stat-row" style="gap:8px; margin:8px 0;">
-          <div class="stat-box"><div class="num">12</div><div class="lbl">Màn hình giao diện<br>hoàn chỉnh</div></div>
-          <div class="stat-box"><div class="num">6</div><div class="lbl">Kênh giao tiếp<br>khách hàng</div></div>
+        <div class="col-title">Số liệu bàn giao</div>
+        <div class="stat-row">
+          <div class="stat-box"><div class="num">12</div><div class="lbl">Màn hình giao diện hoàn chỉnh</div></div>
+          <div class="stat-box"><div class="num">6</div><div class="lbl">Kênh giao tiếp khách hàng</div></div>
         </div>
-        <div class="stat-row" style="gap:8px; margin:8px 0;">
-          <div class="stat-box"><div class="num">3</div><div class="lbl">Nhóm người dùng<br>& phân quyền</div></div>
-          <div class="stat-box"><div class="num">5</div><div class="lbl">Tài liệu phân tích<br>dữ liệu tích hợp</div></div>
+        <div class="stat-row">
+          <div class="stat-box"><div class="num">3</div><div class="lbl">Nhóm người dùng & phân quyền</div></div>
+          <div class="stat-box"><div class="num">5</div><div class="lbl">Tài liệu phân tích tích hợp dữ liệu</div></div>
         </div>
-        <div style="margin-top:10px; padding:8px 12px; background:#f0f4fa; border-left:3px solid #1B2A4A; font-size:13px; color:#444; line-height:1.5;">
+        <div class="info-box" style="margin-top:10px;">
           Giao diện đã được Ban VTDĐ phê duyệt.<br>
-          Tài liệu đặc tả đủ để đội phát triển và kiểm thử làm việc trực tiếp.
+          Tài liệu đặc tả đủ để đội phát triển và kiểm thử làm việc trực tiếp không cần hỏi thêm.
         </div>
       </div>
     </div>
   </div>
-  <span class="slide-num">3 / 11</span>
+  <span class="slide-num">3 / 15</span>
 </div>
 
-<!-- ======================================================
-     SLIDE 3 — KẾT QUẢ: CVM — GIAO DIỆN
-     ====================================================== -->
+<!-- ============================================================
+     SLIDE 4 — KẾT QUẢ CVM: GIAO DIỆN 12 MÀN HÌNH
+     ============================================================ -->
 <div class="slide">
   <div class="header">
-    <h1>II. Kết quả — CVM: Giao diện đã thiết kế & chốt</h1>
-    <div class="logo-area">
-      <div style="text-align:center;">
-        <div style="font-size:22px;color:#F5A623;">✈</div>
-        <div class="logo-text">VIETNAM POST</div>
-      </div>
-    </div>
+    <h1>II. Kết quả — CVM: Giao diện 12 màn hình</h1>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
   </div>
   <div class="content">
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:4px;">
+    <div style="display:grid; grid-template-columns:1.1fr 0.9fr; gap:20px; margin-top:4px;">
       <div>
         <div class="col-title">12 màn hình chức năng — đã được Ban VTDĐ chốt</div>
         <table class="spec" style="font-size:13px;">
@@ -591,207 +384,319 @@
           <tr><td><strong>Danh sách Chiến dịch</strong></td><td>Xem, lọc, quản lý trạng thái toàn bộ campaign</td></tr>
           <tr><td><strong>Xây dựng Chiến dịch</strong></td><td>Thiết lập sự kiện kích hoạt, tệp khách hàng, kênh gửi, lịch gửi, nội dung; gửi duyệt</td></tr>
           <tr><td><strong>Chi tiết Chiến dịch</strong></td><td>Xem kết quả, quản lý danh sách chặn/ưu tiên per campaign</td></tr>
-          <tr><td><strong>Quản lý Mẫu tin nhắn</strong></td><td>Soạn thảo nội dung đa kênh, chèn thông tin cá nhân hoá, xem trước trước khi dùng</td></tr>
+          <tr><td><strong>Quản lý Mẫu tin nhắn</strong></td><td>Soạn thảo đa kênh, chèn thông tin cá nhân hoá, xem trước trước khi dùng</td></tr>
           <tr><td><strong>Quản lý Sự kiện kích hoạt</strong></td><td>Danh mục sự kiện từ hệ thống nguồn; Admin khai báo sự kiện mới</td></tr>
           <tr><td><strong>Danh sách chặn</strong></td><td>Quản lý số điện thoại không gửi tin theo từng kênh</td></tr>
           <tr><td><strong>Hồ sơ Khách hàng (360°)</strong></td><td>Tra cứu lịch sử nhận tin, trạng thái cooldown của từng khách hàng</td></tr>
-          <tr><td><strong>Báo cáo</strong></td><td>Phân tích hiệu quả campaign theo kênh, theo thời gian, so sánh giữa các campaign</td></tr>
+          <tr><td><strong>Báo cáo</strong></td><td>Phân tích hiệu quả campaign theo kênh, theo thời gian</td></tr>
           <tr><td><strong>Quản trị & Cài đặt</strong></td><td>Phê duyệt campaign; cấu hình tần suất gửi, mức độ ưu tiên</td></tr>
         </table>
       </div>
       <div>
         <div class="col-title">Quy trình làm việc với Ban VTDĐ</div>
-        <div style="display:flex; flex-direction:column; gap:10px; margin-top:4px;">
-          <div style="display:flex; gap:12px; align-items:flex-start;">
-            <div style="min-width:28px;height:28px;background:#1B2A4A;color:#F5A623;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;">1</div>
-            <div style="font-size:14.5px;color:#333;"><strong>Làm việc trực tiếp với Ban VTDĐ</strong> — nắm bắt quy trình vận hành thực tế, làm rõ các yêu cầu còn mơ hồ</div>
+        <div class="step-flow" style="margin-top:6px;">
+          <div class="step-row">
+            <div class="step-num">1</div>
+            <div class="step-text"><strong>Làm việc trực tiếp với Ban VTDĐ</strong> — nắm bắt quy trình vận hành thực tế, làm rõ các yêu cầu còn mơ hồ</div>
           </div>
-          <div style="display:flex; gap:12px; align-items:flex-start;">
-            <div style="min-width:28px;height:28px;background:#1B2A4A;color:#F5A623;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;">2</div>
-            <div style="font-size:14.5px;color:#333;"><strong>Thiết kế giao diện</strong> — phác thảo và hoàn thiện từng màn hình theo yêu cầu đã xác nhận</div>
+          <div class="step-row">
+            <div class="step-num">2</div>
+            <div class="step-text"><strong>Thiết kế giao diện từng màn hình</strong> — phác thảo và hoàn thiện theo yêu cầu đã xác nhận</div>
           </div>
-          <div style="display:flex; gap:12px; align-items:flex-start;">
-            <div style="min-width:28px;height:28px;background:#1B2A4A;color:#F5A623;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;">3</div>
-            <div style="font-size:14.5px;color:#333;"><strong>Trình bày để Ban xem xét và góp ý</strong> — điều chỉnh theo phản hồi qua nhiều vòng</div>
+          <div class="step-row">
+            <div class="step-num">3</div>
+            <div class="step-text"><strong>Trình bày để Ban xem xét và góp ý</strong> — điều chỉnh qua nhiều vòng đến khi được chấp thuận</div>
           </div>
-          <div style="display:flex; gap:12px; align-items:flex-start;">
-            <div style="min-width:28px;height:28px;background:#1B7A4A;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;">✓</div>
-            <div style="font-size:14.5px;color:#1B7A4A;font-weight:600;"><strong>Giao diện được phê duyệt</strong> — bàn giao cho đội phát triển triển khai</div>
+          <div class="step-row">
+            <div class="step-done">✓</div>
+            <div class="step-text" style="color:#1B7A4A;font-weight:600;"><strong>Giao diện được phê duyệt</strong> — bàn giao cho đội phát triển triển khai</div>
           </div>
+        </div>
+        <div class="info-box" style="margin-top:14px;font-size:13px;">
+          Giao diện bao phủ đầy đủ vòng đời campaign — từ thiết lập điều kiện kích hoạt, lọc tệp khách hàng, soạn nội dung đa kênh đến theo dõi kết quả và tra cứu lịch sử từng khách hàng.
         </div>
       </div>
     </div>
   </div>
-  <span class="slide-num">4 / 11</span>
+  <span class="slide-num">4 / 15</span>
 </div>
 
-<!-- ======================================================
-     SLIDE 4 — KẾT QUẢ: CVM — TÀI LIỆU & HỖ TRỢ PHÁT TRIỂN
-     ====================================================== -->
+<!-- ============================================================
+     SLIDE 5 — KẾT QUẢ CVM: TÀI LIỆU ĐẶC TẢ & TÍCH HỢP DỮ LIỆU
+     ============================================================ -->
 <div class="slide">
   <div class="header">
-    <h1>II. Kết quả — CVM: Tài liệu & Hỗ trợ đội phát triển</h1>
-    <div class="logo-area">
-      <div style="text-align:center;">
-        <div style="font-size:22px;color:#F5A623;">✈</div>
-        <div class="logo-text">VIETNAM POST</div>
-      </div>
-    </div>
+    <h1>II. Kết quả — CVM: Tài liệu đặc tả & Tích hợp dữ liệu</h1>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
   </div>
   <div class="content">
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:4px;">
       <div>
         <div class="col-title">Tài liệu đặc tả yêu cầu — nội dung chính</div>
-        <table class="spec" style="font-size:13.5px;">
+        <table class="spec" style="font-size:13px;">
           <tr><th>Phần</th><th>Nội dung</th></tr>
-          <tr><td>Quy trình nghiệp vụ</td><td>Sơ đồ toàn bộ luồng vận hành từ sự kiện kích hoạt đến gửi tin</td></tr>
+          <tr><td>Quy trình nghiệp vụ</td><td>Sơ đồ toàn bộ luồng vận hành từ sự kiện kích hoạt đến gửi tin; sơ đồ trình tự từng tình huống</td></tr>
           <tr><td>Phân cấp chức năng</td><td>Cây chức năng đầy đủ của hệ thống</td></tr>
           <tr><td>Phân quyền hệ thống</td><td>Ma trận quyền hạn cho 3 nhóm: Quản trị viên Campaign, Admin Hệ thống, Super Admin</td></tr>
-          <tr><td>Đặc tả tình huống sử dụng</td><td>Từng tình huống: điều kiện thực hiện, các bước thực hiện, trường hợp ngoại lệ, quy tắc nghiệp vụ</td></tr>
-          <tr><td>Đặc tả giao diện</td><td>Từng màn hình: từng thành phần, điều kiện hiển thị, quy tắc kiểm tra dữ liệu đầu vào</td></tr>
+          <tr><td>Đặc tả tình huống sử dụng</td><td>Từng tình huống: điều kiện, các bước, trường hợp ngoại lệ, quy tắc nghiệp vụ</td></tr>
+          <tr><td>Đặc tả giao diện</td><td>Từng màn hình: từng thành phần, điều kiện hiển thị, quy tắc kiểm tra dữ liệu đầu vào, trạng thái đặc biệt</td></tr>
           <tr><td>Yêu cầu phi chức năng</td><td>Hiệu năng, bảo mật, khả năng mở rộng</td></tr>
         </table>
-
-        <div class="col-title" style="margin-top:14px;">Tài liệu phân tích dữ liệu tích hợp (BSS ↔ CVM)</div>
-        <ul class="main-list" style="font-size:14px;">
+      </div>
+      <div>
+        <div class="col-title">Tài liệu phân tích tích hợp dữ liệu (BSS ↔ CVM)</div>
+        <ul class="main-list" style="font-size:14px; margin-bottom:14px;">
           <li>Kiểm kê toàn bộ dữ liệu hiện có từ hệ thống nguồn và dữ liệu còn thiếu</li>
           <li>Xác định phương thức truyền dữ liệu: theo thời gian thực và theo lô</li>
           <li>Xây dựng cấu trúc dữ liệu chuẩn để đội kỹ thuật thiết kế giải pháp kết nối</li>
-        </ul>
-      </div>
-      <div>
-        <div class="col-title">Hỗ trợ đội phát triển trong quá trình xây dựng</div>
-        <ul class="main-list" style="font-size:14.5px;">
-          <li>Giải đáp câu hỏi nghiệp vụ phát sinh trong quá trình đội phát triển triển khai hệ thống</li>
-          <li>Xác nhận các tình huống chưa rõ trong tài liệu — bổ sung đặc tả khi cần thiết</li>
-          <li>Đối chiếu sản phẩm đang xây dựng với yêu cầu đã chốt với Ban VTDĐ; phát hiện và làm rõ kịp thời các điểm chưa khớp</li>
+          <li>Bộ tài liệu gồm <strong>5 tài liệu thành phần</strong> — nền tảng cho đội phát triển thiết kế kết nối hệ thống nguồn</li>
         </ul>
 
-        <div style="margin-top:16px; padding:14px 16px; background:#f0f4fa; border-left:4px solid #1B2A4A; border-radius:4px;">
-          <div style="font-size:13px; font-weight:700; color:#1B2A4A; margin-bottom:6px;">Output cuối cùng bàn giao</div>
-          <ul style="list-style:none;padding:0;margin:0;">
-            <li style="font-size:14px;color:#333;padding:3px 0 3px 16px;position:relative;">
-              <span style="position:absolute;left:0;color:#1B7A4A;font-weight:700;">✓</span>
-              Bản giao diện hoàn chỉnh — 12 màn hình, đã được Ban VTDĐ phê duyệt
-            </li>
-            <li style="font-size:14px;color:#333;padding:3px 0 3px 16px;position:relative;">
-              <span style="position:absolute;left:0;color:#1B7A4A;font-weight:700;">✓</span>
-              Tài liệu đặc tả yêu cầu hoàn chỉnh — đội phát triển và kiểm thử làm việc trực tiếp
-            </li>
-            <li style="font-size:14px;color:#333;padding:3px 0 3px 16px;position:relative;">
-              <span style="position:absolute;left:0;color:#1B7A4A;font-weight:700;">✓</span>
-              Bộ tài liệu phân tích tích hợp dữ liệu — nền tảng cho đội kỹ thuật thiết kế kết nối hệ thống
-            </li>
-            <li style="font-size:14px;color:#333;padding:3px 0 3px 16px;position:relative;">
-              <span style="position:absolute;left:0;color:#1B7A4A;font-weight:700;">✓</span>
-              Tờ trình chủ chương trình phương án và kế hoạch triển khai hệ thống đã được hoàn thiện và trình duyệt
-            </li>
-            <li style="font-size:14px;color:#333;padding:3px 0 3px 16px;position:relative;">
-              <span style="position:absolute;left:0;color:#1B7A4A;font-weight:700;">✓</span>
-              02 Quy trình vận hành (Xử lý lỗi; Tiếp nhận và Phát triển tính năng mới) đã hoàn thiện
-            </li>
-          </ul>
+        <div class="col-title">Hỗ trợ đội phát triển trong quá trình xây dựng</div>
+        <ul class="main-list" style="font-size:14px;">
+          <li>Giải đáp câu hỏi nghiệp vụ phát sinh trong quá trình đội phát triển triển khai</li>
+          <li>Xác nhận các tình huống chưa rõ — bổ sung đặc tả khi cần thiết</li>
+          <li>Đối chiếu sản phẩm đang xây dựng với yêu cầu đã chốt; làm rõ kịp thời các điểm chưa khớp</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <span class="slide-num">5 / 15</span>
+</div>
+
+<!-- ============================================================
+     SLIDE 6 — KẾT QUẢ CVM: TỜ TRÌNH & 02 QUY TRÌNH VẬN HÀNH
+     ============================================================ -->
+<div class="slide">
+  <div class="header">
+    <h1>II. Kết quả — CVM: Tờ trình & Quy trình vận hành</h1>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
+  </div>
+  <div class="content">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:8px;">
+      <div>
+        <div class="col-title">Tờ trình chủ chương trình phương án và kế hoạch triển khai hệ thống CVM</div>
+        <ul class="main-list" style="font-size:15px; margin-bottom:16px;">
+          <li>Tham gia soạn thảo và rà soát nội dung Tờ trình phương án triển khai hệ thống CVM trình cấp có thẩm quyền phê duyệt</li>
+          <li>Đảm bảo nội dung phản ánh đúng phạm vi, mục tiêu nghiệp vụ và lộ trình triển khai đã thống nhất giữa các bên</li>
+        </ul>
+        <div style="padding:10px 14px; background:#e8f5ee; border-left:4px solid #1B7A4A; border-radius:4px; font-size:14px; color:#1B7A4A; font-weight:700;">
+          ✓ Tờ trình đã được hoàn thiện và trình duyệt
+        </div>
+      </div>
+      <div>
+        <div class="col-title">02 Quy trình vận hành — chuẩn bị nền tảng khi hệ thống đi vào hoạt động chính thức</div>
+
+        <div style="background:#f0f4fa; border-radius:8px; padding:14px 18px; margin-bottom:14px;">
+          <div style="font-size:14px; font-weight:800; color:#1B2A4A; margin-bottom:6px;">📋 Quy trình Phối hợp và Xử lý lỗi</div>
+          <div style="font-size:14px; color:#444; line-height:1.5;">Quy định cách thức phối hợp giữa các bên liên quan và xử lý sự cố trong quá trình vận hành hệ thống CVM</div>
+        </div>
+
+        <div style="background:#f0f4fa; border-radius:8px; padding:14px 18px; margin-bottom:14px;">
+          <div style="font-size:14px; font-weight:800; color:#1B2A4A; margin-bottom:6px;">📋 Quy trình Tiếp nhận và Phát triển tính năng mới</div>
+          <div style="font-size:14px; color:#444; line-height:1.5;">Quy định luồng tiếp nhận yêu cầu, đánh giá và triển khai tính năng bổ sung sau khi hệ thống đi vào vận hành</div>
+        </div>
+
+        <div style="padding:10px 14px; background:#e8f5ee; border-left:4px solid #1B7A4A; border-radius:4px; font-size:14px; color:#1B7A4A; font-weight:700;">
+          ✓ 02 Quy trình đã được hoàn thiện, sẵn sàng áp dụng
         </div>
       </div>
     </div>
   </div>
-  <span class="slide-num">5 / 11</span>
+  <span class="slide-num">6 / 15</span>
 </div>
 
-<!-- ======================================================
-     SLIDE 5 — KẾT QUẢ: CDP
-     ====================================================== -->
+<!-- ============================================================
+     SLIDE 7 — KẾT QUẢ CVM: TRẠNG THÁI HIỆN TẠI (UAT)
+     ============================================================ -->
 <div class="slide">
   <div class="header">
-    <h1>II. Kết quả — Dự án CDP cho VNPost</h1>
-    <div class="logo-area">
-      <div style="text-align:center;">
-        <div style="font-size:22px;color:#F5A623;">✈</div>
-        <div class="logo-text">VIETNAM POST</div>
+    <h1>II. Kết quả — CVM: Trạng thái hiện tại</h1>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
+  </div>
+  <div class="content">
+    <div class="banner-uat" style="margin-bottom:16px;">
+      🔵 Sản phẩm đang trong giai đoạn kiểm thử nghiệm thu (UAT) — Đội phát triển đã dựng xong môi trường; BA đang phối hợp kiểm tra nghiệp vụ
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:28px;">
+      <div>
+        <div class="col-title">Tiến trình dự án CVM</div>
+        <div class="step-flow" style="margin-top:8px;">
+          <div class="step-row">
+            <div class="step-done">✓</div>
+            <div class="step-text" style="color:#1B7A4A;"><strong>Làm rõ yêu cầu nghiệp vụ</strong> với Ban VTDĐ — hoàn thành</div>
+          </div>
+          <div class="step-row">
+            <div class="step-done">✓</div>
+            <div class="step-text" style="color:#1B7A4A;"><strong>Thiết kế giao diện 12 màn hình</strong> — được Ban VTDĐ phê duyệt</div>
+          </div>
+          <div class="step-row">
+            <div class="step-done">✓</div>
+            <div class="step-text" style="color:#1B7A4A;"><strong>Lập tài liệu đặc tả yêu cầu</strong> — bàn giao cho đội phát triển</div>
+          </div>
+          <div class="step-row">
+            <div class="step-done">✓</div>
+            <div class="step-text" style="color:#1B7A4A;"><strong>Hỗ trợ đội phát triển</strong> trong quá trình xây dựng sản phẩm</div>
+          </div>
+          <div class="step-row">
+            <div style="min-width:28px;height:28px;background:#3b5bdb;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex-shrink:0;">▶</div>
+            <div class="step-text" style="color:#1e3a8a;font-weight:600;"><strong>Kiểm thử nghiệm thu (UAT)</strong> — đang thực hiện</div>
+          </div>
+          <div class="step-row">
+            <div style="min-width:28px;height:28px;background:#ddd;color:#999;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex-shrink:0;">○</div>
+            <div class="step-text" style="color:#999;"><strong>Nghiệm thu và đưa vào vận hành</strong> — chờ hoàn thành UAT</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Nội dung BA đang phối hợp trong UAT</div>
+        <ul class="main-list" style="font-size:15px; margin-top:8px;">
+          <li>Kiểm tra các luồng nghiệp vụ chính trên môi trường UAT để đảm bảo sản phẩm đúng với yêu cầu đã chốt</li>
+          <li>Xác nhận các tình huống sử dụng thực tế — bao gồm cả trường hợp đặc biệt và tình huống lỗi</li>
+          <li>Ghi nhận và làm rõ các điểm chưa khớp giữa sản phẩm và đặc tả, phối hợp xử lý kịp thời</li>
+          <li>Đảm bảo 6 kênh giao tiếp (SMS, Zalo OA, Thông báo đẩy, Biểu ngữ, USSD, Email) hoạt động đúng nghiệp vụ</li>
+        </ul>
       </div>
     </div>
   </div>
+  <span class="slide-num">7 / 15</span>
+</div>
+
+<!-- ============================================================
+     SLIDE 8 — KẾT QUẢ CDP: NỘI DUNG NGHIÊN CỨU
+     ============================================================ -->
+<div class="slide">
+  <div class="header">
+    <h1>II. Kết quả — CDP: Nội dung nghiên cứu</h1>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
+  </div>
   <div class="content">
-    <div style="margin-bottom:8px; background:#fff5e8; border-left:4px solid #C0830A; padding:7px 14px; border-radius:4px; font-size:14px; color:#7a4a00;">
-      Giai đoạn hoàn thành: <strong>Nghiên cứu domain</strong> — bản tổng hợp đã gửi nội bộ để team review trước khi trình VNPost; bước tiếp theo là tổ chức buổi làm việc chính thức để chốt các vấn đề nghiệp vụ cốt lõi
-    </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+    <div class="banner-wip">Giai đoạn hoàn thành: Nghiên cứu domain — bản tổng hợp đã gửi nội bộ để team review trước khi trình VNPost</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
       <div>
         <div class="col-title">Nội dung đã nghiên cứu</div>
         <ul class="main-list" style="font-size:14.5px;">
           <li><strong>Nghiệp vụ bưu chính VNPost</strong> — 8 giai đoạn trong chuỗi chuyển phát, ~13.000 điểm phục vụ trên 63 tỉnh thành</li>
           <li><strong>Hệ sinh thái công nghệ</strong> — 8+ hệ thống IT đang vận hành; dữ liệu khách hàng phân tán, không có hồ sơ thống nhất giữa các đơn vị</li>
-          <li><strong>Bài toán nhận diện khách hàng</strong> — cùng một giao dịch có hai chủ thể (người gửi + người nhận), cả hai đều là "khách hàng" theo nghĩa khác nhau</li>
-          <li><strong>Phương án triển khai</strong> — đánh giá 3 lựa chọn: tự xây dựng / mua giải pháp có sẵn / hợp tác đối tác công nghệ; kèm khuyến nghị và lộ trình</li>
-          <li><strong>Khung pháp lý mới</strong> — Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15 và Nghị định 356/2025 có hiệu lực từ 01/01/2026; mức phạt vi phạm tối đa 5% doanh thu</li>
+          <li><strong>Bài toán nhận diện khách hàng</strong> — một giao dịch có hai chủ thể (người gửi + người nhận); cùng một người xuất hiện ở nhiều vai trò khác nhau</li>
+          <li><strong>Phương án triển khai</strong> — đánh giá 3 lựa chọn: tự xây dựng (Build) / mua giải pháp có sẵn (Buy) / hợp tác đối tác công nghệ (Partner); kèm khuyến nghị và lộ trình</li>
+          <li><strong>Khung pháp lý mới</strong> — Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15 và Nghị định 356/2025 có hiệu lực từ 01/01/2026; mức phạt tối đa 5% doanh thu</li>
         </ul>
       </div>
       <div>
-        <div class="col-title">Kết quả</div>
-        <ul class="main-list" style="font-size:14.5px;">
-          <li><strong>Tài liệu nghiên cứu domain hoàn chỉnh</strong> — tổng hợp toàn bộ bức tranh nghiệp vụ, công nghệ và pháp lý; sẵn sàng làm nền tảng cho giai đoạn phân tích chính thức</li>
-          <li>Xác định 5 nhóm người dùng liên quan và vai trò của từng nhóm trong hệ thống CDP</li>
-          <li>Đề xuất phương án triển khai phù hợp với quy mô và đặc thù của VNPost, kèm phân tích rủi ro</li>
-        </ul>
-
-        <div style="margin-top:14px; padding:12px 14px; background:#f9f9f9; border-left:3px solid #C0830A; font-size:13.5px; color:#555; line-height:1.6;">
-          <strong style="color:#7a4a00;">Đang chờ xác nhận từ VNPost:</strong><br>
-          Có Master ID khách hàng thống nhất chưa · Cách xử lý xung đột dữ liệu giữa các đơn vị · Quyết định phương án đầu tư · Hệ thống nào có kết nối trực tiếp, hệ thống nào chỉ xuất file · Chính sách thu thập và sử dụng dữ liệu theo luật mới
+        <div class="col-title">Phạm vi và đặc điểm nghiên cứu</div>
+        <table class="spec" style="font-size:13.5px;">
+          <tr><th>Góc độ</th><th>Nội dung</th></tr>
+          <tr><td>Nghiệp vụ</td><td>Toàn bộ chuỗi bưu chính chuyển phát, đặc điểm vận hành quy mô lớn</td></tr>
+          <tr><td>Dữ liệu</td><td>Hiện trạng dữ liệu khách hàng phân tán, bài toán hợp nhất định danh</td></tr>
+          <tr><td>Công nghệ</td><td>8+ hệ thống nội bộ, phương thức kết nối dữ liệu từ các nguồn khác nhau</td></tr>
+          <tr><td>Pháp lý</td><td>Luật bảo vệ dữ liệu cá nhân mới 2026 và tác động đến thiết kế CDP</td></tr>
+          <tr><td>Phương án</td><td>Build vs Buy vs Partner — phân tích ưu/nhược điểm và khuyến nghị</td></tr>
+        </table>
+        <div class="info-box" style="margin-top:10px; font-size:13px;">
+          Nghiên cứu được thực hiện từ tài liệu nghiệp vụ và tài liệu công nghệ được cung cấp, kết hợp phân tích đặc thù vận hành và quy mô của VNPost tại thị trường Việt Nam.
         </div>
       </div>
     </div>
   </div>
-  <span class="slide-num">6 / 11</span>
+  <span class="slide-num">8 / 15</span>
 </div>
 
-<!-- ======================================================
-     SLIDE 6 — KHÓ KHĂN
-     ====================================================== -->
+<!-- ============================================================
+     SLIDE 9 — KẾT QUẢ CDP: KẾT QUẢ & BƯỚC TIẾP THEO
+     ============================================================ -->
+<div class="slide">
+  <div class="header">
+    <h1>II. Kết quả — CDP: Kết quả & Bước tiếp theo</h1>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
+  </div>
+  <div class="content">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:4px;">
+      <div>
+        <div class="col-title">Kết quả giai đoạn nghiên cứu</div>
+        <ul class="main-list" style="font-size:15px;">
+          <li><strong>Tài liệu nghiên cứu domain (Domain Brief) hoàn chỉnh</strong> — tổng hợp đầy đủ bức tranh nghiệp vụ, công nghệ và pháp lý; sẵn sàng làm nền tảng cho giai đoạn phân tích chính thức</li>
+          <li>Xác định được <strong>5 nhóm người dùng</strong> liên quan và vai trò của từng nhóm trong hệ thống CDP</li>
+          <li>Đề xuất phương án triển khai phù hợp với quy mô và đặc thù VNPost, kèm phân tích rủi ro và lộ trình khuyến nghị</li>
+        </ul>
+
+        <div style="margin-top:14px; padding:12px 14px; background:#fff5e8; border-left:4px solid #C0830A; border-radius:4px;">
+          <div style="font-size:13px; font-weight:700; color:#7a4a00; margin-bottom:6px;">Các vấn đề cốt lõi cần chốt với VNPost</div>
+          <ul style="list-style:none;padding:0;margin:0;font-size:13px;color:#555;line-height:1.7;">
+            <li>▸ Có Master ID khách hàng thống nhất chưa</li>
+            <li>▸ Cách xử lý xung đột dữ liệu giữa các đơn vị</li>
+            <li>▸ Quyết định phương án đầu tư (Build / Buy / Partner)</li>
+            <li>▸ Hệ thống nào kết nối trực tiếp, hệ thống nào chỉ xuất file</li>
+            <li>▸ Chính sách thu thập và sử dụng dữ liệu theo luật mới</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Bước tiếp theo</div>
+        <div class="step-flow" style="margin-top:8px;">
+          <div class="step-row">
+            <div style="min-width:28px;height:28px;background:#3b5bdb;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex-shrink:0;">▶</div>
+            <div class="step-text" style="color:#1e3a8a;font-weight:600;"><strong>Tổ chức buổi làm việc chính thức với VNPost</strong> — chốt các vấn đề nghiệp vụ cốt lõi</div>
+          </div>
+          <div class="step-row">
+            <div style="min-width:28px;height:28px;background:#ddd;color:#999;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex-shrink:0;">○</div>
+            <div class="step-text" style="color:#999;"><strong>Phân tích chi tiết nghiệp vụ</strong> — sau khi VNPost xác nhận các vấn đề cốt lõi</div>
+          </div>
+          <div class="step-row">
+            <div style="min-width:28px;height:28px;background:#ddd;color:#999;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex-shrink:0;">○</div>
+            <div class="step-text" style="color:#999;"><strong>Thiết kế giải pháp và lập tài liệu đặc tả</strong> — Phase phân tích chính thức</div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px; padding:12px 14px; background:#eef2ff; border-left:4px solid #3b5bdb; border-radius:4px; font-size:14px; color:#1e3a8a; line-height:1.55;">
+          <strong>Kính đề nghị Trung tâm hỗ trợ:</strong><br>
+          Kết nối và sắp xếp buổi làm việc chính thức với đầu mối tại VNPost để dự án CDP có thể bước vào giai đoạn phân tích chi tiết — tránh để dự án trì hoãn kéo dài ở giai đoạn nghiên cứu.
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-num">9 / 15</span>
+</div>
+
+<!-- ============================================================
+     SLIDE 10 — KHÓ KHĂN
+     ============================================================ -->
 <div class="slide">
   <div class="header">
     <h1>III. Những khó khăn gặp phải</h1>
-    <div class="logo-area">
-      <div style="text-align:center;">
-        <div style="font-size:22px;color:#F5A623;">✈</div>
-        <div class="logo-text">VIETNAM POST</div>
-      </div>
-    </div>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
   </div>
   <div class="content">
     <table class="diff-table">
       <tr>
-        <td>Yêu cầu nghiệp vụ được điều chỉnh trong quá trình làm việc<br><span style="font-weight:400;font-size:13.5px;color:#888;">Một số quy tắc vận hành quan trọng thay đổi sau khi đã có tài liệu và giao diện ban đầu</span></td>
-        <td>Cập nhật tài liệu và giao diện đúng phần bị ảnh hưởng, không làm lại từ đầu; ghi chép lịch sử thay đổi để đảm bảo truy vết và không bỏ sót</td>
+        <td>Yêu cầu nghiệp vụ được điều chỉnh trong quá trình làm việc<br><span style="font-weight:400;font-size:13px;color:#888;">Một số quy tắc vận hành quan trọng thay đổi sau khi đã có tài liệu và giao diện ban đầu</span></td>
+        <td>Cập nhật tài liệu và giao diện đúng phần bị ảnh hưởng, không làm lại từ đầu; duy trì ghi chép lịch sử thay đổi để đảm bảo truy vết</td>
       </tr>
       <tr>
-        <td>Chờ phản hồi từ phía đối tác/khách hàng<br><span style="font-weight:400;font-size:13.5px;color:#888;">Dự án CDP phụ thuộc vào thông tin từ VNPost — một số câu hỏi cốt lõi chưa nhận được phản hồi</span></td>
+        <td>Chờ phản hồi từ phía đối tác/khách hàng<br><span style="font-weight:400;font-size:13px;color:#888;">Dự án CDP phụ thuộc vào thông tin từ VNPost — một số câu hỏi nghiệp vụ cốt lõi chưa nhận được phản hồi</span></td>
         <td>Ghi rõ các điểm còn chờ xác nhận, tiếp tục phần việc có thể làm độc lập; chuẩn bị sẵn để khởi động ngay khi nhận được phản hồi</td>
       </tr>
       <tr>
-        <td>Tiếp cận lĩnh vực bưu chính từ đầu<br><span style="font-weight:400;font-size:13.5px;color:#888;">VNPost là tổ chức lớn, nghiệp vụ phức tạp, nhiều hệ thống vận hành song song — chưa có kinh nghiệm trước</span></td>
-        <td>Tự nghiên cứu có hệ thống: từ tổng quan ngành đến đặc thù Việt Nam; xác minh lại các nhận định quan trọng trước khi đưa vào tài liệu</td>
+        <td>Tiếp cận domain hoàn toàn mới<br><span style="font-weight:400;font-size:13px;color:#888;">VNPost là tổ chức lớn, nghiệp vụ phức tạp, nhiều hệ thống vận hành song song — chưa có kinh nghiệm trước</span></td>
+        <td>Phối hợp nghiên cứu có hệ thống từ tài liệu nghiệp vụ và tài liệu công nghệ được cung cấp, kết hợp phân tích đặc thù vận hành và quy mô của VNPost tại thị trường Việt Nam</td>
       </tr>
       <tr>
-        <td>Đảm bảo tài liệu khớp với sản phẩm thực tế đang xây dựng<br><span style="font-weight:400;font-size:13.5px;color:#888;">Trong quá trình phát triển, một số điểm được đội kỹ thuật triển khai khác so với đặc tả ban đầu</span></td>
-        <td>Đối chiếu trực tiếp với sản phẩm đang xây dựng; cập nhật tài liệu kịp thời để tài liệu luôn là nguồn tham chiếu chính xác cho toàn đội</td>
+        <td>Đảm bảo tài liệu đặc tả và sản phẩm thực tế luôn đồng bộ<br><span style="font-weight:400;font-size:13px;color:#888;">Thách thức phổ biến khi đội phát triển triển khai nhanh — một số điểm được triển khai khác so với đặc tả ban đầu</span></td>
+        <td>Thiết lập điểm kiểm tra định kỳ giữa BA và đội phát triển để phát hiện sớm và xử lý kịp thời; đảm bảo tài liệu luôn là nguồn tham chiếu chính xác</td>
       </tr>
     </table>
   </div>
-  <span class="slide-num">7 / 11</span>
+  <span class="slide-num">10 / 15</span>
 </div>
 
-<!-- ======================================================
-     SLIDE 7 — ĐỀ XUẤT
-     ====================================================== -->
+<!-- ============================================================
+     SLIDE 11 — ĐỀ XUẤT
+     ============================================================ -->
 <div class="slide">
   <div class="header">
     <h1>IV. Đề xuất về công việc</h1>
-    <div class="logo-area">
-      <div style="text-align:center;">
-        <div style="font-size:22px;color:#F5A623;">✈</div>
-        <div class="logo-text">VIETNAM POST</div>
-      </div>
-    </div>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
   </div>
   <div class="content">
     <ul class="proposal-list">
@@ -799,123 +704,141 @@
         <div class="proposal-num">1</div>
         <div>
           <strong>Xây dựng quy trình phê duyệt tài liệu nghiệp vụ chính thức</strong><br>
-          <span style="font-size:15px;color:#555;">Tài liệu đặc tả yêu cầu nên có chữ ký xác nhận từ đại diện bên nghiệp vụ và đội phát triển trước khi triển khai — đảm bảo tất cả các bên cùng hiểu và đồng thuận, tránh tranh cãi về yêu cầu về sau.</span>
+          <span style="font-size:14.5px;color:#555;">Tài liệu đặc tả yêu cầu nên có chữ ký xác nhận từ đại diện bên nghiệp vụ (Ban VTDĐ) và đội phát triển trước khi triển khai — đảm bảo tất cả các bên cùng hiểu và đồng thuận, tránh tranh cãi về yêu cầu về sau.</span>
         </div>
       </li>
       <li>
         <div class="proposal-num">2</div>
         <div>
           <strong>Tổ chức buổi làm việc chính thức với VNPost để khởi động dự án CDP</strong><br>
-          <span style="font-size:15px;color:#555;">Sớm chốt các vấn đề nghiệp vụ cốt lõi để dự án CDP có thể bước vào giai đoạn phân tích và thiết kế — tránh để dự án trì hoãn kéo dài ở giai đoạn nghiên cứu.</span>
+          <span style="font-size:14.5px;color:#555;">Sớm chốt các vấn đề nghiệp vụ cốt lõi để dự án CDP có thể bước vào giai đoạn phân tích và thiết kế — tránh để dự án trì hoãn kéo dài ở giai đoạn nghiên cứu.</span>
         </div>
       </li>
       <li>
         <div class="proposal-num">3</div>
         <div>
-          <strong>Thiết lập quy trình phối hợp rõ ràng giữa BA và đội phát triển</strong><br>
-          <span style="font-size:15px;color:#555;">Khi đội phát triển gặp điểm chưa rõ hoặc cần điều chỉnh so với đặc tả, cần có kênh trao đổi và quy trình xác nhận thống nhất — thay vì tự quyết định trong quá trình triển khai.</span>
+          <strong>Thiết lập cơ chế phối hợp rõ ràng giữa BA và đội phát triển</strong><br>
+          <span style="font-size:14.5px;color:#555;">Khi đội phát triển gặp điểm chưa rõ hoặc cần điều chỉnh so với đặc tả, cần có kênh trao đổi và quy trình xác nhận thống nhất — thay vì tự quyết định trong quá trình triển khai.</span>
         </div>
       </li>
       <li>
         <div class="proposal-num">4</div>
         <div>
           <strong>Bổ sung kịch bản kiểm thử cơ bản song song với tài liệu đặc tả</strong><br>
-          <span style="font-size:15px;color:#555;">Giúp đội kiểm thử bắt đầu chuẩn bị sớm hơn, giảm thời gian đọc hiểu tài liệu, rút ngắn tổng thời gian từ phân tích đến nghiệm thu.</span>
+          <span style="font-size:14.5px;color:#555;">Giúp đội kiểm thử bắt đầu chuẩn bị sớm hơn, giảm thời gian đọc hiểu tài liệu, rút ngắn tổng thời gian từ phân tích đến nghiệm thu.</span>
         </div>
       </li>
     </ul>
   </div>
-  <span class="slide-num">8 / 11</span>
+  <span class="slide-num">11 / 15</span>
 </div>
 
-<!-- ======================================================
-     SLIDE 7 — ĐÁNH GIÁ BẢN THÂN
-     ====================================================== -->
+<!-- ============================================================
+     SLIDE 12 — CHẤP HÀNH KỶ LUẬT
+     ============================================================ -->
 <div class="slide">
   <div class="header">
-    <h1>V. Đánh giá về bản thân</h1>
-    <div class="logo-area">
-      <div style="text-align:center;">
-        <div style="font-size:22px;color:#F5A623;">✈</div>
-        <div class="logo-text">VIETNAM POST</div>
+    <h1>V. Đánh giá bản thân — Chấp hành kỷ luật</h1>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
+  </div>
+  <div class="content">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:12px;">
+      <div>
+        <div class="col-title">Nội quy và tác phong làm việc</div>
+        <ul class="check-list pro-list" style="margin-top:8px;">
+          <li>Chấp hành đầy đủ nội quy, quy định của Trung tâm trong suốt thời gian thử việc</li>
+          <li>Đúng giờ, không cần nhắc nhở về tiến độ — chủ động theo dõi và bám sát kế hoạch công việc</li>
+          <li>Phối hợp tốt với các thành viên trong nhóm và với đội phát triển trong quá trình làm việc</li>
+          <li>Chủ động báo cáo tiến độ và các điểm vướng mắc kịp thời</li>
+        </ul>
+      </div>
+      <div>
+        <div class="col-title">Phong cách làm việc</div>
+        <ul class="check-list pro-list" style="margin-top:8px;">
+          <li>Làm việc độc lập tốt — không cần hướng dẫn chi tiết mới bắt đầu được</li>
+          <li>Tự đặt mục tiêu rõ ràng cho từng giai đoạn và theo dõi tiến độ thực hiện</li>
+          <li>Linh hoạt trong điều chỉnh khi yêu cầu thay đổi — không bị rối khi scope thay đổi giữa chừng</li>
+          <li>Ứng dụng công nghệ để nâng cao hiệu quả và năng suất công việc</li>
+        </ul>
       </div>
     </div>
+  </div>
+  <span class="slide-num">12 / 15</span>
+</div>
+
+<!-- ============================================================
+     SLIDE 13 — TỰ ĐÁNH GIÁ ƯU KHUYẾT ĐIỂM
+     ============================================================ -->
+<div class="slide">
+  <div class="header">
+    <h1>V. Đánh giá bản thân — Ưu & Khuyết điểm</h1>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
   </div>
   <div class="content">
     <div class="procon">
       <div class="procon-box pro">
         <div class="box-title">Ưu điểm</div>
         <ul class="check-list pro-list">
-          <li>Tư duy phân tích hệ thống tốt — xử lý bài toán phức tạp, nhiều luồng song song</li>
-          <li>Chủ động nghiên cứu domain mới độc lập, không cần hỗ trợ nhiều từ bên ngoài</li>
+          <li>Tư duy phân tích hệ thống tốt — xử lý được bài toán phức tạp, nhiều luồng và nhiều bên liên quan</li>
+          <li>Chủ động tìm hiểu domain mới, không phụ thuộc vào hướng dẫn bên ngoài</li>
           <li>Viết tài liệu rõ ràng, có cấu trúc — Dev/Tester làm việc trực tiếp được ngay</li>
-          <li>Ứng dụng công cụ AI/automation để tăng năng suất đáng kể</li>
-          <li>Linh hoạt xử lý thay đổi yêu cầu — không bị rối khi scope thay đổi giữa chừng</li>
+          <li>Linh hoạt xử lý thay đổi yêu cầu — cập nhật nhanh, có kiểm soát, không làm lại từ đầu</li>
+          <li>Biết ứng dụng công nghệ để nâng cao hiệu quả và năng suất công việc</li>
         </ul>
       </div>
       <div class="procon-box con">
         <div class="box-title">Điểm cần cải thiện</div>
         <ul class="check-list con-list">
-          <li>Kỹ năng elicitation requirement trực tiếp với client trong các buổi meeting thực tế</li>
-          <li>Cân bằng giữa độ sâu phân tích và tiến độ thực tế — tránh phân tích quá chi tiết khi chưa cần</li>
-          <li>Kỹ năng trình bày, thuyết trình kết quả với nhiều bên liên quan</li>
+          <li>Kinh nghiệm trực tiếp khai thác yêu cầu từ khách hàng/đối tác trong các buổi họp còn hạn chế — cần cải thiện kỹ năng đặt câu hỏi và dẫn dắt thảo luận</li>
+          <li>Đôi khi phân tích quá chi tiết ở giai đoạn đầu thay vì ưu tiên chốt các quyết định lớn trước — cần cân bằng hơn giữa độ sâu phân tích và tiến độ</li>
+          <li>Cần cải thiện kỹ năng trình bày kết quả trước nhiều bên liên quan, đặc biệt trong các buổi họp đông người</li>
         </ul>
       </div>
     </div>
   </div>
-  <span class="slide-num">9 / 11</span>
+  <span class="slide-num">13 / 15</span>
 </div>
 
-<!-- ======================================================
-     SLIDE 8 — NGUYỆN VỌNG
-     ====================================================== -->
+<!-- ============================================================
+     SLIDE 14 — NGUYỆN VỌNG
+     ============================================================ -->
 <div class="slide">
   <div class="header">
-    <h1>VI. Mong muốn nguyện vọng bản thân</h1>
-    <div class="logo-area">
-      <div style="text-align:center;">
-        <div style="font-size:22px;color:#F5A623;">✈</div>
-        <div class="logo-text">VIETNAM POST</div>
-      </div>
-    </div>
+    <h1>VI. Mong muốn & Nguyện vọng</h1>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
   </div>
   <div class="content">
-    <div style="margin-top: 16px;">
+    <div style="margin-top: 12px;">
       <ul class="main-list">
-        <li style="font-size:18px; margin-bottom:8px;">
-          Sau thời gian thử việc, bản thân đã được tiếp cận bài toán thực tế đa dạng và <strong>đóng góp trực tiếp vào sản phẩm</strong> — từ phân tích yêu cầu đến tài liệu dev/test-ready
+        <li style="font-size:17px; margin-bottom:10px;">
+          Sau thời gian thử việc, bản thân đã có cơ hội <strong>đóng góp thực chất vào các dự án của Trung tâm</strong> — từ làm rõ yêu cầu, thiết kế giao diện, lập tài liệu đến hỗ trợ đội phát triển trong suốt quá trình xây dựng sản phẩm
         </li>
-        <li style="font-size:18px; margin-bottom:8px;">
-          <strong>Mong muốn được tiếp tục gắn bó</strong> và phát triển cùng Trung tâm ĐMST trong các dự án tiếp theo
+        <li style="font-size:17px; margin-bottom:10px;">
+          <strong>Mong muốn được tiếp tục gắn bó và phát triển lâu dài</strong> tại Trung tâm ĐMST trong các dự án tiếp theo
         </li>
-        <li style="font-size:18px; margin-bottom:8px;">
-          Cam kết <strong>nâng cao kỹ năng</strong> — đặc biệt là elicitation requirement và trình bày trực tiếp với stakeholder
+        <li style="font-size:17px; margin-bottom:10px;">
+          Sẵn sàng <strong>tham gia sâu hơn vào các dự án chuyển đổi số quy mô lớn</strong> — đặc biệt là giai đoạn phân tích và thiết kế chính thức của dự án CDP, nơi đã có nền tảng nghiên cứu ban đầu
         </li>
-        <li style="font-size:18px;">
-          Sẵn sàng <strong>nhận thêm trách nhiệm</strong> và hỗ trợ đội ngũ nâng cao chất lượng tài liệu BA toàn Trung tâm
+        <li style="font-size:17px;">
+          Cam kết <strong>tiếp tục nâng cao năng lực chuyên môn</strong> — đặc biệt là kỹ năng khai thác yêu cầu trực tiếp và trình bày với nhiều bên liên quan
         </li>
       </ul>
 
-      <div style="margin-top: 28px; padding: 14px 20px; background: #f0f4fa; border-left: 4px solid #1B2A4A; border-radius: 4px; font-size:16px; color:#333; font-style:italic;">
+      <div style="margin-top: 24px; padding: 14px 20px; background: #f0f4fa; border-left: 4px solid #1B2A4A; border-radius: 4px; font-size:15.5px; color:#333; font-style:italic;">
         "Kính mong lãnh đạo Trung tâm ĐMST xem xét, đánh giá kết quả thử việc và tạo điều kiện để tôi tiếp tục được cống hiến."
       </div>
     </div>
   </div>
-  <span class="slide-num">10 / 11</span>
+  <span class="slide-num">14 / 15</span>
 </div>
 
-<!-- ======================================================
-     SLIDE 11 — CLOSING
-     ====================================================== -->
+<!-- ============================================================
+     SLIDE 15 — CẢM ƠN
+     ============================================================ -->
 <div class="slide">
   <div class="header">
     <h1></h1>
-    <div class="logo-area">
-      <div style="text-align:center;">
-        <div style="font-size:22px;color:#F5A623;">✈</div>
-        <div class="logo-text">VIETNAM POST</div>
-      </div>
-    </div>
+    <div class="logo-area"><div style="text-align:center;"><div style="font-size:22px;color:#F5A623;">✈</div><div class="logo-text">VIETNAM POST</div></div></div>
   </div>
   <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;">
     <div style="font-size:52px;font-weight:900;color:#1B2A4A;letter-spacing:-1px;">Xin trân trọng cảm ơn!</div>
@@ -925,7 +848,7 @@
       <span style="font-size:17px;color:#888;">Người báo cáo: *(ký và ghi rõ họ tên)*</span>
     </div>
   </div>
-  <span class="slide-num">11 / 11</span>
+  <span class="slide-num">15 / 15</span>
 </div>
 
 </body>
