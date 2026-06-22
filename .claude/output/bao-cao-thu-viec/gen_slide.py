@@ -1,0 +1,500 @@
+from pptx import Presentation
+from pptx.util import Inches, Pt, Emu
+from pptx.dml.color import RGBColor
+from pptx.enum.text import PP_ALIGN
+from pptx.util import Inches, Pt
+import copy
+
+# ── Màu sắc template VNPost ──────────────────────────────────────────────────
+NAVY   = RGBColor(0x1B, 0x2A, 0x4A)
+YELLOW = RGBColor(0xF5, 0xA6, 0x23)
+WHITE  = RGBColor(0xFF, 0xFF, 0xFF)
+BLACK  = RGBColor(0x00, 0x00, 0x00)
+GRAY   = RGBColor(0x44, 0x44, 0x44)
+
+W = Inches(13.33)   # widescreen 16:9
+H = Inches(7.5)
+
+prs = Presentation()
+prs.slide_width  = W
+prs.slide_height = H
+
+blank_layout = prs.slide_layouts[6]   # hoàn toàn trắng
+
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+def add_rect(slide, x, y, w, h, fill_color, line_color=None):
+    shape = slide.shapes.add_shape(1, x, y, w, h)   # MSO_SHAPE_TYPE.RECTANGLE = 1
+    shape.fill.solid()
+    shape.fill.fore_color.rgb = fill_color
+    if line_color:
+        shape.line.color.rgb = line_color
+        shape.line.width = Pt(1)
+    else:
+        shape.line.fill.background()
+    return shape
+
+
+def add_textbox(slide, x, y, w, h, text, font_size=18, bold=False,
+                color=BLACK, align=PP_ALIGN.LEFT, wrap=True, italic=False):
+    txBox = slide.shapes.add_textbox(x, y, w, h)
+    tf = txBox.text_frame
+    tf.word_wrap = wrap
+    p = tf.paragraphs[0]
+    p.alignment = align
+    run = p.add_run()
+    run.text = text
+    run.font.name = "Arial"
+    run.font.size = Pt(font_size)
+    run.font.bold = bold
+    run.font.italic = italic
+    run.font.color.rgb = color
+    return txBox
+
+
+def add_header(slide, title_text, sub_text=None):
+    """Banner vàng phía trên, chữ navy đậm."""
+    # Nền navy mỏng ở đáy banner
+    add_rect(slide, Inches(0), Inches(0), W, Inches(1.15), YELLOW)
+    add_rect(slide, Inches(0), Inches(1.05), W, Inches(0.12), NAVY)
+
+    # Tiêu đề
+    add_textbox(slide, Inches(0.3), Inches(0.1), Inches(10.5), Inches(0.95),
+                title_text, font_size=28, bold=True, color=NAVY, align=PP_ALIGN.LEFT)
+
+    # Logo text VNPost thay thế (góc phải)
+    add_textbox(slide, Inches(11.5), Inches(0.25), Inches(1.6), Inches(0.6),
+                "VIETNAM POST", font_size=9, bold=True, color=NAVY, align=PP_ALIGN.CENTER)
+
+
+def add_bullet_para(tf, text, level=0, font_size=17, bold=False, color=GRAY, italic=False):
+    """Thêm 1 đoạn bullet vào text frame."""
+    from pptx.util import Pt
+    p = tf.add_paragraph()
+    p.level = level
+    indent = Inches(0.25 * level)
+    p.space_before = Pt(3)
+    if level == 0:
+        p.text = ""   # reset
+        run = p.add_run()
+        run.text = text
+        run.font.name = "Arial"
+        run.font.size = Pt(font_size)
+        run.font.bold = bold
+        run.font.italic = italic
+        run.font.color.rgb = color
+    else:
+        run = p.add_run()
+        run.text = "• " + text
+        run.font.name = "Arial"
+        run.font.size = Pt(font_size)
+        run.font.bold = bold
+        run.font.italic = italic
+        run.font.color.rgb = color
+
+
+def content_frame(slide, top=Inches(1.3), height=Inches(5.9)):
+    """Trả về text frame của vùng nội dung chính."""
+    txBox = slide.shapes.add_textbox(Inches(0.4), top, Inches(12.5), height)
+    tf = txBox.text_frame
+    tf.word_wrap = True
+    return tf
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SLIDE 1 — BÌA
+# ─────────────────────────────────────────────────────────────────────────────
+s1 = prs.slides.add_slide(blank_layout)
+
+# Viền navy bao quanh
+add_rect(s1, Inches(0.15), Inches(0.15), W - Inches(0.3), H - Inches(0.3),
+         WHITE, NAVY)
+
+# Tiêu đề lớn
+add_textbox(s1, Inches(1.5), Inches(2.0), Inches(10.0), Inches(1.4),
+            "Báo cáo thử việc",
+            font_size=44, bold=True, color=NAVY, align=PP_ALIGN.CENTER)
+
+# Gạch vàng dưới tiêu đề
+add_rect(s1, Inches(3.5), Inches(3.5), Inches(6.0), Inches(0.07), YELLOW)
+
+# Thông tin
+for i, line in enumerate([
+    "Họ tên: *(điền sau)*",
+    "Chuyên viên Phân tích Nghiệp vụ (Business Analyst)",
+    "Phòng: …",
+    "Thời gian từ ../../202.. – ../../202..",
+]):
+    add_textbox(s1, Inches(3.0), Inches(3.8 + i * 0.55), Inches(7.5), Inches(0.5),
+                line, font_size=17, color=GRAY, align=PP_ALIGN.CENTER)
+
+# Logo text
+add_textbox(s1, Inches(10.8), Inches(6.6), Inches(2.1), Inches(0.5),
+            "VIETNAM POST", font_size=10, bold=True, color=NAVY, align=PP_ALIGN.RIGHT)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SLIDE 2 — I. NỘI DUNG CÔNG VIỆC ĐƯỢC GIAO
+# ─────────────────────────────────────────────────────────────────────────────
+s2 = prs.slides.add_slide(blank_layout)
+add_header(s2, "I. Nội dung công việc được giao")
+
+tf = content_frame(s2)
+items = [
+    "Tham gia làm việc với Ban Viễn thông Di động (VTDĐ) để làm rõ và chốt yêu cầu nghiệp vụ cho hệ thống Quản lý Giá trị Khách hàng (CVM).",
+    "Thiết kế và trình bày giao diện hệ thống CVM để Ban VTDĐ xem xét, góp ý và chốt phương án trước khi đưa vào phát triển.",
+    "Lập tài liệu đặc tả yêu cầu (URD/SRS) phục vụ đội phát triển triển khai hệ thống CVM đúng nghiệp vụ đã chốt.",
+    "Hỗ trợ đội phát triển trong quá trình xây dựng sản phẩm — giải đáp thắc mắc nghiệp vụ, xác nhận các tình huống chưa rõ.",
+    "Phối hợp hoàn thiện Tờ trình phương án và kế hoạch triển khai hệ thống CVM trình cấp có thẩm quyền phê duyệt.",
+    "Phối hợp hoàn thiện 02 Quy trình vận hành hệ thống CVM (Quy trình Phối hợp & Xử lý lỗi; Quy trình Tiếp nhận & Phát triển tính năng mới).",
+    "Nghiên cứu domain và xây dựng tài liệu đầu vào cho dự án Nền tảng Dữ liệu Khách hàng (CDP) của VNPost.",
+]
+first = True
+for i, item in enumerate(items, 1):
+    p = tf.paragraphs[0] if first else tf.add_paragraph()
+    first = False
+    p.space_before = Pt(6)
+    run = p.add_run()
+    run.text = f"{i}.  {item}"
+    run.font.name = "Arial"
+    run.font.size = Pt(17)
+    run.font.color.rgb = GRAY
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SLIDE 3 — II. KẾT QUẢ — CVM (1/2)
+# ─────────────────────────────────────────────────────────────────────────────
+s3 = prs.slides.add_slide(blank_layout)
+add_header(s3, "II. Kết quả thực hiện — Dự án CVM (1/2)")
+
+# Badge trạng thái
+add_rect(s3, Inches(0.4), Inches(1.22), Inches(12.5), Inches(0.38), RGBColor(0xE8, 0xF4, 0xFD))
+add_textbox(s3, Inches(0.5), Inches(1.22), Inches(12.0), Inches(0.38),
+            "Trạng thái: Hoàn thành giai đoạn phân tích & bàn giao — đội phát triển đã dựng xong môi trường UAT; BA đang phối hợp kiểm tra nghiệp vụ.",
+            font_size=14, italic=True, color=NAVY)
+
+tf = content_frame(s3, top=Inches(1.7), height=Inches(5.5))
+
+sections = [
+    ("a. Làm rõ và chốt yêu cầu nghiệp vụ với Ban VTDĐ", [
+        "Tham gia các buổi làm việc, hệ thống hóa toàn bộ luồng nghiệp vụ từ tiếp nhận sự kiện khách hàng (sinh nhật, hết data, nạp tiền...) đến tự động gửi thông báo đúng kênh, đúng nội dung, đúng thời điểm.",
+        "Làm rõ quy tắc kích hoạt campaign, kiểm soát tần suất gửi tin, quy trình phê duyệt trước khi phát hành.",
+        "Xác định 2 nhóm người dùng và phân quyền: Quản trị viên Campaign, Admin Hệ thống.",
+    ]),
+    ("b. Thiết kế và trình bày giao diện — chốt phương án với Ban VTDĐ", [
+        "Thiết kế giao diện cho 12 màn hình chức năng, bao phủ toàn bộ vòng đời campaign.",
+        "Trình bày cho Ban VTDĐ, tiếp nhận góp ý và điều chỉnh đến khi được chốt.",
+        "Hỗ trợ 6 kênh giao tiếp: SMS, Zalo OA, Thông báo đẩy, Biểu ngữ App/Web, USSD, Email.",
+    ]),
+    ("c. Lập tài liệu đặc tả yêu cầu (URD/SRS) bàn giao cho Dev/Tester", [
+        "Bao gồm: sơ đồ quy trình nghiệp vụ, phân cấp chức năng, ma trận phân quyền, sơ đồ trình tự, đặc tả từng màn hình và từng tình huống sử dụng.",
+        "Mỗi màn hình đặc tả chi tiết: thành phần giao diện, điều kiện hiển thị, quy tắc kiểm tra đầu vào, các trạng thái đặc biệt.",
+        "Lập thêm bộ tài liệu phân tích tích hợp dữ liệu BSS ↔ CVM (5 tài liệu thành phần).",
+    ]),
+]
+
+first = True
+for title, bullets in sections:
+    p = tf.paragraphs[0] if first else tf.add_paragraph()
+    first = False
+    p.space_before = Pt(8)
+    run = p.add_run()
+    run.text = title
+    run.font.name = "Arial"
+    run.font.size = Pt(16)
+    run.font.bold = True
+    run.font.color.rgb = NAVY
+    for b in bullets:
+        bp = tf.add_paragraph()
+        bp.space_before = Pt(2)
+        brun = bp.add_run()
+        brun.text = "    • " + b
+        brun.font.name = "Arial"
+        brun.font.size = Pt(15)
+        brun.font.color.rgb = GRAY
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SLIDE 4 — II. KẾT QUẢ — CVM (2/2)
+# ─────────────────────────────────────────────────────────────────────────────
+s4 = prs.slides.add_slide(blank_layout)
+add_header(s4, "II. Kết quả thực hiện — Dự án CVM (2/2)")
+
+tf = content_frame(s4)
+
+sections4 = [
+    ("d. Hỗ trợ đội phát triển trong quá trình xây dựng sản phẩm", [
+        "Giải đáp câu hỏi nghiệp vụ, xác nhận tình huống chưa rõ, bổ sung đặc tả khi cần thiết.",
+        "Đối chiếu sản phẩm đang phát triển với yêu cầu đã chốt — phát hiện và xử lý kịp thời các điểm chưa khớp.",
+    ]),
+    ("e. Phối hợp hoàn thiện Tờ trình phương án triển khai hệ thống CVM", [
+        "Tham gia soạn thảo và rà soát nội dung Tờ trình trình cấp có thẩm quyền phê duyệt.",
+        "Đảm bảo nội dung phản ánh đúng phạm vi, mục tiêu nghiệp vụ và lộ trình triển khai đã thống nhất.",
+    ]),
+    ("f. Phối hợp hoàn thiện 02 Quy trình vận hành hệ thống CVM", [
+        "Quy trình Phối hợp và Xử lý lỗi — quy định cách phối hợp giữa các bên và xử lý sự cố trong vận hành.",
+        "Quy trình Tiếp nhận và Phát triển tính năng mới — quy định luồng tiếp nhận, đánh giá và triển khai tính năng bổ sung.",
+    ]),
+    ("Kết quả bàn giao", [
+        "Bản giao diện hoàn chỉnh (12 màn hình, 6 kênh) đã được Ban VTDĐ chốt.",
+        "Tài liệu URD/SRS hoàn chỉnh — Dev/Tester làm việc trực tiếp không cần hỏi thêm.",
+        "Bộ tài liệu phân tích tích hợp BSS ↔ CVM (5 tài liệu thành phần).",
+        "Tờ trình đã được hoàn thiện và trình duyệt.",
+        "02 Quy trình vận hành đã hoàn thiện, sẵn sàng áp dụng khi hệ thống đi vào vận hành.",
+    ]),
+]
+
+first = True
+for title, bullets in sections4:
+    p = tf.paragraphs[0] if first else tf.add_paragraph()
+    first = False
+    p.space_before = Pt(8)
+    run = p.add_run()
+    run.text = title
+    run.font.name = "Arial"
+    run.font.size = Pt(16)
+    run.font.bold = True
+    run.font.color.rgb = NAVY if title != "Kết quả bàn giao" else RGBColor(0x1A, 0x7A, 0x3C)
+    for b in bullets:
+        bp = tf.add_paragraph()
+        bp.space_before = Pt(2)
+        brun = bp.add_run()
+        brun.text = "    • " + b
+        brun.font.name = "Arial"
+        brun.font.size = Pt(15)
+        brun.font.color.rgb = GRAY
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SLIDE 5 — II. KẾT QUẢ — CDP
+# ─────────────────────────────────────────────────────────────────────────────
+s5 = prs.slides.add_slide(blank_layout)
+add_header(s5, "II. Kết quả thực hiện — Dự án CDP (VNPost)")
+
+add_rect(s5, Inches(0.4), Inches(1.22), Inches(12.5), Inches(0.38), RGBColor(0xE8, 0xF4, 0xFD))
+add_textbox(s5, Inches(0.5), Inches(1.22), Inches(12.0), Inches(0.38),
+            "Trạng thái: Hoàn thành giai đoạn nghiên cứu — tài liệu đã gửi nội bộ review; bước tiếp theo là tổ chức buổi làm việc chính thức với đầu mối VNPost.",
+            font_size=14, italic=True, color=NAVY)
+
+tf = content_frame(s5, top=Inches(1.7), height=Inches(5.5))
+
+cdp_sections = [
+    ("Nội dung đã thực hiện", [
+        "Nghiên cứu toàn diện nghiệp vụ bưu chính và hệ sinh thái công nghệ VNPost: 8+ hệ thống IT đang vận hành, 8 giai đoạn chuỗi chuyển phát, đặc điểm dữ liệu khách hàng.",
+        "Phân tích bài toán định danh khách hàng phức tạp: một khách hàng xuất hiện dưới nhiều vai trò (người gửi, người nhận, chủ tài khoản...).",
+        "Đánh giá 3 phương án triển khai: tự xây dựng (Build) / mua giải pháp có sẵn (Buy) / hợp tác đối tác (Partner) — kèm khuyến nghị cụ thể.",
+        "Cập nhật khung pháp lý mới nhất về bảo vệ dữ liệu cá nhân áp dụng từ 01/01/2026 (Luật 91/2025/QH15 và NĐ 356/2025/NĐ-CP).",
+    ]),
+    ("Kết quả", [
+        "Tài liệu nghiên cứu domain (Domain Brief) hoàn chỉnh — sẵn sàng làm nền tảng cho giai đoạn phân tích chính thức.",
+        "Xác định 5 nhóm người dùng liên quan và đề xuất phương án triển khai kèm phân tích rủi ro, lộ trình khuyến nghị.",
+    ]),
+]
+
+first = True
+for title, bullets in cdp_sections:
+    p = tf.paragraphs[0] if first else tf.add_paragraph()
+    first = False
+    p.space_before = Pt(10)
+    run = p.add_run()
+    run.text = title
+    run.font.name = "Arial"
+    run.font.size = Pt(16)
+    run.font.bold = True
+    run.font.color.rgb = NAVY if title != "Kết quả" else RGBColor(0x1A, 0x7A, 0x3C)
+    for b in bullets:
+        bp = tf.add_paragraph()
+        bp.space_before = Pt(3)
+        brun = bp.add_run()
+        brun.text = "    • " + b
+        brun.font.name = "Arial"
+        brun.font.size = Pt(15)
+        brun.font.color.rgb = GRAY
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SLIDE 6 — III. KHÓ KHĂN GẶP PHẢI
+# ─────────────────────────────────────────────────────────────────────────────
+s6 = prs.slides.add_slide(blank_layout)
+add_header(s6, "III. Khó khăn gặp phải")
+
+tf = content_frame(s6)
+
+difficulties = [
+    (
+        "1. Yêu cầu nghiệp vụ thay đổi trong quá trình làm việc (dự án CVM)",
+        "Hướng xử lý: cập nhật đúng phần bị ảnh hưởng, không làm lại từ đầu; duy trì ghi chép lịch sử thay đổi để đảm bảo truy vết.",
+    ),
+    (
+        "2. Chờ phản hồi từ phía VNPost cho dự án CDP",
+        "Hướng xử lý: ghi rõ các điểm còn chờ xác nhận; tiếp tục phần có thể làm độc lập; chuẩn bị sẵn tài liệu để khởi động ngay khi có phản hồi.",
+    ),
+    (
+        "3. Tiếp cận domain hoàn toàn mới (nghiệp vụ bưu chính, hệ sinh thái IT VNPost)",
+        "Hướng xử lý: nghiên cứu có hệ thống từ tài liệu được cung cấp; phân tích đặc thù vận hành và quy mô thực tế tại Việt Nam.",
+    ),
+    (
+        "4. Đảm bảo tài liệu đặc tả và sản phẩm thực tế luôn đồng bộ trong quá trình phát triển",
+        "Hướng xử lý: thiết lập điểm kiểm tra định kỳ giữa BA và đội phát triển; phát hiện sớm và xử lý kịp thời các điểm chưa khớp.",
+    ),
+]
+
+first = True
+for kk, hx in difficulties:
+    p = tf.paragraphs[0] if first else tf.add_paragraph()
+    first = False
+    p.space_before = Pt(10)
+    run = p.add_run()
+    run.text = kk
+    run.font.name = "Arial"
+    run.font.size = Pt(16)
+    run.font.bold = True
+    run.font.color.rgb = NAVY
+
+    bp = tf.add_paragraph()
+    bp.space_before = Pt(2)
+    brun = bp.add_run()
+    brun.text = "    → " + hx
+    brun.font.name = "Arial"
+    brun.font.size = Pt(15)
+    brun.font.italic = True
+    brun.font.color.rgb = GRAY
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SLIDE 7 — IV. ĐỀ XUẤT
+# ─────────────────────────────────────────────────────────────────────────────
+s7 = prs.slides.add_slide(blank_layout)
+add_header(s7, "IV. Đề xuất với vị trí công việc BA")
+
+tf = content_frame(s7)
+
+proposals = [
+    ("1. Xây dựng quy trình phê duyệt tài liệu nghiệp vụ",
+     "Tài liệu đặc tả yêu cầu nên có chữ ký xác nhận từ đại diện bên nghiệp vụ (Ban VTDĐ) và đội phát triển trước khi triển khai, tránh tranh cãi về yêu cầu về sau."),
+    ("2. Tổ chức buổi kickoff chính thức với VNPost",
+     "Sớm sắp xếp buổi làm việc để chốt các vấn đề nghiệp vụ cốt lõi của dự án CDP, tránh để dự án bị trì hoãn kéo dài ở giai đoạn nghiên cứu."),
+    ("3. Thiết lập cơ chế phối hợp BA — Đội phát triển",
+     "Cần có quy trình rõ ràng để đội phát triển trao đổi với BA khi gặp điểm chưa rõ hoặc cần điều chỉnh, thay vì tự quyết định trong quá trình triển khai."),
+    ("4. Bổ sung kịch bản kiểm thử cơ bản",
+     "Cân nhắc lập kịch bản kiểm thử song song với tài liệu đặc tả, giúp đội kiểm thử bắt đầu công việc sớm hơn."),
+]
+
+first = True
+for title, detail in proposals:
+    p = tf.paragraphs[0] if first else tf.add_paragraph()
+    first = False
+    p.space_before = Pt(12)
+    run = p.add_run()
+    run.text = title
+    run.font.name = "Arial"
+    run.font.size = Pt(17)
+    run.font.bold = True
+    run.font.color.rgb = NAVY
+
+    bp = tf.add_paragraph()
+    bp.space_before = Pt(2)
+    brun = bp.add_run()
+    brun.text = "    " + detail
+    brun.font.name = "Arial"
+    brun.font.size = Pt(15)
+    brun.font.color.rgb = GRAY
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SLIDE 8 — V. ĐÁNH GIÁ VỀ BẢN THÂN
+# ─────────────────────────────────────────────────────────────────────────────
+s8 = prs.slides.add_slide(blank_layout)
+add_header(s8, "V. Đánh giá về bản thân")
+
+# Cột trái — Ưu điểm
+add_textbox(s8, Inches(0.4), Inches(1.35), Inches(6.2), Inches(0.45),
+            "Ưu điểm", font_size=18, bold=True, color=RGBColor(0x1A, 0x7A, 0x3C))
+add_rect(s8, Inches(0.4), Inches(1.8), Inches(6.0), Inches(0.05), RGBColor(0x1A, 0x7A, 0x3C))
+
+pros = [
+    "Phân tích bài toán nghiệp vụ phức tạp — nhiều bên liên quan, nhiều luồng quy trình song song.",
+    "Chủ động nghiên cứu domain mới, không phụ thuộc hướng dẫn bên ngoài.",
+    "Viết tài liệu rõ ràng, có cấu trúc — Dev/Tester làm việc trực tiếp được.",
+    "Linh hoạt xử lý thay đổi yêu cầu — cập nhật nhanh và có kiểm soát.",
+    "Biết ứng dụng công nghệ để nâng cao hiệu quả và năng suất công việc.",
+]
+pro_tf = s8.shapes.add_textbox(Inches(0.4), Inches(1.9), Inches(6.0), Inches(5.2)).text_frame
+pro_tf.word_wrap = True
+first = True
+for item in pros:
+    p = pro_tf.paragraphs[0] if first else pro_tf.add_paragraph()
+    first = False
+    p.space_before = Pt(8)
+    run = p.add_run()
+    run.text = "✓  " + item
+    run.font.name = "Arial"
+    run.font.size = Pt(16)
+    run.font.color.rgb = GRAY
+
+# Đường phân cách giữa
+add_rect(s8, Inches(6.55), Inches(1.35), Inches(0.04), Inches(5.8), RGBColor(0xCC, 0xCC, 0xCC))
+
+# Cột phải — Khuyết điểm
+add_textbox(s8, Inches(6.7), Inches(1.35), Inches(6.2), Inches(0.45),
+            "Khuyết điểm", font_size=18, bold=True, color=RGBColor(0xC0, 0x39, 0x2B))
+add_rect(s8, Inches(6.7), Inches(1.8), Inches(6.0), Inches(0.05), RGBColor(0xC0, 0x39, 0x2B))
+
+cons = [
+    "Kinh nghiệm khai thác yêu cầu trực tiếp với khách hàng trong buổi họp còn hạn chế — cần cải thiện kỹ năng đặt câu hỏi và dẫn dắt thảo luận.",
+    "Đôi khi phân tích quá chi tiết giai đoạn đầu thay vì ưu tiên chốt quyết định lớn trước — cần cân bằng hơn giữa độ sâu và tiến độ.",
+    "Cần cải thiện kỹ năng trình bày kết quả trước nhiều bên liên quan, đặc biệt trong các buổi họp đông người.",
+]
+con_tf = s8.shapes.add_textbox(Inches(6.7), Inches(1.9), Inches(6.0), Inches(5.2)).text_frame
+con_tf.word_wrap = True
+first = True
+for item in cons:
+    p = con_tf.paragraphs[0] if first else con_tf.add_paragraph()
+    first = False
+    p.space_before = Pt(8)
+    run = p.add_run()
+    run.text = "△  " + item
+    run.font.name = "Arial"
+    run.font.size = Pt(16)
+    run.font.color.rgb = GRAY
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SLIDE 9 — VI. MONG MUỐN NGUYỆN VỌNG
+# ─────────────────────────────────────────────────────────────────────────────
+s9 = prs.slides.add_slide(blank_layout)
+add_header(s9, "VI. Mong muốn nguyện vọng bản thân")
+
+tf = content_frame(s9, top=Inches(1.4), height=Inches(4.8))
+
+wishes = [
+    "Mong muốn được tiếp tục gắn bó và phát triển lâu dài tại Trung tâm Đổi mới sáng tạo.",
+    "Cam kết nâng cao năng lực chuyên môn — đặc biệt là kỹ năng khai thác yêu cầu trực tiếp và trình bày trước nhiều bên liên quan.",
+    "Sẵn sàng nhận thêm trách nhiệm, đặc biệt là tham gia sâu vào giai đoạn phân tích và thiết kế chính thức của dự án CDP — nơi đã có nền tảng nghiên cứu ban đầu và còn nhiều bài toán thú vị cần tiếp tục giải quyết.",
+]
+
+first = True
+for item in wishes:
+    p = tf.paragraphs[0] if first else tf.add_paragraph()
+    first = False
+    p.space_before = Pt(16)
+    run = p.add_run()
+    run.text = "•  " + item
+    run.font.name = "Arial"
+    run.font.size = Pt(18)
+    run.font.color.rgb = GRAY
+
+# Lời kết
+add_rect(s9, Inches(3.0), Inches(5.8), Inches(7.0), Inches(0.06), YELLOW)
+add_textbox(s9, Inches(2.0), Inches(6.0), Inches(9.0), Inches(0.8),
+            "Kính mong lãnh đạo Trung tâm xem xét và tạo điều kiện để tiếp tục được cống hiến.\nXin trân trọng cảm ơn!",
+            font_size=16, italic=True, color=NAVY, align=PP_ALIGN.CENTER)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Lưu file
+# ─────────────────────────────────────────────────────────────────────────────
+out = "/Users/buidung/Documents/workspace/aeh/eduecosystem/ba-agent/.claude/output/bao-cao-thu-viec/Slide báo cáo thử việc.pptx"
+prs.save(out)
+print(f"Saved: {out}")
