@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CDP VNPost — Prototype v1</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          vnred: { DEFAULT: '#E31837', light: '#fde8ec', dark: '#b01229' }
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+  .sidebar-item { transition: background 0.15s; }
+  .tab-btn { transition: all 0.15s; border-bottom: 2px solid transparent; }
+  .tab-btn.active { border-bottom-color: #E31837; color: #E31837; }
+  .badge-active { background: #dcfce7; color: #166534; }
+  .badge-pause  { background: #fef9c3; color: #854d0e; }
+  .badge-draft  { background: #f1f5f9; color: #475569; }
+  .badge-warning { background: #fff7ed; color: #9a3412; }
+  .score-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+</style>
+</head>
+<body class="bg-gray-50">
+<script type="text/babel">
+const { useState } = React;
+
+/* ── Mock Data ── */
+const customers = [
+  { id: 'C000192', name: 'Nguyễn Văn An',       phone: '090***123', type: 'individual', province: 'Hà Nội',   segment: 'KH VIP HN',      status: 'active' },
+  { id: 'C000234', name: 'Trần Thị Bích',        phone: '091***456', type: 'individual', province: 'TP.HCM',  segment: 'At Risk',        status: 'active' },
+  { id: 'C000301', name: 'Lê Văn Cường',         phone: '098***789', type: 'individual', province: 'Đà Nẵng', segment: 'Champions',      status: 'active' },
+  { id: 'KHL00451', name: 'Cty TNHH ABC Logistics', phone: '024***111', type: 'business', province: 'TP.HCM', segment: 'DN VIP',         status: 'active' },
+  { id: 'KHL00312', name: 'Shopee Express VN',   phone: '028***222', type: 'business', province: 'Hà Nội',   segment: 'KHL Vàng',       status: 'active' },
+  { id: 'C000445', name: 'Phạm Thị Dung',        phone: '093***333', type: 'individual', province: 'Cần Thơ', segment: 'Khách mới',     status: 'inactive' },
+];
+
+const segments = [
+  { id: 1, name: 'KH VIP Hà Nội 2026',           count: 14320, updated: '24/06', status: 'active'  },
+  { id: 2, name: 'KH Doanh nghiệp toàn quốc',    count: 48920, updated: '24/06', status: 'active'  },
+  { id: 3, name: 'KH COD rủi ro cao',             count:  2341, updated: '23/06', status: 'active'  },
+  { id: 4, name: 'KH không giao dịch 6 tháng',   count:  8720, updated: '20/06', status: 'paused'  },
+  { id: 5, name: 'Segment thử nghiệm Q3',         count:   134, updated: '10/06', status: 'draft'   },
+];
+
+const transactions = [
+  { code: 'VE12301', date: '15/06/2026', service: 'EMS', amount: '250,000đ', status: 'Đã giao' },
+  { code: 'VE12298', date: '10/06/2026', service: 'Bưu phẩm', amount: '85,000đ', status: 'Đã giao' },
+  { code: 'VE12287', date: '05/06/2026', service: 'COD', amount: '1,200,000đ', status: 'Đang chờ' },
+  { code: 'VE12265', date: '28/05/2026', service: 'EMS', amount: '320,000đ', status: 'Đã giao' },
+  { code: 'VE12240', date: '20/05/2026', service: 'Bưu kiện', amount: '180,000đ', status: 'Hoàn hàng' },
+];
+
+const contacts = [
+  { name: 'Trần Văn Bình', role: 'Giám đốc',      phone: '090***444' },
+  { name: 'Lê Thị Cẩm',   role: 'Kế toán trưởng', phone: '091***555' },
+  { name: 'Nguyễn Đức',    role: 'Nhân viên Sale', phone: '098***666' },
+];
+
+const activities = [
+  { time: '10:24', text: 'Segment "KH VIP Hà Nội" được tạo bởi Marketing' },
+  { time: '09:51', text: 'Hồ sơ KH #C000192 được cập nhật — CSKH Bắc Ninh' },
+  { time: '09:30', text: 'Merge tự động: 3 profile → 1 (PostID thống nhất)' },
+  { time: '08:15', text: 'Import dữ liệu CAS hoàn tất — 15,420 bản ghi mới' },
+];
+
+/* ── Components ── */
+
+function Sidebar({ screen, setScreen }) {
+  const items = [
+    { key: 'dashboard',  label: 'Tổng quan',    icon: '🏠' },
+    { key: 'search',     label: 'Tìm kiếm KH',  icon: '🔍' },
+    { key: 'segments',   label: 'Phân khúc',     icon: '👥' },
+    { key: 'report',     label: 'Báo cáo',       icon: '📊' },
+    { key: 'settings',   label: 'Cài đặt',       icon: '⚙️'  },
+  ];
+  return (
+    <div className="w-48 min-h-screen bg-slate-800 text-white flex flex-col flex-shrink-0">
+      <div className="px-4 py-4 border-b border-slate-700">
+        <div className="text-vnred font-bold text-lg leading-tight">VNPost</div>
+        <div className="text-slate-400 text-xs">Customer Data Platform</div>
+      </div>
+      <nav className="flex-1 py-3">
+        {items.map(item => (
+          <button
+            key={item.key}
+            onClick={() => setScreen(item.key)}
+            className={`sidebar-item w-full text-left px-4 py-3 flex items-center gap-3 text-sm ${
+              screen === item.key
+                ? 'bg-vnred text-white'
+                : 'text-slate-300 hover:bg-slate-700'
+            }`}
+          >
+            <span>{item.icon}</span>
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
+      <div className="px-4 py-3 border-t border-slate-700 text-xs text-slate-400">
+        CDP VNPost v1.0
+      </div>
+    </div>
+  );
+}
+
+function Header({ title }) {
+  return (
+    <div className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0">
+      <h1 className="font-semibold text-gray-800 text-base">{title}</h1>
+      <div className="flex items-center gap-3">
+        <span className="text-sm text-gray-500">Xin chào,</span>
+        <span className="text-sm font-medium text-gray-800">Nguyễn Thị Lan</span>
+        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Marketing</span>
+        <div className="w-8 h-8 rounded-full bg-vnred text-white flex items-center justify-center text-xs font-bold">NL</div>
+      </div>
+    </div>
+  );
+}
+
+function KPICard({ label, value, sub, subColor }) {
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-4 flex-1">
+      <div className="text-xs text-gray-500 mb-1">{label}</div>
+      <div className="text-2xl font-bold text-gray-800">{value}</div>
+      <div className={`text-xs mt-1 ${subColor || 'text-green-600'}`}>{sub}</div>
+    </div>
+  );
+}
+
+function StatusBadge({ status }) {
+  if (status === 'active')   return <span className="badge-active text-xs px-2 py-0.5 rounded-full">● Active</span>;
+  if (status === 'paused')   return <span className="badge-pause  text-xs px-2 py-0.5 rounded-full">⏸ Tạm dừng</span>;
+  if (status === 'draft')    return <span className="badge-draft  text-xs px-2 py-0.5 rounded-full">📝 Nháp</span>;
+  if (status === 'inactive') return <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Ngưng HĐ</span>;
+  return null;
+}
+
+/* ── Screens ── */
+
+function Dashboard({ setScreen, setSelectedCustomer }) {
+  return (
+    <div className="flex-1 overflow-auto p-6">
+      <div className="max-w-6xl mx-auto space-y-5">
+        {/* KPI Row */}
+        <div className="flex gap-4">
+          <KPICard label="Tổng KH (active)"     value="2,847,312" sub="▲ 3.2% / tháng" />
+          <KPICard label="KH Mới (30 ngày)"     value="+12,450"   sub="▲ so với tháng trước" />
+          <KPICard label="KH Doanh nghiệp (KHL)" value="48,920"   sub="▲ 1.8% / tháng" />
+          <KPICard label="Segment Active"        value="127"       sub="+5 mới trong tháng" subColor="text-blue-600" />
+        </div>
+
+        {/* Activity + Alerts */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="font-medium text-gray-700 mb-3 text-sm">Hoạt động gần đây</div>
+            <div className="space-y-3">
+              {activities.map((a, i) => (
+                <div key={i} className="flex gap-3 text-sm">
+                  <span className="text-gray-400 flex-shrink-0 w-12">{a.time}</span>
+                  <span className="text-gray-600">{a.text}</span>
+                </div>
+              ))}
+            </div>
+            <button className="mt-3 text-xs text-vnred hover:underline">Xem tất cả hoạt động →</button>
+          </div>
+
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="font-medium text-gray-700 mb-3 text-sm">Cảnh báo hệ thống</div>
+            <div className="space-y-3">
+              <div className="flex items-start gap-2 p-3 bg-orange-50 rounded-lg">
+                <span className="text-orange-500 flex-shrink-0">⚠</span>
+                <div className="text-sm">
+                  <div className="text-gray-700">234 KH có COD risk score &gt; 80</div>
+                  <button
+                    onClick={() => { setScreen('search'); }}
+                    className="text-xs text-vnred hover:underline mt-0.5"
+                  >Xem danh sách →</button>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 p-3 bg-orange-50 rounded-lg">
+                <span className="text-orange-500 flex-shrink-0">⚠</span>
+                <div className="text-sm">
+                  <div className="text-gray-700">12 profile chờ xác minh danh tính</div>
+                  <button className="text-xs text-vnred hover:underline mt-0.5">Xem hàng đợi →</button>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 p-3 bg-green-50 rounded-lg">
+                <span className="text-green-500 flex-shrink-0">✅</span>
+                <div className="text-sm text-gray-700">8/9 nguồn dữ liệu hoạt động bình thường</div>
+              </div>
+              <div className="flex items-start gap-2 p-3 bg-yellow-50 rounded-lg">
+                <span className="text-yellow-500 flex-shrink-0">⚠</span>
+                <div className="text-sm">
+                  <div className="text-gray-700">PNS/DingDong: phản hồi chậm</div>
+                  <button className="text-xs text-vnred hover:underline mt-0.5">Chi tiết →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SearchScreen({ setScreen, setSelectedCustomer }) {
+  const [query, setQuery] = useState('');
+  const [showFilter, setShowFilter] = useState(false);
+  const [results, setResults] = useState(customers);
+
+  const handleSearch = () => {
+    if (!query.trim()) { setResults(customers); return; }
+    const q = query.toLowerCase();
+    setResults(customers.filter(c =>
+      c.name.toLowerCase().includes(q) || c.id.toLowerCase().includes(q) || c.phone.includes(q)
+    ));
+  };
+
+  return (
+    <div className="flex-1 overflow-auto p-6">
+      <div className="max-w-5xl mx-auto space-y-4">
+        {/* Search box */}
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <div className="flex gap-3">
+            <input
+              className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-vnred/30 focus:border-vnred"
+              placeholder="Nhập SĐT / Họ tên / CCCD / Mã vận đơn / PostID / Mã KHL..."
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+            />
+            <button
+              onClick={handleSearch}
+              className="bg-vnred hover:bg-vnred-dark text-white px-5 py-2.5 rounded-lg text-sm font-medium"
+            >Tìm kiếm</button>
+          </div>
+
+          <button
+            onClick={() => setShowFilter(!showFilter)}
+            className="mt-3 text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
+          >
+            {showFilter ? '▲' : '▼'} Lọc nâng cao
+          </button>
+
+          {showFilter && (
+            <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-4 gap-3">
+              {['Loại KH', 'Tỉnh/TP', 'Phân khúc', 'Trạng thái'].map(f => (
+                <select key={f} className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-vnred">
+                  <option>{f}: Tất cả</option>
+                </select>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Results */}
+        <div className="bg-white rounded-lg border border-gray-200">
+          <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+            <span className="text-sm text-gray-600">Kết quả: <strong>{results.length}</strong> khách hàng</span>
+            <button className="text-xs text-gray-500 border border-gray-300 rounded px-3 py-1 hover:bg-gray-50">⬇ Xuất Excel</button>
+          </div>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50">
+                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Họ tên</th>
+                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">SĐT</th>
+                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Loại KH</th>
+                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Tỉnh/TP</th>
+                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Phân khúc</th>
+                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Trạng thái</th>
+                <th className="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.map(c => (
+                <tr key={c.id} className="border-b border-gray-50 hover:bg-gray-50">
+                  <td className="px-4 py-3 font-medium text-gray-800">{c.name}</td>
+                  <td className="px-4 py-3 text-gray-500 font-mono text-xs">{c.phone}</td>
+                  <td className="px-4 py-3">
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${c.type === 'business' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                      {c.type === 'business' ? 'Doanh nghiệp' : 'Cá nhân'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">{c.province}</td>
+                  <td className="px-4 py-3">
+                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{c.segment}</span>
+                  </td>
+                  <td className="px-4 py-3"><StatusBadge status={c.status} /></td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => { setSelectedCustomer(c); setScreen(c.type === 'business' ? 'c360-business' : 'c360-individual'); }}
+                      className="text-xs text-vnred border border-vnred/30 rounded px-3 py-1 hover:bg-vnred/5"
+                    >Xem →</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="px-4 py-3 text-xs text-gray-500 text-right">
+            Hiển thị {results.length}/{customers.length} kết quả
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function C360Individual({ customer, setScreen }) {
+  const [tab, setTab] = useState('transactions');
+  const cust = customer || customers[0];
+  const tabs = [
+    { key: 'transactions', label: 'Giao dịch' },
+    { key: 'cod',          label: 'COD' },
+    { key: 'timeline',     label: 'Timeline' },
+    { key: 'complaints',   label: 'Khiếu nại' },
+    { key: 'loyalty',      label: 'Loyalty' },
+    { key: 'consent',      label: 'Consent' },
+  ];
+
+  return (
+    <div className="flex-1 overflow-auto p-6">
+      {/* Breadcrumb */}
+      <div className="text-xs text-gray-400 mb-4 flex items-center gap-1">
+        <button onClick={() => setScreen('search')} className="hover:text-vnred">Tìm kiếm KH</button>
+        <span>›</span><span>Customer 360</span>
+        <span>›</span><span className="text-gray-700 font-medium">{cust.name}</span>
+      </div>
+
+      <div className="grid grid-cols-12 gap-4 max-w-6xl mx-auto">
+        {/* Left col */}
+        <div className="col-span-3 bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+          <div className="text-center">
+            <div className="w-14 h-14 rounded-full bg-vnred text-white flex items-center justify-center text-xl font-bold mx-auto mb-2">
+              {cust.name.split(' ').map(w => w[0]).join('').slice(0,2)}
+            </div>
+            <div className="font-semibold text-gray-800">{cust.name}</div>
+            <div className="text-xs text-gray-400 mt-0.5">#{cust.id}</div>
+            <span className="badge-active text-xs px-2 py-0.5 rounded-full mt-1 inline-block">● Đang hoạt động</span>
+          </div>
+
+          <div className="border-t border-gray-100 pt-3 space-y-2 text-sm">
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Liên hệ</div>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-400">📞</span>
+              <span className="font-mono text-gray-700">{cust.phone}</span>
+              <button className="text-xs text-vnred hover:underline ml-auto">[Hiện]</button>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-400">✉️</span>
+              <span className="text-gray-700 text-xs">nguy***@gmail.com</span>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-100 pt-3 space-y-2 text-sm">
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Định danh</div>
+            <div className="flex justify-between"><span className="text-gray-500">PostID</span><span className="text-gray-700 font-mono text-xs">VNP00192</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">CCCD</span>
+              <span className="text-xs text-gray-400 italic">*** Ẩn — chỉ Admin ***</span>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-100 pt-3 space-y-2 text-sm">
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Phân loại</div>
+            <div className="flex justify-between"><span className="text-gray-500">Loại KH</span><span className="text-blue-600 text-xs">Cá nhân</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Tỉnh/TP</span><span className="text-gray-700 text-xs">{cust.province}</span></div>
+          </div>
+
+          <button className="text-xs text-gray-400 hover:text-vnred mt-2">Lịch sử merge →</button>
+        </div>
+
+        {/* Middle col */}
+        <div className="col-span-6 bg-white rounded-lg border border-gray-200">
+          <div className="flex border-b border-gray-100 overflow-x-auto">
+            {tabs.map(t => (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`tab-btn px-4 py-3 text-sm whitespace-nowrap flex-shrink-0 ${tab === t.key ? 'active font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+              >{t.label}</button>
+            ))}
+          </div>
+          <div className="p-4">
+            {tab === 'transactions' && (
+              <div>
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold text-gray-800">47</div>
+                    <div className="text-xs text-gray-500">Tổng đơn</div>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold text-gray-800">12.4M</div>
+                    <div className="text-xs text-gray-500">Tổng giá trị</div>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                    <div className="text-sm font-bold text-gray-800">15/06/2026</div>
+                    <div className="text-xs text-gray-500">GD cuối</div>
+                  </div>
+                </div>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="text-left py-2 text-xs text-gray-500 font-medium">Mã VĐ</th>
+                      <th className="text-left py-2 text-xs text-gray-500 font-medium">Ngày</th>
+                      <th className="text-left py-2 text-xs text-gray-500 font-medium">Dịch vụ</th>
+                      <th className="text-left py-2 text-xs text-gray-500 font-medium">Giá trị</th>
+                      <th className="text-left py-2 text-xs text-gray-500 font-medium">Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transactions.map(t => (
+                      <tr key={t.code} className="border-b border-gray-50 hover:bg-gray-50">
+                        <td className="py-2 font-mono text-xs text-vnred">{t.code}</td>
+                        <td className="py-2 text-xs text-gray-500">{t.date}</td>
+                        <td className="py-2 text-xs text-gray-700">{t.service}</td>
+                        <td className="py-2 text-xs text-gray-700">{t.amount}</td>
+                        <td className="py-2">
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            t.status === 'Đã giao' ? 'bg-green-100 text-green-700' :
+                            t.status === 'Hoàn hàng' ? 'bg-red-100 text-red-700' :
+                            'bg-yellow-100 text-yellow-700'}`}>{t.status}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <button className="mt-3 text-xs text-vnred hover:underline">Xem thêm 42 giao dịch →</button>
+              </div>
+            )}
+            {tab === 'cod' && (
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-gray-50 rounded-lg p-3 text-center"><div className="text-xl font-bold">8.5M</div><div className="text-xs text-gray-500">Tổng COD</div></div>
+                <div className="bg-green-50 rounded-lg p-3 text-center"><div className="text-xl font-bold text-green-700">7.2M</div><div className="text-xs text-gray-500">Đã thu</div></div>
+                <div className="bg-yellow-50 rounded-lg p-3 text-center"><div className="text-xl font-bold text-yellow-700">1.3M</div><div className="text-xs text-gray-500">Chưa thu</div></div>
+              </div>
+            )}
+            {tab === 'timeline' && (
+              <div className="space-y-3">
+                {[
+                  { time: '15/06 10:30', event: 'Tạo đơn VE12301 qua MyVNPost App', icon: '📦' },
+                  { time: '14/06 09:15', event: 'Đăng nhập app — phiên 45 phút', icon: '📱' },
+                  { time: '10/06 14:22', event: 'Giao dịch VE12298 hoàn tất — đã giao', icon: '✅' },
+                  { time: '08/06 11:00', event: 'Click banner khuyến mãi EMS', icon: '🎯' },
+                  { time: '05/06 08:30', event: 'Tra cứu cước qua website', icon: '🌐' },
+                ].map((e, i) => (
+                  <div key={i} className="flex gap-3 text-sm">
+                    <span className="text-base">{e.icon}</span>
+                    <div>
+                      <div className="text-gray-700">{e.event}</div>
+                      <div className="text-xs text-gray-400">{e.time}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {tab === 'complaints' && (
+              <div className="space-y-2">
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="bg-gray-50 rounded-lg p-3 text-center"><div className="text-xl font-bold">3</div><div className="text-xs text-gray-500">Tổng khiếu nại</div></div>
+                  <div className="bg-green-50 rounded-lg p-3 text-center"><div className="text-xl font-bold text-green-700">0</div><div className="text-xs text-gray-500">Đang mở</div></div>
+                  <div className="bg-blue-50 rounded-lg p-3 text-center"><div className="text-xl font-bold text-blue-700">4.2</div><div className="text-xs text-gray-500">Điểm hài lòng /5</div></div>
+                </div>
+              </div>
+            )}
+            {tab === 'loyalty' && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
+                  <span className="text-2xl">🥇</span>
+                  <div><div className="font-semibold">Hạng Vàng</div><div className="text-xs text-gray-500">Đạt được từ 01/01/2026</div></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-gray-50 rounded-lg p-3 text-center"><div className="text-xl font-bold">2,450</div><div className="text-xs text-gray-500">Điểm tích lũy</div></div>
+                  <div className="bg-gray-50 rounded-lg p-3 text-center"><div className="text-sm font-bold">31/12/2026</div><div className="text-xs text-gray-500">Hết hạn điểm</div></div>
+                </div>
+              </div>
+            )}
+            {tab === 'consent' && (
+              <div className="space-y-2">
+                {[
+                  { channel: 'SMS Marketing', status: true },
+                  { channel: 'Email Marketing', status: false },
+                  { channel: 'Zalo OA', status: true },
+                  { channel: 'Push Notification', status: true },
+                  { channel: 'Phân tích hành vi', status: true },
+                ].map((c, i) => (
+                  <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50">
+                    <span className="text-sm text-gray-700">{c.channel}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${c.status ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      {c.status ? '✓ Đồng ý' : '✗ Từ chối'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right col */}
+        <div className="col-span-3 space-y-3">
+          <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Điểm số</div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-gray-600">CLV Score</span>
+                <span className="font-bold text-gray-800">742</span>
+              </div>
+              <div className="flex gap-0.5">
+                {[1,2,3,4,5].map(i => (
+                  <div key={i} className={`h-2 flex-1 rounded-sm ${i <= 4 ? 'bg-vnred' : 'bg-gray-200'}`}></div>
+                ))}
+              </div>
+              <div className="text-xs text-gray-400 mt-0.5 text-right">Cao</div>
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-gray-600">Churn Score</span>
+                <span className="font-bold text-yellow-600">23/100</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-1.5">
+                <div className="bg-yellow-400 h-1.5 rounded-full" style={{width: '23%'}}></div>
+              </div>
+            </div>
+            <div className="p-2 bg-gray-50 rounded text-xs text-gray-400 text-center">
+              🔒 COD Risk — chỉ Kinh doanh/Admin
+            </div>
+            <div className="p-2 bg-gray-50 rounded text-xs text-gray-400 text-center">
+              🔒 Fraud Score — chỉ Kinh doanh/Admin
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Phân khúc</div>
+            <div className="flex flex-wrap gap-1.5">
+              {['KH VIP HN', 'KH thân thiết', 'EMS thường xuyên'].map(s => (
+                <span key={s} className="text-xs bg-vnred/10 text-vnred px-2 py-0.5 rounded-full">{s}</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Nguồn dữ liệu</div>
+            <div className="flex flex-wrap gap-1">
+              {['CRM ✓', 'PostID ✓', 'CAS ✓', 'MyVNPost ✓'].map(s => (
+                <span key={s} className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">{s}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function C360Business({ customer, setScreen }) {
+  const [tab, setTab] = useState('contacts');
+  const cust = customer || customers[3];
+  const tabs = [
+    { key: 'transactions', label: 'Giao dịch' },
+    { key: 'cod',          label: 'COD' },
+    { key: 'timeline',     label: 'Timeline' },
+    { key: 'complaints',   label: 'Khiếu nại' },
+    { key: 'contracts',    label: 'Hợp đồng' },
+    { key: 'contacts',     label: 'Người liên hệ' },
+  ];
+
+  return (
+    <div className="flex-1 overflow-auto p-6">
+      <div className="text-xs text-gray-400 mb-4 flex items-center gap-1">
+        <button onClick={() => setScreen('search')} className="hover:text-vnred">Tìm kiếm KH</button>
+        <span>›</span><span>Customer 360</span>
+        <span>›</span><span className="text-gray-700 font-medium">{cust.name}</span>
+      </div>
+
+      <div className="grid grid-cols-12 gap-4 max-w-6xl mx-auto">
+        {/* Left */}
+        <div className="col-span-3 bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+          <div className="text-center">
+            <div className="w-14 h-14 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-2xl mx-auto mb-2">🏢</div>
+            <div className="font-semibold text-gray-800 text-sm">{cust.name}</div>
+            <div className="text-xs text-gray-400 mt-0.5">#{cust.id}</div>
+            <span className="badge-active text-xs px-2 py-0.5 rounded-full mt-1 inline-block">● Đang hoạt động</span>
+          </div>
+
+          <div className="border-t border-gray-100 pt-3 space-y-2 text-sm">
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Thông tin DN</div>
+            <div className="flex justify-between"><span className="text-gray-500">Mã KHL</span><span className="font-mono text-xs text-gray-700">KHL00451</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">MST</span><span className="font-mono text-xs text-gray-700">0123456789</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Ngành</span><span className="text-xs text-gray-700">TMĐT</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Quy mô</span><span className="text-xs text-gray-700">Vừa</span></div>
+          </div>
+
+          <div className="border-t border-gray-100 pt-3">
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Hợp đồng</div>
+            <div className="flex justify-between text-sm mb-1"><span className="text-gray-500">Hiện hành</span><span className="text-green-600 font-medium">2</span></div>
+            <div className="p-2 badge-warning rounded text-xs">
+              ⚠ HĐ-2026-002 hết hạn 30/09/2026
+            </div>
+          </div>
+        </div>
+
+        {/* Middle */}
+        <div className="col-span-6 bg-white rounded-lg border border-gray-200">
+          <div className="flex border-b border-gray-100 overflow-x-auto">
+            {tabs.map(t => (
+              <button key={t.key} onClick={() => setTab(t.key)}
+                className={`tab-btn px-4 py-3 text-sm whitespace-nowrap flex-shrink-0 ${tab === t.key ? 'active font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+              >{t.label}</button>
+            ))}
+          </div>
+          <div className="p-4">
+            {tab === 'contacts' && (
+              <div>
+                <table className="w-full text-sm mb-3">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="text-left py-2 text-xs text-gray-500 font-medium">Họ tên</th>
+                      <th className="text-left py-2 text-xs text-gray-500 font-medium">Chức vụ</th>
+                      <th className="text-left py-2 text-xs text-gray-500 font-medium">SĐT</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {contacts.map((c, i) => (
+                      <tr key={i} className="border-b border-gray-50">
+                        <td className="py-2.5 font-medium text-gray-800">{c.name}</td>
+                        <td className="py-2.5 text-gray-600">{c.role}</td>
+                        <td className="py-2.5 font-mono text-xs text-gray-500">{c.phone}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <button className="text-xs border border-dashed border-gray-300 rounded px-3 py-2 text-gray-500 hover:border-vnred hover:text-vnred w-full">
+                  + Thêm người liên hệ
+                </button>
+              </div>
+            )}
+            {tab === 'contracts' && (
+              <div className="space-y-3">
+                {[
+                  { id: 'HĐ-2026-001', from: '01/01/2026', to: '31/12/2026', value: '250M/năm', status: 'active' },
+                  { id: 'HĐ-2026-002', from: '01/04/2026', to: '30/09/2026', value: '80M/quý',  status: 'warning' },
+                ].map((c, i) => (
+                  <div key={i} className={`p-3 rounded-lg border ${c.status === 'warning' ? 'border-yellow-200 bg-yellow-50' : 'border-gray-100 bg-gray-50'}`}>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-sm">{c.id}</span>
+                      {c.status === 'warning' && <span className="badge-warning text-xs px-2 py-0.5 rounded-full">⚠ Sắp hết hạn</span>}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">{c.from} → {c.to} · {c.value}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {tab === 'transactions' && (
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-gray-50 rounded-lg p-3 text-center"><div className="text-2xl font-bold">1,240</div><div className="text-xs text-gray-500">Tổng đơn</div></div>
+                <div className="bg-gray-50 rounded-lg p-3 text-center"><div className="text-2xl font-bold">485M</div><div className="text-xs text-gray-500">Tổng giá trị</div></div>
+                <div className="bg-gray-50 rounded-lg p-3 text-center"><div className="text-sm font-bold">24/06/2026</div><div className="text-xs text-gray-500">GD cuối</div></div>
+              </div>
+            )}
+            {(tab === 'cod' || tab === 'timeline' || tab === 'complaints') && (
+              <div className="text-sm text-gray-400 text-center py-8">Nội dung tab {tabs.find(t=>t.key===tab)?.label}</div>
+            )}
+          </div>
+        </div>
+
+        {/* Right */}
+        <div className="col-span-3 space-y-3">
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Điểm số</div>
+            <div className="mb-3">
+              <div className="flex justify-between text-sm mb-1"><span className="text-gray-600">CLV Score</span><span className="font-bold text-gray-800">1,248</span></div>
+              <div className="flex gap-0.5">
+                {[1,2,3,4,5].map(i => <div key={i} className="h-2 flex-1 rounded-sm bg-vnred"></div>)}
+              </div>
+              <div className="text-xs text-gray-400 mt-0.5 text-right">Rất cao</div>
+            </div>
+            <div className="p-2 bg-gray-50 rounded text-xs text-gray-400 text-center">🔒 COD Risk — chỉ Admin</div>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Hạng KHL</div>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🥇</span>
+              <div><div className="font-semibold text-yellow-600">Vàng</div><div className="text-xs text-gray-400">Từ 01/2026</div></div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Phân khúc</div>
+            {['DN VIP TP.HCM', 'KHL Thương mại điện tử'].map(s => (
+              <span key={s} className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mr-1 mb-1 inline-block">{s}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SegmentBuilder({ setScreen }) {
+  const [name, setName] = useState('KH VIP Hà Nội 2026');
+  const [logic, setLogic] = useState('AND');
+  const [conditions, setConditions] = useState([
+    { attr: 'Tỉnh/TP cư trú', op: '=', val: 'Hà Nội' },
+    { attr: 'Loại khách hàng', op: '=', val: 'Cá nhân' },
+    { attr: 'CLV Score', op: '≥', val: '700' },
+  ]);
+  const estimate = 14320;
+
+  const addCondition = () => setConditions([...conditions, { attr: '', op: '=', val: '' }]);
+  const removeCondition = (i) => setConditions(conditions.filter((_, idx) => idx !== i));
+
+  return (
+    <div className="flex-1 overflow-auto p-6">
+      <div className="text-xs text-gray-400 mb-4 flex items-center gap-1">
+        <button onClick={() => setScreen('segments')} className="hover:text-vnred">Phân khúc</button>
+        <span>›</span><span className="text-gray-700 font-medium">Tạo phân khúc mới</span>
+      </div>
+
+      <div className="max-w-3xl mx-auto space-y-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-5 space-y-4">
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-1.5 block">Tên phân khúc <span className="text-red-500">*</span></label>
+            <input
+              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-vnred/30 focus:border-vnred"
+              value={name}
+              onChange={e => setName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-1.5 block">Mô tả</label>
+            <input
+              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-vnred"
+              defaultValue="KH cá nhân tại HN, CLV > 700, active 3 tháng gần nhất"
+            />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <div className="font-medium text-gray-700 mb-4 text-sm">Điều kiện lọc</div>
+
+          <div className="flex items-center gap-4 mb-4">
+            <span className="text-sm text-gray-500">Khớp với:</span>
+            {['AND', 'OR'].map(l => (
+              <label key={l} className="flex items-center gap-2 cursor-pointer text-sm">
+                <input type="radio" checked={logic === l} onChange={() => setLogic(l)} className="accent-vnred" />
+                <span className={logic === l ? 'font-medium text-vnred' : 'text-gray-600'}>
+                  {l === 'AND' ? 'Tất cả điều kiện [AND]' : 'Bất kỳ điều kiện [OR]'}
+                </span>
+              </label>
+            ))}
+          </div>
+
+          <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+            {conditions.map((c, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <select
+                  className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-vnred"
+                  value={c.attr}
+                  onChange={e => { const nc = [...conditions]; nc[i].attr = e.target.value; setConditions(nc); }}
+                >
+                  <option value="">Thuộc tính...</option>
+                  {['Tỉnh/TP cư trú','Loại khách hàng','CLV Score','Churn Score','Ngày giao dịch cuối','RFM Group','COD Risk Score'].map(a => <option key={a}>{a}</option>)}
+                </select>
+                <select
+                  className="w-28 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-vnred"
+                  value={c.op}
+                  onChange={e => { const nc = [...conditions]; nc[i].op = e.target.value; setConditions(nc); }}
+                >
+                  {['=','≠','≥','≤','>','<','chứa'].map(o => <option key={o}>{o}</option>)}
+                </select>
+                <input
+                  className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-vnred"
+                  value={c.val}
+                  onChange={e => { const nc = [...conditions]; nc[i].val = e.target.value; setConditions(nc); }}
+                  placeholder="Giá trị..."
+                />
+                <button onClick={() => removeCondition(i)} className="text-gray-400 hover:text-red-500 px-2 text-lg leading-none">×</button>
+              </div>
+            ))}
+            <button onClick={addCondition} className="text-xs text-vnred hover:underline flex items-center gap-1">
+              + Thêm điều kiện
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
+          <div>
+            <span className="text-sm text-gray-600">Ước tính: </span>
+            <span className="font-bold text-blue-700 text-lg">~{estimate.toLocaleString()}</span>
+            <span className="text-sm text-gray-600"> khách hàng</span>
+          </div>
+          <button className="text-xs text-blue-600 hover:underline">↻ Cập nhật ước tính</button>
+        </div>
+
+        <div className="flex justify-end gap-3">
+          <button onClick={() => setScreen('segments')} className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Hủy</button>
+          <button className="px-5 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700">Lưu nháp</button>
+          <button
+            onClick={() => setScreen('segments')}
+            className="px-5 py-2.5 text-sm bg-vnred text-white rounded-lg hover:bg-vnred-dark font-medium"
+          >Lưu & Kích hoạt</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SegmentList({ setScreen, setSegments, segmentData }) {
+  const [search, setSearch] = useState('');
+  const [menuOpen, setMenuOpen] = useState(null);
+
+  const filtered = segmentData.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div className="flex-1 overflow-auto p-6">
+      <div className="max-w-5xl mx-auto space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-800">Danh sách phân khúc</h2>
+          <button onClick={() => setScreen('segment-builder')} className="bg-vnred text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-vnred-dark">
+            + Tạo phân khúc mới
+          </button>
+        </div>
+
+        <div className="flex gap-3">
+          <input
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-vnred"
+            placeholder="Tìm theo tên phân khúc..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          <select className="border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-vnred">
+            <option>Trạng thái: Tất cả</option>
+            <option>Active</option>
+            <option>Tạm dừng</option>
+            <option>Nháp</option>
+          </select>
+        </div>
+
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50">
+                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Tên phân khúc</th>
+                <th className="text-right px-4 py-3 text-xs text-gray-500 font-medium">Số KH</th>
+                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Cập nhật</th>
+                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Trạng thái</th>
+                <th className="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(s => (
+                <tr key={s.id} className="border-b border-gray-50 hover:bg-gray-50 relative">
+                  <td className="px-4 py-3 font-medium text-gray-800">{s.name}</td>
+                  <td className="px-4 py-3 text-right text-gray-700 font-mono">{s.count.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-gray-500">{s.updated}</td>
+                  <td className="px-4 py-3"><StatusBadge status={s.status} /></td>
+                  <td className="px-4 py-3 relative">
+                    <button
+                      onClick={() => setMenuOpen(menuOpen === s.id ? null : s.id)}
+                      className="text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100"
+                    >···</button>
+                    {menuOpen === s.id && (
+                      <div className="absolute right-4 top-8 bg-white border border-gray-200 rounded-lg shadow-lg z-10 w-40 py-1" onClick={() => setMenuOpen(null)}>
+                        {['Xem chi tiết','Chỉnh sửa','Nhân bản',s.status==='active'?'Tạm dừng':'Kích hoạt lại'].map(a => (
+                          <button key={a} onClick={() => a==='Chỉnh sửa' && setScreen('segment-builder')}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{a}</button>
+                        ))}
+                        <div className="border-t border-gray-100 mt-1 pt-1">
+                          <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">Xóa</button>
+                        </div>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="px-4 py-3 text-xs text-gray-500 border-t border-gray-100 flex justify-between">
+            <span>Hiển thị {filtered.length}/{segmentData.length} phân khúc</span>
+            <span>Trang 1/26</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Placeholder({ title }) {
+  return (
+    <div className="flex-1 flex items-center justify-center text-gray-400">
+      <div className="text-center">
+        <div className="text-4xl mb-3">🚧</div>
+        <div className="text-lg font-medium">{title}</div>
+        <div className="text-sm mt-1">Màn hình này chưa có trong prototype v1</div>
+      </div>
+    </div>
+  );
+}
+
+/* ── App ── */
+function App() {
+  const [screen, setScreen] = useState('dashboard');
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [segmentData, setSegmentData] = useState(segments);
+
+  const screenTitles = {
+    dashboard:       'Tổng quan hệ thống',
+    search:          'Tìm kiếm khách hàng',
+    'c360-individual': 'Customer 360 — Hồ sơ cá nhân',
+    'c360-business':   'Customer 360 — Hồ sơ doanh nghiệp',
+    'segment-builder': 'Tạo phân khúc mới',
+    segments:          'Danh sách phân khúc',
+    report:            'Báo cáo',
+    settings:          'Cài đặt',
+  };
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar screen={screen} setScreen={setScreen} />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header title={screenTitles[screen] || screen} />
+        {screen === 'dashboard'         && <Dashboard setScreen={setScreen} setSelectedCustomer={setSelectedCustomer} />}
+        {screen === 'search'            && <SearchScreen setScreen={setScreen} setSelectedCustomer={setSelectedCustomer} />}
+        {screen === 'c360-individual'   && <C360Individual customer={selectedCustomer} setScreen={setScreen} />}
+        {screen === 'c360-business'     && <C360Business customer={selectedCustomer} setScreen={setScreen} />}
+        {screen === 'segment-builder'   && <SegmentBuilder setScreen={setScreen} />}
+        {screen === 'segments'          && <SegmentList setScreen={setScreen} setSegments={setSegmentData} segmentData={segmentData} />}
+        {screen === 'report'            && <Placeholder title="Báo cáo" />}
+        {screen === 'settings'          && <Placeholder title="Cài đặt" />}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+<div id="root"></div>
+</body>
+</html>
