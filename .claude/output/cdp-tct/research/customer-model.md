@@ -560,6 +560,119 @@ Bước 5: Ghi audit log đầy đủ vào Block M: ai unmerge, lúc nào, lý d
 
 ---
 
+### Nhóm G — Source Reliability Score (Độ tin cậy nguồn theo từng trường)
+
+Mỗi giá trị khi nhập vào CDP không chỉ lưu giá trị mà còn lưu kèm **điểm tin cậy (0–100)**. Khi conflict, CDP so sánh tổng điểm — giá trị nào cao hơn thắng. Tie-break mới dùng thời gian (Nhóm B).
+
+**Công thức tính điểm tin cậy:**
+
+```
+Reliability Score = Điểm nguồn + Điểm xác thực - Điểm phạt độ cũ
+```
+
+---
+
+**Yếu tố 1 — Điểm nguồn (Source Base Score):**
+
+Phản ánh quy trình xác minh của hệ thống nguồn — nguồn nào có kiểm soát chặt hơn thì điểm cao hơn.
+
+| Hệ thống nguồn | Điểm cơ sở | Lý do |
+|---|---|---|
+| PostID | 90 | OTP xác thực SĐT/email bắt buộc khi đăng ký |
+| CRM / Care Đơn | 80 | Nhân viên xác minh trực tiếp, có đối chiếu giấy tờ |
+| Portal KHL | 80 | Hợp đồng ký kết chính thức, pháp lý đầy đủ |
+| BCCP | 75 | Hệ thống bưu chính nhà nước, có quy trình kiểm duyệt |
+| CAS | 60 | Nhập thủ công tại quầy — phụ thuộc nhân viên, dễ sai |
+| MyVNPost App | 55 | User tự khai báo, chưa xác minh nội dung |
+| PNS / DingDong | 40 (định danh) / 75 (địa chỉ giao) | Định danh do shop tự nhập; địa chỉ là nơi đã giao thực tế |
+| TMS | 40 (định danh) / 80 (địa chỉ) | Tương tự PNS — đáng tin về tuyến phát, không đáng tin về tên/SĐT |
+| PayPost | 85 (COD/tài chính) | Hệ thống tài chính chính thức, có đối soát |
+
+> **Lưu ý:** Điểm nguồn **thay đổi theo loại trường** — PNS/DingDong điểm thấp với tên khách hàng nhưng điểm cao với địa chỉ giao hàng thực tế. Không áp một mức điểm duy nhất cho toàn bộ hệ thống.
+
+---
+
+**Yếu tố 2 — Điểm xác thực (Verification Bonus):**
+
+Cộng thêm khi giá trị đó đã trải qua bước xác minh độc lập.
+
+| Loại xác thực | Điểm cộng |
+|---|---|
+| SĐT đã xác thực qua OTP | +20 |
+| Email đã click link xác nhận | +15 |
+| CCCD đã đối chiếu eKYC (ảnh + chip) | +25 |
+| MST đã tra cứu từ cổng thuế | +20 |
+| Địa chỉ đã giao thành công ≥ 3 lần | +15 |
+| Chưa có xác thực nào | +0 |
+
+---
+
+**Yếu tố 3 — Điểm phạt độ cũ (Staleness Penalty):**
+
+Dữ liệu càng cũ càng kém tin cậy — thông tin khách hàng thay đổi theo thời gian.
+
+| Thời gian từ lần cập nhật cuối | Điểm trừ |
+|---|---|
+| < 30 ngày | 0 |
+| 30–180 ngày | -5 |
+| 181–365 ngày | -15 |
+| > 1 năm | -30 |
+
+---
+
+**Ví dụ thực tế — Conflict tên khách hàng:**
+
+```
+Hồ sơ A (từ CRM, cập nhật 10 ngày trước, tên đã xác minh giấy tờ):
+  Điểm nguồn = 80
+  Xác thực   = +0 (không có OTP cho tên)
+  Độ cũ      = -0 (< 30 ngày)
+  → Reliability Score = 80
+
+Hồ sơ B (từ MyVNPost App, cập nhật hôm qua, user tự nhập):
+  Điểm nguồn = 55
+  Xác thực   = +0
+  Độ cũ      = -0
+  → Reliability Score = 55
+
+Kết quả: Lấy tên từ CRM (80 > 55) dù App mới hơn.
+```
+
+**Ví dụ thực tế — Conflict SĐT:**
+
+```
+Hồ sơ A (từ CAS, cập nhật 8 tháng trước, nhập tay):
+  Điểm nguồn = 60
+  Xác thực   = +0
+  Độ cũ      = -15 (181–365 ngày)
+  → Reliability Score = 45
+
+Hồ sơ B (từ MyVNPost App, cập nhật 2 tuần trước, đã OTP):
+  Điểm nguồn = 55
+  Xác thực   = +20 (OTP)
+  Độ cũ      = -0
+  → Reliability Score = 75
+
+Kết quả: Lấy SĐT từ App (75 > 45) dù App điểm nguồn thấp hơn CAS.
+```
+
+---
+
+**Lưu trữ Reliability Score trong CDP:**
+
+Mỗi alias trong Block D lưu kèm:
+
+| Trường bổ sung | Kiểu | Ghi chú |
+|---|---|---|
+| `source_base_score` | Integer | Điểm nguồn tại thời điểm nhận |
+| `verification_bonus` | Integer | Điểm xác thực cộng thêm |
+| `reliability_score` | Integer | Tổng điểm tại thời điểm tính (tự động giảm theo thời gian) |
+| `reliability_calculated_at` | DateTime | Thời điểm tính điểm gần nhất |
+
+> Điểm phạt độ cũ được tính động — `reliability_score` tự động giảm khi dữ liệu không được cập nhật, không cần lưu cứng vào DB.
+
+---
+
 ## 8. Open Questions cần chốt
 
 - [ ] **OQ-01:** `customer_group` có bao nhiêu giá trị? Ngoài B2C / B2B / KHL / SME / ECOMMERCE còn loại nào khác không?
