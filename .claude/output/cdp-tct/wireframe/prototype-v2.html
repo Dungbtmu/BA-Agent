@@ -129,6 +129,8 @@ const KH_DETAIL = {
     uid:'UID-0000123456', type:'INDIVIDUAL', group:'SME', status:'ACTIVE', name:'Nguyễn Thị Hương',
     phone:'0901234567', email:'huong.nguyen@gmail.com', cccd:'012********', postId:'PID-889234',
     crmId:'CRM-55120', postOffice:'BĐ Cầu Giấy', completeness:82,
+    gender:'Nữ', birthDate:'15/03/1988', customerCode:'CUS-SME-00892',
+    lastOrder:{ id:'ORD-1781765944387', amount:'350.000', date:'23/06/2026', type:'EMS' },
     roles:['SENDER','SHOP_OWNER'], primaryRole:'SENDER', senderCount:1240, receiverCount:35,
     orders:1275, revenue:'458.200.000', avgMonthly:106, service:'EMS',
     routes:['HN→HCM','HN→ĐN','HN→HP'], deliveryRate:94, returnRate:8,
@@ -161,6 +163,8 @@ const KH_DETAIL = {
   'UID-0000987654': {
     uid:'UID-0000987654', type:'BUSINESS', group:'KHL', status:'ACTIVE', name:'Công ty TNHH Thương mại ABC',
     phone:'0987654321', email:'info@abc.vn', cccd:'N/A', postId:'N/A',
+    gender:'—', birthDate:'—', customerCode:'CUS-KHL-00156',
+    lastOrder:{ id:'ORD-1781700012240', amount:'12.400.000', date:'24/06/2026', type:'Bưu kiện loạt' },
     taxId:'0312345678', khlCode:'KHL-2024-0156', representative:'Trần Văn Nam',
     contract:{ status:'ACTIVE', start:'2024-01-15', end:'2026-12-31', segment:'Bán lẻ TMĐT' },
     contacts:[
@@ -199,6 +203,8 @@ const KH_DETAIL = {
   'UID-0000456789': {
     uid:'UID-0000456789', type:'INDIVIDUAL', group:'B2C', status:'ACTIVE', name:'Phạm Minh Tuấn',
     phone:'0978111222', email:'Chưa có dữ liệu', cccd:'Chưa có dữ liệu', postId:'PID-220145',
+    gender:'Nam', birthDate:'01/01/1995', customerCode:'CUS-B2C-04562',
+    lastOrder:{ id:'ORD-1781600088123', amount:'85.000', date:'18/06/2026', type:'Hoàn trả' },
     postOffice:'Chưa có dữ liệu', completeness:54,
     roles:['SENDER','RECEIVER'], primaryRole:'RECEIVER', senderCount:30, receiverCount:56,
     orders:86, revenue:'9.400.000', avgMonthly:8, service:'Chưa có dữ liệu',
@@ -1055,12 +1061,13 @@ function Customer360Screen({ uid, onBack }) {
         </div>
 
         {/* KPI strip */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:12, marginTop:16, paddingTop:16, borderTop:'1px solid #E5E7EB' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:12, marginTop:16, paddingTop:16, borderTop:'1px solid #E5E7EB' }}>
           {[
             { label:'Tổng đơn', value: kh.orders.toLocaleString(), unit:'' },
             { label:'Doanh thu', value: kh.revenue, unit:' ₫' },
             { label:'Tỷ lệ phát', value: kh.deliveryRate, unit:'%', color: kh.deliveryRate>=90 ? '#16A34A':'#F59E0B' },
             { label:'Tỷ lệ hoàn', value: kh.returnRate, unit:'%', color: kh.returnRate>=20 ? '#DC2626':'#F59E0B' },
+            { label:'Điểm tích lũy', value: kh.loyalty?.points != null ? kh.loyalty.points.toLocaleString() : '—', unit:'', color:'#7c3aed' },
             { label:'Độ đầy đủ hồ sơ', value: kh.completeness, unit:'%', color: completenessColor },
           ].map((k,i) => (
             <div key={i}>
@@ -1092,6 +1099,9 @@ function Customer360Screen({ uid, onBack }) {
             <div>
               <div className="section-title">Thông tin định danh</div>
               {[
+                ['Mã KH', kh.customerCode || 'Chưa có dữ liệu'],
+                ['Giới tính', kh.gender || 'Chưa có dữ liệu'],
+                ['Ngày sinh', kh.birthDate || 'Chưa có dữ liệu'],
                 ['SĐT', kh.phone],
                 ['Email', kh.email],
                 ['CCCD', kh.cccd],
@@ -1337,6 +1347,22 @@ function Customer360Screen({ uid, onBack }) {
                   <span style={{ fontSize:13, fontWeight:500 }}>{v}</span>
                 </div>
               ))}
+              {kh.lastOrder && (
+                <div style={{ marginTop:16 }}>
+                  <div className="section-title">Đơn hàng gần nhất</div>
+                  {[
+                    ['Mã đơn', kh.lastOrder.id],
+                    ['Loại dịch vụ', kh.lastOrder.type],
+                    ['Giá trị', `${kh.lastOrder.amount} ₫`],
+                    ['Ngày tạo', kh.lastOrder.date],
+                  ].map(([l,v]) => (
+                    <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                      <span className="field-label" style={{ margin:0 }}>{l}</span>
+                      <span style={{ fontSize:13, fontWeight:500, fontFamily: l==='Mã đơn' ? 'monospace':'inherit' }}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <div className="section-title">Timeline sự kiện</div>
