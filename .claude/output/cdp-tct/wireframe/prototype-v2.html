@@ -149,7 +149,9 @@ const KH_DETAIL = {
       { type:'USER_APP_ID', value:'APP-99213', source:'MyVNPost', confidence:'MEDIUM', reliability:70, primary:false },
     ],
     addresses:[
-      { type:'SENDER', primary:true, detail:'Số 5 ngõ 12 Trần Thái Tông', ward:'P.Dịch Vọng', province:'Hà Nội', vpostcode:'100123', status:'STANDARDIZED', version:'NEW' },
+      { type:'SENDER',   primary:true,  detail:'Số 5 ngõ 12 Trần Thái Tông', ward:'P.Dịch Vọng',        province:'Hà Nội',  vpostcode:'100123', status:'STANDARDIZED', version:'NEW' },
+      { type:'RECEIVER', primary:false, detail:'22 Lê Văn Sỹ',                ward:'P.13',               province:'TP HCM',  vpostcode:'700789', status:'STANDARDIZED', version:'NEW' },
+      { type:'SENDER',   primary:false, detail:'88 Bạch Đằng',                ward:'P.Hải Châu 1',       province:'Đà Nẵng', vpostcode:'550123', status:'PARTIAL',      version:'LEGACY' },
     ],
     timeline:[
       { time:'24/06 09:12', type:'app', icon:'📱', label:'Đăng nhập App', channel:'APP', color:'#2563EB' },
@@ -198,7 +200,9 @@ const KH_DETAIL = {
       { type:'EMAIL',   value:'info@abc.vn',   source:'CRM',        confidence:'MEDIUM', reliability:70, primary:true },
     ],
     addresses:[
-      { type:'BUSINESS', primary:true, detail:'123 Nguyễn Thị Minh Khai', ward:'P.6', province:'TP HCM', vpostcode:'700123', status:'STANDARDIZED', version:'NEW' },
+      { type:'BUSINESS',  primary:true,  detail:'123 Nguyễn Thị Minh Khai', ward:'P.6',          province:'TP HCM',  vpostcode:'700123', status:'STANDARDIZED', version:'NEW' },
+      { type:'WAREHOUSE', primary:false, detail:'KCN Sóng Thần, Lô B12',    ward:'P.Dĩ An',      province:'Bình Dương', vpostcode:'820123', status:'STANDARDIZED', version:'NEW' },
+      { type:'BUSINESS',  primary:false, detail:'45 Lý Thường Kiệt',         ward:'P.Hoàn Kiếm',  province:'Hà Nội',  vpostcode:'100456', status:'PARTIAL',      version:'LEGACY' },
     ],
     timeline:[
       { time:'24/06 10:00', type:'order', icon:'📦', label:'Đơn loạt — 240 đơn bưu kiện HCM→HN', channel:'API', color:'#16A34A' },
@@ -230,7 +234,8 @@ const KH_DETAIL = {
       { type:'POST_ID', value:'PID-220145', source:'PostID',confidence:'HIGH',   reliability:90, primary:true },
     ],
     addresses:[
-      { type:'RECEIVER', primary:true, detail:'45 Trần Hưng Đạo', ward:'P.Nguyễn Cư Trinh', province:'TP HCM', vpostcode:'700456', status:'PARTIAL', version:'LEGACY' },
+      { type:'RECEIVER', primary:true,  detail:'45 Trần Hưng Đạo',    ward:'P.Nguyễn Cư Trinh', province:'TP HCM',  vpostcode:'700456', status:'PARTIAL',      version:'LEGACY' },
+      { type:'SENDER',   primary:false, detail:'12 Nguyễn Trãi',       ward:'P.Bến Thành',       province:'TP HCM',  vpostcode:'700111', status:'STANDARDIZED', version:'NEW' },
     ],
     timeline:[
       { time:'21/06 13:00', type:'complaint', icon:'💬', label:'Khiếu nại — Đơn mất', channel:'CALL_CENTER', color:'#DC2626' },
