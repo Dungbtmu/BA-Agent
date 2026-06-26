@@ -210,7 +210,7 @@ const KH_DETAIL = {
       { time:'20/06 09:00', type:'merge', icon:'🔗', label:'Merge từ UID-0000987001', channel:'SYSTEM', color:'#6B7280' },
       { time:'15/01 00:00', type:'contract', icon:'📄', label:'Hợp đồng KHL ký kết 2024-01-15', channel:'CRM', color:'#2563EB' },
     ],
-    mergeHistory:[{ from:'UID-0000987001', at:'20/06/2026 09:00', by:'ds_trung@vnpost.vn', note:'Trùng MST, confirm merge', type:'MANUAL', source:'Portal KHL', confidence:78 }],
+    mergeHistory:[{ from:'UID-0000987001', at:'20/06/2026 09:00', by:'ds_trung@vnpost.vn', note:'Trùng MST, confirm merge', type:'AUTO', source:'Portal KHL', confidence:78, matchKey:'MST 0312345678' }],
   },
   'UID-0000456789': {
     uid:'UID-0000456789', type:'INDIVIDUAL', group:'B2C', status:'ACTIVE', name:'Phạm Minh Tuấn',
@@ -341,9 +341,8 @@ function Icon({ name }) {
 
 function Sidebar({ active, onNav }) {
   const items = [
-    { key:'customers',label:'Khách hàng',    icon:'users'   },
-    { key:'identity', label:'Đối soát hồ sơ', icon:'merge'   },
-    { key:'segments', label:'Phân khúc',       icon:'segment' },
+    { key:'customers',label:'Khách hàng', icon:'users'   },
+    { key:'segments', label:'Phân khúc',  icon:'segment' },
   ];
   // kafka và c360 ẩn khỏi sidebar — kafka giữ code, c360 mở từ Customer List
   return (
@@ -1038,6 +1037,7 @@ function Customer360Screen({ uid, onBack }) {
   const tabs = [
     { key:'overview',   label:'Tổng quan' },
     { key:'linked',     label:'Hồ sơ liên kết' },
+    { key:'mergehist',  label:'Lịch sử gộp hồ sơ' },
     { key:'address',    label:'Địa chỉ' },
     ...(kh.type==='BUSINESS' ? [{ key:'business', label:'Doanh nghiệp' }] : []),
     { key:'transaction',label:'GD & COD' },
@@ -1244,6 +1244,47 @@ function Customer360Screen({ uid, onBack }) {
                   Báo cáo merge sai
                 </button>
               </div>
+            )}
+          </div>
+        )}
+
+        {/* LỊCH SỬ GỘP HỒ SƠ */}
+        {tab==='mergehist' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+            <div style={{ fontSize:12, color:'#6B7280' }}>
+              Toàn bộ lần BE tự động gộp hồ sơ vào hồ sơ này. Nếu nghi ngờ gộp sai, dùng nút "Báo cáo gộp sai" ở tab Hồ sơ liên kết.
+            </div>
+            {(kh.mergeHistory||[]).length === 0 ? (
+              <div style={{ padding:32, textAlign:'center', color:'#6B7280' }}>Chưa có lần gộp hồ sơ nào</div>
+            ) : (
+              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                <thead>
+                  <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
+                    {['Loại','Hồ sơ được gộp vào','Hệ thống nguồn','Khóa trùng','Độ tin cậy','Thời điểm','Người xác nhận'].map(h => (
+                      <th key={h} style={{ padding:'9px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', whiteSpace:'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {kh.mergeHistory.map((m,i) => (
+                    <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                      <td style={{ padding:'9px 12px' }}>
+                        <span className={`badge ${m.type==='AUTO' ? 'badge-blue':'badge-green'}`}>
+                          {m.type==='AUTO' ? 'Tự động':'Thủ công'}
+                        </span>
+                      </td>
+                      <td style={{ padding:'9px 12px', fontFamily:'monospace', fontSize:12, color:'#7c3aed' }}>{m.from}</td>
+                      <td style={{ padding:'9px 12px', fontSize:12, color:'#6B7280' }}>{m.source||'—'}</td>
+                      <td style={{ padding:'9px 12px', fontSize:12 }}>{m.matchKey||'—'}</td>
+                      <td style={{ padding:'9px 12px', fontWeight:700, color:(m.confidence||0)>=90 ? '#16A34A':'#F59E0B' }}>
+                        {m.confidence ? `${m.confidence}%` : '—'}
+                      </td>
+                      <td style={{ padding:'9px 12px', fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{m.at}</td>
+                      <td style={{ padding:'9px 12px', fontSize:12, color:'#6B7280' }}>{m.by}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
         )}
@@ -1771,7 +1812,6 @@ function App() {
         <main style={{ flex:1, overflowY:'auto' }}>
           {nav==='kafka'     && <KafkaScreen />}
           {nav==='customers' && <CustomerListScreen onC360={goC360} />}
-          {nav==='identity'  && <IdentityScreen onC360={goC360} />}
           {nav==='c360'      && <Customer360Screen uid={c360uid} onBack={c360uid ? () => setNav('customers') : null} />}
           {nav==='segments'  && <SegmentScreen />}
         </main>
