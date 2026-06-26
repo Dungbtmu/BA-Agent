@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CDP VNPost — Prototype v2</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', 'IBM Plex Sans', system-ui, sans-serif; background: #F7F8FA; color: #1A1A1A; }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+  :focus-visible { outline: 2px solid #E30613; outline-offset: 2px; }
+  .sidebar-item:hover { background: #fef2f2; }
+  .sidebar-item.active { background: #fef2f2; color: #E30613; border-right: 3px solid #E30613; }
+  .sidebar-item.active svg { color: #E30613; }
+  .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge-green { background: #dcfce7; color: #16A34A; }
+  .badge-red { background: #fee2e2; color: #DC2626; }
+  .badge-yellow { background: #fef9c3; color: #d97706; }
+  .badge-blue { background: #dbeafe; color: #2563EB; }
+  .badge-gray { background: #f3f4f6; color: #6B7280; }
+  .badge-purple { background: #ede9fe; color: #7c3aed; }
+  .table-row:hover { background: #f9fafb; cursor: pointer; }
+  .score-bar { height: 6px; border-radius: 3px; background: #e5e7eb; }
+  .score-fill { height: 100%; border-radius: 3px; }
+  .tab-btn { padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #6B7280; }
+  .tab-btn.active { background: #E30613; color: white; }
+  .tab-btn:hover:not(.active) { background: #f3f4f6; }
+  .chart-bar { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .chart-bar-fill { width: 28px; border-radius: 4px 4px 0 0; }
+  .kpi-card { background: white; border-radius: 10px; padding: 16px 20px; border: 1px solid #E5E7EB; }
+  .panel { background: white; border-radius: 10px; border: 1px solid #E5E7EB; overflow: hidden; }
+  .section-title { font-size: 13px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .field-label { font-size: 12px; color: #6B7280; margin-bottom: 2px; }
+  .field-value { font-size: 14px; color: #1A1A1A; font-weight: 500; }
+  .consent-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .consent-in { background: #dcfce7; color: #16A34A; }
+  .consent-out { background: #fee2e2; color: #DC2626; }
+  .consent-unknown { background: #f3f4f6; color: #6B7280; }
+  .timeline-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .rule-row { display: flex; align-items: center; gap: 8px; padding: 8px; background: #f9fafb; border-radius: 6px; }
+  .compare-match { background: #f0fdf4; }
+  .compare-diff { background: #fffbeb; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 50; }
+  .modal-box { background: white; border-radius: 12px; padding: 28px; width: 440px; max-width: 90vw; }
+  .gauge-outer { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
+  input, select { border: 1px solid #E5E7EB; border-radius: 6px; padding: 6px 10px; font-size: 13px; background: white; color: #1A1A1A; }
+  input:focus, select:focus { outline: 2px solid #E30613; outline-offset: 1px; border-color: transparent; }
+  .slide-panel { position: fixed; top: 0; right: 0; height: 100vh; width: 440px; max-width: 95vw; background: white; box-shadow: -4px 0 20px rgba(0,0,0,0.12); z-index: 40; overflow-y: auto; padding: 24px; }
+  .recharts-fake { display: flex; align-items: flex-end; gap: 3px; height: 80px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+// ============================================================
+// DATA
+// ============================================================
+const TOPICS = [
+  { id:1, status:'HEALTHY', name:'cdp.customer.profile',     source:'CAS',          type:'Khách hàng',      msgMin:145, msg24h:'208.000', lag:12,    lagWarn:false, err24h:0,  updated:'5s trước' },
+  { id:2, status:'HEALTHY', name:'cdp.customer.profile.crm', source:'CRM',          type:'Khách hàng',      msgMin:60,  msg24h:'86.000',  lag:4,     lagWarn:false, err24h:2,  updated:'8s trước' },
+  { id:3, status:'HEALTHY', name:'cdp.order.created',        source:'MPITS',        type:'Đơn hàng',        msgMin:320, msg24h:'461.000', lag:30,    lagWarn:false, err24h:5,  updated:'2s trước' },
+  { id:4, status:'WARNING', name:'cdp.delivery.status',      source:'PNS/DingDong', type:'Trạng thái phát', msgMin:210, msg24h:'302.000', lag:8400,  lagWarn:true,  err24h:12, updated:'1m trước' },
+  { id:5, status:'ERROR',   name:'cdp.cod.payment',          source:'PayPost',      type:'COD',             msgMin:0,   msg24h:'54.000',  lag:11200, lagWarn:true,  err24h:48, updated:'15m trước' },
+  { id:6, status:'HEALTHY', name:'cdp.behavior.event',       source:'MyVNPost',     type:'Hành vi',         msgMin:480, msg24h:'690.000', lag:55,    lagWarn:false, err24h:8,  updated:'1s trước' },
+  { id:7, status:'HEALTHY', name:'cdp.customer.khl',         source:'Portal KHL',   type:'Khách hàng',      msgMin:12,  msg24h:'17.000',  lag:0,     lagWarn:false, err24h:0,  updated:'20s trước' },
+  { id:8, status:'IDLE',    name:'cdp.address.update',       source:'VPostCode',    type:'Địa chỉ',         msgMin:0,   msg24h:'1.200',   lag:0,     lagWarn:false, err24h:0,  updated:'2h trước' },
+];
+
+const ALERTS = [
+  { level:'ERROR',   time:'10:42', topic:'cdp.cod.payment',    msg:'PayPost ngừng đẩy message 15 phút, lag 11.200' },
+  { level:'WARNING', time:'10:30', topic:'cdp.delivery.status',msg:'Consumer lag vượt ngưỡng 8.000' },
+  { level:'ERROR',   time:'09:15', topic:'cdp.cod.payment',    msg:'48 message lỗi schema trong 1 giờ' },
+];
+
+const CUSTOMERS = [
+  { uid:'UID-0000123456', name:'Nguyễn Thị Hương',         type:'INDIVIDUAL', group:'SME',        phone:'0901234567', orders:1275, revenue:'458.200.000', segment:'Champions',          status:'ACTIVE',   updated:'hôm nay' },
+  { uid:'UID-0000987654', name:'Công ty TNHH TM ABC',      type:'BUSINESS',   group:'KHL',        phone:'0987654321', orders:18450,revenue:'6.820.000.000',segment:'KHL giá trị cao',   status:'ACTIVE',   updated:'hôm nay' },
+  { uid:'UID-0000456789', name:'Phạm Minh Tuấn',           type:'INDIVIDUAL', group:'B2C',        phone:'0978111222', orders:86,   revenue:'9.400.000',   segment:'At Risk',            status:'ACTIVE',   updated:'3 ngày trước' },
+  { uid:'UID-0000334411', name:'Trần Quốc Bảo',            type:'INDIVIDUAL', group:'B2C',        phone:'0905556677', orders:412,  revenue:'78.500.000',  segment:'Loyal',              status:'ACTIVE',   updated:'hôm qua' },
+  { uid:'UID-0000220088', name:'Cửa hàng Mẹ & Bé Sunny',  type:'BUSINESS',   group:'SME',        phone:'0933221100', orders:2310, revenue:'612.000.000', segment:'Chủ shop cao',       status:'ACTIVE',   updated:'hôm nay' },
+  { uid:'UID-0000771122', name:'Lê Thị Hằng',              type:'INDIVIDUAL', group:'B2C',        phone:'0918887766', orders:24,   revenue:'1.800.000',   segment:'New',                status:'ACTIVE',   updated:'1 tuần trước' },
+  { uid:'UID-0000559900', name:'Công ty CP Logistics XYZ', type:'BUSINESS',   group:'KHL',        phone:'0966554433', orders:9870, revenue:'3.410.000.000',segment:'KHL giá trị cao',  status:'ACTIVE',   updated:'hôm nay' },
+  { uid:'UID-0000662200', name:'Đỗ Văn Khải',              type:'INDIVIDUAL', group:'B2C',        phone:'0944332211', orders:153,  revenue:'19.200.000',  segment:'At Risk',            status:'INACTIVE', updated:'2 tháng trước' },
+];
+
+// Dữ liệu nhóm hồ sơ — mỗi nhóm có N hồ sơ từ N nguồn khác nhau
+const GROUPS = [
+  {
+    id:'GRP-0041', matchKey:'SĐT 0901234567 · Tên gần đúng', type:'INDIVIDUAL',
+    profiles:[
+      { uid:'CAS-0009912',  source:'CAS',          name:'Nguyễn Thị Hương',  phone:'0901234567',  email:'huong.nguyen@gmail.com', cccd:'012********',       address:'Hà Nội',   orders:1275, role:'SENDER',   confidence:94 },
+      { uid:'CRM-0000192',  source:'CRM',          name:'Nguyen Thi Huong',  phone:'0901234567',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'—',        confidence:91 },
+      { uid:'MVN-4421009',  source:'MyVNPost',     name:'Hương Nguyễn',      phone:'090123xxxx',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:12,   role:'SENDER',   confidence:76 },
+      { uid:'PNS-8819001',  source:'PNS/DingDong', name:'N.T. Hương',        phone:'0901234567',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'RECEIVER', confidence:88 },
+      { uid:'PAY-2200441',  source:'PayPost',      name:'Nguyễn Hương',      phone:'090123xxx',   email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'—',        confidence:72 },
+      { uid:'VPC-0031122',  source:'VPostCode',    name:'—',                 phone:'—',           email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'—',        confidence:60 },
+    ],
+    conflicts:['SĐT không nhất quán ở MyVNPost, PayPost (thiếu số cuối)', 'Tên viết tắt/không dấu ở 3/6 nguồn'],
+    warn: true,
+  },
+  {
+    id:'GRP-0042', matchKey:'MST 0312345678', type:'BUSINESS',
+    profiles:[
+      { uid:'KHL-0987654',  source:'Portal KHL',   name:'Cty TNHH TM ABC',      phone:'0987654321',  email:'info@abc.vn',            cccd:'MST:0312345678',    address:'TP.HCM',   orders:18450,role:'KHL',      confidence:95 },
+      { uid:'CRM-0000987',  source:'CRM',          name:'Cong ty TNHH TM ABC',  phone:'—',           email:'contact@abc.com.vn',     cccd:'MST:0312345678',    address:'TP.HCM',   orders:0,    role:'—',        confidence:88 },
+      { uid:'CAS-0041200',  source:'CAS',          name:'TNHH TM ABC',          phone:'0987654321',  email:'—',                      cccd:'MST:0312345678',    address:'TP.HCM',   orders:320,  role:'SENDER',   confidence:82 },
+    ],
+    conflicts:['Tên công ty viết tắt/không dấu ở CRM, CAS'],
+    warn: false,
+  },
+  {
+    id:'GRP-0043', matchKey:'SĐT 0978111222', type:'INDIVIDUAL',
+    profiles:[
+      { uid:'CAS-0456789',  source:'CAS',          name:'Phạm Minh Tuấn',       phone:'0978111222',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:86,   role:'SENDER',   confidence:80 },
+      { uid:'PNS-0456120',  source:'PNS/DingDong', name:'Pham M. Tuan',         phone:'0978111222',  email:'—',                      cccd:'—',                 address:'TP.HCM',   orders:0,    role:'RECEIVER', confidence:68 },
+    ],
+    conflicts:['Địa chỉ khác tỉnh (HN vs HCM)', 'Vai trò khác nhau (SENDER vs RECEIVER)'],
+    warn: true,
+  },
+];
+
+const KH_DETAIL = {
+  'UID-0000123456': {
+    uid:'UID-0000123456', type:'INDIVIDUAL', group:'SME', status:'ACTIVE', name:'Nguyễn Thị Hương',
+    phone:'0901234567', email:'huong.nguyen@gmail.com', cccd:'012********', postId:'PID-889234',
+    crmId:'CRM-55120', postOffice:'BĐ Cầu Giấy', completeness:82,
+    gender:'Nữ', birthDate:'15/03/1988', customerCode:'CUS-SME-00892',
+    lastOrder:{ id:'ORD-1781765944387', amount:'350.000', date:'23/06/2026', type:'EMS' },
+    roles:['SENDER','SHOP_OWNER'], primaryRole:'SENDER', senderCount:1240, receiverCount:35,
+    orders:1275, revenue:'458.200.000', avgMonthly:106, service:'EMS',
+    routes:['HN→HCM','HN→ĐN','HN→HP'], deliveryRate:94, returnRate:8,
+    cod:{ total:'1.250.000.000', collected:'1.180.000.000', pending:'70.000.000', status:'MATCHED' },
+    loyalty:{ tier:'GOLD', points:12400, expiry:'2026-12-31' },
+    segments:['Champions','Chủ shop hoạt động cao'],
+    scores:{ rfmR:5, rfmF:5, rfmM:4, rfmGroup:'Champions', clv:'620.000.000', churn:18, engagement:88, codRisk:22, fraud:9, updatedAt:'24/06 08:00' },
+    consent:{ sms:'in', email:'in', zalo:'in', push:'out', deletionRequested:false },
+    appLogin:'24/06 09:12', device:'Android', sessions30d:47,
+    complaints:{ total:3, open:0, satisfaction:4.5, sla:98 },
+    sources:['CAS','CRM','MyVNPost','PayPost','PostID','PNS'],
+    aliases:[
+      { type:'PHONE', value:'0901234567', source:'MyVNPost', confidence:'HIGH', reliability:90, primary:true },
+      { type:'POST_ID', value:'PID-889234', source:'PostID', confidence:'HIGH', reliability:95, primary:true },
+      { type:'CRM_ID', value:'CRM-55120', source:'CRM', confidence:'HIGH', reliability:85, primary:true },
+      { type:'USER_APP_ID', value:'APP-99213', source:'MyVNPost', confidence:'MEDIUM', reliability:70, primary:false },
+    ],
+    addresses:[
+      { type:'SENDER', primary:true, detail:'Số 5 ngõ 12 Trần Thái Tông', ward:'P.Dịch Vọng', province:'Hà Nội', vpostcode:'100123', status:'STANDARDIZED', version:'NEW' },
+    ],
+    timeline:[
+      { time:'24/06 09:12', type:'app', icon:'📱', label:'Đăng nhập App', channel:'APP', color:'#2563EB' },
+      { time:'23/06 14:30', type:'order', icon:'📦', label:'Tạo đơn hàng EMS HN→HCM', channel:'APP', color:'#16A34A' },
+      { time:'20/06 10:00', type:'complaint', icon:'💬', label:'Khiếu nại — Đơn giao chậm', channel:'CALL_CENTER', color:'#F59E0B' },
+      { time:'15/06 08:45', type:'order', icon:'📦', label:'Tạo đơn hàng EMS HN→ĐN', channel:'APP', color:'#16A34A' },
+      { time:'10/06 16:00', type:'campaign', icon:'📣', label:'Phản hồi Campaign Email SALE06', channel:'EMAIL', color:'#7c3aed' },
+    ],
+    mergeHistory:[],
+  },
+  'UID-0000987654': {
+    uid:'UID-0000987654', type:'BUSINESS', group:'KHL', status:'ACTIVE', name:'Công ty TNHH Thương mại ABC',
+    phone:'0987654321', email:'info@abc.vn', cccd:'N/A', postId:'N/A',
+    gender:'—', birthDate:'—', customerCode:'CUS-KHL-00156',
+    lastOrder:{ id:'ORD-1781700012240', amount:'12.400.000', date:'24/06/2026', type:'Bưu kiện loạt' },
+    taxId:'0312345678', khlCode:'KHL-2024-0156', representative:'Trần Văn Nam',
+    contract:{ status:'ACTIVE', start:'2024-01-15', end:'2026-12-31', segment:'Bán lẻ TMĐT' },
+    contacts:[
+      { name:'Trần Văn Nam', phone:'0987654321', email:'nam.tran@abc.vn', role:'Giám đốc', primary:true },
+      { name:'Lê Thị Mai',   phone:'0911222333', email:'mai.le@abc.vn',   role:'Kế toán',  primary:false },
+    ],
+    postOffice:'BĐ Q.1 HCM', completeness:91,
+    roles:['SENDER','KHL'], primaryRole:'KHL', senderCount:18450, receiverCount:0,
+    orders:18450, revenue:'6.820.000.000', avgMonthly:1537, service:'Bưu kiện thường',
+    routes:['HCM→HN','HCM→HP','HCM→ĐN'], deliveryRate:91, returnRate:14,
+    cod:{ total:'14.200.000.000', collected:'13.100.000.000', pending:'1.100.000.000', status:'DISCREPANCY' },
+    loyalty:{ tier:null, points:null, expiry:null },
+    segments:['KHL giá trị cao','Tỷ lệ hoàn cần theo dõi'],
+    scores:{ rfmR:5, rfmF:5, rfmM:5, rfmGroup:'Champions', clv:'9.500.000.000', churn:35, engagement:60, codRisk:58, fraud:21, updatedAt:'24/06 08:00' },
+    consent:{ sms:'in', email:'in', zalo:'unknown', push:'unknown', deletionRequested:false },
+    appLogin:'Chưa có dữ liệu', device:'Chưa có dữ liệu', sessions30d:null,
+    complaints:{ total:24, open:3, satisfaction:3.8, sla:86 },
+    sources:['Portal KHL','CRM','CAS','MPITS','PayPost'],
+    aliases:[
+      { type:'TAX_ID',  value:'0312345678',   source:'Portal KHL', confidence:'HIGH',   reliability:95, primary:true },
+      { type:'KHL_CODE',value:'KHL-2024-0156', source:'Portal KHL', confidence:'HIGH',   reliability:90, primary:true },
+      { type:'PHONE',   value:'0987654321',    source:'CRM',        confidence:'HIGH',   reliability:80, primary:true },
+      { type:'EMAIL',   value:'info@abc.vn',   source:'CRM',        confidence:'MEDIUM', reliability:70, primary:true },
+    ],
+    addresses:[
+      { type:'BUSINESS', primary:true, detail:'123 Nguyễn Thị Minh Khai', ward:'P.6', province:'TP HCM', vpostcode:'700123', status:'STANDARDIZED', version:'NEW' },
+    ],
+    timeline:[
+      { time:'24/06 10:00', type:'order', icon:'📦', label:'Đơn loạt — 240 đơn bưu kiện HCM→HN', channel:'API', color:'#16A34A' },
+      { time:'22/06 15:00', type:'complaint', icon:'💬', label:'Khiếu nại — Đối soát COD sai', channel:'CRM', color:'#F59E0B' },
+      { time:'20/06 09:00', type:'merge', icon:'🔗', label:'Merge từ UID-0000987001', channel:'SYSTEM', color:'#6B7280' },
+      { time:'15/01 00:00', type:'contract', icon:'📄', label:'Hợp đồng KHL ký kết 2024-01-15', channel:'CRM', color:'#2563EB' },
+    ],
+    mergeHistory:[{ from:'UID-0000987001', at:'20/06/2026 09:00', by:'ds_trung@vnpost.vn', note:'Trùng MST, confirm merge', type:'MANUAL', source:'Portal KHL', confidence:78 }],
+  },
+  'UID-0000456789': {
+    uid:'UID-0000456789', type:'INDIVIDUAL', group:'B2C', status:'ACTIVE', name:'Phạm Minh Tuấn',
+    phone:'0978111222', email:'Chưa có dữ liệu', cccd:'Chưa có dữ liệu', postId:'PID-220145',
+    gender:'Nam', birthDate:'01/01/1995', customerCode:'CUS-B2C-04562',
+    lastOrder:{ id:'ORD-1781600088123', amount:'85.000', date:'18/06/2026', type:'Hoàn trả' },
+    postOffice:'Chưa có dữ liệu', completeness:54,
+    roles:['SENDER','RECEIVER'], primaryRole:'RECEIVER', senderCount:30, receiverCount:56,
+    orders:86, revenue:'9.400.000', avgMonthly:8, service:'Chưa có dữ liệu',
+    routes:[], deliveryRate:72, returnRate:31,
+    cod:{ total:'24.000.000', collected:'15.500.000', pending:'8.500.000', status:'PENDING' },
+    loyalty:{ tier:null, points:null, expiry:null },
+    segments:['At Risk','Tỷ lệ hoàn cao'],
+    scores:{ rfmR:2, rfmF:2, rfmM:2, rfmGroup:'At Risk', clv:'Chưa có dữ liệu', churn:78, engagement:25, codRisk:71, fraud:44, updatedAt:'24/06 08:00' },
+    consent:{ sms:'out', email:'unknown', zalo:'unknown', push:'unknown', deletionRequested:false },
+    appLogin:'Chưa có dữ liệu', device:'Chưa có dữ liệu', sessions30d:null,
+    complaints:{ total:7, open:2, satisfaction:2.9, sla:71 },
+    sources:['CAS','PNS','PayPost'],
+    aliases:[
+      { type:'PHONE',   value:'0978111222', source:'CAS',   confidence:'HIGH',   reliability:60, primary:true },
+      { type:'POST_ID', value:'PID-220145', source:'PostID',confidence:'HIGH',   reliability:90, primary:true },
+    ],
+    addresses:[
+      { type:'RECEIVER', primary:true, detail:'45 Trần Hưng Đạo', ward:'P.Nguyễn Cư Trinh', province:'TP HCM', vpostcode:'700456', status:'PARTIAL', version:'LEGACY' },
+    ],
+    timeline:[
+      { time:'21/06 13:00', type:'complaint', icon:'💬', label:'Khiếu nại — Đơn mất', channel:'CALL_CENTER', color:'#DC2626' },
+      { time:'18/06 10:30', type:'order', icon:'📦', label:'Tạo đơn — Hoàn trả', channel:'APP', color:'#F59E0B' },
+      { time:'10/06 09:00', type:'order', icon:'📦', label:'Nhận hàng — Bưu kiện thường', channel:'COUNTER', color:'#16A34A' },
+    ],
+    mergeHistory:[],
+  },
+};
+
+const SEGMENTS = [
+  { name:'KHL giá trị cao',          desc:'customer_group=KHL AND total_revenue>1.000.000.000', count:'1.240', type:'Động', updated:'hôm nay',       status:'ACTIVE' },
+  { name:'Nguy cơ rời bỏ',           desc:'churn_score≥70',                                    count:'8.560', type:'Động', updated:'hôm qua',       status:'ACTIVE' },
+  { name:'Tỷ lệ hoàn cao cần xử lý', desc:'return_rate>0.2 AND total_orders>50',               count:'3.120', type:'Động', updated:'3 ngày trước',  status:'ACTIVE' },
+  { name:'Chủ shop hoạt động cao',   desc:'roles=SHOP_OWNER AND avg_monthly_orders>50',        count:'920',   type:'Động', updated:'1 tuần trước',  status:'ACTIVE' },
+];
+
+// ============================================================
+// UTILS
+// ============================================================
+const fmt = (n) => n;
+
+const statusBadge = (s) => {
+  const map = { HEALTHY:'badge-green', WARNING:'badge-yellow', ERROR:'badge-red', IDLE:'badge-gray' };
+  return <span className={`badge ${map[s]||'badge-gray'}`}>{s}</span>;
+};
+
+const custStatusBadge = (s) => {
+  const map = { ACTIVE:'badge-green', INACTIVE:'badge-gray', BLOCKED:'badge-red', MERGED:'badge-blue' };
+  return <span className={`badge ${map[s]||'badge-gray'}`}>{s}</span>;
+};
+
+const lagBadge = (lag, warn) => {
+  if (warn) return <span className="tabular-nums text-red-600 font-bold">{lag.toLocaleString()}</span>;
+  if (lag > 1000) return <span className="tabular-nums text-yellow-600 font-semibold">{lag.toLocaleString()}</span>;
+  return <span className="tabular-nums text-gray-500">{lag}</span>;
+};
+
+const scoreGauge = (val, label) => {
+  let bg = '#16A34A';
+  if (val >= 70) bg = '#DC2626';
+  else if (val >= 40) bg = '#F59E0B';
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <div className="gauge-outer" style={{ border: `4px solid ${bg}`, color: bg }}>{val}</div>
+      <div className="text-xs text-gray-500">{label}</div>
+    </div>
+  );
+};
+
+const rfmDot = (val) => {
+  const colors = ['','#DC2626','#F59E0B','#d97706','#16A34A','#15803d'];
+  return (
+    <span className="inline-flex items-center gap-0.5">
+      {[1,2,3,4,5].map(i => (
+        <span key={i} style={{ width:10, height:10, borderRadius:'50%', background: i<=val ? colors[val] : '#e5e7eb', display:'inline-block' }}></span>
+      ))}
+      <span className="ml-1 font-bold tabular-nums" style={{ color: colors[val] }}>{val}</span>
+    </span>
+  );
+};
+
+const consentChip = (v, label) => {
+  const cls = v==='in' ? 'consent-in' : v==='out' ? 'consent-out' : 'consent-unknown';
+  const txt = v==='in' ? 'OPT IN' : v==='out' ? 'OPT OUT' : 'UNKNOWN';
+  return <div className="flex items-center justify-between py-1.5 border-b border-gray-100 last:border-0">
+    <span className="text-sm text-gray-600">{label}</span>
+    <span className={`consent-chip ${cls}`}>{v==='in' ? '✓' : v==='out' ? '✕' : '?'} {txt}</span>
+  </div>;
+};
+
+// ============================================================
+// COMPONENTS
+// ============================================================
+
+function Icon({ name }) {
+  const icons = {
+    kafka: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="5" y2="17"/><line x1="12" y1="7" x2="19" y2="17"/></svg>,
+    users: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+    merge: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>,
+    person: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+    segment: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>,
+    bell: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
+    search: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+    x: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    chevRight: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="9 18 15 12 9 6"/></svg>,
+    filter: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>,
+    plus: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    trash: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>,
+  };
+  return icons[name] || null;
+}
+
+function Sidebar({ active, onNav }) {
+  const items = [
+    { key:'customers',label:'Khách hàng',    icon:'users'   },
+    { key:'identity', label:'Đối soát hồ sơ', icon:'merge'   },
+    { key:'segments', label:'Phân khúc',       icon:'segment' },
+  ];
+  // kafka và c360 ẩn khỏi sidebar — kafka giữ code, c360 mở từ Customer List
+  return (
+    <aside style={{ width:220, flexShrink:0, background:'white', borderRight:'1px solid #E5E7EB', display:'flex', flexDirection:'column', height:'100vh', position:'sticky', top:0 }}>
+      <div style={{ padding:'20px 16px 12px', borderBottom:'1px solid #E5E7EB' }}>
+        <div className="flex items-center gap-2">
+          <div style={{ width:32, height:32, background:'#E30613', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <span style={{ color:'white', fontWeight:800, fontSize:14 }}>C</span>
+          </div>
+          <div>
+            <div style={{ fontWeight:700, fontSize:13, color:'#1A1A1A' }}>CDP VNPost</div>
+            <div style={{ fontSize:11, color:'#6B7280' }}>Hệ thống Nội bộ</div>
+          </div>
+        </div>
+      </div>
+      <nav style={{ flex:1, padding:'8px 0' }}>
+        {items.map(it => (
+          <button key={it.key} onClick={() => onNav(it.key)}
+            className={`sidebar-item w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-600 cursor-pointer border-0 bg-transparent ${active===it.key ? 'active':''}`}
+            style={{ transition:'all .15s' }}>
+            <Icon name={it.icon} />
+            <span>{it.label}</span>
+          </button>
+        ))}
+      </nav>
+      <div style={{ padding:'12px 16px', borderTop:'1px solid #E5E7EB', fontSize:12, color:'#6B7280' }}>
+        <div className="font-medium text-gray-800">Admin VNPost</div>
+        <div>admin@vnpost.vn</div>
+      </div>
+    </aside>
+  );
+}
+
+function Header({ title, onNav }) {
+  return (
+    <header style={{ background:'white', borderBottom:'1px solid #E5E7EB', padding:'0 24px', height:56, display:'flex', alignItems:'center', gap:16, position:'sticky', top:0, zIndex:10 }}>
+      <div style={{ flex:1, fontWeight:700, fontSize:16, color:'#1A1A1A' }}>{title}</div>
+      <div className="flex items-center gap-2" style={{ background:'#F7F8FA', border:'1px solid #E5E7EB', borderRadius:8, padding:'6px 12px', flex:'0 0 240px' }}>
+        <Icon name="search" />
+        <input placeholder="Tìm kiếm UID / tên / SĐT / MST..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
+      </div>
+      <button style={{ background:'none', border:'none', cursor:'pointer', color:'#6B7280', position:'relative' }}>
+        <Icon name="bell" />
+        <span style={{ position:'absolute', top:-4, right:-4, width:16, height:16, background:'#DC2626', color:'white', borderRadius:'50%', fontSize:10, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center' }}>3</span>
+      </button>
+    </header>
+  );
+}
+
+// ============================================================
+// CN1 — KAFKA INTEGRATION
+// ============================================================
+function KafkaScreen() {
+  const [selected, setSelected] = React.useState(null);
+  const [filter, setFilter] = React.useState('ALL');
+  const [timeRange, setTimeRange] = React.useState('6h');
+
+  const topics = filter === 'ALL' ? TOPICS : TOPICS.filter(t => t.status === filter);
+
+  const chartData = [45, 60, 80, 120, 200, 310, 480, 390, 320, 280, 350, 420];
+
+  const kpis = [
+    { label:'Topic giám sát', value:'8', sub:'tổng cộng', color:'#2563EB' },
+    { label:'Healthy', value:'5', sub:'hoạt động tốt', color:'#16A34A' },
+    { label:'Warning', value:'1', sub:'cần theo dõi', color:'#F59E0B' },
+    { label:'Error', value:'1', sub:'cần xử lý ngay', color:'#DC2626' },
+    { label:'Throughput', value:'1.227', sub:'msg/phút hiện tại', color:'#7c3aed' },
+    { label:'Message lỗi 24h', value:'75', sub:'cần xem lại', color:'#DC2626' },
+  ];
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:20 }}>
+      {/* KPIs */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:12 }}>
+        {kpis.map((k,i) => (
+          <div key={i} className="kpi-card" style={{ borderTop:`3px solid ${k.color}` }}>
+            <div className="tabular-nums" style={{ fontSize:22, fontWeight:800, color:k.color }}>{k.value}</div>
+            <div style={{ fontSize:13, fontWeight:600, color:'#1A1A1A', marginTop:2 }}>{k.label}</div>
+            <div style={{ fontSize:11, color:'#6B7280' }}>{k.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Chart + Alerts */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 340px', gap:16 }}>
+        {/* Chart */}
+        <div className="panel" style={{ padding:20 }}>
+          <div className="flex items-center justify-between mb-4">
+            <div style={{ fontWeight:700, fontSize:14 }}>Throughput message theo thời gian</div>
+            <div className="flex gap-1">
+              {['1h','6h','24h','7 ngày'].map(r => (
+                <button key={r} onClick={() => setTimeRange(r)} className={`tab-btn ${timeRange===r ? 'active':''}`} style={{ padding:'4px 10px', fontSize:12 }}>{r}</button>
+              ))}
+            </div>
+          </div>
+          <div style={{ display:'flex', alignItems:'flex-end', gap:4, height:100, padding:'0 4px' }}>
+            {chartData.map((v,i) => (
+              <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:2 }}>
+                <div style={{ width:'100%', height: `${(v/500)*90}px`, background:i>=10 ? '#DC2626' : '#E30613', borderRadius:'3px 3px 0 0', opacity: i>=10 ? 0.5 : 0.85 }}></div>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between mt-1" style={{ fontSize:11, color:'#6B7280' }}>
+            <span>-{timeRange}</span><span>Hiện tại</span>
+          </div>
+          <div className="flex gap-4 mt-3" style={{ fontSize:12, color:'#6B7280' }}>
+            <span><span style={{ display:'inline-block', width:10, height:10, background:'#E30613', borderRadius:2, marginRight:4 }}></span>Thành công</span>
+            <span><span style={{ display:'inline-block', width:10, height:10, background:'#DC2626', opacity:.5, borderRadius:2, marginRight:4 }}></span>Lỗi</span>
+          </div>
+        </div>
+
+        {/* Alert feed */}
+        <div className="panel" style={{ padding:20 }}>
+          <div style={{ fontWeight:700, fontSize:14, marginBottom:12 }}>Cảnh báo gần đây</div>
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            {ALERTS.map((a,i) => (
+              <div key={i} style={{ padding:10, borderRadius:8, background: a.level==='ERROR' ? '#fff5f5' : '#fffbeb', borderLeft:`3px solid ${a.level==='ERROR' ? '#DC2626' : '#F59E0B'}` }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`badge ${a.level==='ERROR' ? 'badge-red':'badge-yellow'}`} style={{ fontSize:10 }}>{a.level}</span>
+                  <span style={{ fontSize:12, color:'#6B7280' }}>{a.time}</span>
+                </div>
+                <div style={{ fontSize:12, fontWeight:600, color:'#1A1A1A' }}>{a.topic}</div>
+                <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>{a.msg}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Topic Table */}
+      <div className="panel">
+        <div className="flex items-center gap-3 p-4 border-b border-gray-100">
+          <div style={{ fontWeight:700, fontSize:14 }}>Kafka Topics</div>
+          <div className="flex gap-1 ml-2">
+            {['ALL','HEALTHY','WARNING','ERROR','IDLE'].map(f => (
+              <button key={f} onClick={() => setFilter(f)} className={`tab-btn ${filter===f ? 'active':''}`} style={{ padding:'3px 10px', fontSize:11 }}>{f}</button>
+            ))}
+          </div>
+        </div>
+        <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+          <thead>
+            <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+              {['Trạng thái','Tên Topic','Nguồn','Loại DL','Msg/phút','Tổng 24h','Lag','Lỗi 24h','Cập nhật'].map(h => (
+                <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', whiteSpace:'nowrap' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {topics.map(t => (
+              <tr key={t.id} className="table-row" onClick={() => setSelected(t)} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                <td style={{ padding:'10px 12px' }}>{statusBadge(t.status)}</td>
+                <td style={{ padding:'10px 12px', fontWeight:600, color:'#2563EB', fontFamily:'monospace', fontSize:12 }}>{t.name}</td>
+                <td style={{ padding:'10px 12px', color:'#6B7280' }}>{t.source}</td>
+                <td style={{ padding:'10px 12px', color:'#6B7280' }}>{t.type}</td>
+                <td style={{ padding:'10px 12px', textAlign:'right' }} className="tabular-nums">{t.msgMin}</td>
+                <td style={{ padding:'10px 12px', textAlign:'right' }} className="tabular-nums">{t.msg24h}</td>
+                <td style={{ padding:'10px 12px', textAlign:'right' }}>{lagBadge(t.lag, t.lagWarn)}</td>
+                <td style={{ padding:'10px 12px', textAlign:'right', color: t.err24h>10 ? '#DC2626' : t.err24h>0 ? '#F59E0B' : '#16A34A', fontWeight:600 }} className="tabular-nums">{t.err24h}</td>
+                <td style={{ padding:'10px 12px', color:'#6B7280', fontSize:12 }}>{t.updated}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Slide panel chi tiết Topic */}
+      {selected && (
+        <div className="slide-panel">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <div style={{ fontWeight:700, fontSize:15 }}>Chi tiết Topic</div>
+              <div style={{ fontFamily:'monospace', fontSize:12, color:'#2563EB', marginTop:2 }}>{selected.name}</div>
+            </div>
+            <button onClick={() => setSelected(null)} style={{ background:'#f3f4f6', border:'none', borderRadius:6, padding:'6px 8px', cursor:'pointer' }}><Icon name="x" /></button>
+          </div>
+          {statusBadge(selected.status)}
+          <div className="mt-4" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            {[
+              ['Hệ thống nguồn', selected.source],
+              ['Loại dữ liệu', selected.type],
+              ['Msg/phút', selected.msgMin],
+              ['Tổng 24h', selected.msg24h],
+              ['Consumer lag', <span className={selected.lagWarn ? 'text-red-600 font-bold':''}>{selected.lag.toLocaleString()}</span>],
+              ['Lỗi 24h', selected.err24h],
+              ['Partition', '3'],
+              ['Consumer group', `cdp.${selected.source.toLowerCase().replace(/\//g,'-')}.consumer`],
+            ].map(([l,v],i) => (
+              <div key={i}>
+                <div className="field-label">{l}</div>
+                <div className="field-value tabular-nums">{v}</div>
+              </div>
+            ))}
+          </div>
+          {selected.err24h > 0 && (
+            <div className="mt-5">
+              <div className="section-title">Message lỗi gần nhất</div>
+              {[...Array(Math.min(selected.err24h, 3))].map((_,i) => (
+                <div key={i} style={{ padding:'8px 10px', background:'#fff5f5', borderRadius:6, marginBottom:6, fontSize:12 }}>
+                  <div style={{ fontWeight:600, color:'#DC2626' }}>Schema validation error</div>
+                  <div style={{ color:'#6B7280', marginTop:2 }}>10:{30+i*5} — Offset {120034+i} — Field "customer_id" null</div>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="mt-5 flex gap-2">
+            <button style={{ flex:1, padding:'8px', background:'#E30613', color:'white', border:'none', borderRadius:7, fontSize:13, fontWeight:600, cursor:'pointer' }}>Retry consumer</button>
+            <button style={{ flex:1, padding:'8px', background:'#f3f4f6', color:'#1A1A1A', border:'none', borderRadius:7, fontSize:13, fontWeight:600, cursor:'pointer' }}>Tạm dừng</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+// CN2 — CUSTOMER MANAGEMENT
+// ============================================================
+function CustomerListScreen({ onC360 }) {
+  const [search, setSearch] = React.useState('');
+  const [typeFilter, setTypeFilter] = React.useState('ALL');
+  const [statusFilter, setStatusFilter] = React.useState('ALL');
+
+  const filtered = CUSTOMERS.filter(c => {
+    const q = search.toLowerCase();
+    const matchQ = !q || c.name.toLowerCase().includes(q) || c.uid.toLowerCase().includes(q) || c.phone.includes(q);
+    const matchT = typeFilter === 'ALL' || c.type === typeFilter;
+    const matchS = statusFilter === 'ALL' || c.status === statusFilter;
+    return matchQ && matchT && matchS;
+  });
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
+      {/* Toolbar */}
+      <div className="panel" style={{ padding:16 }}>
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2" style={{ background:'#F7F8FA', border:'1px solid #E5E7EB', borderRadius:8, padding:'6px 12px', flex:'1', minWidth:200 }}>
+            <Icon name="search" />
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tìm theo tên, UID, SĐT, email, MST..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
+          </div>
+          <select value={typeFilter} onChange={e=>setTypeFilter(e.target.value)} style={{ fontSize:13 }}>
+            <option value="ALL">Tất cả loại</option>
+            <option value="INDIVIDUAL">Cá nhân</option>
+            <option value="BUSINESS">Doanh nghiệp</option>
+          </select>
+          <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)} style={{ fontSize:13 }}>
+            <option value="ALL">Tất cả trạng thái</option>
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="INACTIVE">INACTIVE</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="panel">
+        <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+          <thead>
+            <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+              {['UID','Tên / Công ty','Loại','Nhóm','SĐT','Tổng đơn','Doanh thu','Segment','Trạng thái','Cập nhật'].map(h => (
+                <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', whiteSpace:'nowrap' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((c,i) => (
+              <tr key={i} className="table-row" onClick={() => onC360(c.uid)} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                <td style={{ padding:'10px 12px', fontFamily:'monospace', fontSize:11, color:'#6B7280' }}>{c.uid}</td>
+                <td style={{ padding:'10px 12px', fontWeight:600, color:'#2563EB' }}>{c.name}</td>
+                <td style={{ padding:'10px 12px' }}>
+                  <span className={`badge ${c.type==='INDIVIDUAL' ? 'badge-blue':'badge-purple'}`}>{c.type==='INDIVIDUAL' ? 'Cá nhân':'Doanh nghiệp'}</span>
+                </td>
+                <td style={{ padding:'10px 12px' }}><span className="badge badge-gray">{c.group}</span></td>
+                <td style={{ padding:'10px 12px', fontFamily:'monospace' }}>{c.phone.slice(0,3)+'***'+c.phone.slice(-3)}</td>
+                <td style={{ padding:'10px 12px', textAlign:'right' }} className="tabular-nums">{c.orders.toLocaleString()}</td>
+                <td style={{ padding:'10px 12px', textAlign:'right', fontWeight:600 }} className="tabular-nums">{c.revenue} ₫</td>
+                <td style={{ padding:'10px 12px' }}>
+                  <span className={`badge ${c.segment.includes('Risk') || c.segment.includes('hoàn') ? 'badge-red' : c.segment.includes('KHL') || c.segment.includes('Champions') ? 'badge-green' : 'badge-blue'}`}>{c.segment}</span>
+                </td>
+                <td style={{ padding:'10px 12px' }}>{custStatusBadge(c.status)}</td>
+                <td style={{ padding:'10px 12px', color:'#6B7280', fontSize:12 }}>{c.updated}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div style={{ padding:'10px 16px', borderTop:'1px solid #F3F4F6', fontSize:12, color:'#6B7280' }}>
+          Hiển thị {filtered.length} / {CUSTOMERS.length} khách hàng
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// CN3 — IDENTITY RESOLUTION
+// ============================================================
+// ============================================================
+// IDENTITY SCREEN — 2-tầng: Card grid tổng quan → Bảng so sánh chi tiết
+// ============================================================
+function IdentityScreen({ onC360 }) {
+  const [screenTab, setScreenTab] = React.useState('pending');
+  const [selectedGroup, setSelectedGroup] = React.useState(null);
+  const [compareView, setCompareView] = React.useState(false);
+  const [selectedSources, setSelectedSources] = React.useState([]);
+  const [modal, setModal] = React.useState(null);
+  const [decisions, setDecisions] = React.useState({});
+
+  const pendingGroups = GROUPS.filter(g => decisions[g.id] !== 'different');
+
+  const confColor = (c) => c >= 90 ? '#16A34A' : c >= 75 ? '#F59E0B' : '#DC2626';
+  const confBg    = (c) => c >= 90 ? '#dcfce7' : c >= 75 ? '#fef9c3' : '#fee2e2';
+
+  const COMPARE_FIELDS = [
+    { key:'name',    label:'Họ tên / Tên DN' },
+    { key:'phone',   label:'Số điện thoại' },
+    { key:'email',   label:'Email' },
+    { key:'cccd',    label:'CCCD / MST' },
+    { key:'address', label:'Tỉnh/TP' },
+    { key:'role',    label:'Vai trò' },
+    { key:'orders',  label:'Tổng đơn' },
+  ];
+
+  const openGroup = (g) => {
+    setSelectedGroup(g);
+    setSelectedSources(g.profiles.slice(0,3).map(p=>p.uid));
+    setCompareView(false);
+  };
+
+  const toggleSource = (uid) => {
+    setSelectedSources(prev =>
+      prev.includes(uid) ? prev.filter(u => u !== uid) : [...prev, uid]
+    );
+  };
+
+  const handleDecision = (type) => {
+    setDecisions(d => ({ ...d, [selectedGroup.id]: type }));
+    setModal(type);
+  };
+
+  // ── TẦNG 1: Danh sách nhóm ──
+  if (!selectedGroup) return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
+      <div style={{ display:'flex', gap:8, marginBottom:4 }}>
+        {[
+          { key:'pending', label:`Chờ xem xét (${pendingGroups.length})` },
+          { key:'history', label:'Lịch sử merge' },
+          { key:'unmerge', label:`Yêu cầu Unmerge (${UNMERGE_REQUESTS.filter(r=>r.status==='CHỜ DUYỆT').length})` },
+        ].map(t => (
+          <button key={t.key} onClick={() => setScreenTab(t.key)}
+            className={`tab-btn ${screenTab===t.key ? 'active':''}`}>{t.label}</button>
+        ))}
+      </div>
+
+      {screenTab==='pending' && (
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          <div style={{ fontSize:12, color:'#6B7280' }}>
+            Mỗi nhóm gồm các hồ sơ từ nhiều hệ thống mà BE xác định có thể là cùng 1 người. Độ tương đồng 60–89% — cần xác nhận thủ công.
+          </div>
+          {pendingGroups.map(g => (
+            <div key={g.id} className="panel" style={{ padding:0, overflow:'hidden', cursor:'pointer' }}
+              onClick={() => openGroup(g)}>
+              {/* Header nhóm */}
+              <div style={{ padding:'12px 16px', background:'#F7F8FA', borderBottom:'1px solid #E5E7EB', display:'flex', alignItems:'center', gap:12 }}>
+                <div style={{ fontWeight:700, fontSize:13 }}>{g.id}</div>
+                <span className={`badge ${g.type==='INDIVIDUAL' ? 'badge-blue':'badge-purple'}`}>{g.type==='INDIVIDUAL' ? 'Cá nhân':'Doanh nghiệp'}</span>
+                <span className="badge badge-blue">{g.matchKey}</span>
+                {g.warn && <span className="badge badge-red">⚠️ Có conflict</span>}
+                <span style={{ marginLeft:'auto', fontSize:12, color:'#6B7280' }}>{g.profiles.length} nguồn</span>
+                <span style={{ fontSize:12, color:'#E30613', fontWeight:600 }}>Xem chi tiết →</span>
+              </div>
+              {/* Card grid nguồn — preview nhỏ */}
+              <div style={{ padding:16, display:'flex', gap:10, flexWrap:'wrap' }}>
+                {g.profiles.map(p => (
+                  <div key={p.uid} style={{ minWidth:140, padding:'10px 12px', border:'1px solid #E5E7EB', borderRadius:8, background:'white', position:'relative' }}>
+                    <div style={{ fontSize:10, fontWeight:700, color:'#6B7280', marginBottom:4 }}>{p.source}</div>
+                    <div style={{ fontSize:12, fontWeight:600, marginBottom:2 }}>{p.name}</div>
+                    <div style={{ fontSize:11, color:'#6B7280', fontFamily:'monospace' }}>{p.phone}</div>
+                    <div style={{ marginTop:8, display:'flex', alignItems:'center', gap:6 }}>
+                      <div style={{ flex:1, height:4, borderRadius:2, background:'#E5E7EB' }}>
+                        <div style={{ width:`${p.confidence}%`, height:'100%', borderRadius:2, background:confColor(p.confidence) }}></div>
+                      </div>
+                      <span style={{ fontSize:11, fontWeight:700, color:confColor(p.confidence) }}>{p.confidence}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Conflict summary */}
+              {g.conflicts.length > 0 && (
+                <div style={{ padding:'8px 16px', borderTop:'1px solid #FEF9C3', background:'#FFFBEB' }}>
+                  {g.conflicts.map((c,i) => (
+                    <div key={i} style={{ fontSize:12, color:'#d97706' }}>⚠️ {c}</div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+          {pendingGroups.length === 0 && (
+            <div style={{ padding:40, textAlign:'center', color:'#6B7280' }}>✅ Không còn nhóm nào chờ xem xét</div>
+          )}
+        </div>
+      )}
+
+      {screenTab==='history' && (
+        <div className="panel" style={{ overflow:'hidden' }}>
+          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+            <thead>
+              <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
+                {['ID','Loại','UID Master','UID gộp vào','Độ tin cậy','Khóa trùng','Người quyết định','Thời điểm'].map(h => (
+                  <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', whiteSpace:'nowrap' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {MERGE_HISTORY.map(m => (
+                <tr key={m.id} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                  <td style={{ padding:'10px 12px', fontFamily:'monospace', fontSize:12 }}>{m.id}</td>
+                  <td style={{ padding:'10px 12px' }}>
+                    <span className={`badge ${m.type==='AUTO_MERGE' ? 'badge-blue':'badge-green'}`}>{m.type==='AUTO_MERGE' ? 'Tự động':'Thủ công'}</span>
+                  </td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#2563EB', fontFamily:'monospace' }}>{m.uidMaster}</td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#7c3aed', fontFamily:'monospace' }}>{m.uidMerged}</td>
+                  <td style={{ padding:'10px 12px', fontWeight:700, color:confColor(m.confidence) }}>{m.confidence}%</td>
+                  <td style={{ padding:'10px 12px', fontSize:12 }}><span className="badge badge-blue">{m.matchKeys}</span></td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280' }}>{m.by}</td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{m.at}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {screenTab==='unmerge' && (
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          <div style={{ padding:12, background:'#fef9c3', border:'1px solid #F59E0B', borderRadius:8, fontSize:12, color:'#d97706' }}>
+            Chỉ Admin mới có thể phê duyệt hoặc từ chối yêu cầu Unmerge.
+          </div>
+          <div className="panel" style={{ overflow:'hidden' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+              <thead>
+                <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
+                  {['ID','UID liên quan','Người báo cáo','Thời gian','Lý do','Trạng thái',''].map(h => (
+                    <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {UNMERGE_REQUESTS.map(r => (
+                  <tr key={r.id} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                    <td style={{ padding:'10px 12px', fontFamily:'monospace', fontSize:12 }}>{r.id}</td>
+                    <td style={{ padding:'10px 12px', fontSize:12, color:'#2563EB', fontFamily:'monospace' }}>{r.uidMaster}</td>
+                    <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280' }}>{r.reporter}</td>
+                    <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{r.reportedAt}</td>
+                    <td style={{ padding:'10px 12px', fontSize:12, maxWidth:260 }}>{r.reason}</td>
+                    <td style={{ padding:'10px 12px' }}><span className="badge badge-yellow">{r.status}</span></td>
+                    <td style={{ padding:'10px 12px' }}>
+                      <div className="flex gap-2">
+                        <button style={{ padding:'5px 10px', background:'#DC2626', color:'white', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer' }}>Phê duyệt</button>
+                        <button style={{ padding:'5px 10px', background:'#f3f4f6', color:'#6B7280', border:'none', borderRadius:6, fontSize:12, cursor:'pointer' }}>Từ chối</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  // ── TẦNG 2: Chi tiết nhóm (card grid đầy đủ + bảng so sánh) ──
+  const compareCols = selectedGroup.profiles.filter(p => selectedSources.includes(p.uid));
+
+  // Kiểm tra field có conflict trong nhóm đang chọn không
+  const hasConflict = (fieldKey) => {
+    const vals = compareCols.map(p => String(p[fieldKey]||'—').toLowerCase().trim());
+    const filled = vals.filter(v => v !== '—' && v !== '');
+    return filled.length > 1 && new Set(filled).size > 1;
+  };
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
+      {modal && (
+        <div className="modal-overlay" onClick={() => setModal(null)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize:16, fontWeight:700, marginBottom:8 }}>
+              {modal==='confirmed' ? '✅ Đã ghi nhận — Cùng người' : modal==='different' ? '🚫 Đã ghi nhận — Tách nhóm' : '⏳ Để lại sau'}
+            </div>
+            <div style={{ fontSize:13, color:'#6B7280', marginBottom:16 }}>
+              {modal==='confirmed' && 'Quyết định đã ghi nhận. BE sẽ merge toàn bộ hồ sơ trong nhóm thành 1 Golden Record.'}
+              {modal==='different' && 'Nhóm này sẽ được đánh dấu tách và không xuất hiện lại.'}
+              {modal==='later' && 'Nhóm vẫn còn trong danh sách chờ.'}
+            </div>
+            <button onClick={() => { setModal(null); setSelectedGroup(null); }}
+              style={{ width:'100%', padding:'10px', background:'#E30613', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer' }}>
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2">
+        <button onClick={() => setSelectedGroup(null)} style={{ background:'#f3f4f6', border:'none', borderRadius:6, padding:'6px 12px', fontSize:13, cursor:'pointer' }}>← Danh sách nhóm</button>
+        <span style={{ color:'#6B7280', fontSize:13 }}>/</span>
+        <span style={{ fontWeight:700, fontSize:14 }}>{selectedGroup.id}</span>
+        <span className="badge badge-yellow" style={{ marginLeft:4 }}>PENDING</span>
+        {selectedGroup.warn && <span className="badge badge-red">⚠️ Có conflict</span>}
+      </div>
+
+      {/* Toggle tầng 1/2 */}
+      <div className="flex gap-2">
+        <button onClick={() => setCompareView(false)}
+          className={`tab-btn ${!compareView ? 'active':''}`}>📋 Tổng quan nguồn</button>
+        <button onClick={() => setCompareView(true)}
+          className={`tab-btn ${compareView ? 'active':''}`}>🔍 So sánh chi tiết</button>
+      </div>
+
+      {/* ── TẦNG 1: Card grid tổng quan ── */}
+      {!compareView && (
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          <div style={{ fontSize:12, color:'#6B7280' }}>
+            Khóa trùng: <strong>{selectedGroup.matchKey}</strong> · {selectedGroup.profiles.length} hồ sơ từ {selectedGroup.profiles.length} nguồn
+          </div>
+
+          {/* Cards */}
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:12 }}>
+            {selectedGroup.profiles.map(p => (
+              <div key={p.uid} style={{ border:`2px solid ${confColor(p.confidence)}22`, borderRadius:10, padding:14, background:'white', position:'relative' }}>
+                {/* Source badge + confidence */}
+                <div className="flex items-center justify-between mb-2">
+                  <span style={{ fontSize:11, fontWeight:700, color:'white', background: p.confidence>=90 ? '#16A34A' : p.confidence>=75 ? '#F59E0B':'#DC2626', padding:'2px 8px', borderRadius:4 }}>
+                    {p.source}
+                  </span>
+                  <span style={{ fontSize:12, fontWeight:800, color:confColor(p.confidence) }}>{p.confidence}%</span>
+                </div>
+                {/* UID */}
+                <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace', marginBottom:6 }}>{p.uid}</div>
+                {/* Fields */}
+                {[
+                  { label:'Tên',    val:p.name },
+                  { label:'SĐT',    val:p.phone },
+                  { label:'Email',  val:p.email },
+                  { label:'Địa chỉ',val:p.address },
+                  { label:'Vai trò',val:p.role },
+                  { label:'Đơn',    val:p.orders > 0 ? p.orders.toLocaleString() : '—' },
+                ].map(f => (
+                  <div key={f.label} style={{ display:'flex', justifyContent:'space-between', padding:'3px 0', borderBottom:'1px solid #F3F4F6' }}>
+                    <span style={{ fontSize:11, color:'#9CA3AF' }}>{f.label}</span>
+                    <span style={{ fontSize:11, fontWeight:500, color: f.val==='—' ? '#D1D5DB':'#1A1A1A', maxWidth:110, textAlign:'right', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{f.val}</span>
+                  </div>
+                ))}
+                {/* Confidence bar */}
+                <div style={{ marginTop:10, height:4, borderRadius:2, background:'#E5E7EB' }}>
+                  <div style={{ width:`${p.confidence}%`, height:'100%', borderRadius:2, background:confColor(p.confidence) }}></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Conflict summary */}
+          {selectedGroup.conflicts.length > 0 && (
+            <div style={{ padding:12, background:'#FFFBEB', border:'1px solid #F59E0B', borderRadius:8 }}>
+              <div style={{ fontSize:12, fontWeight:700, color:'#d97706', marginBottom:6 }}>⚠️ Conflict phát hiện</div>
+              {selectedGroup.conflicts.map((c,i) => <div key={i} style={{ fontSize:12, color:'#92400E' }}>• {c}</div>)}
+            </div>
+          )}
+
+          <div style={{ fontSize:12, color:'#6B7280' }}>
+            Muốn so sánh field-by-field? Chọn tab <strong>So sánh chi tiết</strong> và chọn các nguồn cần xem.
+          </div>
+        </div>
+      )}
+
+      {/* ── TẦNG 2: Bảng so sánh chi tiết ── */}
+      {compareView && (
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          {/* Chọn nguồn để so sánh */}
+          <div style={{ padding:12, background:'#F7F8FA', borderRadius:8, border:'1px solid #E5E7EB' }}>
+            <div style={{ fontSize:12, fontWeight:600, marginBottom:8 }}>Chọn nguồn để so sánh:</div>
+            <div className="flex gap-2 flex-wrap">
+              {selectedGroup.profiles.map(p => (
+                <button key={p.uid} onClick={() => toggleSource(p.uid)}
+                  style={{ padding:'5px 12px', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer', border:`2px solid ${selectedSources.includes(p.uid) ? confColor(p.confidence) : '#E5E7EB'}`, background: selectedSources.includes(p.uid) ? confBg(p.confidence) : 'white', color: selectedSources.includes(p.uid) ? confColor(p.confidence) : '#6B7280' }}>
+                  {p.source} ({p.confidence}%)
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Bảng so sánh */}
+          <div className="panel" style={{ overflow:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+              <thead>
+                <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
+                  <th style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', width:120, position:'sticky', left:0, background:'#F7F8FA' }}>Trường</th>
+                  {compareCols.map(p => (
+                    <th key={p.uid} style={{ padding:'10px 12px', fontSize:11, fontWeight:700, minWidth:160 }}>
+                      <div style={{ color:confColor(p.confidence) }}>{p.source}</div>
+                      <div style={{ fontFamily:'monospace', fontWeight:400, color:'#6B7280', fontSize:10 }}>{p.uid}</div>
+                      <div style={{ marginTop:4, height:3, borderRadius:2, background:'#E5E7EB' }}>
+                        <div style={{ width:`${p.confidence}%`, height:'100%', borderRadius:2, background:confColor(p.confidence) }}></div>
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARE_FIELDS.map(f => {
+                  const conflict = hasConflict(f.key);
+                  return (
+                    <tr key={f.key} style={{ borderBottom:'1px solid #F3F4F6', background: conflict ? '#FFFBEB':'white' }}>
+                      <td style={{ padding:'9px 12px', fontWeight:600, color:'#6B7280', fontSize:12, position:'sticky', left:0, background: conflict ? '#FFFBEB':'white' }}>
+                        {conflict && <span style={{ color:'#d97706', marginRight:4 }}>⚠️</span>}
+                        {f.label}
+                      </td>
+                      {compareCols.map(p => {
+                        const val = String(p[f.key]||'—');
+                        const isEmpty = val === '—' || val === '';
+                        return (
+                          <td key={p.uid} style={{ padding:'9px 12px', color: isEmpty ? '#D1D5DB':'#1A1A1A', fontStyle: isEmpty ? 'italic':'' }}>
+                            {!isEmpty && conflict && <span style={{ color:'#16A34A', marginRight:4 }}>•</span>}
+                            {val}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Nút quyết định */}
+      <div style={{ padding:16, background:'#F7F8FA', borderRadius:8, border:'1px solid #E5E7EB' }}>
+        <div style={{ fontSize:12, color:'#6B7280', marginBottom:12 }}>
+          Quyết định của bạn được ghi nhận và BE xử lý merge. BE tự chọn Golden Record master và ưu tiên field theo rule nguồn dữ liệu.
+        </div>
+        <div className="flex gap-3">
+          <button onClick={() => handleDecision('confirmed')}
+            style={{ flex:2, padding:'11px', background:'#16A34A', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:700, cursor:'pointer' }}>
+            ✓ Cùng người — Xác nhận merge {selectedGroup.profiles.length} hồ sơ
+          </button>
+          <button onClick={() => handleDecision('different')}
+            style={{ flex:2, padding:'11px', background:'#f3f4f6', color:'#1A1A1A', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer' }}>
+            ✗ Tách nhóm — Không phải cùng người
+          </button>
+          <button onClick={() => handleDecision('later')}
+            style={{ flex:1, padding:'11px', background:'#f3f4f6', color:'#6B7280', border:'none', borderRadius:8, fontSize:13, cursor:'pointer' }}>
+            Để sau
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Data mẫu lịch sử merge (audit log)
+const MERGE_HISTORY = [
+  { id:'MG-001', type:'AUTO_MERGE', uidMaster:'UID-0000123456', uidMerged:'UID-0000123999', confidence:94, matchKeys:'SĐT + Tên gần đúng', by:'SYSTEM', at:'12/06/2026 09:12', scoresBefore:'CLV 680 / COD Risk 42', scoresAfter:'CLV 742 / COD Risk 38' },
+  { id:'MG-002', type:'MANUAL',     uidMaster:'UID-0000987654', uidMerged:'UID-0000987001', confidence:78, matchKeys:'MST + Tên DN', by:'ds_trung@vnpost.vn', at:'10/06/2026 14:30', scoresBefore:'CLV 1100 / COD Risk 15', scoresAfter:'CLV 1248 / COD Risk 12' },
+  { id:'MG-003', type:'AUTO_MERGE', uidMaster:'UID-0000334411', uidMerged:'UID-0000334900', confidence:91, matchKeys:'SĐT', by:'SYSTEM', at:'08/06/2026 07:45', scoresBefore:'CLV 200 / COD Risk 55', scoresAfter:'CLV 220 / COD Risk 52' },
+];
+
+const UNMERGE_REQUESTS = [
+  { id:'UR-001', uidMaster:'UID-0000220088', reporter:'ds_lan@vnpost.vn', reportedAt:'25/06/2026 10:15', reason:'Hai cửa hàng khác nhau, trùng SĐT chủ nhưng là pháp nhân riêng biệt', status:'CHỜ DUYỆT', mergeRef:'MG-004' },
+];
+
+// ============================================================
+// CN4 — CUSTOMER 360
+// ============================================================
+function Customer360Screen({ uid, onBack }) {
+  const [role, setRole] = React.useState('Admin');
+  const [tab, setTab] = React.useState('overview');
+  const kh = KH_DETAIL[uid] || KH_DETAIL['UID-0000123456'];
+
+  const canSee = (field) => {
+    const rbac = {
+      rfm:          ['CSKH','Marketing','Kinh doanh','Admin'],
+      clv:          ['CSKH','Marketing','Kinh doanh','Admin'],
+      churn:        ['CSKH','Marketing','Kinh doanh','Admin'],
+      engagement:   ['CSKH','Marketing','Admin'],
+      codRisk:      ['Kinh doanh','Vận hành','Admin'],
+      fraud:        ['Kinh doanh','Vận hành','Admin'],
+      linkedProfiles:['CSKH','Marketing','Kinh doanh','Vận hành','Data Steward','Admin'],
+      reportMerge:  ['Data Steward','Admin'],
+    };
+    return (rbac[field]||[]).includes(role);
+  };
+
+  const tabs = [
+    { key:'overview',   label:'Tổng quan' },
+    { key:'linked',     label:'Hồ sơ liên kết' },
+    { key:'address',    label:'Địa chỉ' },
+    ...(kh.type==='BUSINESS' ? [{ key:'business', label:'Doanh nghiệp' }] : []),
+    { key:'transaction',label:'GD & COD' },
+    { key:'behavior',   label:'Hành vi số' },
+    { key:'cskh',       label:'CSKH' },
+    { key:'scores',     label:'Điểm số & Phân khúc' },
+    { key:'consent',    label:'Consent' },
+    { key:'audit',      label:'Audit' },
+  ];
+
+  const completenessColor = kh.completeness >= 80 ? '#16A34A' : kh.completeness >= 60 ? '#F59E0B' : '#DC2626';
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
+      {/* Back btn */}
+      {onBack && (
+        <button onClick={onBack} style={{ alignSelf:'flex-start', background:'#f3f4f6', border:'none', borderRadius:6, padding:'6px 12px', fontSize:13, cursor:'pointer' }}>
+          ← Quay lại danh sách
+        </button>
+      )}
+
+      {/* Header card */}
+      <div className="panel" style={{ padding:20 }}>
+        <div className="flex items-start gap-4">
+          <div style={{ width:56, height:56, borderRadius:12, background:'#E30613', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, fontWeight:800, flexShrink:0 }}>
+            {kh.name.charAt(0)}
+          </div>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:20, fontWeight:800, color:'#1A1A1A' }}>{kh.name}</div>
+            <div style={{ fontSize:12, color:'#6B7280', fontFamily:'monospace', marginTop:2 }}>{kh.uid}</div>
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              <span className={`badge ${kh.type==='INDIVIDUAL' ? 'badge-blue':'badge-purple'}`}>{kh.type==='INDIVIDUAL' ? 'Cá nhân':'Doanh nghiệp'}</span>
+              <span className="badge badge-gray">{kh.group}</span>
+              {custStatusBadge(kh.status)}
+              {kh.loyalty?.tier && <span className={`badge ${kh.loyalty.tier==='GOLD' ? 'badge-yellow' : kh.loyalty.tier==='PLATINUM' ? 'badge-purple' : 'badge-gray'}`}>🏅 {kh.loyalty.tier}</span>}
+              {kh.segments.map(s => <span key={s} className={`badge ${s.includes('Risk')||s.includes('hoàn') ? 'badge-red':'badge-green'}`}>{s}</span>)}
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <select value={role} onChange={e=>setRole(e.target.value)} style={{ fontSize:12, borderRadius:6 }}>
+              {['CSKH','Marketing','Kinh doanh','Vận hành','Data Steward','Admin'].map(r => <option key={r}>{r}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* KPI strip */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:12, marginTop:16, paddingTop:16, borderTop:'1px solid #E5E7EB' }}>
+          {[
+            { label:'Tổng đơn', value: kh.orders.toLocaleString(), unit:'' },
+            { label:'Doanh thu', value: kh.revenue, unit:' ₫' },
+            { label:'Tỷ lệ phát', value: kh.deliveryRate, unit:'%', color: kh.deliveryRate>=90 ? '#16A34A':'#F59E0B' },
+            { label:'Tỷ lệ hoàn', value: kh.returnRate, unit:'%', color: kh.returnRate>=20 ? '#DC2626':'#F59E0B' },
+            { label:'Điểm tích lũy', value: kh.loyalty?.points != null ? kh.loyalty.points.toLocaleString() : '—', unit:'', color:'#7c3aed' },
+            { label:'Độ đầy đủ hồ sơ', value: kh.completeness, unit:'%', color: completenessColor },
+          ].map((k,i) => (
+            <div key={i}>
+              <div style={{ fontSize:11, color:'#6B7280', marginBottom:2 }}>{k.label}</div>
+              <div style={{ fontSize:18, fontWeight:800, color:k.color||'#1A1A1A' }} className="tabular-nums">{k.value}{k.unit}</div>
+              {k.label==='Độ đầy đủ hồ sơ' && (
+                <div style={{ height:4, borderRadius:2, background:'#E5E7EB', marginTop:4 }}>
+                  <div style={{ width:`${kh.completeness}%`, height:'100%', background:completenessColor, borderRadius:2 }}></div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 flex-wrap">
+        {tabs.map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)} className={`tab-btn ${tab===t.key ? 'active':''}`}>{t.label}</button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      <div className="panel" style={{ padding:20 }}>
+
+        {/* TỔNG QUAN */}
+        {tab==='overview' && (
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+            <div>
+              <div className="section-title">Thông tin định danh</div>
+              {[
+                ['Giới tính', kh.gender || 'Chưa có dữ liệu'],
+                ['Ngày sinh', kh.birthDate || 'Chưa có dữ liệu'],
+                ['SĐT', kh.phone],
+                ['Email', kh.email],
+                ['CCCD', kh.cccd],
+                ['PostID', kh.postId || 'Chưa có dữ liệu'],
+                ['Bưu cục quản lý', kh.postOffice || 'Chưa có dữ liệu'],
+              ].map(([l,v]) => (
+                <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                  <span className="field-label" style={{ margin:0 }}>{l}</span>
+                  <span style={{ fontSize:13, fontWeight:500 }}>{v}</span>
+                </div>
+              ))}
+            </div>
+            <div>
+              <div className="section-title">Vai trò giao dịch</div>
+              <div className="flex gap-2 mb-3">
+                {kh.roles.map(r => (
+                  <span key={r} className={`badge ${r===kh.primaryRole ? 'badge-red':'badge-blue'}`}>{r} {r===kh.primaryRole ? '(chính)':''}</span>
+                ))}
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+                <div style={{ background:'#f0fdf4', borderRadius:8, padding:12 }}>
+                  <div style={{ fontSize:22, fontWeight:800, color:'#16A34A' }} className="tabular-nums">{kh.senderCount.toLocaleString()}</div>
+                  <div style={{ fontSize:12, color:'#6B7280' }}>lần là Người gửi</div>
+                </div>
+                <div style={{ background:'#eff6ff', borderRadius:8, padding:12 }}>
+                  <div style={{ fontSize:22, fontWeight:800, color:'#2563EB' }} className="tabular-nums">{kh.receiverCount}</div>
+                  <div style={{ fontSize:12, color:'#6B7280' }}>lần là Người nhận</div>
+                </div>
+              </div>
+              <div className="section-title mt-4">Segment hiện tại</div>
+              <div className="flex gap-2 flex-wrap">
+                {kh.segments.map(s => <span key={s} className={`badge ${s.includes('Risk')||s.includes('hoàn') ? 'badge-red':'badge-green'}`}>{s}</span>)}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ĐỊNH DANH */}
+        {tab==='linked' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+            {/* Alias IDs */}
+            <div>
+              <div className="section-title">Alias IDs — Các định danh được liên kết</div>
+              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                <thead>
+                  <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+                    {['Loại ID','Giá trị','Nguồn','Độ tin cậy','Reliability','Chính'].map(h => (
+                      <th key={h} style={{ padding:'8px 10px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {kh.aliases.map((a,i) => (
+                    <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                      <td style={{ padding:'8px 10px' }}><span className="badge badge-blue">{a.type}</span></td>
+                      <td style={{ padding:'8px 10px', fontFamily:'monospace', fontWeight:600 }}>{a.value}</td>
+                      <td style={{ padding:'8px 10px', color:'#6B7280' }}>{a.source}</td>
+                      <td style={{ padding:'8px 10px' }}>
+                        <span className={`badge ${a.confidence==='HIGH' ? 'badge-green' : a.confidence==='MEDIUM' ? 'badge-yellow' : 'badge-gray'}`}>{a.confidence}</span>
+                      </td>
+                      <td style={{ padding:'8px 10px' }}>
+                        <div className="flex items-center gap-2">
+                          <div style={{ flex:1, height:6, borderRadius:3, background:'#E5E7EB', overflow:'hidden', minWidth:60 }}>
+                            <div style={{ width:`${a.reliability}%`, height:'100%', background: a.reliability>=80 ? '#16A34A' : a.reliability>=60 ? '#F59E0B' : '#DC2626', borderRadius:3 }}></div>
+                          </div>
+                          <span className="tabular-nums" style={{ fontSize:12, fontWeight:700 }}>{a.reliability}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding:'8px 10px' }}>{a.primary ? '✓' : ''}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Lịch sử merge của KH này */}
+            <div>
+              <div className="section-title">Lịch sử merge hồ sơ</div>
+              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                <thead>
+                  <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+                    {['Loại merge','UID được gộp vào','Nguồn','Ngày ghép','Độ tin cậy','Người quyết định'].map(h => (
+                      <th key={h} style={{ padding:'8px 10px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(kh.mergeHistory||[]).map((m,i) => (
+                    <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                      <td style={{ padding:'8px 10px' }}>
+                        <span className={`badge ${m.type==='AUTO' ? 'badge-blue':'badge-green'}`}>
+                          {m.type==='AUTO' ? 'Tự động':'Thủ công'}
+                        </span>
+                      </td>
+                      <td style={{ padding:'8px 10px', fontFamily:'monospace', fontSize:12, color:'#7c3aed' }}>{m.from}</td>
+                      <td style={{ padding:'8px 10px', fontSize:12, color:'#6B7280' }}>{m.source||'—'}</td>
+                      <td style={{ padding:'8px 10px', fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{m.at}</td>
+                      <td style={{ padding:'8px 10px', fontWeight:700, color: (m.confidence||0)>=90 ? '#16A34A':'#F59E0B' }}>
+                        {m.confidence ? `${m.confidence}%` : '—'}
+                      </td>
+                      <td style={{ padding:'8px 10px', fontSize:12, color:'#6B7280' }}>{m.by}</td>
+                    </tr>
+                  ))}
+                  {!(kh.mergeHistory||[]).length && (
+                    <tr><td colSpan={6} style={{ padding:20, textAlign:'center', color:'#6B7280' }}>Chưa có lịch sử merge</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Nút Báo cáo merge sai — chỉ Data Steward và Admin */}
+            {canSee('reportMerge') && (
+              <div style={{ padding:14, background:'#fef9c3', border:'1px solid #F59E0B', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <div>
+                  <div style={{ fontWeight:600, fontSize:13 }}>Nghi ngờ merge nhầm?</div>
+                  <div style={{ fontSize:12, color:'#6B7280', marginTop:2 }}>Báo cáo để Admin xem xét và xử lý unmerge nếu cần.</div>
+                </div>
+                <button style={{ padding:'8px 16px', background:'#d97706', color:'white', border:'none', borderRadius:7, fontSize:13, fontWeight:600, cursor:'pointer', flexShrink:0 }}>
+                  Báo cáo merge sai
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ĐỊA CHỈ */}
+        {tab==='address' && (
+          <div>
+            <div className="section-title">Danh sách địa chỉ</div>
+            {kh.addresses.map((a,i) => (
+              <div key={i} style={{ padding:14, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:10 }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="badge badge-blue">{a.type}</span>
+                  {a.primary && <span className="badge badge-green">Chính</span>}
+                  <span className={`badge ${a.status==='STANDARDIZED' ? 'badge-green' : 'badge-yellow'}`}>{a.status}</span>
+                  <span className="badge badge-gray">{a.version}</span>
+                </div>
+                <div style={{ fontWeight:600, fontSize:14 }}>{a.detail}, {a.ward}, {a.province}</div>
+                <div style={{ fontSize:12, color:'#6B7280', marginTop:4 }}>VPostCode: {a.vpostcode}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* DOANH NGHIỆP */}
+        {tab==='business' && kh.type==='BUSINESS' && (
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+            <div>
+              <div className="section-title">Thông tin doanh nghiệp</div>
+              {[
+                ['Mã số thuế', kh.taxId],
+                ['Mã KHL', kh.khlCode],
+                ['Đại diện pháp lý', kh.representative],
+                ['Hợp đồng', kh.contract?.status],
+                ['Hiệu lực', `${kh.contract?.start} → ${kh.contract?.end}`],
+                ['Ngành nghề', kh.contract?.segment],
+              ].map(([l,v]) => (
+                <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                  <span className="field-label" style={{ margin:0 }}>{l}</span>
+                  <span style={{ fontSize:13, fontWeight:500 }}>{v}</span>
+                </div>
+              ))}
+            </div>
+            <div>
+              <div className="section-title">Người liên hệ</div>
+              {kh.contacts?.map((c,i) => (
+                <div key={i} style={{ padding:12, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:8 }}>
+                  <div className="flex items-center gap-2">
+                    <span style={{ fontWeight:600 }}>{c.name}</span>
+                    {c.primary && <span className="badge badge-green">Chính</span>}
+                  </div>
+                  <div style={{ fontSize:12, color:'#6B7280' }}>{c.role}</div>
+                  <div style={{ fontSize:12, fontFamily:'monospace', marginTop:4 }}>{c.phone} · {c.email}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* GIAO DỊCH & COD */}
+        {tab==='transaction' && (
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+            <div>
+              <div className="section-title">Tổng hợp giao dịch</div>
+              {[
+                ['Tổng đơn', kh.orders.toLocaleString()],
+                ['Tổng doanh thu', `${kh.revenue} ₫`],
+                ['Trung bình đơn/tháng', kh.avgMonthly],
+                ['Dịch vụ chính', kh.service || 'Chưa có dữ liệu'],
+                ['Tỷ lệ phát thành công', `${kh.deliveryRate}%`],
+                ['Tỷ lệ hoàn', `${kh.returnRate}%`],
+              ].map(([l,v]) => (
+                <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                  <span className="field-label" style={{ margin:0 }}>{l}</span>
+                  <span style={{ fontSize:13, fontWeight:600 }} className="tabular-nums">{v}</span>
+                </div>
+              ))}
+              {kh.routes?.length > 0 && (
+                <div style={{ marginTop:10 }}>
+                  <div className="field-label">Tuyến thường xuyên</div>
+                  <div className="flex gap-2 mt-1 flex-wrap">
+                    {kh.routes.map(r => <span key={r} className="badge badge-blue">{r}</span>)}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div>
+              <div className="section-title">COD — Thu hộ</div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:12 }}>
+                <div style={{ background:'#f0fdf4', borderRadius:8, padding:12 }}>
+                  <div style={{ fontSize:11, color:'#6B7280' }}>Tổng COD</div>
+                  <div style={{ fontSize:15, fontWeight:800, color:'#1A1A1A' }} className="tabular-nums">{kh.cod.total} ₫</div>
+                </div>
+                <div style={{ background:'#eff6ff', borderRadius:8, padding:12 }}>
+                  <div style={{ fontSize:11, color:'#6B7280' }}>Đã thu</div>
+                  <div style={{ fontSize:15, fontWeight:800, color:'#2563EB' }} className="tabular-nums">{kh.cod.collected} ₫</div>
+                </div>
+                <div style={{ background: parseFloat(kh.cod.pending.replace(/\./g,''))>0 ? '#fff5f5':'#f9fafb', borderRadius:8, padding:12 }}>
+                  <div style={{ fontSize:11, color:'#6B7280' }}>Chưa thu</div>
+                  <div style={{ fontSize:15, fontWeight:800, color: parseFloat(kh.cod.pending.replace(/\./g,''))>0 ? '#DC2626':'#1A1A1A' }} className="tabular-nums">{kh.cod.pending} ₫</div>
+                </div>
+                <div style={{ padding:12, borderRadius:8, background: kh.cod.status==='MATCHED' ? '#f0fdf4' : kh.cod.status==='DISCREPANCY' ? '#fff5f5' : '#fffbeb' }}>
+                  <div style={{ fontSize:11, color:'#6B7280' }}>Đối soát</div>
+                  <span className={`badge ${kh.cod.status==='MATCHED' ? 'badge-green' : kh.cod.status==='DISCREPANCY' ? 'badge-red' : 'badge-yellow'}`}>{kh.cod.status}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* HÀNH VI SỐ */}
+        {tab==='behavior' && (
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+            <div>
+              <div className="section-title">Thông tin thiết bị & App</div>
+              {[
+                ['Lần đăng nhập cuối', kh.appLogin],
+                ['Thiết bị', kh.device],
+                ['Phiên/30 ngày', kh.sessions30d ?? 'Chưa có dữ liệu'],
+              ].map(([l,v]) => (
+                <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                  <span className="field-label" style={{ margin:0 }}>{l}</span>
+                  <span style={{ fontSize:13, fontWeight:500 }}>{v}</span>
+                </div>
+              ))}
+              {kh.lastOrder && (
+                <div style={{ marginTop:16 }}>
+                  <div className="section-title">Đơn hàng gần nhất</div>
+                  {[
+                    ['Mã đơn', kh.lastOrder.id],
+                    ['Loại dịch vụ', kh.lastOrder.type],
+                    ['Giá trị', `${kh.lastOrder.amount} ₫`],
+                    ['Ngày tạo', kh.lastOrder.date],
+                  ].map(([l,v]) => (
+                    <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                      <span className="field-label" style={{ margin:0 }}>{l}</span>
+                      <span style={{ fontSize:13, fontWeight:500, fontFamily: l==='Mã đơn' ? 'monospace':'inherit' }}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div>
+              <div className="section-title">Timeline sự kiện</div>
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                {kh.timeline.map((e,i) => (
+                  <div key={i} className="flex gap-3">
+                    <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+                      <div className="timeline-dot" style={{ background:e.color, marginTop:2 }}></div>
+                      {i<kh.timeline.length-1 && <div style={{ width:2, flex:1, background:'#E5E7EB', minHeight:20 }}></div>}
+                    </div>
+                    <div style={{ paddingBottom:10 }}>
+                      <div style={{ fontSize:12, color:'#6B7280' }}>{e.time} · {e.channel}</div>
+                      <div style={{ fontSize:13, fontWeight:600, color:'#1A1A1A' }}>{e.icon} {e.label}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* CSKH */}
+        {tab==='cskh' && (
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12 }}>
+            {[
+              { label:'Tổng khiếu nại', value:kh.complaints.total, color:'#1A1A1A' },
+              { label:'Đang mở', value:kh.complaints.open, color: kh.complaints.open>0 ? '#DC2626' : '#16A34A' },
+              { label:'Điểm hài lòng', value:`${kh.complaints.satisfaction}/5`, color: kh.complaints.satisfaction>=4 ? '#16A34A' : kh.complaints.satisfaction>=3 ? '#F59E0B' : '#DC2626' },
+              { label:'SLA đúng hạn', value:`${kh.complaints.sla}%`, color: kh.complaints.sla>=90 ? '#16A34A' : '#F59E0B' },
+            ].map((k,i) => (
+              <div key={i} className="kpi-card" style={{ textAlign:'center' }}>
+                <div style={{ fontSize:28, fontWeight:800, color:k.color }} className="tabular-nums">{k.value}</div>
+                <div style={{ fontSize:12, color:'#6B7280', marginTop:4 }}>{k.label}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ĐIỂM SỐ */}
+        {tab==='scores' && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="section-title" style={{ margin:0 }}>Điểm số & Phân khúc (vai trò: {role})</div>
+              <div style={{ fontSize:12, color:'#6B7280' }}>Cập nhật: {kh.scores.updatedAt}</div>
+            </div>
+
+            {/* RFM */}
+            {canSee('rfm') ? (
+              <div style={{ padding:16, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:16 }}>
+                <div style={{ fontWeight:700, fontSize:13, marginBottom:10 }}>RFM — Nhóm: <span style={{ color:'#E30613' }}>{kh.scores.rfmGroup}</span></div>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
+                  {[['R — Recency',kh.scores.rfmR],['F — Frequency',kh.scores.rfmF],['M — Monetary',kh.scores.rfmM]].map(([l,v]) => (
+                    <div key={l}>
+                      <div style={{ fontSize:11, color:'#6B7280', marginBottom:4 }}>{l}</div>
+                      {rfmDot(v)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : <div style={{ padding:12, background:'#f3f4f6', borderRadius:8, marginBottom:16, color:'#6B7280', fontSize:13 }}>🔒 Vai trò {role} không có quyền xem RFM</div>}
+
+            {/* CLV */}
+            {canSee('clv') ? (
+              <div style={{ padding:14, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:12, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <div>
+                  <div style={{ fontSize:11, color:'#6B7280' }}>CLV — Giá trị vòng đời ước tính</div>
+                  <div style={{ fontSize:20, fontWeight:800, color:'#16A34A' }} className="tabular-nums">{kh.scores.clv} ₫</div>
+                </div>
+              </div>
+            ) : null}
+
+            {/* Score gauges */}
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12 }}>
+              {canSee('churn') && scoreGauge(kh.scores.churn, 'Churn Score')}
+              {canSee('engagement') && scoreGauge(kh.scores.engagement, 'Engagement')}
+              {canSee('codRisk') ? scoreGauge(kh.scores.codRisk, 'COD Risk') : <div style={{ textAlign:'center', fontSize:12, color:'#6B7280' }}>🔒 COD Risk<br/>Không có quyền</div>}
+              {canSee('fraud') ? scoreGauge(kh.scores.fraud, 'Fraud Score') : <div style={{ textAlign:'center', fontSize:12, color:'#6B7280' }}>🔒 Fraud Score<br/>Không có quyền</div>}
+            </div>
+          </div>
+        )}
+
+        {/* CONSENT */}
+        {tab==='consent' && (
+          <div>
+            {kh.consent.deletionRequested && (
+              <div style={{ padding:12, background:'#fee2e2', border:'1px solid #DC2626', borderRadius:8, marginBottom:16, fontWeight:700, color:'#DC2626', fontSize:14 }}>
+                🚫 Khách hàng đã yêu cầu xóa dữ liệu (data_deletion_requested = true)
+              </div>
+            )}
+            <div style={{ maxWidth:360 }}>
+              <div className="section-title">Trạng thái Consent theo kênh</div>
+              <div style={{ border:'1px solid #E5E7EB', borderRadius:8, padding:'4px 12px' }}>
+                {consentChip(kh.consent.sms,  'SMS')}
+                {consentChip(kh.consent.email,'Email')}
+                {consentChip(kh.consent.zalo, 'Zalo OA')}
+                {consentChip(kh.consent.push, 'Push Notification')}
+              </div>
+              <div style={{ marginTop:12, fontSize:12, color:'#6B7280' }}>
+                ⚠️ Kiểm tra consent bắt buộc trước mọi activation marketing.<br/>
+                Tuân thủ Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15.
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* AUDIT */}
+        {tab==='audit' && (
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+            <div>
+              <div className="section-title">Nguồn dữ liệu đóng góp</div>
+              <div className="flex gap-2 flex-wrap">
+                {kh.sources.map(s => <span key={s} className="badge badge-blue">{s}</span>)}
+              </div>
+              <div className="section-title mt-4">Thông tin hồ sơ</div>
+              {[
+                ['Ngày tạo', '10/01/2023'],
+                ['Lần cập nhật cuối', kh.appLogin || 'Chưa có dữ liệu'],
+                ['Profile version', 'v14'],
+                ['Tạo bởi hệ thống', 'CAS'],
+              ].map(([l,v]) => (
+                <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                  <span className="field-label" style={{ margin:0 }}>{l}</span>
+                  <span style={{ fontSize:13, fontWeight:500 }}>{v}</span>
+                </div>
+              ))}
+            </div>
+            <div>
+              <div className="section-title">Lịch sử merge</div>
+              <div style={{ fontSize:12, color:'#6B7280', padding:'10px 0' }}>
+                Xem lịch sử merge chi tiết tại tab <strong>Hồ sơ liên kết</strong>.
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// CN5 — SEGMENT MANAGEMENT
+// ============================================================
+function SegmentScreen() {
+  const [view, setView] = React.useState('list');
+  const [preview, setPreview] = React.useState(false);
+  const [segName, setSegName] = React.useState('');
+  const [rules, setRules] = React.useState([
+    { field:'churn_score', op:'≥', value:'70' },
+    { field:'last_transaction_date', op:'<', value:'90 ngày trước' },
+  ]);
+  const [logic, setLogic] = React.useState('AND');
+  const [modal, setModal] = React.useState(false);
+
+  const FIELDS = ['customer_type','customer_group','province','loyalty_tier','churn_score','cod_risk_score','return_rate','total_orders','total_revenue','rfm_group','last_transaction_date','roles'];
+  const OPS = ['=','≠','>','<','≥','≤','chứa','thuộc'];
+
+  const addRule = () => setRules(r => [...r, { field:'churn_score', op:'≥', value:'' }]);
+  const removeRule = (i) => setRules(r => r.filter((_,j) => j!==i));
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
+      {modal && (
+        <div className="modal-overlay" onClick={() => setModal(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize:16, fontWeight:700, marginBottom:8 }}>✅ Segment đã được lưu</div>
+            <div style={{ fontSize:13, color:'#6B7280', marginBottom:16 }}>Segment "{segName||'Không có tên'}" đã được tạo và sẽ cập nhật tự động mỗi ngày.</div>
+            <button onClick={() => { setModal(false); setView('list'); }} style={{ width:'100%', padding:'10px', background:'#E30613', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer' }}>
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between">
+        <div style={{ fontWeight:700, fontSize:16 }}>Segment Management</div>
+        <div className="flex gap-2">
+          <button onClick={() => setView('list')} className={`tab-btn ${view==='list' ? 'active':''}`}>Danh sách</button>
+          <button onClick={() => setView('builder')} className={`tab-btn ${view==='builder' ? 'active':''}`}>+ Tạo Segment</button>
+        </div>
+      </div>
+
+      {view === 'list' && (
+        <div className="panel">
+          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+            <thead>
+              <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+                {['Tên Segment','Điều kiện','Số KH','Loại','Cập nhật','Trạng thái',''].map(h => (
+                  <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {SEGMENTS.map((s,i) => (
+                <tr key={i} className="table-row" style={{ borderBottom:'1px solid #F3F4F6' }}>
+                  <td style={{ padding:'10px 12px', fontWeight:700 }}>{s.name}</td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280', fontFamily:'monospace' }}>{s.desc}</td>
+                  <td style={{ padding:'10px 12px', fontWeight:700, color:'#E30613' }} className="tabular-nums">{s.count} KH</td>
+                  <td style={{ padding:'10px 12px' }}><span className="badge badge-blue">{s.type}</span></td>
+                  <td style={{ padding:'10px 12px', color:'#6B7280', fontSize:12 }}>{s.updated}</td>
+                  <td style={{ padding:'10px 12px' }}><span className="badge badge-green">{s.status}</span></td>
+                  <td style={{ padding:'10px 12px' }}>
+                    <button style={{ padding:'4px 10px', background:'#f3f4f6', border:'none', borderRadius:6, fontSize:12, cursor:'pointer' }}>Xem KH</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {view === 'builder' && (
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 360px', gap:16 }}>
+          {/* Rule builder */}
+          <div className="panel" style={{ padding:20 }}>
+            <div style={{ fontWeight:700, fontSize:15, marginBottom:16 }}>Tạo Segment mới</div>
+            <div style={{ marginBottom:14 }}>
+              <label className="field-label">Tên segment</label>
+              <input value={segName} onChange={e=>setSegName(e.target.value)} placeholder="VD: Khách hàng nguy cơ rời bỏ Q3" style={{ width:'100%', marginTop:4 }} />
+            </div>
+            <div style={{ marginBottom:14 }}>
+              <label className="field-label">Mô tả</label>
+              <input placeholder="Mô tả ngắn gọn mục tiêu segment..." style={{ width:'100%', marginTop:4 }} />
+            </div>
+
+            <div className="flex items-center justify-between mb-3">
+              <div style={{ fontWeight:700, fontSize:13 }}>Điều kiện lọc</div>
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize:12, color:'#6B7280' }}>Logic:</span>
+                {['AND','OR'].map(l => (
+                  <button key={l} onClick={() => setLogic(l)} className={`tab-btn ${logic===l ? 'active':''}`} style={{ padding:'3px 10px', fontSize:11 }}>{l}</button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              {rules.map((r,i) => (
+                <div key={i}>
+                  {i > 0 && <div style={{ fontSize:11, fontWeight:700, color:'#E30613', padding:'4px 0', textAlign:'center' }}>{logic}</div>}
+                  <div className="rule-row">
+                    <select value={r.field} onChange={e => setRules(rules => rules.map((x,j) => j===i ? {...x, field:e.target.value}:x))} style={{ flex:2, fontSize:12 }}>
+                      {FIELDS.map(f => <option key={f}>{f}</option>)}
+                    </select>
+                    <select value={r.op} onChange={e => setRules(rules => rules.map((x,j) => j===i ? {...x, op:e.target.value}:x))} style={{ flex:1, fontSize:12 }}>
+                      {OPS.map(o => <option key={o}>{o}</option>)}
+                    </select>
+                    <input value={r.value} onChange={e => setRules(rules => rules.map((x,j) => j===i ? {...x, value:e.target.value}:x))} placeholder="Giá trị" style={{ flex:2, fontSize:12 }} />
+                    <button onClick={() => removeRule(i)} style={{ background:'none', border:'none', cursor:'pointer', color:'#DC2626' }}><Icon name="trash" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={addRule} style={{ width:'100%', marginTop:12, padding:'8px', background:'#f3f4f6', border:'1px dashed #E5E7EB', borderRadius:8, fontSize:13, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4, color:'#6B7280' }}>
+              <Icon name="plus" /> Thêm điều kiện
+            </button>
+
+            <div className="flex gap-3 mt-5">
+              <button onClick={() => setPreview(true)} style={{ flex:1, padding:'9px', background:'#f3f4f6', color:'#1A1A1A', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>
+                Preview KH khớp
+              </button>
+              <button onClick={() => setModal(true)} style={{ flex:2, padding:'9px', background:'#E30613', color:'white', border:'none', borderRadius:8, fontSize:13, fontWeight:700, cursor:'pointer' }}>
+                Lưu Segment
+              </button>
+            </div>
+          </div>
+
+          {/* Preview */}
+          <div className="panel" style={{ padding:20 }}>
+            <div style={{ fontWeight:700, fontSize:14, marginBottom:12 }}>Preview — Khách hàng khớp</div>
+            {preview ? (
+              <>
+                <div style={{ fontSize:28, fontWeight:800, color:'#E30613', marginBottom:4 }} className="tabular-nums">8.560</div>
+                <div style={{ fontSize:12, color:'#6B7280', marginBottom:16 }}>khách hàng khớp điều kiện</div>
+                <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                  {[
+                    { name:'Phạm Minh Tuấn', uid:'UID-0000456789', val:'Churn 78' },
+                    { name:'Đỗ Văn Khải',    uid:'UID-0000662200', val:'Churn 72' },
+                    { name:'Lê Thị Hằng',   uid:'UID-0000771122', val:'Churn 71' },
+                  ].map((c,i) => (
+                    <div key={i} style={{ padding:'8px 10px', border:'1px solid #E5E7EB', borderRadius:7 }}>
+                      <div style={{ fontWeight:600, fontSize:13 }}>{c.name}</div>
+                      <div style={{ fontSize:11, color:'#6B7280', fontFamily:'monospace' }}>{c.uid}</div>
+                      <div style={{ fontSize:12, color:'#DC2626', fontWeight:600, marginTop:2 }}>{c.val}</div>
+                    </div>
+                  ))}
+                  <div style={{ fontSize:12, color:'#6B7280', textAlign:'center', marginTop:4 }}>... và 8.557 KH khác</div>
+                </div>
+              </>
+            ) : (
+              <div style={{ padding:32, textAlign:'center', color:'#6B7280', fontSize:13 }}>
+                Thêm điều kiện rồi bấm "Preview KH khớp" để xem kết quả
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+// APP
+// ============================================================
+function App() {
+  const [nav, setNav] = React.useState('customers');
+  const [c360uid, setC360uid] = React.useState(null);
+
+  const navLabels = {
+    kafka:'Kafka Integration',
+    customers:'Khách hàng',
+    identity:'Đối soát hồ sơ',
+    c360:'Customer 360',
+    segments:'Phân khúc',
+  };
+
+  const goC360 = (uid) => {
+    setC360uid(uid);
+    setNav('c360');
+  };
+
+  const handleNav = (key) => {
+    setNav(key);
+    if (key !== 'c360') setC360uid(null);
+  };
+
+  return (
+    <div style={{ display:'flex', height:'100vh', overflow:'hidden' }}>
+      <Sidebar active={nav} onNav={handleNav} />
+      <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden' }}>
+        <Header title={navLabels[nav]} />
+        <main style={{ flex:1, overflowY:'auto' }}>
+          {nav==='kafka'     && <KafkaScreen />}
+          {nav==='customers' && <CustomerListScreen onC360={goC360} />}
+          {nav==='identity'  && <IdentityScreen onC360={goC360} />}
+          {nav==='c360'      && <Customer360Screen uid={c360uid} onBack={c360uid ? () => setNav('customers') : null} />}
+          {nav==='segments'  && <SegmentScreen />}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+</body>
+</html>
