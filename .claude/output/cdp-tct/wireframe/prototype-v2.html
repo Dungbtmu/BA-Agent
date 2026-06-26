@@ -264,9 +264,19 @@ const statusBadge = (s) => {
 };
 
 const custStatusBadge = (s) => {
-  const map = { ACTIVE:'badge-green', INACTIVE:'badge-gray', BLOCKED:'badge-red', MERGED:'badge-blue' };
-  return <span className={`badge ${map[s]||'badge-gray'}`}>{s}</span>;
+  const colorMap = { ACTIVE:'badge-green', INACTIVE:'badge-gray', BLOCKED:'badge-red', MERGED:'badge-blue' };
+  const labelMap = { ACTIVE:'Hoạt động', INACTIVE:'Không hoạt động', BLOCKED:'Bị khóa', MERGED:'Đã gộp' };
+  return <span className={`badge ${colorMap[s]||'badge-gray'}`}>{labelMap[s]||s}</span>;
 };
+
+const GROUP_LABEL = { SME:'SME', KHL:'KHL', B2C:'Cá nhân thường' };
+const TIER_LABEL  = { GOLD:'Vàng', PLATINUM:'Bạch kim', SILVER:'Bạc' };
+const TIER_BADGE  = { GOLD:'badge-yellow', PLATINUM:'badge-purple', SILVER:'badge-gray' };
+const CONFIDENCE_LABEL = { HIGH:'Cao', MEDIUM:'Trung bình', LOW:'Thấp' };
+const ALIAS_TYPE_LABEL = { PHONE:'SĐT', POST_ID:'Post ID', CRM_ID:'Mã CRM', TAX_ID:'MST', KHL_CODE:'Mã KHL', USER_APP_ID:'ID App', EMAIL:'Email' };
+const ADDR_STATUS_LABEL = { STANDARDIZED:'Đã chuẩn hóa', PARTIAL:'Một phần', UNKNOWN:'Chưa xác định' };
+const ADDR_TYPE_LABEL   = { SENDER:'Địa chỉ gửi', RECEIVER:'Địa chỉ nhận', BUSINESS:'Trụ sở', WAREHOUSE:'Kho hàng' };
+const SEGMENT_LABEL = { 'Champions':'Khách hàng trung thành', 'At Risk':'Có nguy cơ rời bỏ' };
 
 const lagBadge = (lag, warn) => {
   if (warn) return <span className="tabular-nums text-red-600 font-bold">{lag.toLocaleString()}</span>;
@@ -678,7 +688,7 @@ function IdentityScreen({ onC360 }) {
         {[
           { key:'pending', label:`Chờ xem xét (${pendingGroups.length})` },
           { key:'history', label:'Lịch sử merge' },
-          { key:'unmerge', label:`Yêu cầu Unmerge (${UNMERGE_REQUESTS.filter(r=>r.status==='CHỜ DUYỆT').length})` },
+          { key:'unmerge', label:`Yêu cầu tách hồ sơ (${UNMERGE_REQUESTS.filter(r=>r.status==='CHỜ DUYỆT').length})` },
         ].map(t => (
           <button key={t.key} onClick={() => setScreenTab(t.key)}
             className={`tab-btn ${screenTab===t.key ? 'active':''}`}>{t.label}</button>
@@ -1060,9 +1070,9 @@ function Customer360Screen({ uid, onBack }) {
             <div style={{ fontSize:12, color:'#6B7280', fontFamily:'monospace', marginTop:2 }}>{kh.uid}</div>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span className={`badge ${kh.type==='INDIVIDUAL' ? 'badge-blue':'badge-purple'}`}>{kh.type==='INDIVIDUAL' ? 'Cá nhân':'Doanh nghiệp'}</span>
-              <span className="badge badge-gray">{kh.group}</span>
+              <span className="badge badge-gray">{GROUP_LABEL[kh.group]||kh.group}</span>
               {custStatusBadge(kh.status)}
-              {kh.loyalty?.tier && <span className={`badge ${kh.loyalty.tier==='GOLD' ? 'badge-yellow' : kh.loyalty.tier==='PLATINUM' ? 'badge-purple' : 'badge-gray'}`}>🏅 {kh.loyalty.tier}</span>}
+              {kh.loyalty?.tier && <span className={`badge ${TIER_BADGE[kh.loyalty.tier]||'badge-gray'}`}>🏅 {TIER_LABEL[kh.loyalty.tier]||kh.loyalty.tier}</span>}
             </div>
           </div>
           <div className="flex gap-2">
@@ -1144,7 +1154,7 @@ function Customer360Screen({ uid, onBack }) {
               </div>
               <div className="section-title mt-4">Segment hiện tại</div>
               <div className="flex gap-2 flex-wrap">
-                {kh.segments.map(s => <span key={s} className={`badge ${s.includes('Risk')||s.includes('hoàn') ? 'badge-red':'badge-green'}`}>{s}</span>)}
+                {kh.segments.map(s => <span key={s} className={`badge ${s.includes('Risk')||s.includes('hoàn') ? 'badge-red':'badge-green'}`}>{SEGMENT_LABEL[s]||s}</span>)}
               </div>
             </div>
           </div>
@@ -1167,11 +1177,11 @@ function Customer360Screen({ uid, onBack }) {
                 <tbody>
                   {kh.aliases.map((a,i) => (
                     <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
-                      <td style={{ padding:'8px 10px' }}><span className="badge badge-blue">{a.type}</span></td>
+                      <td style={{ padding:'8px 10px' }}><span className="badge badge-blue">{ALIAS_TYPE_LABEL[a.type]||a.type}</span></td>
                       <td style={{ padding:'8px 10px', fontFamily:'monospace', fontWeight:600 }}>{a.value}</td>
                       <td style={{ padding:'8px 10px', color:'#6B7280' }}>{a.source}</td>
                       <td style={{ padding:'8px 10px' }}>
-                        <span className={`badge ${a.confidence==='HIGH' ? 'badge-green' : a.confidence==='MEDIUM' ? 'badge-yellow' : 'badge-gray'}`}>{a.confidence}</span>
+                        <span className={`badge ${a.confidence==='HIGH' ? 'badge-green' : a.confidence==='MEDIUM' ? 'badge-yellow' : 'badge-gray'}`}>{CONFIDENCE_LABEL[a.confidence]||a.confidence}</span>
                       </td>
                       <td style={{ padding:'8px 10px' }}>
                         <div className="flex items-center gap-2">
@@ -1245,10 +1255,9 @@ function Customer360Screen({ uid, onBack }) {
             {kh.addresses.map((a,i) => (
               <div key={i} style={{ padding:14, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:10 }}>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="badge badge-blue">{a.type}</span>
+                  <span className="badge badge-blue">{ADDR_TYPE_LABEL[a.type]||a.type}</span>
                   {a.primary && <span className="badge badge-green">Chính</span>}
-                  <span className={`badge ${a.status==='STANDARDIZED' ? 'badge-green' : 'badge-yellow'}`}>{a.status}</span>
-                  <span className="badge badge-gray">{a.version}</span>
+                  <span className={`badge ${a.status==='STANDARDIZED' ? 'badge-green' : 'badge-yellow'}`}>{ADDR_STATUS_LABEL[a.status]||a.status}</span>
                 </div>
                 <div style={{ fontWeight:600, fontSize:14 }}>{a.detail}, {a.ward}, {a.province}</div>
                 <div style={{ fontSize:12, color:'#6B7280', marginTop:4 }}>VPostCode: {a.vpostcode}</div>
