@@ -179,7 +179,7 @@ const KH_DETAIL = {
       { time:'20/06 09:00', type:'merge', icon:'🔗', label:'Merge từ UID-0000987001', channel:'SYSTEM', color:'#6B7280' },
       { time:'15/01 00:00', type:'contract', icon:'📄', label:'Hợp đồng KHL ký kết 2024-01-15', channel:'CRM', color:'#2563EB' },
     ],
-    mergeHistory:[{ from:'UID-0000987001', at:'20/06 09:00', by:'admin@vnpost.vn', note:'Trùng MST, confirm merge' }],
+    mergeHistory:[{ from:'UID-0000987001', at:'20/06/2026 09:00', by:'ds_trung@vnpost.vn', note:'Trùng MST, confirm merge', type:'MANUAL', source:'Portal KHL', confidence:78 }],
   },
   'UID-0000456789': {
     uid:'UID-0000456789', type:'INDIVIDUAL', group:'B2C', status:'ACTIVE', name:'Phạm Minh Tuấn',
@@ -297,12 +297,11 @@ function Icon({ name }) {
 
 function Sidebar({ active, onNav }) {
   const items = [
-    { key:'kafka',    label:'Kafka Integration',  icon:'kafka'   },
-    { key:'customers',label:'Customer Management',icon:'users'   },
-    { key:'identity', label:'Identity Resolution',icon:'merge'   },
-    { key:'c360',     label:'Customer 360',        icon:'person'  },
-    { key:'segments', label:'Segment Management',  icon:'segment' },
+    { key:'customers',label:'Tìm kiếm KH',    icon:'users'   },
+    { key:'identity', label:'Đối soát hồ sơ', icon:'merge'   },
+    { key:'segments', label:'Phân khúc',       icon:'segment' },
   ];
+  // kafka và c360 ẩn khỏi sidebar — kafka giữ code, c360 mở từ Customer List
   return (
     <aside style={{ width:220, flexShrink:0, background:'white', borderRight:'1px solid #E5E7EB', display:'flex', flexDirection:'column', height:'100vh', position:'sticky', top:0 }}>
       <div style={{ padding:'20px 16px 12px', borderBottom:'1px solid #E5E7EB' }}>
@@ -550,9 +549,6 @@ function CustomerListScreen({ onC360 }) {
             <option value="ACTIVE">ACTIVE</option>
             <option value="INACTIVE">INACTIVE</option>
           </select>
-          <button style={{ padding:'6px 14px', background:'#E30613', color:'white', border:'none', borderRadius:7, fontSize:13, fontWeight:600, cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>
-            <Icon name="segment" /> Tạo Segment
-          </button>
         </div>
       </div>
 
@@ -575,7 +571,7 @@ function CustomerListScreen({ onC360 }) {
                   <span className={`badge ${c.type==='INDIVIDUAL' ? 'badge-blue':'badge-purple'}`}>{c.type==='INDIVIDUAL' ? 'Cá nhân':'Doanh nghiệp'}</span>
                 </td>
                 <td style={{ padding:'10px 12px' }}><span className="badge badge-gray">{c.group}</span></td>
-                <td style={{ padding:'10px 12px', fontFamily:'monospace' }}>{c.phone}</td>
+                <td style={{ padding:'10px 12px', fontFamily:'monospace' }}>{c.phone.slice(0,3)+'***'+c.phone.slice(-3)}</td>
                 <td style={{ padding:'10px 12px', textAlign:'right' }} className="tabular-nums">{c.orders.toLocaleString()}</td>
                 <td style={{ padding:'10px 12px', textAlign:'right', fontWeight:600 }} className="tabular-nums">{c.revenue} ₫</td>
                 <td style={{ padding:'10px 12px' }}>
@@ -598,23 +594,37 @@ function CustomerListScreen({ onC360 }) {
 // ============================================================
 // CN3 — IDENTITY RESOLUTION
 // ============================================================
+// Data mẫu lịch sử merge (audit log)
+const MERGE_HISTORY = [
+  { id:'MG-001', type:'AUTO_MERGE', uidMaster:'UID-0000123456', uidMerged:'UID-0000123999', confidence:94, matchKeys:'SĐT + Tên gần đúng', by:'SYSTEM', at:'12/06/2026 09:12', scoresBefore:'CLV 680 / COD Risk 42', scoresAfter:'CLV 742 / COD Risk 38' },
+  { id:'MG-002', type:'MANUAL',     uidMaster:'UID-0000987654', uidMerged:'UID-0000987001', confidence:78, matchKeys:'MST + Tên DN', by:'ds_trung@vnpost.vn', at:'10/06/2026 14:30', scoresBefore:'CLV 1100 / COD Risk 15', scoresAfter:'CLV 1248 / COD Risk 12' },
+  { id:'MG-003', type:'AUTO_MERGE', uidMaster:'UID-0000334411', uidMerged:'UID-0000334900', confidence:91, matchKeys:'SĐT', by:'SYSTEM', at:'08/06/2026 07:45', scoresBefore:'CLV 200 / COD Risk 55', scoresAfter:'CLV 220 / COD Risk 52' },
+];
+
+const UNMERGE_REQUESTS = [
+  { id:'UR-001', uidMaster:'UID-0000220088', reporter:'ds_lan@vnpost.vn', reportedAt:'25/06/2026 10:15', reason:'Hai cửa hàng khác nhau, trùng SĐT chủ nhưng là pháp nhân riêng biệt', status:'CHỜ DUYỆT', mergeRef:'MG-004' },
+];
+
 function IdentityScreen({ onC360 }) {
+  const [screenTab, setScreenTab] = React.useState('pending');
   const [view, setView] = React.useState('list');
   const [selectedPair, setSelectedPair] = React.useState(null);
-  const [masterChoice, setMasterChoice] = React.useState('A');
-  const [fieldChoices, setFieldChoices] = React.useState({});
-  const [modal, setModal] = React.useState(null);
-  const [dismissed, setDismissed] = React.useState([]);
+  const [modal, setModal] = React.useState(null); // 'confirmed' | 'different' | 'later'
+  const [decisions, setDecisions] = React.useState({}); // pairId -> 'confirmed'|'different'|'later'
 
-  const pairs = PAIRS.filter(p => !dismissed.includes(p.id));
+  // Chỉ hiển thị cặp PENDING (60–89%) — cặp ≥90% đã AUTO_MERGE ở BE
+  const pendingPairs = PAIRS.filter(p => p.sim >= 60 && p.sim < 90 && decisions[p.id] !== 'different');
 
-  const simColor = (s) => s >= 90 ? '#DC2626' : s >= 70 ? '#F59E0B' : '#6B7280';
+  const simColor = (s) => s >= 80 ? '#F59E0B' : '#6B7280';
 
   const openCompare = (pair) => {
     setSelectedPair(pair);
-    setMasterChoice('A');
-    setFieldChoices({});
     setView('compare');
+  };
+
+  const handleDecision = (type) => {
+    setDecisions(d => ({ ...d, [selectedPair.id]: type }));
+    setModal(type);
   };
 
   const COMPARE_FIELDS = [
@@ -631,18 +641,19 @@ function IdentityScreen({ onC360 }) {
 
   return (
     <div style={{ padding:24 }}>
+      {/* Modal xác nhận */}
       {modal && (
         <div className="modal-overlay" onClick={() => setModal(null)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <div style={{ fontSize:16, fontWeight:700, marginBottom:8 }}>
-              {modal==='merge' ? '✅ Xác nhận Merge' : '🚫 Bỏ qua cặp'}
+              {modal==='confirmed' ? '✅ Đã ghi nhận — Cùng người' : modal==='different' ? '🚫 Đã ghi nhận — Hai người khác nhau' : '⏳ Để lại sau'}
             </div>
             <div style={{ fontSize:13, color:'#6B7280', marginBottom:16 }}>
-              {modal==='merge'
-                ? `Merge thành công. UID master: ${masterChoice==='A' ? selectedPair.a.uid : selectedPair.b.uid}`
-                : 'Cặp này được đánh dấu "Hai người khác nhau" và sẽ không xuất hiện lại.'}
+              {modal==='confirmed' && 'Quyết định của bạn đã được ghi nhận. BE sẽ tiến hành merge và cập nhật hồ sơ.'}
+              {modal==='different' && 'Cặp này được đánh dấu là hai người khác nhau và sẽ không hiển thị lại trong danh sách.'}
+              {modal==='later' && 'Cặp này vẫn còn trong danh sách chờ để bạn xem xét sau.'}
             </div>
-            <button onClick={() => { setModal(null); setDismissed(d => [...d, selectedPair.id]); setView('list'); }}
+            <button onClick={() => { setModal(null); setView('list'); }}
               style={{ width:'100%', padding:'10px', background:'#E30613', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer' }}>
               Đóng
             </button>
@@ -650,13 +661,27 @@ function IdentityScreen({ onC360 }) {
         </div>
       )}
 
-      {view === 'list' && (
+      {/* Tab điều hướng màn hình */}
+      <div style={{ display:'flex', gap:8, marginBottom:20 }}>
+        {[
+          { key:'pending', label:`Chờ xem xét (${pendingPairs.length})` },
+          { key:'history', label:'Lịch sử merge' },
+          { key:'unmerge', label:`Yêu cầu Unmerge (${UNMERGE_REQUESTS.filter(r=>r.status==='CHỜ DUYỆT').length})` },
+        ].map(t => (
+          <button key={t.key} onClick={() => { setScreenTab(t.key); setView('list'); }}
+            className={`tab-btn ${screenTab===t.key ? 'active':''}`}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* TAB: Chờ xem xét (PENDING 60–89%) */}
+      {screenTab==='pending' && view === 'list' && (
         <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-          <div className="flex items-center justify-between">
-            <div style={{ fontWeight:700, fontSize:16 }}>Cặp hồ sơ nghi ngờ trùng</div>
-            <span className="badge badge-yellow">{pairs.length} chờ review</span>
-          </div>
           <div className="panel">
+            <div style={{ padding:'12px 16px', borderBottom:'1px solid #E5E7EB', fontSize:12, color:'#6B7280' }}>
+              Chỉ hiển thị cặp có độ tương đồng 60–89%. Cặp ≥90% đã được BE tự động merge. Cặp &lt;60% bị loại tự động.
+            </div>
             <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
               <thead>
                 <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
@@ -666,8 +691,8 @@ function IdentityScreen({ onC360 }) {
                 </tr>
               </thead>
               <tbody>
-                {pairs.map(p => (
-                  <tr key={p.id} style={{ borderBottom:'1px solid #F3F4F6', background: p.warn ? '#fffbeb' : 'white' }}>
+                {pendingPairs.map(p => (
+                  <tr key={p.id} style={{ borderBottom:'1px solid #F3F4F6' }}>
                     <td style={{ padding:'10px 12px' }}>
                       <div style={{ fontWeight:600, color:'#2563EB', fontSize:12 }}>{p.a.uid}</div>
                       <div style={{ fontSize:12 }}>{p.a.name}</div>
@@ -689,19 +714,17 @@ function IdentityScreen({ onC360 }) {
                     <td style={{ padding:'10px 12px', fontSize:12 }}><span className="badge badge-blue">{p.key}</span></td>
                     <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280' }}>{p.a.source} / {p.b.source}</td>
                     <td style={{ padding:'10px 12px' }}>
-                      <span className="badge badge-yellow">Chờ review</span>
-                      {p.warn && <div style={{ fontSize:11, color:'#d97706', marginTop:4 }}>⚠️ Cảnh báo</div>}
+                      {decisions[p.id]==='later'
+                        ? <span className="badge badge-gray">Để sau</span>
+                        : <span className="badge badge-yellow">Chờ xem xét</span>}
                     </td>
                     <td style={{ padding:'10px 12px' }}>
-                      <div className="flex gap-2">
-                        <button onClick={() => openCompare(p)} style={{ padding:'5px 12px', background:'#E30613', color:'white', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer' }}>So sánh</button>
-                        <button onClick={() => setDismissed(d => [...d, p.id])} style={{ padding:'5px 10px', background:'#f3f4f6', color:'#6B7280', border:'none', borderRadius:6, fontSize:12, cursor:'pointer' }}>Bỏ qua</button>
-                      </div>
+                      <button onClick={() => openCompare(p)} style={{ padding:'5px 12px', background:'#E30613', color:'white', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer' }}>So sánh</button>
                     </td>
                   </tr>
                 ))}
-                {pairs.length === 0 && (
-                  <tr><td colSpan={7} style={{ padding:32, textAlign:'center', color:'#6B7280' }}>✅ Không còn cặp chờ review</td></tr>
+                {pendingPairs.length === 0 && (
+                  <tr><td colSpan={7} style={{ padding:32, textAlign:'center', color:'#6B7280' }}>✅ Không còn cặp chờ xem xét</td></tr>
                 )}
               </tbody>
             </table>
@@ -709,41 +732,28 @@ function IdentityScreen({ onC360 }) {
         </div>
       )}
 
-      {view === 'compare' && selectedPair && (
+      {/* View so sánh chi tiết — read-only + nút quyết định Data Steward */}
+      {screenTab==='pending' && view === 'compare' && selectedPair && (
         <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
           <div className="flex items-center gap-3">
             <button onClick={() => setView('list')} style={{ background:'#f3f4f6', border:'none', borderRadius:6, padding:'6px 12px', fontSize:13, cursor:'pointer' }}>← Quay lại</button>
-            <div style={{ fontWeight:700, fontSize:16 }}>So sánh hồ sơ — Tương đồng {selectedPair.sim}%</div>
+            <div style={{ fontWeight:700, fontSize:16 }}>So sánh hồ sơ — Độ tương đồng {selectedPair.sim}%</div>
+            <span className="badge badge-yellow">PENDING — Chờ xác nhận</span>
           </div>
 
-          {selectedPair.warn && (
-            <div style={{ padding:12, background:'#fffbeb', border:'1px solid #F59E0B', borderRadius:8, color:'#d97706', fontWeight:600, fontSize:13 }}>
-              {selectedPair.warnMsg}
-            </div>
-          )}
-
-          {/* Master choice */}
-          <div className="panel" style={{ padding:16 }}>
-            <div style={{ fontWeight:700, fontSize:13, marginBottom:10 }}>Chọn UID Master (UID được giữ lại sau merge)</div>
-            <div className="flex gap-4">
-              {['A','B'].map(side => {
-                const hf = side==='A' ? selectedPair.a : selectedPair.b;
-                return (
-                  <label key={side} className="flex items-center gap-3 cursor-pointer" style={{ flex:1, padding:12, border:`2px solid ${masterChoice===side ? '#E30613' : '#E5E7EB'}`, borderRadius:8 }}>
-                    <input type="radio" name="master" value={side} checked={masterChoice===side} onChange={() => setMasterChoice(side)} />
-                    <div>
-                      <div style={{ fontWeight:700, color:'#2563EB', fontSize:12 }}>{hf.uid}</div>
-                      <div style={{ fontWeight:600 }}>{hf.name}</div>
-                      <div style={{ fontSize:11, color:'#6B7280' }}>{hf.source}</div>
-                    </div>
-                    {masterChoice===side && <span className="badge badge-green ml-auto">Master</span>}
-                  </label>
-                );
-              })}
-            </div>
+          {/* Thông tin 2 hồ sơ */}
+          <div className="flex gap-4">
+            {[selectedPair.a, selectedPair.b].map((hf, idx) => (
+              <div key={idx} className="panel" style={{ flex:1, padding:16 }}>
+                <div style={{ fontSize:11, fontWeight:700, color:'#6B7280', marginBottom:8 }}>HỒ SƠ {idx===0 ? 'A':'B'} — {hf.source}</div>
+                <div style={{ fontWeight:700, color:'#2563EB', fontSize:12, marginBottom:4 }}>{hf.uid}</div>
+                <div style={{ fontWeight:600, fontSize:14 }}>{hf.name}</div>
+                <div style={{ fontSize:12, color:'#6B7280', marginTop:4 }}>{hf.phone} · {hf.type} · {hf.address}</div>
+              </div>
+            ))}
           </div>
 
-          {/* Side-by-side fields */}
+          {/* Bảng so sánh — read-only, không có radio chọn field */}
           <div className="panel" style={{ overflow:'hidden' }}>
             <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
               <thead>
@@ -751,29 +761,26 @@ function IdentityScreen({ onC360 }) {
                   <th style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', width:140 }}>Trường</th>
                   <th style={{ padding:'10px 12px', fontSize:11, fontWeight:700, color:'#2563EB' }}>Hồ sơ A — {selectedPair.a.uid}</th>
                   <th style={{ padding:'10px 12px', fontSize:11, fontWeight:700, color:'#7c3aed' }}>Hồ sơ B — {selectedPair.b.uid}</th>
-                  <th style={{ padding:'10px 12px', fontSize:11, fontWeight:700, color:'#6B7280', width:120 }}>Giữ lại</th>
+                  <th style={{ padding:'10px 12px', fontSize:11, fontWeight:700, color:'#6B7280', width:100 }}>Kết quả</th>
                 </tr>
               </thead>
               <tbody>
                 {COMPARE_FIELDS.map(f => {
-                  const va = String(selectedPair.a[f.key]||'');
-                  const vb = String(selectedPair.b[f.key]||'');
+                  const va = String(selectedPair.a[f.key]||'—');
+                  const vb = String(selectedPair.b[f.key]||'—');
                   const same = va.toLowerCase() === vb.toLowerCase();
-                  const chosen = fieldChoices[f.key] || 'A';
                   return (
                     <tr key={f.key} style={{ borderBottom:'1px solid #F3F4F6', background: same ? '#f0fdf4' : 'white' }}>
                       <td style={{ padding:'9px 12px', fontWeight:600, color:'#6B7280', fontSize:12 }}>{f.label}</td>
-                      <td style={{ padding:'9px 12px', background: !same && chosen==='A' ? '#eff6ff' : '' }}>
-                        {!same && <input type="radio" name={`field-${f.key}`} checked={chosen==='A'} onChange={() => setFieldChoices(c => ({...c,[f.key]:'A'}))} style={{ marginRight:6 }} />}
+                      <td style={{ padding:'9px 12px' }}>
                         {same && <span style={{ color:'#16A34A', marginRight:6 }}>✓</span>}
                         {va}
                       </td>
-                      <td style={{ padding:'9px 12px', background: !same && chosen==='B' ? '#f5f3ff' : '', color: !same ? '#d97706' : '#6B7280' }}>
-                        {!same && <input type="radio" name={`field-${f.key}`} checked={chosen==='B'} onChange={() => setFieldChoices(c => ({...c,[f.key]:'B'}))} style={{ marginRight:6 }} />}
-                        {vb}
-                      </td>
-                      <td style={{ padding:'9px 12px', fontSize:11, color:'#6B7280' }}>
-                        {same ? <span className="badge badge-green">Khớp</span> : <span className="badge badge-yellow">Chọn {chosen}</span>}
+                      <td style={{ padding:'9px 12px', color: !same ? '#d97706' : '#6B7280' }}>{vb}</td>
+                      <td style={{ padding:'9px 12px' }}>
+                        {same
+                          ? <span className="badge badge-green">Khớp</span>
+                          : <span className="badge badge-yellow">Khác nhau</span>}
                       </td>
                     </tr>
                   );
@@ -782,13 +789,97 @@ function IdentityScreen({ onC360 }) {
             </table>
           </div>
 
-          <div className="flex gap-3">
-            <button onClick={() => setModal('merge')} style={{ flex:2, padding:'11px', background:'#E30613', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:700, cursor:'pointer' }}>
-              Xác nhận Merge
-            </button>
-            <button onClick={() => setModal('skip')} style={{ flex:1, padding:'11px', background:'#f3f4f6', color:'#1A1A1A', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer' }}>
-              Hai người khác nhau — Bỏ qua
-            </button>
+          {/* Nút quyết định Data Steward — BE thực hiện merge, người dùng chỉ xác nhận ý kiến */}
+          <div style={{ padding:16, background:'#F7F8FA', borderRadius:8, border:'1px solid #E5E7EB' }}>
+            <div style={{ fontSize:12, color:'#6B7280', marginBottom:12 }}>
+              Quyết định của bạn sẽ được ghi nhận và BE xử lý. Bạn không chọn field nào được giữ lại — BE tự quyết định theo rule ưu tiên nguồn dữ liệu.
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => handleDecision('confirmed')}
+                style={{ flex:2, padding:'11px', background:'#16A34A', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:700, cursor:'pointer' }}>
+                ✓ Cùng người — Xác nhận merge
+              </button>
+              <button onClick={() => handleDecision('different')}
+                style={{ flex:2, padding:'11px', background:'#f3f4f6', color:'#1A1A1A', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer' }}>
+                ✗ Hai người khác nhau
+              </button>
+              <button onClick={() => handleDecision('later')}
+                style={{ flex:1, padding:'11px', background:'#f3f4f6', color:'#6B7280', border:'none', borderRadius:8, fontSize:13, cursor:'pointer' }}>
+                Để sau
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB: Lịch sử merge (audit log) */}
+      {screenTab==='history' && (
+        <div className="panel" style={{ overflow:'hidden' }}>
+          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+            <thead>
+              <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
+                {['ID','Loại merge','UID Master','UID được gộp','Độ tin cậy','Khóa trùng','Người quyết định','Thời điểm','Điểm trước → sau'].map(h => (
+                  <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', whiteSpace:'nowrap' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {MERGE_HISTORY.map(m => (
+                <tr key={m.id} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                  <td style={{ padding:'10px 12px', fontFamily:'monospace', fontSize:12 }}>{m.id}</td>
+                  <td style={{ padding:'10px 12px' }}>
+                    <span className={`badge ${m.type==='AUTO_MERGE' ? 'badge-blue':'badge-green'}`}>
+                      {m.type==='AUTO_MERGE' ? 'Tự động':'Thủ công'}
+                    </span>
+                  </td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#2563EB', fontFamily:'monospace' }}>{m.uidMaster}</td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#7c3aed', fontFamily:'monospace' }}>{m.uidMerged}</td>
+                  <td style={{ padding:'10px 12px', fontWeight:700, color: m.confidence>=90 ? '#16A34A':'#F59E0B' }}>{m.confidence}%</td>
+                  <td style={{ padding:'10px 12px', fontSize:12 }}><span className="badge badge-blue">{m.matchKeys}</span></td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280' }}>{m.by}</td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{m.at}</td>
+                  <td style={{ padding:'10px 12px', fontSize:11, color:'#6B7280' }}>{m.scoresBefore} → {m.scoresAfter}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* TAB: Yêu cầu Unmerge (chỉ Admin) */}
+      {screenTab==='unmerge' && (
+        <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+          <div style={{ padding:12, background:'#fef9c3', border:'1px solid #F59E0B', borderRadius:8, fontSize:12, color:'#d97706' }}>
+            Chỉ Admin mới có thể phê duyệt hoặc từ chối yêu cầu Unmerge. Mọi quyết định được ghi audit log.
+          </div>
+          <div className="panel" style={{ overflow:'hidden' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+              <thead>
+                <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
+                  {['ID','UID liên quan','Người báo cáo','Thời gian','Lý do','Trạng thái',''].map(h => (
+                    <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {UNMERGE_REQUESTS.map(r => (
+                  <tr key={r.id} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                    <td style={{ padding:'10px 12px', fontFamily:'monospace', fontSize:12 }}>{r.id}</td>
+                    <td style={{ padding:'10px 12px', fontSize:12, color:'#2563EB', fontFamily:'monospace' }}>{r.uidMaster}</td>
+                    <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280' }}>{r.reporter}</td>
+                    <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{r.reportedAt}</td>
+                    <td style={{ padding:'10px 12px', fontSize:12, maxWidth:280 }}>{r.reason}</td>
+                    <td style={{ padding:'10px 12px' }}><span className="badge badge-yellow">{r.status}</span></td>
+                    <td style={{ padding:'10px 12px' }}>
+                      <div className="flex gap-2">
+                        <button style={{ padding:'5px 10px', background:'#DC2626', color:'white', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer' }}>Phê duyệt</button>
+                        <button style={{ padding:'5px 10px', background:'#f3f4f6', color:'#6B7280', border:'none', borderRadius:6, fontSize:12, cursor:'pointer' }}>Từ chối</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
@@ -806,19 +897,21 @@ function Customer360Screen({ uid, onBack }) {
 
   const canSee = (field) => {
     const rbac = {
-      rfm:       ['CSKH','Marketing','Kinh doanh','Admin'],
-      clv:       ['CSKH','Marketing','Kinh doanh','Admin'],
-      churn:     ['CSKH','Marketing','Kinh doanh','Admin'],
-      engagement:['CSKH','Marketing','Admin'],
-      codRisk:   ['Kinh doanh','Vận hành','Admin'],
-      fraud:     ['Kinh doanh','Vận hành','Admin'],
+      rfm:          ['CSKH','Marketing','Kinh doanh','Admin'],
+      clv:          ['CSKH','Marketing','Kinh doanh','Admin'],
+      churn:        ['CSKH','Marketing','Kinh doanh','Admin'],
+      engagement:   ['CSKH','Marketing','Admin'],
+      codRisk:      ['Kinh doanh','Vận hành','Admin'],
+      fraud:        ['Kinh doanh','Vận hành','Admin'],
+      linkedProfiles:['CSKH','Marketing','Kinh doanh','Vận hành','Data Steward','Admin'],
+      reportMerge:  ['Data Steward','Admin'],
     };
     return (rbac[field]||[]).includes(role);
   };
 
   const tabs = [
     { key:'overview',   label:'Tổng quan' },
-    { key:'identity',   label:'Định danh' },
+    { key:'linked',     label:'Hồ sơ liên kết' },
     { key:'address',    label:'Địa chỉ' },
     ...(kh.type==='BUSINESS' ? [{ key:'business', label:'Doanh nghiệp' }] : []),
     { key:'transaction',label:'GD & COD' },
@@ -859,10 +952,8 @@ function Customer360Screen({ uid, onBack }) {
           </div>
           <div className="flex gap-2">
             <select value={role} onChange={e=>setRole(e.target.value)} style={{ fontSize:12, borderRadius:6 }}>
-              {['CSKH','Marketing','Kinh doanh','Vận hành','Admin'].map(r => <option key={r}>{r}</option>)}
+              {['CSKH','Marketing','Kinh doanh','Vận hành','Data Steward','Admin'].map(r => <option key={r}>{r}</option>)}
             </select>
-            <button style={{ padding:'6px 12px', background:'#f3f4f6', border:'none', borderRadius:7, fontSize:12, cursor:'pointer' }}>Sửa</button>
-            <button style={{ padding:'6px 12px', background:'#f3f4f6', border:'none', borderRadius:7, fontSize:12, cursor:'pointer' }}>Lịch sử merge</button>
           </div>
         </div>
 
@@ -942,39 +1033,90 @@ function Customer360Screen({ uid, onBack }) {
         )}
 
         {/* ĐỊNH DANH */}
-        {tab==='identity' && (
-          <div>
-            <div className="section-title">Identity Graph — Alias IDs</div>
-            <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
-              <thead>
-                <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
-                  {['Loại ID','Giá trị','Nguồn','Confidence','Reliability Score','Chính'].map(h => (
-                    <th key={h} style={{ padding:'8px 10px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {kh.aliases.map((a,i) => (
-                  <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
-                    <td style={{ padding:'8px 10px' }}><span className="badge badge-blue">{a.type}</span></td>
-                    <td style={{ padding:'8px 10px', fontFamily:'monospace', fontWeight:600 }}>{a.value}</td>
-                    <td style={{ padding:'8px 10px', color:'#6B7280' }}>{a.source}</td>
-                    <td style={{ padding:'8px 10px' }}>
-                      <span className={`badge ${a.confidence==='HIGH' ? 'badge-green' : a.confidence==='MEDIUM' ? 'badge-yellow' : 'badge-gray'}`}>{a.confidence}</span>
-                    </td>
-                    <td style={{ padding:'8px 10px' }}>
-                      <div className="flex items-center gap-2">
-                        <div style={{ flex:1, height:6, borderRadius:3, background:'#E5E7EB', overflow:'hidden', minWidth:60 }}>
-                          <div style={{ width:`${a.reliability}%`, height:'100%', background: a.reliability>=80 ? '#16A34A' : a.reliability>=60 ? '#F59E0B' : '#DC2626', borderRadius:3 }}></div>
-                        </div>
-                        <span className="tabular-nums" style={{ fontSize:12, fontWeight:700 }}>{a.reliability}</span>
-                      </div>
-                    </td>
-                    <td style={{ padding:'8px 10px' }}>{a.primary ? '✓' : ''}</td>
+        {tab==='linked' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+            {/* Alias IDs */}
+            <div>
+              <div className="section-title">Alias IDs — Các định danh được liên kết</div>
+              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                <thead>
+                  <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+                    {['Loại ID','Giá trị','Nguồn','Độ tin cậy','Reliability','Chính'].map(h => (
+                      <th key={h} style={{ padding:'8px 10px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {kh.aliases.map((a,i) => (
+                    <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                      <td style={{ padding:'8px 10px' }}><span className="badge badge-blue">{a.type}</span></td>
+                      <td style={{ padding:'8px 10px', fontFamily:'monospace', fontWeight:600 }}>{a.value}</td>
+                      <td style={{ padding:'8px 10px', color:'#6B7280' }}>{a.source}</td>
+                      <td style={{ padding:'8px 10px' }}>
+                        <span className={`badge ${a.confidence==='HIGH' ? 'badge-green' : a.confidence==='MEDIUM' ? 'badge-yellow' : 'badge-gray'}`}>{a.confidence}</span>
+                      </td>
+                      <td style={{ padding:'8px 10px' }}>
+                        <div className="flex items-center gap-2">
+                          <div style={{ flex:1, height:6, borderRadius:3, background:'#E5E7EB', overflow:'hidden', minWidth:60 }}>
+                            <div style={{ width:`${a.reliability}%`, height:'100%', background: a.reliability>=80 ? '#16A34A' : a.reliability>=60 ? '#F59E0B' : '#DC2626', borderRadius:3 }}></div>
+                          </div>
+                          <span className="tabular-nums" style={{ fontSize:12, fontWeight:700 }}>{a.reliability}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding:'8px 10px' }}>{a.primary ? '✓' : ''}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Lịch sử merge của KH này */}
+            <div>
+              <div className="section-title">Lịch sử merge hồ sơ</div>
+              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                <thead>
+                  <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+                    {['Loại merge','UID được gộp vào','Nguồn','Ngày ghép','Độ tin cậy','Người quyết định'].map(h => (
+                      <th key={h} style={{ padding:'8px 10px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(kh.mergeHistory||[]).map((m,i) => (
+                    <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                      <td style={{ padding:'8px 10px' }}>
+                        <span className={`badge ${m.type==='AUTO' ? 'badge-blue':'badge-green'}`}>
+                          {m.type==='AUTO' ? 'Tự động':'Thủ công'}
+                        </span>
+                      </td>
+                      <td style={{ padding:'8px 10px', fontFamily:'monospace', fontSize:12, color:'#7c3aed' }}>{m.from}</td>
+                      <td style={{ padding:'8px 10px', fontSize:12, color:'#6B7280' }}>{m.source||'—'}</td>
+                      <td style={{ padding:'8px 10px', fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{m.at}</td>
+                      <td style={{ padding:'8px 10px', fontWeight:700, color: (m.confidence||0)>=90 ? '#16A34A':'#F59E0B' }}>
+                        {m.confidence ? `${m.confidence}%` : '—'}
+                      </td>
+                      <td style={{ padding:'8px 10px', fontSize:12, color:'#6B7280' }}>{m.by}</td>
+                    </tr>
+                  ))}
+                  {!(kh.mergeHistory||[]).length && (
+                    <tr><td colSpan={6} style={{ padding:20, textAlign:'center', color:'#6B7280' }}>Chưa có lịch sử merge</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Nút Báo cáo merge sai — chỉ Data Steward và Admin */}
+            {canSee('reportMerge') && (
+              <div style={{ padding:14, background:'#fef9c3', border:'1px solid #F59E0B', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <div>
+                  <div style={{ fontWeight:600, fontSize:13 }}>Nghi ngờ merge nhầm?</div>
+                  <div style={{ fontSize:12, color:'#6B7280', marginTop:2 }}>Báo cáo để Admin xem xét và xử lý unmerge nếu cần.</div>
+                </div>
+                <button style={{ padding:'8px 16px', background:'#d97706', color:'white', border:'none', borderRadius:7, fontSize:13, fontWeight:600, cursor:'pointer', flexShrink:0 }}>
+                  Báo cáo merge sai
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -1226,16 +1368,9 @@ function Customer360Screen({ uid, onBack }) {
             </div>
             <div>
               <div className="section-title">Lịch sử merge</div>
-              {kh.mergeHistory?.length === 0
-                ? <div style={{ color:'#6B7280', fontSize:13 }}>Chưa có lịch sử merge</div>
-                : kh.mergeHistory?.map((m,i) => (
-                  <div key={i} style={{ padding:10, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:8 }}>
-                    <div style={{ fontWeight:600, fontSize:13 }}>Merge từ {m.from}</div>
-                    <div style={{ fontSize:12, color:'#6B7280' }}>{m.at} · {m.by}</div>
-                    <div style={{ fontSize:12, color:'#1A1A1A', marginTop:4 }}>{m.note}</div>
-                  </div>
-                ))
-              }
+              <div style={{ fontSize:12, color:'#6B7280', padding:'10px 0' }}>
+                Xem lịch sử merge chi tiết tại tab <strong>Hồ sơ liên kết</strong>.
+              </div>
             </div>
           </div>
         )}
@@ -1410,15 +1545,15 @@ function SegmentScreen() {
 // APP
 // ============================================================
 function App() {
-  const [nav, setNav] = React.useState('kafka');
+  const [nav, setNav] = React.useState('customers');
   const [c360uid, setC360uid] = React.useState(null);
 
   const navLabels = {
     kafka:'Kafka Integration',
-    customers:'Customer Management',
-    identity:'Identity Resolution',
+    customers:'Tìm kiếm KH',
+    identity:'Đối soát hồ sơ',
     c360:'Customer 360',
-    segments:'Segment Management',
+    segments:'Phân khúc',
   };
 
   const goC360 = (uid) => {
