@@ -93,12 +93,12 @@ const GROUPS = [
   {
     id:'GRP-0041', matchKey:'SĐT 0901234567 · Tên gần đúng', type:'INDIVIDUAL',
     profiles:[
-      { uid:'CAS-0009912',  source:'CAS',          name:'Nguyễn Thị Hương',  phone:'0901234567',  email:'huong.nguyen@gmail.com', cccd:'012********',       address:'Hà Nội',   orders:1275, role:'SENDER',   confidence:94 },
-      { uid:'CRM-0000192',  source:'CRM',          name:'Nguyen Thi Huong',  phone:'0901234567',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'—',        confidence:91 },
-      { uid:'MVN-4421009',  source:'MyVNPost',     name:'Hương Nguyễn',      phone:'090123xxxx',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:12,   role:'SENDER',   confidence:76 },
-      { uid:'PNS-8819001',  source:'PNS/DingDong', name:'N.T. Hương',        phone:'0901234567',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'RECEIVER', confidence:88 },
-      { uid:'PAY-2200441',  source:'PayPost',      name:'Nguyễn Hương',      phone:'090123xxx',   email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'—',        confidence:72 },
-      { uid:'VPC-0031122',  source:'VPostCode',    name:'—',                 phone:'—',           email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'—',        confidence:60 },
+      { uid:'CAS-0009912',  source:'CAS',          name:'Nguyễn Thị Hương',  phone:'0901234567',  email:'huong.nguyen@gmail.com', cccd:'012********',       address:'Hà Nội',   orders:1275, role:'Người gửi',   confidence:82 },
+      { uid:'CRM-0000192',  source:'CRM',          name:'Nguyen Thi Huong',  phone:'0901234567',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'—',           confidence:78 },
+      { uid:'MVN-4421009',  source:'MyVNPost',     name:'Hương Nguyễn',      phone:'090123xxxx',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:12,   role:'Người gửi',   confidence:76 },
+      { uid:'PNS-8819001',  source:'PNS/DingDong', name:'N.T. Hương',        phone:'0901234567',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'Người nhận',  confidence:71 },
+      { uid:'PAY-2200441',  source:'PayPost',      name:'Nguyễn Hương',      phone:'090123xxx',   email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'—',           confidence:68 },
+      { uid:'VPC-0031122',  source:'VPostCode',    name:'—',                 phone:'—',           email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'—',           confidence:61 },
     ],
     conflicts:['SĐT không nhất quán ở MyVNPost, PayPost (thiếu số cuối)', 'Tên viết tắt/không dấu ở 3/6 nguồn'],
     warn: true,
@@ -106,20 +106,20 @@ const GROUPS = [
   {
     id:'GRP-0042', matchKey:'MST 0312345678', type:'BUSINESS',
     profiles:[
-      { uid:'KHL-0987654',  source:'Portal KHL',   name:'Cty TNHH TM ABC',      phone:'0987654321',  email:'info@abc.vn',            cccd:'MST:0312345678',    address:'TP.HCM',   orders:18450,role:'KHL',      confidence:95 },
-      { uid:'CRM-0000987',  source:'CRM',          name:'Cong ty TNHH TM ABC',  phone:'—',           email:'contact@abc.com.vn',     cccd:'MST:0312345678',    address:'TP.HCM',   orders:0,    role:'—',        confidence:88 },
-      { uid:'CAS-0041200',  source:'CAS',          name:'TNHH TM ABC',          phone:'0987654321',  email:'—',                      cccd:'MST:0312345678',    address:'TP.HCM',   orders:320,  role:'SENDER',   confidence:82 },
+      { uid:'KHL-0987654',  source:'Portal KHL',   name:'Công ty TNHH TM ABC',  phone:'0987654321',  email:'info@abc.vn',            cccd:'MST:0312345678',    address:'TP.HCM',   orders:18450,role:'KHL',         confidence:88 },
+      { uid:'CRM-0000987',  source:'CRM',          name:'Cong ty TNHH TM ABC',  phone:'—',           email:'contact@abc.com.vn',     cccd:'MST:0312345678',    address:'TP.HCM',   orders:0,    role:'—',           confidence:79 },
+      { uid:'CAS-0041200',  source:'CAS',          name:'TNHH TM ABC',          phone:'0987654321',  email:'—',                      cccd:'MST:0312345678',    address:'TP.HCM',   orders:320,  role:'Người gửi',   confidence:74 },
     ],
-    conflicts:['Tên công ty viết tắt/không dấu ở CRM, CAS'],
-    warn: false,
+    conflicts:['Tên công ty viết tắt/không dấu ở CRM, CAS', 'Email khác nhau giữa Portal KHL và CRM'],
+    warn: true,
   },
   {
     id:'GRP-0043', matchKey:'SĐT 0978111222', type:'INDIVIDUAL',
     profiles:[
-      { uid:'CAS-0456789',  source:'CAS',          name:'Phạm Minh Tuấn',       phone:'0978111222',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:86,   role:'SENDER',   confidence:80 },
-      { uid:'PNS-0456120',  source:'PNS/DingDong', name:'Pham M. Tuan',         phone:'0978111222',  email:'—',                      cccd:'—',                 address:'TP.HCM',   orders:0,    role:'RECEIVER', confidence:68 },
+      { uid:'CAS-0456789',  source:'CAS',          name:'Phạm Minh Tuấn',       phone:'0978111222',  email:'—',                      cccd:'—',                 address:'TP.HCM',   orders:86,   role:'Người gửi',   confidence:80 },
+      { uid:'PNS-0456120',  source:'PNS/DingDong', name:'Pham M. Tuan',         phone:'0978111222',  email:'—',                      cccd:'—',                 address:'TP.HCM',   orders:0,    role:'Người nhận',  confidence:68 },
     ],
-    conflicts:['Địa chỉ khác tỉnh (HN vs HCM)', 'Vai trò khác nhau (SENDER vs RECEIVER)'],
+    conflicts:['Tên không dấu ở PNS/DingDong', 'Vai trò khác nhau (gửi vs nhận)'],
     warn: true,
   },
 ];
@@ -160,7 +160,10 @@ const KH_DETAIL = {
       { time:'15/06 08:45', type:'order', icon:'📦', label:'Tạo đơn hàng EMS HN→ĐN', channel:'APP', color:'#16A34A' },
       { time:'10/06 16:00', type:'campaign', icon:'📣', label:'Phản hồi Campaign Email SALE06', channel:'EMAIL', color:'#7c3aed' },
     ],
-    mergeHistory:[],
+    mergeHistory:[
+      { from:'CRM-0000192', at:'20/06/2026 08:45', by:'SYSTEM', type:'AUTO', source:'CRM', confidence:78, matchKey:'SĐT 0901234567' },
+      { from:'MVN-4421009', at:'20/06/2026 08:46', by:'SYSTEM', type:'AUTO', source:'MyVNPost', confidence:76, matchKey:'SĐT 090123xxxx · Tên gần đúng' },
+    ],
   },
   'UID-0000987654': {
     uid:'UID-0000987654', type:'BUSINESS', group:'KHL', status:'ACTIVE', name:'Công ty TNHH Thương mại ABC',
@@ -207,10 +210,13 @@ const KH_DETAIL = {
     timeline:[
       { time:'24/06 10:00', type:'order', icon:'📦', label:'Đơn loạt — 240 đơn bưu kiện HCM→HN', channel:'API', color:'#16A34A' },
       { time:'22/06 15:00', type:'complaint', icon:'💬', label:'Khiếu nại — Đối soát COD sai', channel:'CRM', color:'#F59E0B' },
-      { time:'20/06 09:00', type:'merge', icon:'🔗', label:'Merge từ UID-0000987001', channel:'SYSTEM', color:'#6B7280' },
+      { time:'20/06 09:00', type:'merge', icon:'🔗', label:'Hồ sơ CRM (CRM-0000987) được gộp vào — MST khớp', channel:'SYSTEM', color:'#6B7280' },
       { time:'15/01 00:00', type:'contract', icon:'📄', label:'Hợp đồng KHL ký kết 2024-01-15', channel:'CRM', color:'#2563EB' },
     ],
-    mergeHistory:[{ from:'UID-0000987001', at:'20/06/2026 09:00', by:'ds_trung@vnpost.vn', note:'Trùng MST, confirm merge', type:'AUTO', source:'Portal KHL', confidence:78, matchKey:'MST 0312345678' }],
+    mergeHistory:[
+      { from:'CRM-0000987', at:'20/06/2026 09:00', by:'SYSTEM', type:'AUTO', source:'CRM', confidence:79, matchKey:'MST 0312345678' },
+      { from:'CAS-0041200', at:'20/06/2026 09:01', by:'SYSTEM', type:'AUTO', source:'CAS', confidence:74, matchKey:'MST 0312345678 · SĐT 0987654321' },
+    ],
   },
   'UID-0000456789': {
     uid:'UID-0000456789', type:'INDIVIDUAL', group:'B2C', status:'ACTIVE', name:'Phạm Minh Tuấn',
