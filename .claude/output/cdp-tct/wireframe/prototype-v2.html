@@ -253,10 +253,12 @@ const KH_DETAIL = {
 };
 
 const SEGMENTS = [
-  { name:'KHL giá trị cao',          desc:'customer_group=KHL AND total_revenue>1.000.000.000', count:'1.240', type:'Động', updated:'hôm nay',       status:'ACTIVE' },
-  { name:'Nguy cơ rời bỏ',           desc:'churn_score≥70',                                    count:'8.560', type:'Động', updated:'hôm qua',       status:'ACTIVE' },
-  { name:'Tỷ lệ hoàn cao cần xử lý', desc:'return_rate>0.2 AND total_orders>50',               count:'3.120', type:'Động', updated:'3 ngày trước',  status:'ACTIVE' },
-  { name:'Chủ shop hoạt động cao',   desc:'roles=SHOP_OWNER AND avg_monthly_orders>50',        count:'920',   type:'Động', updated:'1 tuần trước',  status:'ACTIVE' },
+  { name:'Khách hàng trung thành',    desc:'Nhóm KH giao dịch thường xuyên, giá trị cao, ít rủi ro — RFM nhóm Champions',              count:'2.180', type:'Động', updated:'hôm nay',      status:'Đang hoạt động' },
+  { name:'KHL giá trị cao',           desc:'Khách hàng doanh nghiệp có doanh thu tích lũy trên 1 tỷ đồng',                             count:'1.240', type:'Động', updated:'hôm nay',      status:'Đang hoạt động' },
+  { name:'Có nguy cơ rời bỏ',         desc:'KH có điểm churn từ 70 trở lên và không phát sinh giao dịch trong 90 ngày gần nhất',       count:'8.560', type:'Động', updated:'hôm qua',      status:'Đang hoạt động' },
+  { name:'Tỷ lệ hoàn cao',            desc:'KH có tỷ lệ hoàn trả trên 20% và có từ 50 đơn trở lên — cần theo dõi rủi ro',             count:'3.120', type:'Động', updated:'3 ngày trước', status:'Đang hoạt động' },
+  { name:'Chủ shop hoạt động cao',    desc:'KH có vai trò chủ shop và trung bình trên 50 đơn mỗi tháng',                               count:'920',   type:'Động', updated:'1 tuần trước', status:'Đang hoạt động' },
+  { name:'Khách hàng mới',            desc:'KH tạo tài khoản hoặc phát sinh giao dịch đầu tiên trong vòng 30 ngày gần nhất',           count:'4.430', type:'Động', updated:'hôm nay',      status:'Đang hoạt động' },
 ];
 
 // ============================================================
@@ -282,7 +284,7 @@ const CONFIDENCE_LABEL = { HIGH:'Cao', MEDIUM:'Trung bình', LOW:'Thấp' };
 const ALIAS_TYPE_LABEL = { PHONE:'SĐT', POST_ID:'Post ID', CRM_ID:'Mã CRM', TAX_ID:'MST', KHL_CODE:'Mã KHL', USER_APP_ID:'ID App', EMAIL:'Email' };
 const ADDR_STATUS_LABEL = { STANDARDIZED:'Đã chuẩn hóa', PARTIAL:'Một phần', UNKNOWN:'Chưa xác định' };
 const ADDR_TYPE_LABEL   = { SENDER:'Địa chỉ gửi', RECEIVER:'Địa chỉ nhận', BUSINESS:'Trụ sở', WAREHOUSE:'Kho hàng' };
-const SEGMENT_LABEL = { 'Champions':'Khách hàng trung thành', 'At Risk':'Có nguy cơ rời bỏ' };
+const SEGMENT_LABEL = { 'Champions':'Khách hàng trung thành', 'At Risk':'Có nguy cơ rời bỏ', 'New':'Khách hàng mới', 'Loyal':'Khách hàng trung thành' };
 
 const lagBadge = (lag, warn) => {
   if (warn) return <span className="tabular-nums text-red-600 font-bold">{lag.toLocaleString()}</span>;
@@ -1659,7 +1661,7 @@ function SegmentScreen() {
       )}
 
       <div className="flex items-center justify-between">
-        <div style={{ fontWeight:700, fontSize:16 }}>Segment Management</div>
+        <div style={{ fontWeight:700, fontSize:16 }}>Quản lý Phân khúc</div>
         <div className="flex gap-2">
           <button onClick={() => setView('list')} className={`tab-btn ${view==='list' ? 'active':''}`}>Danh sách</button>
           <button onClick={() => setView('builder')} className={`tab-btn ${view==='builder' ? 'active':''}`}>+ Tạo Segment</button>
@@ -1684,7 +1686,7 @@ function SegmentScreen() {
                   <td style={{ padding:'10px 12px', fontWeight:700, color:'#E30613' }} className="tabular-nums">{s.count} KH</td>
                   <td style={{ padding:'10px 12px' }}><span className="badge badge-blue">{s.type}</span></td>
                   <td style={{ padding:'10px 12px', color:'#6B7280', fontSize:12 }}>{s.updated}</td>
-                  <td style={{ padding:'10px 12px' }}><span className="badge badge-green">{s.status}</span></td>
+                  <td style={{ padding:'10px 12px' }}><span className={`badge ${s.status==='Đang hoạt động' ? 'badge-green':'badge-gray'}`}>{s.status}</span></td>
                   <td style={{ padding:'10px 12px' }}>
                     <button style={{ padding:'4px 10px', background:'#f3f4f6', border:'none', borderRadius:6, fontSize:12, cursor:'pointer' }}>Xem KH</button>
                   </td>
