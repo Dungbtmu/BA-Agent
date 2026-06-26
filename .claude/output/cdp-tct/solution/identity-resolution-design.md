@@ -369,6 +369,7 @@ Thực hiện: Khi nhận được báo cáo từ Data Steward
 - [ ] **OQ-02**: Ngưỡng số cụ thể cho vùng PENDING — VNPost muốn dùng 60% hay có ngưỡng khác? (Ví dụ: một số hệ thống dùng 70% là ngưỡng review)
 - [ ] **OQ-03**: Notification cho Admin khi có request Unmerge mới — chỉ badge trong app hay cần email/SMS ngoài giờ?
 - [ ] **OQ-04**: Nếu một UID đã bị merge nhiều lần (chuỗi merge), khi Unmerge cần tách đến đâu — chỉ tách merge gần nhất hay có thể tách toàn bộ chuỗi?
+- [ ] **OQ-05**: Khi nhiều hệ thống nguồn cung cấp giá trị khác nhau cho cùng một trường (ví dụ: CRM nói ACTIVE, CAS nói INACTIVE; CRM phân loại "Cá nhân", Portal KHL phân loại "Doanh nghiệp"), CDP dùng rule ưu tiên nguồn nào để quyết định giá trị hiển thị trên Golden Record? Rule này do VNPost tự định nghĩa hay theo cấu hình Unomi? Cần xác nhận cho các trường: loại KH, group, status, loyalty tier.
 
 ---
 
