@@ -643,9 +643,7 @@ function IdentityScreen({ onC360 }) {
 
   const toggleSource = (uid) => {
     setSelectedSources(prev =>
-      prev.includes(uid)
-        ? prev.filter(u => u !== uid)
-        : prev.length < 4 ? [...prev, uid] : prev
+      prev.includes(uid) ? prev.filter(u => u !== uid) : [...prev, uid]
     );
   };
 
@@ -885,7 +883,7 @@ function IdentityScreen({ onC360 }) {
           )}
 
           <div style={{ fontSize:12, color:'#6B7280' }}>
-            Muốn so sánh field-by-field? Chọn tab <strong>So sánh chi tiết</strong> và chọn tối đa 4 nguồn.
+            Muốn so sánh field-by-field? Chọn tab <strong>So sánh chi tiết</strong> và chọn các nguồn cần xem.
           </div>
         </div>
       )}
@@ -895,7 +893,7 @@ function IdentityScreen({ onC360 }) {
         <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
           {/* Chọn nguồn để so sánh */}
           <div style={{ padding:12, background:'#F7F8FA', borderRadius:8, border:'1px solid #E5E7EB' }}>
-            <div style={{ fontSize:12, fontWeight:600, marginBottom:8 }}>Chọn nguồn để so sánh (tối đa 4):</div>
+            <div style={{ fontSize:12, fontWeight:600, marginBottom:8 }}>Chọn nguồn để so sánh:</div>
             <div className="flex gap-2 flex-wrap">
               {selectedGroup.profiles.map(p => (
                 <button key={p.uid} onClick={() => toggleSource(p.uid)}
