@@ -1058,7 +1058,6 @@ function Customer360Screen({ uid, onBack }) {
               <span className="badge badge-gray">{kh.group}</span>
               {custStatusBadge(kh.status)}
               {kh.loyalty?.tier && <span className={`badge ${kh.loyalty.tier==='GOLD' ? 'badge-yellow' : kh.loyalty.tier==='PLATINUM' ? 'badge-purple' : 'badge-gray'}`}>🏅 {kh.loyalty.tier}</span>}
-              {kh.segments.map(s => <span key={s} className={`badge ${s.includes('Risk')||s.includes('hoàn') ? 'badge-red':'badge-green'}`}>{s}</span>)}
             </div>
           </div>
           <div className="flex gap-2">
