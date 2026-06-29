@@ -397,7 +397,6 @@ const custStatusBadge = (s) => {
 const GROUP_LABEL = { SME:'SME', KHL:'KHL', B2C:'Cá nhân thường' };
 const CONFIDENCE_LABEL = { HIGH:'Cao', MEDIUM:'Trung bình', LOW:'Thấp' };
 const ALIAS_TYPE_LABEL = { PHONE:'SĐT', POST_ID:'Post ID', CRM_ID:'Mã CRM', TAX_ID:'MST', KHL_CODE:'Mã KHL', USER_APP_ID:'ID App', EMAIL:'Email' };
-const ADDR_STATUS_LABEL = { STANDARDIZED:'Đã chuẩn hóa', PARTIAL:'Một phần', UNKNOWN:'Chưa xác định' };
 const ADDR_TYPE_LABEL   = { SENDER:'Địa chỉ gửi', RECEIVER:'Địa chỉ nhận', BUSINESS:'Trụ sở', WAREHOUSE:'Kho hàng' };
 const SEGMENT_RISK = ['Có nguy cơ rời bỏ','Tỷ lệ hoàn cao','Có nguy cơ gian lận'];
 const SEGMENT_GREEN = ['Khách hàng trung thành','KHL giá trị cao','Chủ shop hoạt động cao'];
@@ -1547,7 +1546,6 @@ function Customer360Screen({ uid, onBack }) {
               <div key={i} style={{ padding:14, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:10 }}>
                 <div className="flex items-center gap-2 mb-2">
                   {a.primary && <span className="badge badge-green">Chính</span>}
-                  <span className={`badge ${a.status==='STANDARDIZED' ? 'badge-green' : 'badge-yellow'}`}>{ADDR_STATUS_LABEL[a.status]||a.status}</span>
                 </div>
                 <div style={{ fontWeight:600, fontSize:14 }}>{a.detail}, {a.ward}, {a.province}</div>
                 <div style={{ fontSize:12, color:'#6B7280', marginTop:4 }}>VPostCode: {a.vpostcode}</div>
