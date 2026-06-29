@@ -706,7 +706,7 @@ function CustomerListScreen({ onC360, initSegment }) {
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-2" style={{ background:'#F7F8FA', border:'1px solid #E5E7EB', borderRadius:8, padding:'6px 12px', flex:'1', minWidth:200 }}>
             <Icon name="search" />
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tìm theo tên, mã KH, SĐT, email, MST..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tìm theo mã KH, tên khách hàng..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
           </div>
           <select value={typeFilter} onChange={e=>setTypeFilter(e.target.value)} style={{ fontSize:13 }}>
             <option value="ALL">Tất cả loại</option>
