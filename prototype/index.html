@@ -1854,6 +1854,7 @@ function Customer360Screen({ uid, onBack }) {
 // ============================================================
 function SegmentScreen({ onViewKH }) {
   const [view, setView] = React.useState('list');
+  const [selectedSeg, setSelectedSeg] = React.useState(null);
   const [previewCount, setPreviewCount] = React.useState(null);
   const [segName, setSegName] = React.useState('');
   const [rules, setRules] = React.useState([
@@ -1905,7 +1906,7 @@ function SegmentScreen({ onViewKH }) {
             </thead>
             <tbody>
               {SEGMENTS.map((s,i) => (
-                <tr key={i} className="table-row" style={{ borderBottom:'1px solid #F3F4F6', cursor:'pointer' }}>
+                <tr key={i} className="table-row" onClick={() => { setSelectedSeg(i); setView('detail'); }} style={{ borderBottom:'1px solid #F3F4F6', cursor:'pointer' }}>
                   <td style={{ padding:'10px 12px', fontWeight:700 }}>{s.name}</td>
                   <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280', maxWidth:260 }}>{s.desc}</td>
                   <td style={{ padding:'10px 12px', fontWeight:700, color:'#E30613' }} className="tabular-nums">{s.count} KH</td>

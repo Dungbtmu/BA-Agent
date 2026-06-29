@@ -25,6 +25,7 @@ Hà Nội – Tháng 05/2026
 | 19/06/2026 | Jun | UC-CAM-02; Screen 4A (STT 11, 12); Screen 4B (STT 5); NFR Hiệu năng UI | U | Đổi preview Campaign Builder từ on-demand sang realtime — đồng nhất với Template Editor. Cập nhật Hoạt động bước 5, Quy tắc nghiệp vụ, bảng component STT 11–12 trong Screen 4A, STT 5 trong Screen 4B, và mục Hiệu năng UI trong NFR. | V3.5 |
 | 24/06/2026 | Jun | I.3 Thuật ngữ; UC-CAM-02; Screen 4A (S3 STT 4, S4 STT 13) | U | Bổ sung logic chặn biến thể khi Logic phân khúc = AND (Tất cả phân khúc): (1) Cập nhật định nghĩa Audience Variant — chỉ áp dụng khi đồng thời Logic trigger OR VÀ Logic phân khúc OR; (2) Thêm 2 quy tắc nghiệp vụ vào UC-CAM-02: AND phân khúc → ẩn [+ Biến thể đối tượng], chuyển OR→AND khi đang có variant → confirm xóa; (3) Bổ sung đầy đủ behavior chuyển đổi vào bảng S3 STT 4; (4) Cập nhật điều kiện hiển thị S4 STT 13 — phải thỏa cả hai: trigger OR VÀ phân khúc OR. | V3.6 |
 | 29/06/2026 | Jun | Screen 2B (STT 7) | U | Bổ sung và làm rõ hiển thị Biến thể đối tượng trong Campaign Detail View: (1) tab biến thể per trigger card, mặc định Biến thể 1, click để xem nội dung từng biến thể; (2) số biến thể per kênh độc lập — kênh chỉ có 1 biến thể không hiển thị hàng tab; (3) số biến thể per trigger trong cùng kênh cũng độc lập; (4) reset về Biến thể 1 khi switch kênh để tránh index out-of-range; không có biến thể → hiển thị thẳng nội dung. | V3.7 |
+| 29/06/2026 | Jun | II.6.4 Điều kiện dừng pipeline | U | Bổ sung rule bỏ qua trigger xảy ra trước `startDate`: campaign đang Active nhưng trigger kích hoạt trước ngày bắt đầu hiệu lực → bỏ qua event, không enqueue, ghi log `EVENT_BEFORE_START_DATE`; đồng thời thêm cột "Thời điểm kiểm tra" vào bảng để phân biệt điều kiện trước enqueue vs trong pipeline. | V3.8 |
 
 ---
 
@@ -857,17 +858,18 @@ Cụ thể, `message_log` cần lưu đủ 2 trường:
 
 ### II.6.4. Điều kiện dừng pipeline
 
-Pipeline dừng khi gặp **một trong các điều kiện** sau:
+Pipeline dừng (hoặc bỏ qua event trước khi enqueue) khi gặp **một trong các điều kiện** sau:
 
-| Điều kiện | Mô tả |
-|---|---|
-| Delivered thành công | Gửi được qua bất kỳ kênh nào → dừng, không gửi kênh tiếp theo |
-| Hết kênh khả dụng | Đã thử tất cả kênh có nội dung, không kênh nào thành công |
-| DNC hoặc BL block | Không fallback; dừng ngay |
-| Trạng thái SIM không hợp lệ | SIM ở trạng thái Inactive, Suspended, hoặc Chờ hủy (Khóa 2 chiều) tại thời điểm gửi → dừng ngay; không fallback; ghi log `SIM_STATUS_BLOCKED`; chỉ gửi cho SIM Active (1 chiều hoặc 2 chiều đang hoạt động) |
-| Throttle / Cooldown | KH đạt daily cap hoặc đang trong cooldown → dừng ngay; không fallback; ghi log tương ứng |
-| Campaign bị Kill Switch | Hủy message đang chờ trong queue; không gửi |
-| Thời gian hiệu lực campaign kết thúc | Message còn trong queue nhưng campaign đã Ended → hủy |
+| Điều kiện | Thời điểm kiểm tra | Mô tả |
+|---|---|---|
+| Trigger xảy ra trước `startDate` | Trước khi enqueue | Campaign đang Active nhưng trigger kích hoạt vào thời điểm trước ngày bắt đầu hiệu lực → bỏ qua event, không enqueue; ghi log `EVENT_BEFORE_START_DATE`; không retry |
+| Delivered thành công | Trong pipeline | Gửi được qua bất kỳ kênh nào → dừng, không gửi kênh tiếp theo |
+| Hết kênh khả dụng | Trong pipeline | Đã thử tất cả kênh có nội dung, không kênh nào thành công |
+| DNC hoặc BL block | Trong pipeline | Không fallback; dừng ngay |
+| Trạng thái SIM không hợp lệ | Trong pipeline | SIM ở trạng thái Inactive, Suspended, hoặc Chờ hủy (Khóa 2 chiều) tại thời điểm gửi → dừng ngay; không fallback; ghi log `SIM_STATUS_BLOCKED`; chỉ gửi cho SIM Active (1 chiều hoặc 2 chiều đang hoạt động) |
+| Throttle / Cooldown | Trong pipeline | KH đạt daily cap hoặc đang trong cooldown → dừng ngay; không fallback; ghi log tương ứng |
+| Campaign bị Kill Switch | Trong pipeline | Hủy message đang chờ trong queue; không gửi |
+| Thời gian hiệu lực campaign kết thúc | Trong pipeline | Message còn trong queue nhưng campaign đã Ended → hủy |
 
 ### II.6.5. Kênh & Lịch gửi override
 
