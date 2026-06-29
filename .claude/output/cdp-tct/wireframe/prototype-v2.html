@@ -701,12 +701,6 @@ function CustomerListScreen({ onC360, initSegment }) {
 
   return (
     <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
-      {segmentFilter !== 'ALL' && (
-        <div style={{ padding:'8px 14px', background:'#EFF6FF', border:'1px solid #BFDBFE', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-          <span style={{ fontSize:13, color:'#2563EB' }}>Đang lọc phân khúc: <strong>{segmentFilter}</strong></span>
-          <button onClick={() => setSegmentFilter('ALL')} style={{ fontSize:12, color:'#2563EB', background:'none', border:'none', cursor:'pointer', fontWeight:600 }}>✕ Bỏ lọc</button>
-        </div>
-      )}
       {/* Toolbar */}
       <div className="panel" style={{ padding:16 }}>
         <div className="flex items-center gap-3 flex-wrap">
@@ -721,8 +715,12 @@ function CustomerListScreen({ onC360, initSegment }) {
           </select>
           <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)} style={{ fontSize:13 }}>
             <option value="ALL">Tất cả trạng thái</option>
-            <option value="ACTIVE">ACTIVE</option>
-            <option value="INACTIVE">INACTIVE</option>
+            <option value="ACTIVE">Đang hoạt động</option>
+            <option value="INACTIVE">Không hoạt động</option>
+          </select>
+          <select value={segmentFilter} onChange={e=>setSegmentFilter(e.target.value)} style={{ fontSize:13 }}>
+            <option value="ALL">Tất cả phân khúc</option>
+            {SEGMENTS.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
           </select>
         </div>
       </div>
