@@ -1854,6 +1854,7 @@ function Customer360Screen({ uid, onBack }) {
 // ============================================================
 function SegmentScreen({ onViewKH }) {
   const [view, setView] = React.useState('list');
+  const [selectedSeg, setSelectedSeg] = React.useState(null);
   const [previewCount, setPreviewCount] = React.useState(null);
   const [segName, setSegName] = React.useState('');
   const [rules, setRules] = React.useState([
@@ -1886,7 +1887,11 @@ function SegmentScreen({ onViewKH }) {
       )}
 
       <div className="flex items-center justify-between">
-        <div style={{ fontWeight:700, fontSize:16 }}>Quản lý Phân khúc</div>
+        <div style={{ fontWeight:700, fontSize:16 }}>
+          {view==='detail' && selectedSeg!==null
+            ? <span><button onClick={() => setView('list')} style={{ background:'none', border:'none', color:'#6B7280', cursor:'pointer', fontSize:13, padding:0, marginRight:6 }}>← Danh sách</button>{SEGMENTS[selectedSeg]?.name}</span>
+            : 'Quản lý Phân khúc'}
+        </div>
         <div className="flex gap-2">
           <button onClick={() => setView('list')} className={`tab-btn ${view==='list' ? 'active':''}`}>Danh sách</button>
           <button onClick={() => setView('builder')} className={`tab-btn ${view==='builder' ? 'active':''}`}>+ Tạo phân khúc</button>
@@ -1905,7 +1910,7 @@ function SegmentScreen({ onViewKH }) {
             </thead>
             <tbody>
               {SEGMENTS.map((s,i) => (
-                <tr key={i} className="table-row" style={{ borderBottom:'1px solid #F3F4F6', cursor:'pointer' }}>
+                <tr key={i} className="table-row" onClick={() => { setSelectedSeg(i); setView('detail'); }} style={{ borderBottom:'1px solid #F3F4F6', cursor:'pointer' }}>
                   <td style={{ padding:'10px 12px', fontWeight:700 }}>{s.name}</td>
                   <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280', maxWidth:260 }}>{s.desc}</td>
                   <td style={{ padding:'10px 12px', fontWeight:700, color:'#E30613' }} className="tabular-nums">{s.count} KH</td>
@@ -1990,6 +1995,136 @@ function SegmentScreen({ onViewKH }) {
           </div>
         </div>
       )}
+
+      {view === 'detail' && selectedSeg !== null && (() => {
+        const s = SEGMENTS[selectedSeg];
+        const seg_idx = selectedSeg;
+        // Mock data biến động số KH 6 tuần gần nhất
+        const trend = [
+          { week:'T5/W2', count: parseInt(s.count.replace(/\./g,'')) * 0.91 },
+          { week:'T5/W3', count: parseInt(s.count.replace(/\./g,'')) * 0.94 },
+          { week:'T5/W4', count: parseInt(s.count.replace(/\./g,'')) * 0.96 },
+          { week:'T6/W1', count: parseInt(s.count.replace(/\./g,'')) * 0.98 },
+          { week:'T6/W2', count: parseInt(s.count.replace(/\./g,'')) * 0.99 },
+          { week:'T6/W3', count: parseInt(s.count.replace(/\./g,'')) },
+        ];
+        const maxCount = Math.max(...trend.map(t => t.count));
+        // KH trong phân khúc này
+        const khList = CUSTOMERS.filter(c => c.segment === s.name);
+        // Mock rules theo phân khúc
+        const mockRules = {
+          'Khách hàng trung thành':   [{ field:'Nhóm RFM', op:'=', value:'Champions' }, { field:'Điểm rời bỏ', op:'<', value:'30' }],
+          'KHL giá trị cao':          [{ field:'Nhóm khách hàng', op:'=', value:'KHL' }, { field:'Tổng doanh thu', op:'≥', value:'1.000.000.000' }],
+          'Có nguy cơ rời bỏ':        [{ field:'Điểm rời bỏ', op:'≥', value:'70' }, { field:'Ngày GD gần nhất', op:'<', value:'90 ngày trước' }],
+          'Tỷ lệ hoàn cao':           [{ field:'Tỷ lệ hoàn', op:'>', value:'20%' }, { field:'Tổng đơn', op:'≥', value:'50' }],
+          'Chủ shop hoạt động cao':   [{ field:'Vai trò', op:'chứa', value:'SHOP_OWNER' }, { field:'Tổng đơn / tháng', op:'≥', value:'50' }],
+          'Khách hàng mới':           [{ field:'Ngày GD đầu tiên', op:'>', value:'30 ngày trước' }],
+        };
+        const rules = mockRules[s.name] || [];
+
+        return (
+          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+            {/* Row 1: Thông tin + Điều kiện */}
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+              {/* Thông tin chung */}
+              <div className="panel" style={{ padding:20 }}>
+                <div className="section-title">Thông tin phân khúc</div>
+                {[
+                  ['Tên', s.name],
+                  ['Loại', s.type],
+                  ['Số KH hiện tại', s.count + ' KH'],
+                  ['Cập nhật lần cuối', s.updated],
+                  ['Trạng thái', statuses[seg_idx]],
+                ].map(([l,v]) => (
+                  <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                    <span style={{ fontSize:12, color:'#6B7280' }}>{l}</span>
+                    <span style={{ fontSize:13, fontWeight:600 }}>{v}</span>
+                  </div>
+                ))}
+                <div style={{ marginTop:12, fontSize:12, color:'#6B7280', lineHeight:1.6 }}>{s.desc}</div>
+              </div>
+
+              {/* Điều kiện lọc */}
+              <div className="panel" style={{ padding:20 }}>
+                <div className="section-title">Điều kiện lọc — Logic AND</div>
+                <div style={{ display:'flex', flexDirection:'column', gap:8, marginTop:4 }}>
+                  {rules.map((r,i) => (
+                    <div key={i} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 12px', background:'#F7F8FA', borderRadius:8, fontSize:13 }}>
+                      {i > 0 && <span style={{ fontSize:11, fontWeight:700, color:'#E30613', minWidth:28 }}>AND</span>}
+                      {i === 0 && <span style={{ minWidth:28 }}></span>}
+                      <span style={{ fontWeight:600, color:'#1A1A1A' }}>{r.field}</span>
+                      <span style={{ color:'#6B7280' }}>{r.op}</span>
+                      <span style={{ color:'#2563EB', fontWeight:600 }}>{r.value}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ marginTop:16 }}>
+                  <button onClick={() => setView('builder')} style={{ padding:'7px 16px', background:'#f3f4f6', border:'none', borderRadius:7, fontSize:12, fontWeight:600, cursor:'pointer', color:'#1A1A1A' }}>
+                    Chỉnh sửa điều kiện
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 2: Biến động số KH */}
+            <div className="panel" style={{ padding:20 }}>
+              <div className="section-title">Biến động số khách hàng — 6 tuần gần nhất</div>
+              <div style={{ display:'flex', alignItems:'flex-end', gap:12, height:80, marginTop:12 }}>
+                {trend.map((t,i) => {
+                  const pct = Math.round((t.count / maxCount) * 100);
+                  const isLast = i === trend.length - 1;
+                  return (
+                    <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
+                      <div style={{ fontSize:10, color: isLast ? '#E30613' : '#6B7280', fontWeight: isLast ? 700 : 400 }}>
+                        {Math.round(t.count).toLocaleString()}
+                      </div>
+                      <div style={{ width:'100%', borderRadius:'4px 4px 0 0', background: isLast ? '#E30613' : '#BFDBFE', height: pct * 0.6 + '%', minHeight:4, transition:'height 0.3s' }}></div>
+                      <div style={{ fontSize:10, color:'#6B7280', whiteSpace:'nowrap' }}>{t.week}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Row 3: Danh sách KH */}
+            <div className="panel">
+              <div style={{ padding:'14px 16px', borderBottom:'1px solid #F3F4F6', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <div className="section-title" style={{ margin:0 }}>Khách hàng trong phân khúc ({khList.length > 0 ? khList.length : s.count})</div>
+                <button onClick={() => onViewKH && onViewKH(s.name)} style={{ padding:'5px 14px', background:'#EFF6FF', color:'#2563EB', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer' }}>
+                  Xem tất cả →
+                </button>
+              </div>
+              {khList.length > 0 ? (
+                <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                  <thead>
+                    <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+                      {['Mã KH','Tên / Công ty','Loại','SĐT','Tổng đơn','Trạng thái'].map(h => (
+                        <th key={h} style={{ padding:'8px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {khList.map((c,i) => (
+                      <tr key={i} className="table-row" style={{ borderBottom:'1px solid #F3F4F6', cursor:'pointer' }}>
+                        <td style={{ padding:'9px 12px', fontFamily:'monospace', fontSize:11, color:'#6B7280' }}>{c.uid}</td>
+                        <td style={{ padding:'9px 12px', fontWeight:600, color:'#2563EB' }}>{c.name}</td>
+                        <td style={{ padding:'9px 12px' }}><span className={`badge ${c.type==='INDIVIDUAL' ? 'badge-blue':'badge-purple'}`}>{c.type==='INDIVIDUAL' ? 'Cá nhân':'Doanh nghiệp'}</span></td>
+                        <td style={{ padding:'9px 12px', fontFamily:'monospace', fontSize:12 }}>{c.phone.slice(0,3)+'***'+c.phone.slice(-3)}</td>
+                        <td style={{ padding:'9px 12px', textAlign:'right' }} className="tabular-nums">{c.orders.toLocaleString()}</td>
+                        <td style={{ padding:'9px 12px' }}>{custStatusBadge(c.status)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div style={{ padding:'24px 16px', fontSize:13, color:'#6B7280' }}>
+                  Phân khúc này có <strong>{s.count} KH</strong> — bấm "Xem tất cả" để xem danh sách đầy đủ.
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
