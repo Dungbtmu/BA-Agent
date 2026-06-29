@@ -395,8 +395,6 @@ const custStatusBadge = (s) => {
 };
 
 const GROUP_LABEL = { SME:'SME', KHL:'KHL', B2C:'Cá nhân thường' };
-const TIER_LABEL  = { GOLD:'Vàng', PLATINUM:'Bạch kim', SILVER:'Bạc' };
-const TIER_BADGE  = { GOLD:'badge-yellow', PLATINUM:'badge-purple', SILVER:'badge-gray' };
 const CONFIDENCE_LABEL = { HIGH:'Cao', MEDIUM:'Trung bình', LOW:'Thấp' };
 const ALIAS_TYPE_LABEL = { PHONE:'SĐT', POST_ID:'Post ID', CRM_ID:'Mã CRM', TAX_ID:'MST', KHL_CODE:'Mã KHL', USER_APP_ID:'ID App', EMAIL:'Email' };
 const ADDR_STATUS_LABEL = { STANDARDIZED:'Đã chuẩn hóa', PARTIAL:'Một phần', UNKNOWN:'Chưa xác định' };
@@ -509,7 +507,7 @@ function Header({ title, onNav }) {
       <div style={{ flex:1, fontWeight:700, fontSize:16, color:'#1A1A1A' }}>{title}</div>
       <div className="flex items-center gap-2" style={{ background:'#F7F8FA', border:'1px solid #E5E7EB', borderRadius:8, padding:'6px 12px', flex:'0 0 240px' }}>
         <Icon name="search" />
-        <input placeholder="Tìm kiếm UID / tên / SĐT / MST..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
+        <input placeholder="Tìm kiếm mã KH / tên / SĐT / MST..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
       </div>
       <button style={{ background:'none', border:'none', cursor:'pointer', color:'#6B7280', position:'relative' }}>
         <Icon name="bell" />
@@ -715,7 +713,7 @@ function CustomerListScreen({ onC360, initSegment }) {
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-2" style={{ background:'#F7F8FA', border:'1px solid #E5E7EB', borderRadius:8, padding:'6px 12px', flex:'1', minWidth:200 }}>
             <Icon name="search" />
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tìm theo tên, UID, SĐT, email, MST..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tìm theo tên, mã KH, SĐT, email, MST..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
           </div>
           <select value={typeFilter} onChange={e=>setTypeFilter(e.target.value)} style={{ fontSize:13 }}>
             <option value="ALL">Tất cả loại</option>
@@ -883,7 +881,7 @@ function IdentityScreen({ onC360 }) {
           <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
             <thead>
               <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
-                {['ID','Loại','UID Master','UID gộp vào','Độ tin cậy','Khóa trùng','Người quyết định','Thời điểm'].map(h => (
+                {['ID','Loại','Mã KH chính','Mã KH gộp vào','Độ tin cậy','Khóa trùng','Người quyết định','Thời điểm'].map(h => (
                   <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', whiteSpace:'nowrap' }}>{h}</th>
                 ))}
               </tr>
@@ -917,7 +915,7 @@ function IdentityScreen({ onC360 }) {
             <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
               <thead>
                 <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
-                  {['ID','UID liên quan','Người báo cáo','Thời gian','Lý do','Trạng thái',''].map(h => (
+                  {['ID','Mã KH liên quan','Người báo cáo','Thời gian','Lý do','Trạng thái',''].map(h => (
                     <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
                   ))}
                 </tr>
@@ -1165,7 +1163,6 @@ function Customer360Screen({ uid, onBack }) {
       codRisk:      ['Kinh doanh','Vận hành','Admin'],
       fraud:        ['Kinh doanh','Vận hành','Admin'],
       linkedProfiles:['CSKH','Marketing','Kinh doanh','Vận hành','Data Steward','Admin'],
-      reportMerge:  ['Data Steward','Admin'],
     };
     return (rbac[field]||[]).includes(role);
   };
@@ -1684,7 +1681,7 @@ function Customer360Screen({ uid, onBack }) {
                 </div>
                 <div style={{ padding:12, borderRadius:8, background: kh.cod.status==='MATCHED' ? '#f0fdf4' : kh.cod.status==='DISCREPANCY' ? '#fff5f5' : '#fffbeb' }}>
                   <div style={{ fontSize:11, color:'#6B7280' }}>Đối soát</div>
-                  <span className={`badge ${kh.cod.status==='MATCHED' ? 'badge-green' : kh.cod.status==='DISCREPANCY' ? 'badge-red' : 'badge-yellow'}`}>{kh.cod.status}</span>
+                  <span className={`badge ${kh.cod.status==='MATCHED' ? 'badge-green' : kh.cod.status==='DISCREPANCY' ? 'badge-red' : 'badge-yellow'}`}>{kh.cod.status==='MATCHED' ? 'Khớp' : kh.cod.status==='DISCREPANCY' ? 'Chênh lệch' : kh.cod.status}</span>
                 </div>
               </div>
             </div>
