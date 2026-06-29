@@ -161,8 +161,10 @@ const KH_DETAIL = {
       { time:'10/06 16:00', type:'campaign', icon:'📣', label:'Phản hồi Campaign Email SALE06', channel:'EMAIL', color:'#7c3aed' },
     ],
     mergeHistory:[
-      { from:'CRM-0000192', at:'20/06/2026 08:45', by:'SYSTEM', type:'AUTO', source:'CRM', confidence:78, matchKey:'SĐT 0901234567' },
-      { from:'MVN-4421009', at:'20/06/2026 08:46', by:'SYSTEM', type:'AUTO', source:'MyVNPost', confidence:76, matchKey:'SĐT 090123xxxx · Tên gần đúng' },
+      { from:'CRM-0000192', at:'20/06/2026 08:45', by:'SYSTEM', type:'AUTO', source:'CRM', confidence:78, matchKey:'SĐT 0901234567',
+        profile:{ name:'Nguyen Thi Huong', phone:'0901234567', email:'huong.nt@gmail.com', cccd:'—', address:'Hà Nội', role:'Người gửi', orders:0, note:'Tên không dấu' } },
+      { from:'MVN-4421009', at:'20/06/2026 08:46', by:'SYSTEM', type:'AUTO', source:'MyVNPost', confidence:76, matchKey:'SĐT 090123xxxx · Tên gần đúng',
+        profile:{ name:'Nguyễn Hương', phone:'090123xxxx', email:'—', cccd:'—', address:'Hà Nội', role:'—', orders:0, note:'SĐT thiếu số cuối' } },
     ],
   },
   'UID-0000987654': {
@@ -214,8 +216,10 @@ const KH_DETAIL = {
       { time:'15/01 00:00', type:'contract', icon:'📄', label:'Hợp đồng KHL ký kết 2024-01-15', channel:'CRM', color:'#2563EB' },
     ],
     mergeHistory:[
-      { from:'CRM-0000987', at:'20/06/2026 09:00', by:'SYSTEM', type:'AUTO', source:'CRM', confidence:79, matchKey:'MST 0312345678' },
-      { from:'CAS-0041200', at:'20/06/2026 09:01', by:'SYSTEM', type:'AUTO', source:'CAS', confidence:74, matchKey:'MST 0312345678 · SĐT 0987654321' },
+      { from:'CRM-0000987', at:'20/06/2026 09:00', by:'SYSTEM', type:'AUTO', source:'CRM', confidence:79, matchKey:'MST 0312345678',
+        profile:{ name:'Cong ty TNHH TM ABC', phone:'—', email:'contact@abc.com.vn', cccd:'MST:0312345678', address:'TP.HCM', role:'—', orders:0, note:'Tên không dấu, email khác' } },
+      { from:'CAS-0041200', at:'20/06/2026 09:01', by:'SYSTEM', type:'AUTO', source:'CAS', confidence:74, matchKey:'MST 0312345678 · SĐT 0987654321',
+        profile:{ name:'TNHH TM ABC', phone:'0987654321', email:'—', cccd:'MST:0312345678', address:'TP.HCM', role:'Người gửi', orders:320, note:'Tên viết tắt' } },
     ],
   },
   'UID-0000456789': {
@@ -1026,6 +1030,7 @@ const UNMERGE_REQUESTS = [
 function Customer360Screen({ uid, onBack }) {
   const [role, setRole] = React.useState('Admin');
   const [tab, setTab] = React.useState('overview');
+  const [expandedMerge, setExpandedMerge] = React.useState(null);
   const kh = KH_DETAIL[uid] || KH_DETAIL['UID-0000123456'];
 
   const canSee = (field) => {
@@ -1257,45 +1262,167 @@ function Customer360Screen({ uid, onBack }) {
         )}
 
         {/* LỊCH SỬ GỘP HỒ SƠ */}
-        {tab==='mergehist' && (
-          <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-            <div style={{ fontSize:12, color:'#6B7280' }}>
-              Toàn bộ lần BE tự động gộp hồ sơ vào hồ sơ này. Nếu nghi ngờ gộp sai, dùng nút "Báo cáo gộp sai" ở tab Hồ sơ liên kết.
-            </div>
-            {(kh.mergeHistory||[]).length === 0 ? (
+        {tab==='mergehist' && (() => {
+          const MERGE_COMPARE_FIELDS = [
+            { key:'name',    label:'Họ tên / Tên DN' },
+            { key:'phone',   label:'Số điện thoại' },
+            { key:'email',   label:'Email' },
+            { key:'cccd',    label:'CCCD / MST' },
+            { key:'address', label:'Tỉnh/TP' },
+            { key:'role',    label:'Vai trò' },
+            { key:'orders',  label:'Tổng đơn' },
+          ];
+          const goldenProfile = {
+            name: kh.name,
+            phone: kh.phone,
+            email: kh.email,
+            cccd: kh.cccd || kh.taxId || '—',
+            address: kh.addresses?.[0]?.province || '—',
+            role: kh.primaryRole || '—',
+            orders: kh.orders,
+          };
+          const confColor = (c) => c >= 90 ? '#16A34A' : c >= 75 ? '#F59E0B' : '#DC2626';
+
+          const hasConflict = (fieldKey, mergedProfile) => {
+            const v1 = String(goldenProfile[fieldKey]||'—').toLowerCase().trim();
+            const v2 = String(mergedProfile[fieldKey]||'—').toLowerCase().trim();
+            const filled = [v1,v2].filter(v => v !== '—' && v !== '' && v !== 'chưa có dữ liệu');
+            return filled.length === 2 && v1 !== v2;
+          };
+
+          if ((kh.mergeHistory||[]).length === 0) {
+            return (
               <div style={{ padding:32, textAlign:'center', color:'#6B7280' }}>Chưa có lần gộp hồ sơ nào</div>
-            ) : (
-              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
-                <thead>
-                  <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
-                    {['Loại','Hồ sơ được gộp vào','Hệ thống nguồn','Khóa trùng','Độ tin cậy','Thời điểm','Người xác nhận'].map(h => (
-                      <th key={h} style={{ padding:'9px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', whiteSpace:'nowrap' }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {kh.mergeHistory.map((m,i) => (
-                    <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
-                      <td style={{ padding:'9px 12px' }}>
-                        <span className={`badge ${m.type==='AUTO' ? 'badge-blue':'badge-green'}`}>
-                          {m.type==='AUTO' ? 'Tự động':'Thủ công'}
-                        </span>
-                      </td>
-                      <td style={{ padding:'9px 12px', fontFamily:'monospace', fontSize:12, color:'#7c3aed' }}>{m.from}</td>
-                      <td style={{ padding:'9px 12px', fontSize:12, color:'#6B7280' }}>{m.source||'—'}</td>
-                      <td style={{ padding:'9px 12px', fontSize:12 }}>{m.matchKey||'—'}</td>
-                      <td style={{ padding:'9px 12px', fontWeight:700, color:(m.confidence||0)>=90 ? '#16A34A':'#F59E0B' }}>
-                        {m.confidence ? `${m.confidence}%` : '—'}
-                      </td>
-                      <td style={{ padding:'9px 12px', fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{m.at}</td>
-                      <td style={{ padding:'9px 12px', fontSize:12, color:'#6B7280' }}>{m.by}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        )}
+            );
+          }
+
+          return (
+            <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+              <div style={{ fontSize:12, color:'#6B7280' }}>
+                Mỗi lần gộp bên dưới hiển thị so sánh thông tin hồ sơ nguồn (đã gộp vào) với Golden Record hiện tại. Ô vàng = có sai khác dữ liệu.
+              </div>
+
+              {kh.mergeHistory.map((m, i) => {
+                const merged = m.profile || {};
+                const isOpen = expandedMerge === i;
+                const anyConflict = MERGE_COMPARE_FIELDS.some(f => hasConflict(f.key, merged));
+
+                return (
+                  <div key={i} style={{ border:`1px solid ${anyConflict ? '#F59E0B' : '#E5E7EB'}`, borderRadius:10, overflow:'hidden' }}>
+                    {/* Header row — click để expand/collapse */}
+                    <div
+                      onClick={() => setExpandedMerge(isOpen ? null : i)}
+                      style={{ padding:'12px 16px', background: isOpen ? '#F7F8FA' : 'white', cursor:'pointer', display:'flex', alignItems:'center', gap:12 }}
+                    >
+                      <span className={`badge ${m.type==='AUTO' ? 'badge-blue':'badge-green'}`}>
+                        {m.type==='AUTO' ? 'Tự động':'Thủ công'}
+                      </span>
+                      <span style={{ fontFamily:'monospace', fontSize:13, fontWeight:700, color:'#7c3aed' }}>{m.from}</span>
+                      <span style={{ fontSize:12, color:'#6B7280' }}>·</span>
+                      <span style={{ fontSize:12, color:'#6B7280' }}>{m.source}</span>
+                      <span style={{ fontSize:12, color:'#6B7280' }}>·</span>
+                      <span style={{ fontSize:12 }}>Khóa: <strong>{m.matchKey}</strong></span>
+                      <span style={{ marginLeft:'auto', fontWeight:700, color:confColor(m.confidence||0), fontSize:13 }}>{m.confidence}%</span>
+                      {anyConflict && <span className="badge badge-yellow">⚠️ Có sai khác</span>}
+                      <span style={{ fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{m.at}</span>
+                      <span style={{ fontSize:18, color:'#9CA3AF', marginLeft:4 }}>{isOpen ? '▲' : '▼'}</span>
+                    </div>
+
+                    {/* So sánh chi tiết khi mở rộng */}
+                    {isOpen && (
+                      <div style={{ padding:'0 16px 16px 16px' }}>
+                        {/* Card grid: Golden Record vs Hồ sơ nguồn */}
+                        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginTop:12, marginBottom:16 }}>
+                          {/* Golden Record */}
+                          <div style={{ border:'2px solid #16A34A', borderRadius:10, padding:14, background:'#f0fdf4' }}>
+                            <div className="flex items-center justify-between mb-2">
+                              <span style={{ fontSize:11, fontWeight:700, color:'white', background:'#16A34A', padding:'2px 8px', borderRadius:4 }}>Golden Record</span>
+                              <span style={{ fontSize:11, color:'#16A34A', fontWeight:700 }}>CDP</span>
+                            </div>
+                            <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace', marginBottom:6 }}>{kh.uid}</div>
+                            {MERGE_COMPARE_FIELDS.map(f => (
+                              <div key={f.key} style={{ display:'flex', justifyContent:'space-between', padding:'3px 0', borderBottom:'1px solid #D1FAE5' }}>
+                                <span style={{ fontSize:11, color:'#6B7280' }}>{f.label}</span>
+                                <span style={{ fontSize:11, fontWeight:500, maxWidth:160, textAlign:'right', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                                  {String(goldenProfile[f.key]||'—')}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Hồ sơ nguồn */}
+                          <div style={{ border:`2px solid ${confColor(m.confidence||0)}44`, borderRadius:10, padding:14, background:'white' }}>
+                            <div className="flex items-center justify-between mb-2">
+                              <span style={{ fontSize:11, fontWeight:700, color:'white', background:confColor(m.confidence||0), padding:'2px 8px', borderRadius:4 }}>{m.source}</span>
+                              <span style={{ fontSize:12, fontWeight:800, color:confColor(m.confidence||0) }}>{m.confidence}%</span>
+                            </div>
+                            <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace', marginBottom:6 }}>{m.from}</div>
+                            {MERGE_COMPARE_FIELDS.map(f => (
+                              <div key={f.key} style={{ display:'flex', justifyContent:'space-between', padding:'3px 0', borderBottom:'1px solid #F3F4F6' }}>
+                                <span style={{ fontSize:11, color:'#6B7280' }}>{f.label}</span>
+                                <span style={{ fontSize:11, fontWeight:500, maxWidth:160, textAlign:'right', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', color: hasConflict(f.key, merged) ? '#d97706' : undefined }}>
+                                  {String(merged[f.key]||'—')}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Bảng so sánh field-by-field */}
+                        <div style={{ overflow:'auto', borderRadius:8, border:'1px solid #E5E7EB' }}>
+                          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                            <thead>
+                              <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
+                                <th style={{ padding:'9px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', width:130 }}>Trường</th>
+                                <th style={{ padding:'9px 12px', fontSize:11, fontWeight:700, color:'#16A34A', minWidth:200 }}>Golden Record (CDP)</th>
+                                <th style={{ padding:'9px 12px', fontSize:11, fontWeight:700, color:confColor(m.confidence||0), minWidth:200 }}>{m.source} — {m.from}</th>
+                                <th style={{ padding:'9px 12px', fontSize:11, fontWeight:700, color:'#6B7280', width:90, textAlign:'center' }}>Trạng thái</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {MERGE_COMPARE_FIELDS.map(f => {
+                                const conflict = hasConflict(f.key, merged);
+                                const gVal = String(goldenProfile[f.key]||'—');
+                                const mVal = String(merged[f.key]||'—');
+                                return (
+                                  <tr key={f.key} style={{ borderBottom:'1px solid #F3F4F6', background: conflict ? '#FFFBEB' : 'white' }}>
+                                    <td style={{ padding:'9px 12px', fontWeight:600, color:'#6B7280', fontSize:12 }}>
+                                      {conflict && <span style={{ color:'#d97706', marginRight:4 }}>⚠️</span>}
+                                      {f.label}
+                                    </td>
+                                    <td style={{ padding:'9px 12px', color: gVal==='—' ? '#D1D5DB' : '#1A1A1A', fontStyle: gVal==='—' ? 'italic':'' }}>{gVal}</td>
+                                    <td style={{ padding:'9px 12px', color: conflict ? '#d97706' : mVal==='—' ? '#D1D5DB' : '#1A1A1A', fontStyle: mVal==='—' ? 'italic':'' }}>{mVal}</td>
+                                    <td style={{ padding:'9px 12px', textAlign:'center' }}>
+                                      {conflict
+                                        ? <span className="badge badge-yellow">Sai khác</span>
+                                        : gVal !== '—' && mVal !== '—'
+                                          ? <span className="badge badge-green">Khớp</span>
+                                          : <span style={{ fontSize:11, color:'#D1D5DB' }}>—</span>}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {merged.note && (
+                          <div style={{ marginTop:10, padding:'8px 12px', background:'#fef9c3', border:'1px solid #F59E0B', borderRadius:6, fontSize:12, color:'#92400E' }}>
+                            📝 Ghi chú: {merged.note}
+                          </div>
+                        )}
+
+                        <div style={{ marginTop:10, fontSize:12, color:'#6B7280' }}>
+                          Gộp lúc {m.at} · Người xác nhận: {m.by}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
 
         {/* ĐỊA CHỈ */}
         {tab==='address' && (
