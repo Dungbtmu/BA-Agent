@@ -2000,17 +2000,6 @@ function SegmentScreen({ onViewKH }) {
         const s = SEGMENTS[selectedSeg];
         const seg_idx = selectedSeg;
         // Mock data biến động số KH 6 tuần gần nhất
-        const trend = [
-          { week:'T5/W2', count: parseInt(s.count.replace(/\./g,'')) * 0.91 },
-          { week:'T5/W3', count: parseInt(s.count.replace(/\./g,'')) * 0.94 },
-          { week:'T5/W4', count: parseInt(s.count.replace(/\./g,'')) * 0.96 },
-          { week:'T6/W1', count: parseInt(s.count.replace(/\./g,'')) * 0.98 },
-          { week:'T6/W2', count: parseInt(s.count.replace(/\./g,'')) * 0.99 },
-          { week:'T6/W3', count: parseInt(s.count.replace(/\./g,'')) },
-        ];
-        const maxCount = Math.max(...trend.map(t => t.count));
-        // KH trong phân khúc này
-        const khList = CUSTOMERS.filter(c => c.segment === s.name);
         // Mock rules theo phân khúc
         const mockRules = {
           'Khách hàng trung thành':   [{ field:'Nhóm RFM', op:'=', value:'Champions' }, { field:'Điểm rời bỏ', op:'<', value:'30' }],
@@ -2066,62 +2055,6 @@ function SegmentScreen({ onViewKH }) {
               </div>
             </div>
 
-            {/* Row 2: Biến động số KH */}
-            <div className="panel" style={{ padding:20 }}>
-              <div className="section-title">Biến động số khách hàng — 6 tuần gần nhất</div>
-              <div style={{ display:'flex', alignItems:'flex-end', gap:12, height:80, marginTop:12 }}>
-                {trend.map((t,i) => {
-                  const pct = Math.round((t.count / maxCount) * 100);
-                  const isLast = i === trend.length - 1;
-                  return (
-                    <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
-                      <div style={{ fontSize:10, color: isLast ? '#E30613' : '#6B7280', fontWeight: isLast ? 700 : 400 }}>
-                        {Math.round(t.count).toLocaleString()}
-                      </div>
-                      <div style={{ width:'100%', borderRadius:'4px 4px 0 0', background: isLast ? '#E30613' : '#BFDBFE', height: pct * 0.6 + '%', minHeight:4, transition:'height 0.3s' }}></div>
-                      <div style={{ fontSize:10, color:'#6B7280', whiteSpace:'nowrap' }}>{t.week}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Row 3: Danh sách KH */}
-            <div className="panel">
-              <div style={{ padding:'14px 16px', borderBottom:'1px solid #F3F4F6', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                <div className="section-title" style={{ margin:0 }}>Khách hàng trong phân khúc ({khList.length > 0 ? khList.length : s.count})</div>
-                <button onClick={() => onViewKH && onViewKH(s.name)} style={{ padding:'5px 14px', background:'#EFF6FF', color:'#2563EB', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer' }}>
-                  Xem tất cả →
-                </button>
-              </div>
-              {khList.length > 0 ? (
-                <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
-                  <thead>
-                    <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
-                      {['Mã KH','Tên / Công ty','Loại','SĐT','Tổng đơn','Trạng thái'].map(h => (
-                        <th key={h} style={{ padding:'8px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {khList.map((c,i) => (
-                      <tr key={i} className="table-row" style={{ borderBottom:'1px solid #F3F4F6', cursor:'pointer' }}>
-                        <td style={{ padding:'9px 12px', fontFamily:'monospace', fontSize:11, color:'#6B7280' }}>{c.uid}</td>
-                        <td style={{ padding:'9px 12px', fontWeight:600, color:'#2563EB' }}>{c.name}</td>
-                        <td style={{ padding:'9px 12px' }}><span className={`badge ${c.type==='INDIVIDUAL' ? 'badge-blue':'badge-purple'}`}>{c.type==='INDIVIDUAL' ? 'Cá nhân':'Doanh nghiệp'}</span></td>
-                        <td style={{ padding:'9px 12px', fontFamily:'monospace', fontSize:12 }}>{c.phone.slice(0,3)+'***'+c.phone.slice(-3)}</td>
-                        <td style={{ padding:'9px 12px', textAlign:'right' }} className="tabular-nums">{c.orders.toLocaleString()}</td>
-                        <td style={{ padding:'9px 12px' }}>{custStatusBadge(c.status)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <div style={{ padding:'24px 16px', fontSize:13, color:'#6B7280' }}>
-                  Phân khúc này có <strong>{s.count} KH</strong> — bấm "Xem tất cả" để xem danh sách đầy đủ.
-                </div>
-              )}
-            </div>
           </div>
         );
       })()}
