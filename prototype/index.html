@@ -727,7 +727,7 @@ function CustomerListScreen({ onC360 }) {
         <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
           <thead>
             <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
-              {['UID','Tên / Công ty','Loại','Nhóm','SĐT','Tổng đơn','Doanh thu','Segment','Trạng thái','Cập nhật'].map(h => (
+              {['UID','Tên / Công ty','Loại','Nhóm','SĐT','Tổng đơn','Doanh thu','Phân khúc','Trạng thái','Cập nhật'].map(h => (
                 <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', whiteSpace:'nowrap' }}>{h}</th>
               ))}
             </tr>
@@ -1279,7 +1279,7 @@ function Customer360Screen({ uid, onBack }) {
                   <div style={{ fontSize:12, color:'#6B7280' }}>lần là Người nhận</div>
                 </div>
               </div>
-              <div className="section-title mt-4">Segment hiện tại</div>
+              <div className="section-title mt-4">Phân khúc hiện tại</div>
               <div className="flex gap-2 flex-wrap">
                 {kh.segments.map(s => <span key={s} className={`badge ${segBadgeColor(s)}`}>{s}</span>)}
               </div>
@@ -1926,8 +1926,8 @@ function SegmentScreen() {
       {modal && (
         <div className="modal-overlay" onClick={() => setModal(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <div style={{ fontSize:16, fontWeight:700, marginBottom:8 }}>✅ Segment đã được lưu</div>
-            <div style={{ fontSize:13, color:'#6B7280', marginBottom:16 }}>Segment "{segName||'Không có tên'}" đã được tạo và sẽ cập nhật tự động mỗi ngày.</div>
+            <div style={{ fontSize:16, fontWeight:700, marginBottom:8 }}>✅ Phân khúc đã được lưu</div>
+            <div style={{ fontSize:13, color:'#6B7280', marginBottom:16 }}>Phân khúc "{segName||'Không có tên'}" đã được tạo và sẽ cập nhật tự động mỗi ngày.</div>
             <button onClick={() => { setModal(false); setView('list'); }} style={{ width:'100%', padding:'10px', background:'#E30613', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer' }}>
               Đóng
             </button>
@@ -1939,7 +1939,7 @@ function SegmentScreen() {
         <div style={{ fontWeight:700, fontSize:16 }}>Quản lý Phân khúc</div>
         <div className="flex gap-2">
           <button onClick={() => setView('list')} className={`tab-btn ${view==='list' ? 'active':''}`}>Danh sách</button>
-          <button onClick={() => setView('builder')} className={`tab-btn ${view==='builder' ? 'active':''}`}>+ Tạo Segment</button>
+          <button onClick={() => setView('builder')} className={`tab-btn ${view==='builder' ? 'active':''}`}>+ Tạo phân khúc</button>
         </div>
       </div>
 
@@ -1948,7 +1948,7 @@ function SegmentScreen() {
           <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
             <thead>
               <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
-                {['Tên Segment','Điều kiện','Số KH','Loại','Cập nhật','Trạng thái',''].map(h => (
+                {['Tên phân khúc','Điều kiện','Số KH','Loại','Cập nhật','Trạng thái',''].map(h => (
                   <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
                 ))}
               </tr>
@@ -1976,14 +1976,14 @@ function SegmentScreen() {
         <div style={{ display:'grid', gridTemplateColumns:'1fr 360px', gap:16 }}>
           {/* Rule builder */}
           <div className="panel" style={{ padding:20 }}>
-            <div style={{ fontWeight:700, fontSize:15, marginBottom:16 }}>Tạo Segment mới</div>
+            <div style={{ fontWeight:700, fontSize:15, marginBottom:16 }}>Tạo phân khúc mới</div>
             <div style={{ marginBottom:14 }}>
-              <label className="field-label">Tên segment</label>
+              <label className="field-label">Tên phân khúc</label>
               <input value={segName} onChange={e=>setSegName(e.target.value)} placeholder="VD: Khách hàng nguy cơ rời bỏ Q3" style={{ width:'100%', marginTop:4 }} />
             </div>
             <div style={{ marginBottom:14 }}>
               <label className="field-label">Mô tả</label>
-              <input placeholder="Mô tả ngắn gọn mục tiêu segment..." style={{ width:'100%', marginTop:4 }} />
+              <input placeholder="Mô tả ngắn gọn mục tiêu phân khúc..." style={{ width:'100%', marginTop:4 }} />
             </div>
 
             <div className="flex items-center justify-between mb-3">
@@ -2023,7 +2023,7 @@ function SegmentScreen() {
                 Preview KH khớp
               </button>
               <button onClick={() => setModal(true)} style={{ flex:2, padding:'9px', background:'#E30613', color:'white', border:'none', borderRadius:8, fontSize:13, fontWeight:700, cursor:'pointer' }}>
-                Lưu Segment
+                Lưu phân khúc
               </button>
             </div>
           </div>
