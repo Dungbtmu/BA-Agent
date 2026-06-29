@@ -964,7 +964,7 @@ function IdentityScreen({ onC360 }) {
               {modal==='confirmed' ? '✅ Đã ghi nhận — Cùng người' : modal==='different' ? '🚫 Đã ghi nhận — Tách nhóm' : '⏳ Để lại sau'}
             </div>
             <div style={{ fontSize:13, color:'#6B7280', marginBottom:16 }}>
-              {modal==='confirmed' && 'Quyết định đã ghi nhận. BE sẽ merge toàn bộ hồ sơ trong nhóm thành 1 Golden Record.'}
+              {modal==='confirmed' && 'Quyết định đã ghi nhận. BE sẽ merge toàn bộ hồ sơ trong nhóm thành 1 Hồ sơ chuẩn.'}
               {modal==='different' && 'Nhóm này sẽ được đánh dấu tách và không xuất hiện lại.'}
               {modal==='later' && 'Nhóm vẫn còn trong danh sách chờ.'}
             </div>
@@ -1113,7 +1113,7 @@ function IdentityScreen({ onC360 }) {
       {/* Nút quyết định */}
       <div style={{ padding:16, background:'#F7F8FA', borderRadius:8, border:'1px solid #E5E7EB' }}>
         <div style={{ fontSize:12, color:'#6B7280', marginBottom:12 }}>
-          Quyết định của bạn được ghi nhận và BE xử lý merge. BE tự chọn Golden Record master và ưu tiên field theo rule nguồn dữ liệu.
+          Quyết định của bạn được ghi nhận và BE xử lý merge. BE tự chọn Hồ sơ chuẩn master và ưu tiên field theo rule nguồn dữ liệu.
         </div>
         <div className="flex gap-3">
           <button onClick={() => handleDecision('confirmed')}
@@ -1435,9 +1435,9 @@ function Customer360Screen({ uid, onBack }) {
                     <thead>
                       <tr style={{ background:'#F7F8FA', borderBottom:'2px solid #E5E7EB' }}>
                         <th style={{ padding:'10px 14px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', width:160, position:'sticky', left:0, background:'#F7F8FA', zIndex:2 }}>Trường dữ liệu</th>
-                        {/* Golden Record */}
+                        {/* Hồ sơ chuẩn */}
                         <th style={{ padding:'10px 14px', minWidth:180, textAlign:'left' }}>
-                          <div style={{ fontSize:11, fontWeight:700, color:'white', background:'#16A34A', display:'inline-block', padding:'2px 8px', borderRadius:4, marginBottom:2 }}>✦ Golden Record</div>
+                          <div style={{ fontSize:11, fontWeight:700, color:'white', background:'#16A34A', display:'inline-block', padding:'2px 8px', borderRadius:4, marginBottom:2 }}>✦ Hồ sơ chuẩn</div>
                           <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace' }}>{kh.uid}</div>
                         </th>
                         {sources.map((s,i) => (
@@ -1470,7 +1470,7 @@ function Customer360Screen({ uid, onBack }) {
                                   {anyConflict && <span style={{ color:'#d97706', marginRight:4 }}>⚠️</span>}
                                   {f.label}
                                 </td>
-                                {/* Golden */}
+                                {/* Hồ sơ chuẩn */}
                                 <td style={{ padding:'9px 14px', background:'#f0fdf4', borderLeft:'3px solid #16A34A', fontWeight:500, color: isAbsent(goldenVal) ? '#D1D5DB' : '#1A1A1A', fontStyle: isAbsent(goldenVal) ? 'italic':'normal' }}>
                                   {goldenVal}
                                 </td>
@@ -1499,16 +1499,16 @@ function Customer360Screen({ uid, onBack }) {
               {sourceTab === 'timeline' && (
                 <div style={{ display:'flex', flexDirection:'column', gap:0 }}>
                   <div style={{ fontSize:12, color:'#6B7280', marginBottom:12 }}>
-                    Thứ tự các hệ thống nguồn được CDP nhận diện và gộp vào Golden Record.
+                    Thứ tự các hệ thống nguồn được CDP nhận diện và gộp vào Hồ sơ chuẩn.
                   </div>
-                  {/* Golden Record — điểm cuối */}
+                  {/* Hồ sơ chuẩn — điểm cuối */}
                   <div style={{ display:'flex', gap:16, alignItems:'flex-start', paddingBottom:16 }}>
                     <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:0 }}>
                       <div style={{ width:14, height:14, borderRadius:50, background:'#16A34A', border:'3px solid white', boxShadow:'0 0 0 2px #16A34A', flexShrink:0 }}></div>
                       <div style={{ width:2, height:40, background:'#E5E7EB' }}></div>
                     </div>
                     <div style={{ paddingTop:0 }}>
-                      <div style={{ fontWeight:700, fontSize:13, color:'#16A34A' }}>✦ Golden Record tạo thành</div>
+                      <div style={{ fontWeight:700, fontSize:13, color:'#16A34A' }}>✦ Hồ sơ chuẩn tạo thành</div>
                       <div style={{ fontSize:11, color:'#6B7280', fontFamily:'monospace' }}>{kh.uid}</div>
                       <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>Tổng hợp từ {sources.length} nguồn · Hoàn chỉnh {kh.completeness}%</div>
                     </div>
