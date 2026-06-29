@@ -160,11 +160,58 @@ const KH_DETAIL = {
       { time:'15/06 08:45', type:'order', icon:'📦', label:'Tạo đơn hàng EMS HN→ĐN', channel:'APP', color:'#16A34A' },
       { time:'10/06 16:00', type:'campaign', icon:'📣', label:'Phản hồi Campaign Email SALE06', channel:'EMAIL', color:'#7c3aed' },
     ],
-    mergeHistory:[
-      { from:'CRM-0000192', at:'20/06/2026 08:45', by:'SYSTEM', type:'AUTO', source:'CRM', confidence:78, matchKey:'SĐT 0901234567',
-        profile:{ name:'Nguyen Thi Huong', phone:'0901234567', email:'huong.nt@gmail.com', cccd:'—', address:'Hà Nội', role:'Người gửi', orders:0, note:'Tên không dấu' } },
-      { from:'MVN-4421009', at:'20/06/2026 08:46', by:'SYSTEM', type:'AUTO', source:'MyVNPost', confidence:76, matchKey:'SĐT 090123xxxx · Tên gần đúng',
-        profile:{ name:'Nguyễn Hương', phone:'090123xxxx', email:'—', cccd:'—', address:'Hà Nội', role:'—', orders:0, note:'SĐT thiếu số cuối' } },
+    sourcesData:[
+      {
+        sourceId:'CAS-0881234', source:'CAS', mergedAt:'15/06/2026 06:00', confidence:92, matchKey:'SĐT 0901234567',
+        dinh_danh:{ ten:'Nguyễn Thị Hương', sdt:'0901234567', email:'—', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'Số 5 ngõ 12 Trần Thái Tông, P.Dịch Vọng, Hà Nội', nhanHang:'22 Lê Văn Sỹ, P.13, TP HCM', vpostcode:'100123' },
+        giao_dich:{ vaiTro:'Người gửi', tongDon:1240, doanhThu:'440.000.000', tyLeHoan:'8%', cod:'1.180.000.000' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+      },
+      {
+        sourceId:'CRM-0000192', source:'CRM', mergedAt:'20/06/2026 08:45', confidence:78, matchKey:'SĐT 0901234567',
+        dinh_danh:{ ten:'Nguyen Thi Huong', sdt:'0901234567', email:'huong.nt@gmail.com', cccd:'—', gioiTinh:'Nữ', ngaySinh:'15/03/1988', postId:'—' },
+        dia_chi:{ guiHang:'Số 5 ngõ 12 Trần Thái Tông, Hà Nội', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'Người gửi', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+        note:'Tên không dấu',
+      },
+      {
+        sourceId:'MVN-4421009', source:'MyVNPost', mergedAt:'20/06/2026 08:46', confidence:76, matchKey:'SĐT 090123xxxx · Tên gần đúng',
+        dinh_danh:{ ten:'Nguyễn Hương', sdt:'090123xxxx', email:'—', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'Hà Nội', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'—', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'24/06 09:12', device:'Android', sessions30d:47 },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+        note:'SĐT thiếu số cuối',
+      },
+      {
+        sourceId:'PID-889234', source:'PostID', mergedAt:'18/06/2026 07:00', confidence:95, matchKey:'PostID PID-889234',
+        dinh_danh:{ ten:'Nguyễn Thị Hương', sdt:'0901234567', email:'—', cccd:'012********', gioiTinh:'Nữ', ngaySinh:'15/03/1988', postId:'PID-889234' },
+        dia_chi:{ guiHang:'Số 5 ngõ 12 Trần Thái Tông, P.Dịch Vọng, Hà Nội', nhanHang:'88 Bạch Đằng, P.Hải Châu 1, Đà Nẵng', vpostcode:'100123' },
+        giao_dich:{ vaiTro:'—', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+      },
+      {
+        sourceId:'PNS-0044120', source:'PNS/DingDong', mergedAt:'19/06/2026 10:00', confidence:65, matchKey:'Tên gần đúng · SĐT 0901234567',
+        dinh_danh:{ ten:'Nguyen Huong', sdt:'0901234567', email:'—', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'Ha Noi', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'Người nhận', tongDon:12, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+        note:'Tên không dấu, không dấu cách',
+      },
+      {
+        sourceId:'PAY-2200441', source:'PayPost', mergedAt:'20/06/2026 08:47', confidence:68, matchKey:'SĐT 0901234567',
+        dinh_danh:{ ten:'Nguyễn Hương', sdt:'0901234567', email:'huong.nguyen@gmail.com', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'—', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'—', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'70.000.000' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+      },
     ],
   },
   'UID-0000987654': {
@@ -215,11 +262,50 @@ const KH_DETAIL = {
       { time:'20/06 09:00', type:'merge', icon:'🔗', label:'Hồ sơ CRM (CRM-0000987) được gộp vào — MST khớp', channel:'SYSTEM', color:'#6B7280' },
       { time:'15/01 00:00', type:'contract', icon:'📄', label:'Hợp đồng KHL ký kết 2024-01-15', channel:'CRM', color:'#2563EB' },
     ],
-    mergeHistory:[
-      { from:'CRM-0000987', at:'20/06/2026 09:00', by:'SYSTEM', type:'AUTO', source:'CRM', confidence:79, matchKey:'MST 0312345678',
-        profile:{ name:'Cong ty TNHH TM ABC', phone:'—', email:'contact@abc.com.vn', cccd:'MST:0312345678', address:'TP.HCM', role:'—', orders:0, note:'Tên không dấu, email khác' } },
-      { from:'CAS-0041200', at:'20/06/2026 09:01', by:'SYSTEM', type:'AUTO', source:'CAS', confidence:74, matchKey:'MST 0312345678 · SĐT 0987654321',
-        profile:{ name:'TNHH TM ABC', phone:'0987654321', email:'—', cccd:'MST:0312345678', address:'TP.HCM', role:'Người gửi', orders:320, note:'Tên viết tắt' } },
+    sourcesData:[
+      {
+        sourceId:'KHL-0987654', source:'Portal KHL', mergedAt:'15/01/2024 00:00', confidence:95, matchKey:'MST 0312345678',
+        dinh_danh:{ ten:'Công ty TNHH Thương mại ABC', sdt:'0987654321', email:'info@abc.vn', cccd:'MST:0312345678', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'123 Nguyễn Thị Minh Khai, P.6, TP HCM', nhanHang:'—', vpostcode:'700123' },
+        giao_dich:{ vaiTro:'KHL', tongDon:18450, doanhThu:'6.820.000.000', tyLeHoan:'14%', cod:'13.100.000.000' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'0312345678', hopDong:'ACTIVE — 2024-01-15 → 2026-12-31', congNo:'1.100.000.000 (OVERDUE)' },
+      },
+      {
+        sourceId:'CRM-0000987', source:'CRM', mergedAt:'20/06/2026 09:00', confidence:79, matchKey:'MST 0312345678',
+        dinh_danh:{ ten:'Cong ty TNHH TM ABC', sdt:'—', email:'contact@abc.com.vn', cccd:'MST:0312345678', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'123 Nguyễn Thị Minh Khai, TP HCM', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'—', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'0312345678', hopDong:'—', congNo:'—' },
+        note:'Tên không dấu, email khác',
+      },
+      {
+        sourceId:'CAS-0041200', source:'CAS', mergedAt:'20/06/2026 09:01', confidence:74, matchKey:'MST 0312345678 · SĐT 0987654321',
+        dinh_danh:{ ten:'TNHH TM ABC', sdt:'0987654321', email:'—', cccd:'MST:0312345678', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'KCN Sóng Thần, Lô B12, Bình Dương', nhanHang:'—', vpostcode:'820123' },
+        giao_dich:{ vaiTro:'Người gửi', tongDon:320, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'0312345678', hopDong:'—', congNo:'—' },
+        note:'Tên viết tắt',
+      },
+      {
+        sourceId:'MPITS-00441', source:'MPITS', mergedAt:'20/06/2026 09:02', confidence:71, matchKey:'MST 0312345678',
+        dinh_danh:{ ten:'Công ty TNHH TM ABC', sdt:'0987654321', email:'—', cccd:'MST:0312345678', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'45 Lý Thường Kiệt, P.Hoàn Kiếm, Hà Nội', nhanHang:'—', vpostcode:'100456' },
+        giao_dich:{ vaiTro:'Người gửi', tongDon:85, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'0312345678', hopDong:'—', congNo:'—' },
+      },
+      {
+        sourceId:'PAY-9900123', source:'PayPost', mergedAt:'22/06/2026 10:00', confidence:68, matchKey:'SĐT 0987654321',
+        dinh_danh:{ ten:'ABC Company', sdt:'0987654321', email:'—', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'—', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'—', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'1.100.000.000' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'1.100.000.000 (PENDING)' },
+        note:'Tên tiếng Anh',
+      },
     ],
   },
   'UID-0000456789': {
@@ -252,7 +338,34 @@ const KH_DETAIL = {
       { time:'18/06 10:30', type:'order', icon:'📦', label:'Tạo đơn — Hoàn trả', channel:'APP', color:'#F59E0B' },
       { time:'10/06 09:00', type:'order', icon:'📦', label:'Nhận hàng — Bưu kiện thường', channel:'COUNTER', color:'#16A34A' },
     ],
-    mergeHistory:[],
+    sourcesData:[
+      {
+        sourceId:'CAS-0456789', source:'CAS', mergedAt:'10/06/2026 09:00', confidence:80, matchKey:'SĐT 0978111222',
+        dinh_danh:{ ten:'Phạm Minh Tuấn', sdt:'0978111222', email:'—', cccd:'—', gioiTinh:'Nam', ngaySinh:'01/01/1995', postId:'—' },
+        dia_chi:{ guiHang:'12 Nguyễn Trãi, P.Bến Thành, TP HCM', nhanHang:'45 Trần Hưng Đạo, TP HCM', vpostcode:'700111' },
+        giao_dich:{ vaiTro:'Người gửi', tongDon:30, doanhThu:'—', tyLeHoan:'31%', cod:'15.500.000' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'8.500.000' },
+      },
+      {
+        sourceId:'PNS-0456120', source:'PNS/DingDong', mergedAt:'12/06/2026 11:00', confidence:68, matchKey:'SĐT 0978111222',
+        dinh_danh:{ ten:'Pham M. Tuan', sdt:'0978111222', email:'—', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'TP HCM', nhanHang:'TP HCM', vpostcode:'—' },
+        giao_dich:{ vaiTro:'Người nhận', tongDon:56, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+        note:'Tên viết tắt không dấu',
+      },
+      {
+        sourceId:'PAY-0078912', source:'PayPost', mergedAt:'15/06/2026 08:00', confidence:60, matchKey:'SĐT 0978111222',
+        dinh_danh:{ ten:'Phạm Tuấn', sdt:'0978111222', email:'—', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'—', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'—', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'8.500.000' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'8.500.000' },
+        note:'Tên viết tắt',
+      },
+    ],
   },
 };
 
@@ -1030,7 +1143,7 @@ const UNMERGE_REQUESTS = [
 function Customer360Screen({ uid, onBack }) {
   const [role, setRole] = React.useState('Admin');
   const [tab, setTab] = React.useState('overview');
-  const [expandedMerge, setExpandedMerge] = React.useState(null);
+  const [sourceTab, setSourceTab] = React.useState('compare');
   const kh = KH_DETAIL[uid] || KH_DETAIL['UID-0000123456'];
 
   const canSee = (field) => {
@@ -1050,7 +1163,7 @@ function Customer360Screen({ uid, onBack }) {
   const tabs = [
     { key:'overview',   label:'Tổng quan' },
     { key:'linked',     label:'Hồ sơ liên kết' },
-    { key:'mergehist',  label:'Lịch sử gộp hồ sơ' },
+    { key:'mergehist',  label:'Hồ sơ đa nguồn' },
     { key:'address',    label:'Địa chỉ' },
     ...(kh.type==='BUSINESS' ? [{ key:'business', label:'Doanh nghiệp' }] : []),
     { key:'transaction',label:'GD & COD' },
@@ -1211,39 +1324,12 @@ function Customer360Screen({ uid, onBack }) {
               </table>
             </div>
 
-            {/* Lịch sử merge của KH này */}
-            <div>
-              <div className="section-title">Lịch sử merge hồ sơ</div>
-              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
-                <thead>
-                  <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
-                    {['Loại merge','UID được gộp vào','Nguồn','Ngày ghép','Độ tin cậy','Người quyết định'].map(h => (
-                      <th key={h} style={{ padding:'8px 10px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {(kh.mergeHistory||[]).map((m,i) => (
-                    <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
-                      <td style={{ padding:'8px 10px' }}>
-                        <span className={`badge ${m.type==='AUTO' ? 'badge-blue':'badge-green'}`}>
-                          {m.type==='AUTO' ? 'Tự động':'Thủ công'}
-                        </span>
-                      </td>
-                      <td style={{ padding:'8px 10px', fontFamily:'monospace', fontSize:12, color:'#7c3aed' }}>{m.from}</td>
-                      <td style={{ padding:'8px 10px', fontSize:12, color:'#6B7280' }}>{m.source||'—'}</td>
-                      <td style={{ padding:'8px 10px', fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{m.at}</td>
-                      <td style={{ padding:'8px 10px', fontWeight:700, color: (m.confidence||0)>=90 ? '#16A34A':'#F59E0B' }}>
-                        {m.confidence ? `${m.confidence}%` : '—'}
-                      </td>
-                      <td style={{ padding:'8px 10px', fontSize:12, color:'#6B7280' }}>{m.by}</td>
-                    </tr>
-                  ))}
-                  {!(kh.mergeHistory||[]).length && (
-                    <tr><td colSpan={6} style={{ padding:20, textAlign:'center', color:'#6B7280' }}>Chưa có lịch sử merge</td></tr>
-                  )}
-                </tbody>
-              </table>
+            {/* Link sang tab Hồ sơ đa nguồn */}
+            <div style={{ padding:'10px 14px', background:'#EFF6FF', border:'1px solid #BFDBFE', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ fontSize:12, color:'#2563EB' }}>Xem chi tiết dữ liệu từng hệ thống nguồn và so sánh field-by-field tại tab <strong>Hồ sơ đa nguồn</strong>.</div>
+              <button onClick={() => setTab('mergehist')} style={{ padding:'6px 14px', background:'#2563EB', color:'white', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer', flexShrink:0, marginLeft:12 }}>
+                → Xem Hồ sơ đa nguồn
+              </button>
             </div>
 
             {/* Nút Báo cáo merge sai — chỉ Data Steward và Admin */}
@@ -1261,165 +1347,226 @@ function Customer360Screen({ uid, onBack }) {
           </div>
         )}
 
-        {/* LỊCH SỬ GỘP HỒ SƠ */}
+        {/* HỒ SƠ ĐA NGUỒN */}
         {tab==='mergehist' && (() => {
-          const MERGE_COMPARE_FIELDS = [
-            { key:'name',    label:'Họ tên / Tên DN' },
-            { key:'phone',   label:'Số điện thoại' },
-            { key:'email',   label:'Email' },
-            { key:'cccd',    label:'CCCD / MST' },
-            { key:'address', label:'Tỉnh/TP' },
-            { key:'role',    label:'Vai trò' },
-            { key:'orders',  label:'Tổng đơn' },
-          ];
-          const goldenProfile = {
-            name: kh.name,
-            phone: kh.phone,
-            email: kh.email,
-            cccd: kh.cccd || kh.taxId || '—',
-            address: kh.addresses?.[0]?.province || '—',
-            role: kh.primaryRole || '—',
-            orders: kh.orders,
-          };
+          const sources = kh.sourcesData || [];
           const confColor = (c) => c >= 90 ? '#16A34A' : c >= 75 ? '#F59E0B' : '#DC2626';
+          const confBg    = (c) => c >= 90 ? '#dcfce7' : c >= 75 ? '#fef9c3' : '#fee2e2';
 
-          const hasConflict = (fieldKey, mergedProfile) => {
-            const v1 = String(goldenProfile[fieldKey]||'—').toLowerCase().trim();
-            const v2 = String(mergedProfile[fieldKey]||'—').toLowerCase().trim();
-            const filled = [v1,v2].filter(v => v !== '—' && v !== '' && v !== 'chưa có dữ liệu');
-            return filled.length === 2 && v1 !== v2;
+          const FIELD_GROUPS = [
+            {
+              group: 'Định danh',
+              fields: [
+                { key:'ten',      label:'Họ tên / Tên DN',  golden: kh.name },
+                { key:'sdt',      label:'Số điện thoại',    golden: kh.phone },
+                { key:'email',    label:'Email',             golden: kh.email },
+                { key:'cccd',     label:'CCCD / MST',        golden: kh.cccd || kh.taxId || '—' },
+                { key:'gioiTinh', label:'Giới tính',         golden: kh.gender || '—' },
+                { key:'ngaySinh', label:'Ngày sinh',         golden: kh.birthDate || '—' },
+                { key:'postId',   label:'PostID',            golden: kh.postId || '—' },
+              ],
+              dataKey: 'dinh_danh',
+            },
+            {
+              group: 'Địa chỉ',
+              fields: [
+                { key:'guiHang',  label:'Địa chỉ gửi hàng',  golden: kh.addresses?.find(a=>a.type==='SENDER'&&a.primary)?.detail + ', ' + kh.addresses?.find(a=>a.type==='SENDER'&&a.primary)?.province || '—' },
+                { key:'nhanHang', label:'Địa chỉ nhận hàng', golden: kh.addresses?.find(a=>a.type==='RECEIVER')?.detail + ', ' + kh.addresses?.find(a=>a.type==='RECEIVER')?.province || '—' },
+                { key:'vpostcode',label:'VPostCode',          golden: kh.addresses?.find(a=>a.primary)?.vpostcode || '—' },
+              ],
+              dataKey: 'dia_chi',
+            },
+            {
+              group: 'Vai trò & Giao dịch',
+              fields: [
+                { key:'vaiTro',   label:'Vai trò chính',   golden: kh.primaryRole || '—' },
+                { key:'tongDon',  label:'Tổng đơn',         golden: String(kh.orders?.toLocaleString() || '—') },
+                { key:'doanhThu', label:'Doanh thu',        golden: kh.revenue || '—' },
+                { key:'tyLeHoan', label:'Tỷ lệ hoàn',      golden: kh.returnRate ? kh.returnRate + '%' : '—' },
+                { key:'cod',      label:'COD thu được',     golden: kh.cod?.collected || '—' },
+              ],
+              dataKey: 'giao_dich',
+            },
+            {
+              group: 'Hành vi số',
+              fields: [
+                { key:'appLogin',    label:'Đăng nhập App gần nhất', golden: kh.appLogin || '—' },
+                { key:'device',      label:'Thiết bị',               golden: kh.device || '—' },
+                { key:'sessions30d', label:'Sessions 30 ngày',       golden: kh.sessions30d != null ? String(kh.sessions30d) : '—' },
+              ],
+              dataKey: 'hanh_vi',
+            },
+            {
+              group: 'Tài chính / Hợp đồng',
+              fields: [
+                { key:'mst',     label:'Mã số thuế',  golden: kh.taxId || '—' },
+                { key:'hopDong', label:'Hợp đồng',    golden: kh.contract ? `${kh.contract.status} — ${kh.contract.start} → ${kh.contract.end}` : '—' },
+                { key:'congNo',  label:'Công nợ',     golden: kh.debt ? `${kh.debt.unpaid} (${kh.debt.status})` : '—' },
+              ],
+              dataKey: 'tai_chinh',
+            },
+          ];
+
+          const getVal = (src, groupKey, fieldKey) => {
+            const g = src[groupKey] || {};
+            const v = g[fieldKey];
+            if (v === null || v === undefined) return '—';
+            return String(v);
           };
 
-          if ((kh.mergeHistory||[]).length === 0) {
-            return (
-              <div style={{ padding:32, textAlign:'center', color:'#6B7280' }}>Chưa có lần gộp hồ sơ nào</div>
-            );
+          const isAbsent = (v) => !v || v === '—' || v === 'null' || v === 'undefined';
+
+          const hasConflict = (golden, srcVal) => {
+            if (isAbsent(golden) || isAbsent(srcVal)) return false;
+            return golden.toLowerCase().trim() !== srcVal.toLowerCase().trim();
+          };
+
+          if (sources.length === 0) {
+            return <div style={{ padding:32, textAlign:'center', color:'#6B7280' }}>Chưa có dữ liệu nguồn</div>;
           }
 
           return (
-            <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-              <div style={{ fontSize:12, color:'#6B7280' }}>
-                Mỗi lần gộp bên dưới hiển thị so sánh thông tin hồ sơ nguồn (đã gộp vào) với Golden Record hiện tại. Ô vàng = có sai khác dữ liệu.
-              </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
 
-              {kh.mergeHistory.map((m, i) => {
-                const merged = m.profile || {};
-                const isOpen = expandedMerge === i;
-                const anyConflict = MERGE_COMPARE_FIELDS.some(f => hasConflict(f.key, merged));
-
-                return (
-                  <div key={i} style={{ border:`1px solid ${anyConflict ? '#F59E0B' : '#E5E7EB'}`, borderRadius:10, overflow:'hidden' }}>
-                    {/* Header row — click để expand/collapse */}
-                    <div
-                      onClick={() => setExpandedMerge(isOpen ? null : i)}
-                      style={{ padding:'12px 16px', background: isOpen ? '#F7F8FA' : 'white', cursor:'pointer', display:'flex', alignItems:'center', gap:12 }}
-                    >
-                      <span className={`badge ${m.type==='AUTO' ? 'badge-blue':'badge-green'}`}>
-                        {m.type==='AUTO' ? 'Tự động':'Thủ công'}
-                      </span>
-                      <span style={{ fontFamily:'monospace', fontSize:13, fontWeight:700, color:'#7c3aed' }}>{m.from}</span>
-                      <span style={{ fontSize:12, color:'#6B7280' }}>·</span>
-                      <span style={{ fontSize:12, color:'#6B7280' }}>{m.source}</span>
-                      <span style={{ fontSize:12, color:'#6B7280' }}>·</span>
-                      <span style={{ fontSize:12 }}>Khóa: <strong>{m.matchKey}</strong></span>
-                      <span style={{ marginLeft:'auto', fontWeight:700, color:confColor(m.confidence||0), fontSize:13 }}>{m.confidence}%</span>
-                      {anyConflict && <span className="badge badge-yellow">⚠️ Có sai khác</span>}
-                      <span style={{ fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{m.at}</span>
-                      <span style={{ fontSize:18, color:'#9CA3AF', marginLeft:4 }}>{isOpen ? '▲' : '▼'}</span>
-                    </div>
-
-                    {/* So sánh chi tiết khi mở rộng */}
-                    {isOpen && (
-                      <div style={{ padding:'0 16px 16px 16px' }}>
-                        {/* Card grid: Golden Record vs Hồ sơ nguồn */}
-                        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginTop:12, marginBottom:16 }}>
-                          {/* Golden Record */}
-                          <div style={{ border:'2px solid #16A34A', borderRadius:10, padding:14, background:'#f0fdf4' }}>
-                            <div className="flex items-center justify-between mb-2">
-                              <span style={{ fontSize:11, fontWeight:700, color:'white', background:'#16A34A', padding:'2px 8px', borderRadius:4 }}>Golden Record</span>
-                              <span style={{ fontSize:11, color:'#16A34A', fontWeight:700 }}>CDP</span>
-                            </div>
-                            <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace', marginBottom:6 }}>{kh.uid}</div>
-                            {MERGE_COMPARE_FIELDS.map(f => (
-                              <div key={f.key} style={{ display:'flex', justifyContent:'space-between', padding:'3px 0', borderBottom:'1px solid #D1FAE5' }}>
-                                <span style={{ fontSize:11, color:'#6B7280' }}>{f.label}</span>
-                                <span style={{ fontSize:11, fontWeight:500, maxWidth:160, textAlign:'right', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                                  {String(goldenProfile[f.key]||'—')}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Hồ sơ nguồn */}
-                          <div style={{ border:`2px solid ${confColor(m.confidence||0)}44`, borderRadius:10, padding:14, background:'white' }}>
-                            <div className="flex items-center justify-between mb-2">
-                              <span style={{ fontSize:11, fontWeight:700, color:'white', background:confColor(m.confidence||0), padding:'2px 8px', borderRadius:4 }}>{m.source}</span>
-                              <span style={{ fontSize:12, fontWeight:800, color:confColor(m.confidence||0) }}>{m.confidence}%</span>
-                            </div>
-                            <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace', marginBottom:6 }}>{m.from}</div>
-                            {MERGE_COMPARE_FIELDS.map(f => (
-                              <div key={f.key} style={{ display:'flex', justifyContent:'space-between', padding:'3px 0', borderBottom:'1px solid #F3F4F6' }}>
-                                <span style={{ fontSize:11, color:'#6B7280' }}>{f.label}</span>
-                                <span style={{ fontSize:11, fontWeight:500, maxWidth:160, textAlign:'right', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', color: hasConflict(f.key, merged) ? '#d97706' : undefined }}>
-                                  {String(merged[f.key]||'—')}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
+              {/* TẦNG 1 — Tổng quan nguồn */}
+              <div>
+                <div className="section-title">Tổng quan nguồn dữ liệu — {sources.length} hệ thống</div>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px,1fr))', gap:10 }}>
+                  {sources.map((s,i) => {
+                    const totalFields = Object.values(FIELD_GROUPS).flatMap(g => g.fields).length;
+                    const filledFields = FIELD_GROUPS.flatMap(g => g.fields).filter(f => !isAbsent(getVal(s, g => FIELD_GROUPS.find(fg=>fg.fields.includes(f))?.dataKey || '', f.key))).length;
+                    return (
+                      <div key={i} style={{ border:`2px solid ${confColor(s.confidence)}33`, borderRadius:10, padding:12, background:'white' }}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span style={{ fontSize:12, fontWeight:700, color:'white', background:confColor(s.confidence), padding:'2px 8px', borderRadius:4 }}>{s.source}</span>
+                          <span style={{ fontSize:13, fontWeight:800, color:confColor(s.confidence) }}>{s.confidence}%</span>
                         </div>
-
-                        {/* Bảng so sánh field-by-field */}
-                        <div style={{ overflow:'auto', borderRadius:8, border:'1px solid #E5E7EB' }}>
-                          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
-                            <thead>
-                              <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
-                                <th style={{ padding:'9px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', width:130 }}>Trường</th>
-                                <th style={{ padding:'9px 12px', fontSize:11, fontWeight:700, color:'#16A34A', minWidth:200 }}>Golden Record (CDP)</th>
-                                <th style={{ padding:'9px 12px', fontSize:11, fontWeight:700, color:confColor(m.confidence||0), minWidth:200 }}>{m.source} — {m.from}</th>
-                                <th style={{ padding:'9px 12px', fontSize:11, fontWeight:700, color:'#6B7280', width:90, textAlign:'center' }}>Trạng thái</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {MERGE_COMPARE_FIELDS.map(f => {
-                                const conflict = hasConflict(f.key, merged);
-                                const gVal = String(goldenProfile[f.key]||'—');
-                                const mVal = String(merged[f.key]||'—');
-                                return (
-                                  <tr key={f.key} style={{ borderBottom:'1px solid #F3F4F6', background: conflict ? '#FFFBEB' : 'white' }}>
-                                    <td style={{ padding:'9px 12px', fontWeight:600, color:'#6B7280', fontSize:12 }}>
-                                      {conflict && <span style={{ color:'#d97706', marginRight:4 }}>⚠️</span>}
-                                      {f.label}
-                                    </td>
-                                    <td style={{ padding:'9px 12px', color: gVal==='—' ? '#D1D5DB' : '#1A1A1A', fontStyle: gVal==='—' ? 'italic':'' }}>{gVal}</td>
-                                    <td style={{ padding:'9px 12px', color: conflict ? '#d97706' : mVal==='—' ? '#D1D5DB' : '#1A1A1A', fontStyle: mVal==='—' ? 'italic':'' }}>{mVal}</td>
-                                    <td style={{ padding:'9px 12px', textAlign:'center' }}>
-                                      {conflict
-                                        ? <span className="badge badge-yellow">Sai khác</span>
-                                        : gVal !== '—' && mVal !== '—'
-                                          ? <span className="badge badge-green">Khớp</span>
-                                          : <span style={{ fontSize:11, color:'#D1D5DB' }}>—</span>}
-                                    </td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
-                        </div>
-
-                        {merged.note && (
-                          <div style={{ marginTop:10, padding:'8px 12px', background:'#fef9c3', border:'1px solid #F59E0B', borderRadius:6, fontSize:12, color:'#92400E' }}>
-                            📝 Ghi chú: {merged.note}
-                          </div>
-                        )}
-
-                        <div style={{ marginTop:10, fontSize:12, color:'#6B7280' }}>
-                          Gộp lúc {m.at} · Người xác nhận: {m.by}
+                        <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace', marginBottom:6 }}>{s.sourceId}</div>
+                        <div style={{ fontSize:11, color:'#6B7280' }}>Khóa: <strong style={{ color:'#1A1A1A' }}>{s.matchKey}</strong></div>
+                        <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>Gộp: {s.mergedAt}</div>
+                        {s.note && <div style={{ marginTop:6, fontSize:11, color:'#d97706', background:'#fef9c3', borderRadius:4, padding:'2px 6px' }}>⚠️ {s.note}</div>}
+                        <div style={{ marginTop:8, height:4, borderRadius:2, background:'#E5E7EB' }}>
+                          <div style={{ width:`${s.confidence}%`, height:'100%', borderRadius:2, background:confColor(s.confidence) }}></div>
                         </div>
                       </div>
-                    )}
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Toggle so sánh / timeline */}
+              <div className="flex gap-2">
+                <button onClick={() => setSourceTab('compare')} className={`tab-btn ${sourceTab==='compare' ? 'active':''}`}>🔍 So sánh chi tiết</button>
+                <button onClick={() => setSourceTab('timeline')} className={`tab-btn ${sourceTab==='timeline' ? 'active':''}`}>📅 Timeline gộp hồ sơ</button>
+              </div>
+
+              {/* TẦNG 2 — Bảng so sánh tất tần tật */}
+              {sourceTab === 'compare' && (
+                <div style={{ overflow:'auto', borderRadius:10, border:'1px solid #E5E7EB' }}>
+                  <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12, minWidth: 200 + sources.length * 180 }}>
+                    <thead>
+                      <tr style={{ background:'#F7F8FA', borderBottom:'2px solid #E5E7EB' }}>
+                        <th style={{ padding:'10px 14px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', width:160, position:'sticky', left:0, background:'#F7F8FA', zIndex:2 }}>Trường dữ liệu</th>
+                        {/* Golden Record */}
+                        <th style={{ padding:'10px 14px', minWidth:180, textAlign:'left' }}>
+                          <div style={{ fontSize:11, fontWeight:700, color:'white', background:'#16A34A', display:'inline-block', padding:'2px 8px', borderRadius:4, marginBottom:2 }}>✦ Golden Record</div>
+                          <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace' }}>{kh.uid}</div>
+                        </th>
+                        {sources.map((s,i) => (
+                          <th key={i} style={{ padding:'10px 14px', minWidth:180, textAlign:'left' }}>
+                            <div style={{ fontSize:11, fontWeight:700, color:'white', background:confColor(s.confidence), display:'inline-block', padding:'2px 8px', borderRadius:4, marginBottom:2 }}>{s.source}</div>
+                            <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace' }}>{s.sourceId}</div>
+                            <div style={{ marginTop:4, height:3, borderRadius:2, background:'#E5E7EB' }}>
+                              <div style={{ width:`${s.confidence}%`, height:'100%', borderRadius:2, background:confColor(s.confidence) }}></div>
+                            </div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {FIELD_GROUPS.map((fg, gi) => (
+                        <React.Fragment key={gi}>
+                          {/* Group header */}
+                          <tr style={{ background:'#F0F4FF' }}>
+                            <td colSpan={2 + sources.length} style={{ padding:'7px 14px', fontSize:11, fontWeight:700, color:'#2563EB', letterSpacing:'0.4px', position:'sticky', left:0 }}>
+                              {fg.group.toUpperCase()}
+                            </td>
+                          </tr>
+                          {fg.fields.map((f, fi) => {
+                            const goldenVal = String(f.golden || '—');
+                            const srcVals = sources.map(s => getVal(s, fg.dataKey, f.key));
+                            const anyConflict = srcVals.some(v => hasConflict(goldenVal, v));
+                            return (
+                              <tr key={fi} style={{ borderBottom:'1px solid #F3F4F6', background: anyConflict ? '#FFFBEB' : 'white' }}>
+                                <td style={{ padding:'9px 14px', fontWeight:600, color:'#6B7280', fontSize:11, position:'sticky', left:0, background: anyConflict ? '#FFFBEB' : 'white', whiteSpace:'nowrap' }}>
+                                  {anyConflict && <span style={{ color:'#d97706', marginRight:4 }}>⚠️</span>}
+                                  {f.label}
+                                </td>
+                                {/* Golden */}
+                                <td style={{ padding:'9px 14px', background:'#f0fdf4', borderLeft:'3px solid #16A34A', fontWeight:500, color: isAbsent(goldenVal) ? '#D1D5DB' : '#1A1A1A', fontStyle: isAbsent(goldenVal) ? 'italic':'normal' }}>
+                                  {goldenVal}
+                                </td>
+                                {/* Nguồn */}
+                                {srcVals.map((v, si) => {
+                                  const conflict = hasConflict(goldenVal, v);
+                                  const absent = isAbsent(v);
+                                  return (
+                                    <td key={si} style={{ padding:'9px 14px', background: conflict ? '#FFFBEB' : absent ? '#FAFAFA' : 'white', color: conflict ? '#d97706' : absent ? '#D1D5DB' : '#1A1A1A', fontStyle: absent ? 'italic':'normal' }}>
+                                      {absent ? <span style={{ fontSize:11 }}>Không có</span> : v}
+                                      {conflict && <span className="badge badge-yellow" style={{ marginLeft:6, fontSize:10 }}>Sai khác</span>}
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            );
+                          })}
+                        </React.Fragment>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* TẦNG 3 — Timeline */}
+              {sourceTab === 'timeline' && (
+                <div style={{ display:'flex', flexDirection:'column', gap:0 }}>
+                  <div style={{ fontSize:12, color:'#6B7280', marginBottom:12 }}>
+                    Thứ tự các hệ thống nguồn được CDP nhận diện và gộp vào Golden Record.
                   </div>
-                );
-              })}
+                  {/* Golden Record — điểm cuối */}
+                  <div style={{ display:'flex', gap:16, alignItems:'flex-start', paddingBottom:16 }}>
+                    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:0 }}>
+                      <div style={{ width:14, height:14, borderRadius:50, background:'#16A34A', border:'3px solid white', boxShadow:'0 0 0 2px #16A34A', flexShrink:0 }}></div>
+                      <div style={{ width:2, height:40, background:'#E5E7EB' }}></div>
+                    </div>
+                    <div style={{ paddingTop:0 }}>
+                      <div style={{ fontWeight:700, fontSize:13, color:'#16A34A' }}>✦ Golden Record tạo thành</div>
+                      <div style={{ fontSize:11, color:'#6B7280', fontFamily:'monospace' }}>{kh.uid}</div>
+                      <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>Tổng hợp từ {sources.length} nguồn · Hoàn chỉnh {kh.completeness}%</div>
+                    </div>
+                  </div>
+                  {[...sources].sort((a,b) => new Date(b.mergedAt.split(' ')[0].split('/').reverse().join('-')) - new Date(a.mergedAt.split(' ')[0].split('/').reverse().join('-'))).map((s, i, arr) => (
+                    <div key={i} style={{ display:'flex', gap:16, alignItems:'flex-start', paddingBottom: i < arr.length-1 ? 16 : 0 }}>
+                      <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+                        <div style={{ width:12, height:12, borderRadius:50, background:confColor(s.confidence), flexShrink:0 }}></div>
+                        {i < arr.length-1 && <div style={{ width:2, flex:1, minHeight:32, background:'#E5E7EB' }}></div>}
+                      </div>
+                      <div style={{ flex:1, paddingBottom: i < arr.length-1 ? 0:0 }}>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span style={{ fontWeight:700, fontSize:13 }}>{s.source}</span>
+                          <span style={{ fontFamily:'monospace', fontSize:11, color:'#7c3aed' }}>{s.sourceId}</span>
+                          <span style={{ fontSize:12, fontWeight:700, color:confColor(s.confidence) }}>{s.confidence}%</span>
+                          {s.note && <span className="badge badge-yellow" style={{ fontSize:10 }}>⚠️ {s.note}</span>}
+                        </div>
+                        <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>
+                          Khóa trùng: <strong>{s.matchKey}</strong> · Gộp lúc {s.mergedAt}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
             </div>
           );
         })()}
