@@ -1766,7 +1766,7 @@ function Customer360Screen({ uid, onBack }) {
               <div style={{ padding:16, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:16 }}>
                 <div style={{ fontWeight:700, fontSize:13, marginBottom:10 }}>RFM — Nhóm: <span style={{ color:'#E30613' }}>{kh.scores.rfmGroup}</span></div>
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
-                  {[['R — Recency',kh.scores.rfmR],['F — Frequency',kh.scores.rfmF],['M — Monetary',kh.scores.rfmM]].map(([l,v]) => (
+                  {[['R — Gần đây',kh.scores.rfmR],['F — Tần suất',kh.scores.rfmF],['M — Giá trị',kh.scores.rfmM]].map(([l,v]) => (
                     <div key={l}>
                       <div style={{ fontSize:11, color:'#6B7280', marginBottom:4 }}>{l}</div>
                       {rfmDot(v)}
@@ -1776,11 +1776,11 @@ function Customer360Screen({ uid, onBack }) {
               </div>
             ) : <div style={{ padding:12, background:'#f3f4f6', borderRadius:8, marginBottom:16, color:'#6B7280', fontSize:13 }}>🔒 Vai trò {role} không có quyền xem RFM</div>}
 
-            {/* CLV */}
+            {/* Giá trị vòng đời */}
             {canSee('clv') ? (
               <div style={{ padding:14, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:12, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                 <div>
-                  <div style={{ fontSize:11, color:'#6B7280' }}>CLV — Giá trị vòng đời ước tính</div>
+                  <div style={{ fontSize:11, color:'#6B7280' }}>Giá trị vòng đời khách hàng (CLV)</div>
                   <div style={{ fontSize:20, fontWeight:800, color:'#16A34A' }} className="tabular-nums">{kh.scores.clv} ₫</div>
                 </div>
               </div>
@@ -1788,10 +1788,10 @@ function Customer360Screen({ uid, onBack }) {
 
             {/* Score gauges */}
             <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12 }}>
-              {canSee('churn') && scoreGauge(kh.scores.churn, 'Churn Score')}
-              {canSee('engagement') && scoreGauge(kh.scores.engagement, 'Engagement')}
-              {canSee('codRisk') ? scoreGauge(kh.scores.codRisk, 'COD Risk') : <div style={{ textAlign:'center', fontSize:12, color:'#6B7280' }}>🔒 COD Risk<br/>Không có quyền</div>}
-              {canSee('fraud') ? scoreGauge(kh.scores.fraud, 'Fraud Score') : <div style={{ textAlign:'center', fontSize:12, color:'#6B7280' }}>🔒 Fraud Score<br/>Không có quyền</div>}
+              {canSee('churn') && scoreGauge(kh.scores.churn, 'Điểm rời bỏ')}
+              {canSee('engagement') && scoreGauge(kh.scores.engagement, 'Mức độ tương tác')}
+              {canSee('codRisk') ? scoreGauge(kh.scores.codRisk, 'Rủi ro COD') : <div style={{ textAlign:'center', fontSize:12, color:'#6B7280' }}>🔒 Rủi ro COD<br/>Không có quyền</div>}
+              {canSee('fraud') ? scoreGauge(kh.scores.fraud, 'Điểm gian lận') : <div style={{ textAlign:'center', fontSize:12, color:'#6B7280' }}>🔒 Điểm gian lận<br/>Không có quyền</div>}
             </div>
           </div>
         )}
@@ -1832,7 +1832,7 @@ function Customer360Screen({ uid, onBack }) {
               {[
                 ['Ngày tạo', '10/01/2023'],
                 ['Lần cập nhật cuối', kh.appLogin || 'Chưa có dữ liệu'],
-                ['Profile version', 'v14'],
+                ['Phiên bản hồ sơ', 'v14'],
                 ['Tạo bởi hệ thống', 'CAS'],
               ].map(([l,v]) => (
                 <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
