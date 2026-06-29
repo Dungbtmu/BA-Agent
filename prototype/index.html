@@ -1200,7 +1200,6 @@ function Customer360Screen({ uid, onBack }) {
               <span className={`badge ${kh.type==='INDIVIDUAL' ? 'badge-blue':'badge-purple'}`}>{kh.type==='INDIVIDUAL' ? 'Cá nhân':'Doanh nghiệp'}</span>
               <span className="badge badge-gray">{GROUP_LABEL[kh.group]||kh.group}</span>
               {custStatusBadge(kh.status)}
-              {kh.loyalty?.tier && <span className={`badge ${TIER_BADGE[kh.loyalty.tier]||'badge-gray'}`}>🏅 {TIER_LABEL[kh.loyalty.tier]||kh.loyalty.tier}</span>}
             </div>
           </div>
           <div className="flex gap-2">
