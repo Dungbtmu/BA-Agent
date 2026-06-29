@@ -78,14 +78,14 @@ const ALERTS = [
 ];
 
 const CUSTOMERS = [
-  { uid:'UID-0000123456', name:'Nguyễn Thị Hương',         type:'INDIVIDUAL', group:'SME',        phone:'0901234567', orders:1275, revenue:'458.200.000', segment:'Champions',          status:'ACTIVE',   updated:'hôm nay' },
-  { uid:'UID-0000987654', name:'Công ty TNHH TM ABC',      type:'BUSINESS',   group:'KHL',        phone:'0987654321', orders:18450,revenue:'6.820.000.000',segment:'KHL giá trị cao',   status:'ACTIVE',   updated:'hôm nay' },
-  { uid:'UID-0000456789', name:'Phạm Minh Tuấn',           type:'INDIVIDUAL', group:'B2C',        phone:'0978111222', orders:86,   revenue:'9.400.000',   segment:'At Risk',            status:'ACTIVE',   updated:'3 ngày trước' },
-  { uid:'UID-0000334411', name:'Trần Quốc Bảo',            type:'INDIVIDUAL', group:'B2C',        phone:'0905556677', orders:412,  revenue:'78.500.000',  segment:'Loyal',              status:'ACTIVE',   updated:'hôm qua' },
-  { uid:'UID-0000220088', name:'Cửa hàng Mẹ & Bé Sunny',  type:'BUSINESS',   group:'SME',        phone:'0933221100', orders:2310, revenue:'612.000.000', segment:'Chủ shop cao',       status:'ACTIVE',   updated:'hôm nay' },
-  { uid:'UID-0000771122', name:'Lê Thị Hằng',              type:'INDIVIDUAL', group:'B2C',        phone:'0918887766', orders:24,   revenue:'1.800.000',   segment:'New',                status:'ACTIVE',   updated:'1 tuần trước' },
-  { uid:'UID-0000559900', name:'Công ty CP Logistics XYZ', type:'BUSINESS',   group:'KHL',        phone:'0966554433', orders:9870, revenue:'3.410.000.000',segment:'KHL giá trị cao',  status:'ACTIVE',   updated:'hôm nay' },
-  { uid:'UID-0000662200', name:'Đỗ Văn Khải',              type:'INDIVIDUAL', group:'B2C',        phone:'0944332211', orders:153,  revenue:'19.200.000',  segment:'At Risk',            status:'INACTIVE', updated:'2 tháng trước' },
+  { uid:'UID-0000123456', name:'Nguyễn Thị Hương',         type:'INDIVIDUAL', group:'SME',        phone:'0901234567', orders:1275, revenue:'458.200.000', segment:'Khách hàng trung thành', status:'ACTIVE',   updated:'hôm nay' },
+  { uid:'UID-0000987654', name:'Công ty TNHH TM ABC',      type:'BUSINESS',   group:'KHL',        phone:'0987654321', orders:18450,revenue:'6.820.000.000',segment:'KHL giá trị cao',        status:'ACTIVE',   updated:'hôm nay' },
+  { uid:'UID-0000456789', name:'Phạm Minh Tuấn',           type:'INDIVIDUAL', group:'B2C',        phone:'0978111222', orders:86,   revenue:'9.400.000',   segment:'Có nguy cơ rời bỏ',      status:'ACTIVE',   updated:'3 ngày trước' },
+  { uid:'UID-0000334411', name:'Trần Quốc Bảo',            type:'INDIVIDUAL', group:'B2C',        phone:'0905556677', orders:412,  revenue:'78.500.000',  segment:'Khách hàng trung thành',  status:'ACTIVE',   updated:'hôm qua' },
+  { uid:'UID-0000220088', name:'Cửa hàng Mẹ & Bé Sunny',  type:'BUSINESS',   group:'SME',        phone:'0933221100', orders:2310, revenue:'612.000.000', segment:'Chủ shop hoạt động cao',  status:'ACTIVE',   updated:'hôm nay' },
+  { uid:'UID-0000771122', name:'Lê Thị Hằng',              type:'INDIVIDUAL', group:'B2C',        phone:'0918887766', orders:24,   revenue:'1.800.000',   segment:'Khách hàng mới',          status:'ACTIVE',   updated:'1 tuần trước' },
+  { uid:'UID-0000559900', name:'Công ty CP Logistics XYZ', type:'BUSINESS',   group:'KHL',        phone:'0966554433', orders:9870, revenue:'3.410.000.000',segment:'KHL giá trị cao',        status:'ACTIVE',   updated:'hôm nay' },
+  { uid:'UID-0000662200', name:'Đỗ Văn Khải',              type:'INDIVIDUAL', group:'B2C',        phone:'0944332211', orders:153,  revenue:'19.200.000',  segment:'Có nguy cơ rời bỏ',       status:'INACTIVE', updated:'2 tháng trước' },
 ];
 
 // Dữ liệu nhóm hồ sơ — mỗi nhóm có N hồ sơ từ N nguồn khác nhau
@@ -136,7 +136,7 @@ const KH_DETAIL = {
     routes:['HN→HCM','HN→ĐN','HN→HP'], deliveryRate:94, returnRate:8,
     cod:{ total:'1.250.000.000', collected:'1.180.000.000', pending:'70.000.000', status:'MATCHED' },
     loyalty:{ tier:'GOLD', points:12400, expiry:'2026-12-31' },
-    segments:['Champions','Chủ shop hoạt động cao'],
+    segments:['Khách hàng trung thành','Chủ shop hoạt động cao'],
     scores:{ rfmR:5, rfmF:5, rfmM:4, rfmGroup:'Champions', clv:'620.000.000', churn:18, engagement:88, codRisk:22, fraud:9, updatedAt:'24/06 08:00' },
     consent:{ sms:'in', email:'in', zalo:'in', push:'out', deletionRequested:false },
     appLogin:'24/06 09:12', device:'Android', sessions30d:47,
@@ -239,7 +239,7 @@ const KH_DETAIL = {
     routes:['HCM→HN','HCM→HP','HCM→ĐN'], deliveryRate:91, returnRate:14,
     cod:{ total:'14.200.000.000', collected:'13.100.000.000', pending:'1.100.000.000', status:'DISCREPANCY' },
     loyalty:{ tier:null, points:null, expiry:null },
-    segments:['KHL giá trị cao','Tỷ lệ hoàn cần theo dõi'],
+    segments:['KHL giá trị cao','Tỷ lệ hoàn cao'],
     scores:{ rfmR:5, rfmF:5, rfmM:5, rfmGroup:'Champions', clv:'9.500.000.000', churn:35, engagement:60, codRisk:58, fraud:21, updatedAt:'24/06 08:00' },
     consent:{ sms:'in', email:'in', zalo:'unknown', push:'unknown', deletionRequested:false },
     appLogin:'Chưa có dữ liệu', device:'Chưa có dữ liệu', sessions30d:null,
@@ -319,7 +319,7 @@ const KH_DETAIL = {
     routes:[], deliveryRate:72, returnRate:31,
     cod:{ total:'24.000.000', collected:'15.500.000', pending:'8.500.000', status:'PENDING' },
     loyalty:{ tier:null, points:null, expiry:null },
-    segments:['At Risk','Tỷ lệ hoàn cao'],
+    segments:['Có nguy cơ rời bỏ','Tỷ lệ hoàn cao'],
     scores:{ rfmR:2, rfmF:2, rfmM:2, rfmGroup:'At Risk', clv:'Chưa có dữ liệu', churn:78, engagement:25, codRisk:71, fraud:44, updatedAt:'24/06 08:00' },
     consent:{ sms:'out', email:'unknown', zalo:'unknown', push:'unknown', deletionRequested:false },
     appLogin:'Chưa có dữ liệu', device:'Chưa có dữ liệu', sessions30d:null,
@@ -401,7 +401,9 @@ const CONFIDENCE_LABEL = { HIGH:'Cao', MEDIUM:'Trung bình', LOW:'Thấp' };
 const ALIAS_TYPE_LABEL = { PHONE:'SĐT', POST_ID:'Post ID', CRM_ID:'Mã CRM', TAX_ID:'MST', KHL_CODE:'Mã KHL', USER_APP_ID:'ID App', EMAIL:'Email' };
 const ADDR_STATUS_LABEL = { STANDARDIZED:'Đã chuẩn hóa', PARTIAL:'Một phần', UNKNOWN:'Chưa xác định' };
 const ADDR_TYPE_LABEL   = { SENDER:'Địa chỉ gửi', RECEIVER:'Địa chỉ nhận', BUSINESS:'Trụ sở', WAREHOUSE:'Kho hàng' };
-const SEGMENT_LABEL = { 'Champions':'Khách hàng trung thành', 'At Risk':'Có nguy cơ rời bỏ', 'New':'Khách hàng mới', 'Loyal':'Khách hàng trung thành' };
+const SEGMENT_RISK = ['Có nguy cơ rời bỏ','Tỷ lệ hoàn cao','Có nguy cơ gian lận'];
+const SEGMENT_GREEN = ['Khách hàng trung thành','KHL giá trị cao','Chủ shop hoạt động cao'];
+const segBadgeColor = (s) => SEGMENT_RISK.some(r => s.includes(r.slice(0,6))) || s.includes('rời bỏ') || s.includes('hoàn') || s.includes('gian lận') ? 'badge-red' : SEGMENT_GREEN.some(g => s.includes(g.slice(0,6))) || s.includes('trung thành') || s.includes('KHL') || s.includes('shop') ? 'badge-green' : 'badge-blue';
 
 const lagBadge = (lag, warn) => {
   if (warn) return <span className="tabular-nums text-red-600 font-bold">{lag.toLocaleString()}</span>;
@@ -743,7 +745,7 @@ function CustomerListScreen({ onC360 }) {
                 <td style={{ padding:'10px 12px', textAlign:'right' }} className="tabular-nums">{c.orders.toLocaleString()}</td>
                 <td style={{ padding:'10px 12px', textAlign:'right', fontWeight:600 }} className="tabular-nums">{c.revenue} ₫</td>
                 <td style={{ padding:'10px 12px' }}>
-                  <span className={`badge ${c.segment.includes('Risk') || c.segment.includes('hoàn') ? 'badge-red' : c.segment.includes('KHL') || c.segment.includes('Champions') ? 'badge-green' : 'badge-blue'}`}>{c.segment}</span>
+                  <span className={`badge ${segBadgeColor(c.segment)}`}>{c.segment}</span>
                 </td>
                 <td style={{ padding:'10px 12px' }}>{custStatusBadge(c.status)}</td>
                 <td style={{ padding:'10px 12px', color:'#6B7280', fontSize:12 }}>{c.updated}</td>
@@ -1280,7 +1282,7 @@ function Customer360Screen({ uid, onBack }) {
               </div>
               <div className="section-title mt-4">Segment hiện tại</div>
               <div className="flex gap-2 flex-wrap">
-                {kh.segments.map(s => <span key={s} className={`badge ${s.includes('Risk')||s.includes('hoàn') ? 'badge-red':'badge-green'}`}>{SEGMENT_LABEL[s]||s}</span>)}
+                {kh.segments.map(s => <span key={s} className={`badge ${segBadgeColor(s)}`}>{s}</span>)}
               </div>
             </div>
           </div>
