@@ -727,7 +727,7 @@ function CustomerListScreen({ onC360 }) {
         <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
           <thead>
             <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
-              {['UID','Tên / Công ty','Loại','Nhóm','SĐT','Tổng đơn','Doanh thu','Phân khúc','Trạng thái','Cập nhật'].map(h => (
+              {['Mã khách hàng','Tên / Công ty','Loại','Nhóm','SĐT','Tổng đơn','Doanh thu','Phân khúc','Trạng thái','Cập nhật'].map(h => (
                 <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', whiteSpace:'nowrap' }}>{h}</th>
               ))}
             </tr>
@@ -1333,18 +1333,6 @@ function Customer360Screen({ uid, onBack }) {
               </button>
             </div>
 
-            {/* Nút Báo cáo merge sai — chỉ Data Steward và Admin */}
-            {canSee('reportMerge') && (
-              <div style={{ padding:14, background:'#fef9c3', border:'1px solid #F59E0B', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                <div>
-                  <div style={{ fontWeight:600, fontSize:13 }}>Nghi ngờ merge nhầm?</div>
-                  <div style={{ fontSize:12, color:'#6B7280', marginTop:2 }}>Báo cáo để Admin xem xét và xử lý unmerge nếu cần.</div>
-                </div>
-                <button style={{ padding:'8px 16px', background:'#d97706', color:'white', border:'none', borderRadius:7, fontSize:13, fontWeight:600, cursor:'pointer', flexShrink:0 }}>
-                  Báo cáo merge sai
-                </button>
-              </div>
-            )}
           </div>
         )}
 
@@ -1429,32 +1417,6 @@ function Customer360Screen({ uid, onBack }) {
           return (
             <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
 
-              {/* TẦNG 1 — Tổng quan nguồn */}
-              <div>
-                <div className="section-title">Tổng quan nguồn dữ liệu — {sources.length} hệ thống</div>
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px,1fr))', gap:10 }}>
-                  {sources.map((s,i) => {
-                    const totalFields = Object.values(FIELD_GROUPS).flatMap(g => g.fields).length;
-                    const filledFields = FIELD_GROUPS.flatMap(g => g.fields).filter(f => !isAbsent(getVal(s, g => FIELD_GROUPS.find(fg=>fg.fields.includes(f))?.dataKey || '', f.key))).length;
-                    return (
-                      <div key={i} style={{ border:`2px solid ${confColor(s.confidence)}33`, borderRadius:10, padding:12, background:'white' }}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span style={{ fontSize:12, fontWeight:700, color:'white', background:confColor(s.confidence), padding:'2px 8px', borderRadius:4 }}>{s.source}</span>
-                          <span style={{ fontSize:13, fontWeight:800, color:confColor(s.confidence) }}>{s.confidence}%</span>
-                        </div>
-                        <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace', marginBottom:6 }}>{s.sourceId}</div>
-                        <div style={{ fontSize:11, color:'#6B7280' }}>Khóa: <strong style={{ color:'#1A1A1A' }}>{s.matchKey}</strong></div>
-                        <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>Gộp: {s.mergedAt}</div>
-                        {s.note && <div style={{ marginTop:6, fontSize:11, color:'#d97706', background:'#fef9c3', borderRadius:4, padding:'2px 6px' }}>⚠️ {s.note}</div>}
-                        <div style={{ marginTop:8, height:4, borderRadius:2, background:'#E5E7EB' }}>
-                          <div style={{ width:`${s.confidence}%`, height:'100%', borderRadius:2, background:confColor(s.confidence) }}></div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Toggle so sánh / timeline */}
               <div className="flex gap-2">
                 <button onClick={() => setSourceTab('compare')} className={`tab-btn ${sourceTab==='compare' ? 'active':''}`}>🔍 So sánh chi tiết</button>
@@ -1514,7 +1476,7 @@ function Customer360Screen({ uid, onBack }) {
                                   return (
                                     <td key={si} style={{ padding:'9px 14px', background: conflict ? '#FFFBEB' : absent ? '#FAFAFA' : 'white', color: conflict ? '#d97706' : absent ? '#D1D5DB' : '#1A1A1A', fontStyle: absent ? 'italic':'normal' }}>
                                       {absent ? <span style={{ fontSize:11 }}>Không có</span> : v}
-                                      {conflict && <span className="badge badge-yellow" style={{ marginLeft:6, fontSize:10 }}>Sai khác</span>}
+                                      {conflict && <span className="badge badge-yellow" style={{ marginLeft:6, fontSize:10 }}>Khác biệt</span>}
                                     </td>
                                   );
                                 })}
@@ -1575,11 +1537,10 @@ function Customer360Screen({ uid, onBack }) {
         {/* ĐỊA CHỈ */}
         {tab==='address' && (
           <div>
-            <div className="section-title">Danh sách địa chỉ</div>
-            {kh.addresses.map((a,i) => (
+            <div className="section-title">Địa chỉ gửi hàng</div>
+            {kh.addresses.filter(a => a.type === 'SENDER').map((a,i) => (
               <div key={i} style={{ padding:14, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:10 }}>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="badge badge-blue">{ADDR_TYPE_LABEL[a.type]||a.type}</span>
                   {a.primary && <span className="badge badge-green">Chính</span>}
                   <span className={`badge ${a.status==='STANDARDIZED' ? 'badge-green' : 'badge-yellow'}`}>{ADDR_STATUS_LABEL[a.status]||a.status}</span>
                 </div>
