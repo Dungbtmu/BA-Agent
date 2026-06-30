@@ -1327,6 +1327,18 @@ function Customer360Screen({ uid, onBack }) {
               </table>
             </div>
 
+            {/* Nghi ngờ merge sai */}
+            <div style={{ padding:'12px 14px', background:'#FFF7ED', border:'1px solid #FED7AA', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div>
+                <div style={{ fontSize:13, fontWeight:600, color:'#92400E' }}>Nghi ngờ merge sai?</div>
+                <div style={{ fontSize:12, color:'#B45309', marginTop:2 }}>Nếu hồ sơ này bị gộp nhầm, bạn có thể gửi yêu cầu để Data Steward xem xét.</div>
+              </div>
+              <button style={{ padding:'6px 14px', background:'#D97706', color:'white', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer', flexShrink:0, marginLeft:12 }}
+                onClick={() => alert('Yêu cầu báo cáo merge sai đã được ghi nhận. Data Steward sẽ xem xét trong 1–2 ngày làm việc.')}>
+                Báo cáo
+              </button>
+            </div>
+
             {/* Link sang tab Hồ sơ đa nguồn */}
             <div style={{ padding:'10px 14px', background:'#EFF6FF', border:'1px solid #BFDBFE', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
               <div style={{ fontSize:12, color:'#2563EB' }}>Xem chi tiết dữ liệu từng hệ thống nguồn và so sánh field-by-field tại tab <strong>Hồ sơ đa nguồn</strong>.</div>
