@@ -413,8 +413,7 @@ flowchart TD
 | 14 | QTV Marketing | Nhấn [Dừng] trên campaign đang chạy; xác nhận trong hộp thoại cảnh báo rằng các tin nhắn đang chờ gửi sẽ bị hủy |
 | 14.1 | Hệ thống | Hủy toàn bộ tin nhắn đang chờ gửi; chuyển campaign sang trạng thái Tạm dừng |
 | 15 | QTV Marketing | Nhấn [Bật] trên campaign đang Tạm dừng |
-| 15.1 | Hệ thống | **[Nhánh: không sửa nội dung]** Kích hoạt lại campaign ngay lập tức, không cần phê duyệt lại; chuyển về trạng thái Đang chạy → quay lại bước 11 |
-| 15.2 | Hệ thống | **[Nhánh: đã sửa nội dung khi Paused]** Campaign có thay đổi nội dung kể từ lần duyệt cuối → không thể bật lại ngay; chuyển về trạng thái Nháp; QTV phải gửi duyệt lại trước khi bật |
+| 15.1 | Hệ thống | Kích hoạt lại campaign ngay lập tức, không cần phê duyệt lại; chuyển về trạng thái Đang chạy → quay lại bước 11 |
 
 ---
 
@@ -1072,7 +1071,7 @@ CVM query thông tin này từ BSS qua Integration Layer khi tải trang — kh�
 | **Tiền điều kiện** | - Người dùng đã đăng nhập |
 | **Hậu điều kiện** | - Người dùng xem được toàn bộ cấu hình campaign |
 | **Hoạt động** | 1. Hệ thống load và hiển thị Campaign Detail View (chỉ đọc): Thông tin cơ bản, Trigger & Logic, Audience, Message Matrix (tab kênh), Kênh & Lịch gửi, An toàn <br>2. Người dùng click tab kênh để xem nội dung message per kênh; tab mặc định = tab đầu tiên có nội dung <br>3. Người dùng click [Xem] bên cạnh danh sách Blacklist/Whitelist → modal preview chỉ đọc hiển thị danh sách số điện thoại thuộc danh sách đó kèm tổng số lượng <br>4. Người dùng click nút hành động tùy trạng thái: Draft → [Sửa]; Active → [Dừng]; Paused → [Sửa] hoặc [Bật] <br>**[Alternative — từ Dashboard]**: Click campaign trong bảng Top Active Campaigns → navigate đến Campaign Detail View |
-| **Quy tắc nghiệp vụ** | - Toàn bộ nội dung chỉ đọc — không có ô nhập liệu hay nút chỉnh sửa nội dung <br>- Nút hành động biến đổi theo trạng thái: Draft → [Sửa] thay [Đóng]; Active → [Dừng] + [Đóng]; Paused → [Sửa] + [Bật] + [Đóng]; Pending/Ended → chỉ [Đóng] <br>- Campaign Paused có nút [Sửa] — click → mở Campaign Builder; nếu QTV thay đổi nội dung → campaign về Draft, phải gửi duyệt lại; nếu không thay đổi → vẫn bật lại trực tiếp |
+| **Quy tắc nghiệp vụ** | - Toàn bộ nội dung chỉ đọc — không có ô nhập liệu hay nút chỉnh sửa nội dung <br>- Nút hành động biến đổi theo trạng thái: Draft → [Sửa] thay [Đóng]; Active → [Dừng] + [Đóng]; Paused → [Sửa] + [Bật] + [Đóng]; Pending/Ended → chỉ [Đóng] <br>- Campaign Paused có nút [Sửa] — click → mở Campaign Builder; nếu QTV thay đổi nội dung và nhấn [Lưu nháp] → campaign về Draft, phải gửi duyệt lại; nếu không thay đổi → chiến dịch vẫn Paused, QTV dùng [Bật] để kích hoạt lại |
 
 ---
 
@@ -1114,10 +1113,10 @@ CVM query thông tin này từ BSS qua Integration Layer khi tải trang — kh�
 | **Mục tiêu** | Cho phép khôi phục campaign đã dừng mà không cần gửi duyệt lại, miễn là không có thay đổi nội dung |
 | **Tác nhân** | QTV Marketing, Admin Hệ thống |
 | **Trigger** | Click [Bật] trên campaign Paused trong Campaign List hoặc Campaign Detail View |
-| **Tiền điều kiện** | - Campaign ở trạng thái Paused <br>- Nội dung campaign không thay đổi so với lúc được duyệt |
+| **Tiền điều kiện** | - Campaign ở trạng thái Paused |
 | **Hậu điều kiện** | - Campaign chuyển → Active; hệ thống tiếp tục lắng nghe trigger |
-| **Hoạt động** | 1. Người dùng click [Bật] <br>1a. **[Nhánh: không có thay đổi nội dung]** Hệ thống chuyển trạng thái → Active ngay (không cần confirm); toast "Campaign đã kích hoạt lại"; button chuyển từ [Bật] → [Dừng] <br>1b. **[Nhánh: đã sửa nội dung khi Paused]** Hệ thống thông báo "Campaign có thay đổi nội dung — cần duyệt lại"; chuyển campaign về Draft; QTV vào [Sửa] → hoàn thiện → [Gửi duyệt] |
-| **Quy tắc nghiệp vụ** | - Không cần quy trình duyệt lại nếu nội dung không thay đổi so với lần duyệt cuối <br>- CVM cho phép sửa campaign đang Paused; sau khi sửa nội dung → campaign chuyển về Draft; bắt buộc gửi duyệt lại trước khi bật lại <br>- Nút [Sửa] xuất hiện trên Campaign Detail View của campaign Paused; QTV click → mở Campaign Builder ở chế độ sửa <br>- Nếu bật lại mà không sửa nội dung: không cần duyệt lại, không cần confirm dialog <br>- Không cần confirm dialog khi bật lại (ngược với Kill Switch) |
+| **Hoạt động** | 1. Người dùng click [Bật] <br>1a. Hệ thống chuyển trạng thái → Active ngay (không cần confirm); toast "Campaign đã kích hoạt lại"; button chuyển từ [Bật] → [Dừng] |
+| **Quy tắc nghiệp vụ** | - Kích hoạt lại không cần duyệt lại, không cần confirm dialog (ngược với Kill Switch) <br>- Muốn sửa nội dung campaign Paused: QTV dùng nút [Sửa] → Campaign Builder → chỉnh sửa → [Lưu nháp] → campaign chuyển về Draft → gửi duyệt lại theo flow bình thường |
 
 ---
 
@@ -1812,7 +1811,7 @@ Màn hình danh sách campaign cho QTV Marketing và Admin HT.
 | 5 | Cột TRIGGER | Chip | – | – | Hiển thị tối đa 2 chip trigger; nếu có hơn 2 → hiển thị "+N ⓘ"; hover/click "+N ⓘ" → popover đầy đủ (tên trigger, nguồn, kiểu chạy) |
 | 6 | Cột HIỆU LỰC | Text | – | – | Định dạng "DD/MM – DD/MM/YYYY" |
 | 7 | Cột TRẠNG THÁI | Status chip | – | – | Active: nền xanh lá nhạt, chữ xanh đậm; Draft: nền xám nhạt, chữ xám vừa; Pending: nền vàng nhạt, chữ vàng đậm; Paused: nền cam nhạt, chữ cam đậm; Ended: nền xám nhạt, chữ xám mờ (nhạt hơn Draft để phân biệt) |
-| 8 | Cột HÀNH ĐỘNG | Button | – | – | Nút thay đổi theo trạng thái: Active → [Xem][Dừng]; Draft → [Xem][Sửa]; Pending → [Xem]; Paused → [Xem][Sửa][Bật]; Ended → [Xem]; **[Dừng]** màu đỏ — bắt buộc confirm dialog "Tin nhắn đang trong hàng chờ sẽ bị hủy. Không thể hoàn tác." [Hủy] / [Xác nhận Dừng]; sau khi xác nhận: nút bị khoá và hiển thị trạng thái đang xử lý, rồi chuyển sang Paused; **[Bật] từ Paused**: hệ thống kiểm tra nội dung campaign có bị sửa sau khi duyệt không — nếu không thay đổi → nút bị khoá trong lúc xử lý rồi chuyển Active ngay; nếu đã thay đổi → chuyển về Draft + thông báo "Campaign đã sửa — cần gửi duyệt lại"; **[Sửa] từ Paused**: mở Campaign Builder; nếu QTV thay đổi bất kỳ field nào và nhấn [Lưu Nháp] → campaign về Draft; nếu chỉ vào xem không thay đổi gì → campaign giữ nguyên Paused; **Lưu ý**: [Bật] và [Sửa] chỉ hiển thị khi campaign chưa qua ngày kết thúc |
+| 8 | Cột HÀNH ĐỘNG | Button | – | – | Nút thay đổi theo trạng thái: Active → [Xem][Dừng]; Draft → [Xem][Sửa]; Pending → [Xem]; Paused → [Xem][Sửa][Bật]; Ended → [Xem]; **[Dừng]** màu đỏ — bắt buộc confirm dialog "Tin nhắn đang trong hàng chờ sẽ bị hủy. Không thể hoàn tác." [Hủy] / [Xác nhận Dừng]; sau khi xác nhận: nút bị khoá và hiển thị trạng thái đang xử lý, rồi chuyển sang Paused; **[Bật] từ Paused**: nút bị khoá trong lúc xử lý rồi chuyển Active ngay, không cần confirm; **[Sửa] từ Paused**: mở Campaign Builder; nếu QTV thay đổi bất kỳ field nào và nhấn [Lưu Nháp] → campaign về Draft; nếu chỉ vào xem không thay đổi gì → campaign giữ nguyên Paused; **Lưu ý**: [Bật] và [Sửa] chỉ hiển thị khi campaign chưa qua ngày kết thúc |
 | 9 | Sắp xếp & Phân trang | Pagination | – | 20/trang · Ngày tạo ↓ | Mặc định: campaign tạo mới nhất lên đầu; phân trang "< 1 2 3 >" + dropdown [20/trang ▾]; options: 20, 50, 100 |
 
 ---
@@ -1827,7 +1826,7 @@ Màn hình xem chi tiết campaign chỉ đọc — hiển thị đầy đủ to
 |-----|----------------|-----------|----------|----------|-------|
 | 1 | Header breadcrumb | Link | – | – | "← Campaign" → quay lại danh sách campaign |
 | 2 | Tiêu đề + Status chip | Text + Chip | – | – | Tên campaign (chữ đậm) + mã kịch bản (chữ mờ) + status chip đúng màu trạng thái (giống bảng màu Screen 2 STT 7) |
-| 3 | Nút hành động | Button | – | – | Nút thay đổi theo trạng thái: Draft → [Sửa] + [Đóng]; Active → [Dừng] + [Đóng]; Paused → [Sửa] + [Bật] + [Đóng]; Pending/Ended → chỉ [Đóng]; [Đóng] → quay lại danh sách; **[Dừng]**: hoạt động giống [Dừng] tại Campaign List — bắt buộc confirm dialog "Tin nhắn đang trong hàng chờ sẽ bị hủy. Không thể hoàn tác." → sau khi xác nhận: nút bị khoá trong lúc hệ thống xử lý rồi chuyển Paused; **[Bật]**: hoạt động hoàn toàn giống [Bật] tại Campaign List (kiểm tra phiên bản nội dung, xử lý tương tự); **[Sửa]**: mở Campaign Builder ở chế độ sửa; **Khi vào trang lần đầu**: toàn bộ nội dung hiển thị trạng thái đang tải; **Khi hệ thống không tải được**: hiển thị "⚠ Không tải được thông tin campaign — [↻ Thử lại]" ở giữa trang |
+| 3 | Nút hành động | Button | – | – | Nút thay đổi theo trạng thái: Draft → [Sửa] + [Đóng]; Active → [Dừng] + [Đóng]; Paused → [Sửa] + [Bật] + [Đóng]; Pending/Ended → chỉ [Đóng]; [Đóng] → quay lại danh sách; **[Dừng]**: hoạt động giống [Dừng] tại Campaign List — bắt buộc confirm dialog "Tin nhắn đang trong hàng chờ sẽ bị hủy. Không thể hoàn tác." → sau khi xác nhận: nút bị khoá trong lúc hệ thống xử lý rồi chuyển Paused; **[Bật]**: chuyển trạng thái → Active ngay, không cần confirm (giống [Bật] tại Campaign List); **[Sửa]**: mở Campaign Builder ở chế độ sửa; **Khi vào trang lần đầu**: toàn bộ nội dung hiển thị trạng thái đang tải; **Khi hệ thống không tải được**: hiển thị "⚠ Không tải được thông tin campaign — [↻ Thử lại]" ở giữa trang |
 | 4 | Section 1 — Thông tin Campaign | Read-only | – | – | Tên, mã kịch bản, mục tiêu, thời gian hiệu lực, độ ưu tiên, người tạo, ngày tạo, ngày gửi duyệt |
 | 5 | Section 2 — Trigger & Logic | Read-only | – | – | Chế độ (Basic/Advanced), logic (OR/AND), danh sách trigger kèm số thứ tự ưu tiên, quy tắc khi khớp nhiều trigger, ước tính số tin |
 | 6 | Section 3 — Audience | Read-only | – | – | Danh sách phân khúc đã chọn, logic phân khúc, điều kiện lọc, số KH ước tính |
