@@ -100,6 +100,7 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
+| E03 | is_guest | KH là khách vãng lai (chưa đăng nhập) | boolean | = | FALSE | Bắt buộc | Phải = FALSE — KH chưa đăng nhập → CVM không trigger banner | AND | SuperApp/Kafka API Event |
 | E03 | hours_since_activation | Số giờ từ khi kích hoạt SIM | integer | >=, <=, BETWEEN | 24 | Tùy chọn | Lọc theo mốc thời gian từ kích hoạt | AND | SuperApp/Kafka API Event |
 | E03 | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Gợi ý gói phù hợp ngay khi đăng nhập | AND | BSS/OCS API Event |
 | E03 | balance | Số dư TKC tại thời điểm đăng nhập (đồng) | decimal | >=, <= | 50000 | Tùy chọn | KH có tiền → ưu tiên gợi ý mua gói | AND | BSS/OCS API Event |
@@ -219,6 +220,7 @@
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
 | E07 | days_since_activation | Số ngày kể từ kích hoạt | integer | >=, <=, BETWEEN | 7 | Bắt buộc | Đúng mốc 7 ngày từ NGAY_0 | AND | SuperApp/Kafka Batch CSV |
+| E07 | trigger_reason | Lý do kích hoạt trigger | enum | IN | DAY_7, TASK_3 | Tùy chọn | DAY_7 = đến mốc ngày 7; TASK_3 = hoàn thành 3 nhiệm vụ sớm hơn | AND | SuperApp/Kafka Batch CSV |
 | E07 | open_count_7d | Số lần mở app trong 7 ngày | integer | >= | 1 | Bắt buộc | Đã dùng app ít nhất 1 lần | AND | SuperApp/Kafka Batch CSV |
 | E07 | survey_completed | Đã hoàn thành khảo sát | boolean | = | FALSE | Tùy chọn | Chưa làm khảo sát → nhắc làm | AND | SuperApp/Kafka Batch CSV |
 | E07 | package_code | Mã gói hiện tại | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Gợi ý đúng gói trong khảo sát | AND | BSS/OCS Batch CSV |
@@ -306,8 +308,11 @@
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
 | E11 | days_since_activation | Số ngày từ kích hoạt | integer | >=, <=, BETWEEN | 30 | Bắt buộc | Đúng mốc 30 ngày từ NGAY_0 | AND | BSS/OCS Batch CSV |
-| E11 | topup_after_score | Số lần nạp tiền trong 30 ngày | integer | >= | 1 | Tùy chọn | KH đã nạp → gắn kết cao hơn | AND | BSS/OCS Batch CSV |
+| E11 | topup_count | Số lần nạp tiền trong 30 ngày | integer | >= | 1 | Tùy chọn | KH đã nạp → gắn kết cao hơn | AND | BSS/OCS Batch CSV |
+| E11 | plan_change_count | Số lần đổi gói trong 30 ngày | integer | >= | 1 | Tùy chọn | KH chủ động tìm gói phù hợp | AND | BSS/OCS Batch CSV |
+| E11 | current_plan | Gói đang dùng tại ngày N30 | string | IN, NOT IN | GOI_DATA_120K | Tùy chọn | Gợi ý upsell đúng gói hiện tại | AND | BSS/OCS Batch CSV |
 | E11 | total_data_30d_mb | Tổng data dùng trong 30 ngày (MB) | decimal | >=, BETWEEN | 5120 | Tùy chọn | KH dùng nhiều → upsell gói lớn hơn | AND | BSS/OCS Batch CSV |
+| E11 | app_tasks_completed | Số nhiệm vụ App đã hoàn thành trong 30 ngày | integer | >= | 1 | Tùy chọn | ❓ Cần xác nhận Q20 — BSS có aggregate được không | AND | SuperApp/Kafka Batch CSV |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -362,7 +367,7 @@
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
 | E_VOICE_100_ONNET | remaining_minutes | Phút thoại nội mạng còn lại | decimal | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | BSS/OCS API Event |
-| E_VOICE_100_ONNET | package_code | Mã gói cước | string | IN, NOT IN | GOI_THOAI_50K | Tùy chọn | Nhắm gói cụ thể cần bổ sung | AND | BSS/OCS API Event |
+| E_VOICE_100_ONNET | current_plan | Gói cước đang dùng | string | IN, NOT IN | GOI_THOAI_50K | Tùy chọn | Lọc theo gói thoại cụ thể cần bổ sung | AND | BSS/OCS API Event |
 | E_VOICE_100_ONNET | quota_type | Loại quota thoại | enum | IN | VOICE_ONNET | Bắt buộc | Phân biệt nội/ngoại mạng | AND | BSS/OCS API Event |
 | E_VOICE_100_ONNET | days_remaining | Số ngày còn lại trong chu kỳ | integer | >= | 1 | Tùy chọn | Còn nhiều ngày → cấp bách hơn | AND | BSS/OCS API Event |
 | E_VOICE_100_ONNET | balance | Số dư tài khoản (đồng) | decimal | >= | 10000 | Tùy chọn | KH có đủ tiền mua gói bổ sung | AND | BSS/OCS API Event |
@@ -392,7 +397,7 @@
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
 | E_VOICE_100_OFFNET | remaining_minutes | Phút thoại ngoại mạng còn lại | decimal | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | BSS/OCS API Event |
-| E_VOICE_100_OFFNET | package_code | Mã gói cước | string | IN, NOT IN | GOI_THOAI_50K | Tùy chọn | Nhắm gói cụ thể | AND | BSS/OCS API Event |
+| E_VOICE_100_OFFNET | current_plan | Gói cước đang dùng | string | IN, NOT IN | GOI_THOAI_50K | Tùy chọn | Lọc theo gói thoại cụ thể cần bổ sung | AND | BSS/OCS API Event |
 | E_VOICE_100_OFFNET | quota_type | Loại quota thoại | enum | IN | VOICE_OFFNET | Bắt buộc | Phân biệt nội/ngoại mạng | AND | BSS/OCS API Event |
 | E_VOICE_100_OFFNET | offnet_rate_per_min | Cước ngoại mạng ngoài gói (đồng/phút) | integer | >=, <= | 1500 | Tùy chọn | Hiển thị cảnh báo phí phát sinh | AND | BSS/OCS API Event |
 | E_VOICE_100_OFFNET | balance | Số dư tài khoản (đồng) | decimal | >= | 10000 | Tùy chọn | KH có đủ tiền mua gói bổ sung | AND | BSS/OCS API Event |
@@ -753,10 +758,12 @@
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
 | U05-A | depletion_count | Số tháng liên tiếp hết data sớm | integer | >= | 2 | Bắt buộc | Pattern tối thiểu 2 tháng liên tiếp | AND | BSS/OCS Batch CSV |
+| U05-A | quota_type | Loại quota data | enum | IN | MONTHLY | Bắt buộc | Chỉ dành cho gói data tháng | AND | BSS/OCS Batch CSV |
+| U05-A | current_plan | Gói data tháng đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Nhắm gói cụ thể cần nâng cấp | AND | BSS/OCS Batch CSV |
+| U05-A | month1_depleted_date | Ngày hết data tháng 1 | date | BEFORE | 2026-05-25 | Tùy chọn | Lọc KH hết data trước ngày cut-off tháng 1 | AND | BSS/OCS Batch CSV |
+| U05-A | month2_depleted_date | Ngày hết data tháng 2 | date | BEFORE | 2026-06-25 | Tùy chọn | Lọc KH hết data trước ngày cut-off tháng 2 | AND | BSS/OCS Batch CSV |
 | U05-A | avg_depletion_day | Ngày bình quân hết data trong tháng | integer | >=, <=, BETWEEN | 25 | Tùy chọn | Ngày bình quân so với ngày N_CUTOFF cấu hình | AND | BSS/OCS Batch CSV |
 | U05-A | avg_monthly_usage_mb | Data bình quân tiêu thụ mỗi tháng (MB) | decimal | >= | 20480 | Tùy chọn | KH dùng nhiều data mới cần nâng gói | AND | BSS/OCS Batch CSV |
-| U05-A | quota_type | Loại quota data | enum | IN | MONTHLY | Bắt buộc | Chỉ dành cho gói data tháng | AND | BSS/OCS Batch CSV |
-| U05-A | package_code | Mã gói data tháng | string | IN, NOT IN | GOI_DATA_MONTHLY_70K | Tùy chọn | Nhắm gói cụ thể cần nâng cấp | AND | BSS/OCS Batch CSV |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -782,9 +789,11 @@
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
 | U05-B | depletion_count | Số ngày hết data ngày trong tháng | integer | >= | 10 | Bắt buộc | Tối thiểu 10 ngày/tháng bị hết data sớm | AND | BSS/OCS Batch CSV |
+| U05-B | quota_type | Loại quota data | enum | IN | DAILY | Bắt buộc | Chỉ dành cho gói data ngày/quota reset ngày | AND | BSS/OCS Batch CSV |
+| U05-B | current_plan | Gói data ngày đang dùng | string | IN, NOT IN | GOI_DATA_NGAY_10K | Tùy chọn | Nhắm gói ngày cụ thể cần nâng quota | AND | BSS/OCS Batch CSV |
+| U05-B | daily_quota_mb | Hạn mức data ngày của gói (MB) | integer | >=, <=, BETWEEN | 500 | Tùy chọn | Lọc gói ngày có quota thấp ≤ 500MB | AND | BSS/OCS Batch CSV |
 | U05-B | depletion_ratio | Tỷ lệ ngày hết data so với tổng ngày dùng | decimal | >= | 0.33 | Tùy chọn | Ít nhất 1/3 số ngày bị hết data | AND | BSS/OCS Batch CSV |
 | U05-B | avg_depletion_hour | Giờ trung bình hết data ngày (0–23) | integer | >=, <=, BETWEEN | 14 | Tùy chọn | Hết data trước 14h → pattern rõ ràng | AND | BSS/OCS Batch CSV |
-| U05-B | quota_type | Loại quota data | enum | IN | DAILY | Bắt buộc | Chỉ dành cho gói data ngày/quota reset ngày | AND | BSS/OCS Batch CSV |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -849,7 +858,9 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
+| U07 | old_sim_type | Loại SIM cũ trước khi đổi | enum | IN | PHYSICAL, ESIM | Tùy chọn | Lọc hướng đổi: vật lý → eSIM hay ngược lại | AND | BSS/CRM Batch CSV |
 | U07 | new_sim_type | Loại SIM mới | enum | IN | PHYSICAL, ESIM | Tùy chọn | Phân nhánh nội dung eSIM vs SIM vật lý | AND | BSS/CRM Batch CSV |
+| U07 | current_plan | Gói cước được giữ nguyên sau đổi SIM | string | IN, NOT IN | GOI_DATA_120K | Tùy chọn | Gợi ý addon phù hợp gói đang giữ nguyên | AND | BSS/CRM Batch CSV |
 | U07 | sim_change_reason | Lý do đổi SIM | enum | IN | LOST, DAMAGED, ESIM_CONVERSION, UPGRADE | Tùy chọn | Phân nhánh nội dung theo lý do đổi | AND | BSS/CRM Batch CSV |
 | U07 | is_same_msisdn | Giữ nguyên số sau khi đổi SIM | boolean | = | TRUE | Tùy chọn | Giữ số cũ → gợi ý khác so với đổi số | AND | BSS/CRM Batch CSV |
 
@@ -881,7 +892,9 @@
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
 | U08 | consecutive_renewals | Số lần gia hạn liên tiếp | integer | >=, <=, BETWEEN | 3 | Bắt buộc | Đạt mốc chuỗi gia hạn để vinh danh | AND | BSS/OCS Batch CSV |
-| U08 | package_code | Mã gói gia hạn | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Nhắm gói cụ thể | AND | BSS/OCS Batch CSV |
+| U08 | renewal_pattern | Kiểu chuỗi gia hạn | enum | IN | ON_TIME_ONLY, EARLY_ONLY, MIXED | Tùy chọn | Phân nhánh nội dung: đúng hạn / sớm hạn / hỗn hợp | AND | BSS/OCS Batch CSV |
+| U08 | loyalty_milestone | Mốc trung thành vừa đạt được | enum | IN | M3, M6, M12 | Tùy chọn | Lọc theo mốc để gắn ưu đãi đúng cấp độ | AND | BSS/OCS Batch CSV |
+| U08 | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_120K | Tùy chọn | Nhắm gói cụ thể khi vinh danh | AND | BSS/OCS Batch CSV |
 | U08 | renewal_amount | Tổng tiền gia hạn trong chuỗi (đồng) | decimal | >=, BETWEEN | 210000 | Tùy chọn | Vinh danh theo mức chi tiêu | AND | BSS/OCS Batch CSV |
 | U08 | subscriber_tenure_days | Tổng ngày gắn kết với mạng | integer | >=, BETWEEN | 90 | Tùy chọn | Kết hợp mốc thời gian gắn kết | AND | BSS/CRM |
 
