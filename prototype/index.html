@@ -3,54 +3,110 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CDP VNPost — Prototype v2</title>
+<title>CDP VNPost — Prototype v3</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
+  :root {
+    --brand: #F4B400; --brand-soft: #FEF7E0; --brand-2: #ffd44d;
+    --text: #1A1A1A; --text-2: #374151; --muted: #6B7280;
+    --border: #E5E7EB; --line: #F3F4F6; --bg: #F7F8FA; --bg-2: #fafbfc;
+    --success: #16A34A; --success-soft: #dcfce7;
+    --info: #2563EB; --info-soft: #dbeafe;
+    --warn: #d97706; --warn-soft: #fef9c3;
+    --danger: #DC2626; --danger-soft: #fee2e2;
+    --purple: #7c3aed; --purple-soft: #ede9fe;
+    --radius: 14px; --radius-sm: 8px;
+    --shadow-xs: 0 2px 6px rgba(17,24,39,.05);
+    --shadow-sm: 0 4px 14px rgba(17,24,39,.07);
+  }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: 'Inter', 'IBM Plex Sans', system-ui, sans-serif; background: #F7F8FA; color: #1A1A1A; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); }
   .tabular-nums { font-variant-numeric: tabular-nums; }
-  :focus-visible { outline: 2px solid #E30613; outline-offset: 2px; }
-  .sidebar-item:hover { background: #fef2f2; }
-  .sidebar-item.active { background: #fef2f2; color: #E30613; border-right: 3px solid #E30613; }
-  .sidebar-item.active svg { color: #E30613; }
-  .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-  .badge-green { background: #dcfce7; color: #16A34A; }
-  .badge-red { background: #fee2e2; color: #DC2626; }
-  .badge-yellow { background: #fef9c3; color: #d97706; }
-  .badge-blue { background: #dbeafe; color: #2563EB; }
-  .badge-gray { background: #f3f4f6; color: #6B7280; }
-  .badge-purple { background: #ede9fe; color: #7c3aed; }
-  .table-row:hover { background: #f9fafb; cursor: pointer; }
-  .score-bar { height: 6px; border-radius: 3px; background: #e5e7eb; }
+  :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+  /* Sidebar */
+  .sidebar-item { transition: background .15s; }
+  .sidebar-item:hover { background: var(--brand-soft); }
+  .sidebar-item.active { background: var(--brand-soft); color: #8a5a00; border-right: 3px solid var(--brand); }
+  .sidebar-item.active svg { color: #8a5a00; }
+  .sidebar-section-label { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #9CA3AF; padding: 10px 16px 4px; }
+
+  /* Badges */
+  .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .badge-green  { background: var(--success-soft); color: var(--success); }
+  .badge-red    { background: var(--danger-soft);  color: var(--danger); }
+  .badge-yellow { background: var(--warn-soft);    color: var(--warn); }
+  .badge-blue   { background: var(--info-soft);    color: var(--info); }
+  .badge-gray   { background: var(--line);         color: var(--muted); }
+  .badge-purple { background: var(--purple-soft);  color: var(--purple); }
+
+  /* Table */
+  .table-row:hover { background: #fffdf6; cursor: pointer; }
+
+  /* Score bar */
+  .score-bar { height: 6px; border-radius: 3px; background: var(--border); }
   .score-fill { height: 100%; border-radius: 3px; }
-  .tab-btn { padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #6B7280; }
-  .tab-btn.active { background: #E30613; color: white; }
-  .tab-btn:hover:not(.active) { background: #f3f4f6; }
-  .chart-bar { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .chart-bar-fill { width: 28px; border-radius: 4px 4px 0 0; }
-  .kpi-card { background: white; border-radius: 10px; padding: 16px 20px; border: 1px solid #E5E7EB; }
-  .panel { background: white; border-radius: 10px; border: 1px solid #E5E7EB; overflow: hidden; }
-  .section-title { font-size: 13px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
-  .field-label { font-size: 12px; color: #6B7280; margin-bottom: 2px; }
-  .field-value { font-size: 14px; color: #1A1A1A; font-weight: 500; }
-  .consent-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
-  .consent-in { background: #dcfce7; color: #16A34A; }
-  .consent-out { background: #fee2e2; color: #DC2626; }
-  .consent-unknown { background: #f3f4f6; color: #6B7280; }
+
+  /* Tabs */
+  .tab-btn { padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--muted); transition: all .15s; white-space: nowrap; }
+  .tab-btn.active { background: linear-gradient(180deg, var(--brand), #efb000); color: #1A1A1A; border-color: #e1ad1f; box-shadow: var(--shadow-xs); }
+  .tab-btn:hover:not(.active) { background: var(--line); color: var(--text); }
+  .tabs-strip { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .tabs-strip::-webkit-scrollbar { display: none; }
+
+  /* Cards & Panels */
+  .kpi-card { background: white; border-radius: var(--radius); padding: 16px 18px; border: 1px solid rgba(17,24,39,.06); box-shadow: var(--shadow-xs); }
+  .panel { background: white; border-radius: var(--radius); border: 1px solid rgba(17,24,39,.06); overflow: hidden; box-shadow: var(--shadow-xs); }
+
+  /* Typography */
+  .section-title { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+  .field-label { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+  .field-value { font-size: 14px; color: var(--text); font-weight: 500; }
+
+  /* Consent */
+  .consent-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 8px; font-size: 12px; font-weight: 700; }
+  .consent-in  { background: var(--success-soft); color: var(--success); }
+  .consent-out { background: var(--danger-soft);  color: var(--danger); }
+  .consent-unknown { background: var(--line); color: var(--muted); }
+
+  /* Timeline */
   .timeline-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
-  .rule-row { display: flex; align-items: center; gap: 8px; padding: 8px; background: #f9fafb; border-radius: 6px; }
-  .compare-match { background: #f0fdf4; }
-  .compare-diff { background: #fffbeb; }
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 50; }
-  .modal-box { background: white; border-radius: 12px; padding: 28px; width: 440px; max-width: 90vw; }
-  .gauge-outer { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
-  input, select { border: 1px solid #E5E7EB; border-radius: 6px; padding: 6px 10px; font-size: 13px; background: white; color: #1A1A1A; }
-  input:focus, select:focus { outline: 2px solid #E30613; outline-offset: 1px; border-color: transparent; }
-  .slide-panel { position: fixed; top: 0; right: 0; height: 100vh; width: 440px; max-width: 95vw; background: white; box-shadow: -4px 0 20px rgba(0,0,0,0.12); z-index: 40; overflow-y: auto; padding: 24px; }
-  .recharts-fake { display: flex; align-items: flex-end; gap: 3px; height: 80px; }
+
+  /* Rule builder */
+  .rule-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--bg-2); border-radius: 10px; border: 1px solid var(--border); }
+
+  /* Modals */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(2px); }
+  .modal-box { background: white; border-radius: 16px; padding: 28px; width: 440px; max-width: 90vw; box-shadow: var(--shadow-sm); }
+
+  /* Gauge */
+  .gauge-outer { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; }
+
+  /* Inputs */
+  input, select { border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font-size: 13px; background: white; color: var(--text); transition: border-color .15s; }
+  input:focus, select:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-color: transparent; }
+
+  /* Slide panel */
+  .slide-panel { position: fixed; top: 0; right: 0; height: 100vh; width: 440px; max-width: 95vw; background: white; box-shadow: -6px 0 28px rgba(0,0,0,.1); z-index: 40; overflow-y: auto; padding: 24px; }
+
+  /* Buttons */
+  .btn-primary { background: linear-gradient(180deg, var(--brand), #efb000); color: #1A1A1A; border: 1px solid #e1ad1f; border-radius: 10px; font-weight: 700; cursor: pointer; }
+  .btn-primary:hover { filter: brightness(1.04); }
+  .btn-ghost { background: var(--line); color: var(--text); border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* Info row (key-value) */
+  .info-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+  .info-row:last-child { border-bottom: none; }
+  .info-row span:first-child { color: var(--muted); font-size: 13px; }
+  .info-row b { text-align: right; font-size: 13px; }
+
+  /* Metadata strip */
+  .meta-strip { display: flex; gap: 16px; flex-wrap: wrap; padding: 10px 14px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; font-size: 12px; color: var(--muted); }
+  .meta-strip b { color: var(--text-2); }
 </style>
 </head>
 <body>
@@ -78,14 +134,14 @@ const ALERTS = [
 ];
 
 const CUSTOMERS = [
-  { uid:'UID-0000123456', name:'Nguyễn Thị Hương',         type:'INDIVIDUAL', group:'SME',        phone:'0901234567', orders:1275, revenue:'458.200.000', segment:'Khách hàng trung thành', status:'ACTIVE',   updated:'29/06/2026' },
-  { uid:'UID-0000987654', name:'Công ty TNHH TM ABC',      type:'BUSINESS',   group:'KHL',        phone:'0987654321', orders:18450,revenue:'6.820.000.000',segment:'KHL giá trị cao',        status:'ACTIVE',   updated:'29/06/2026' },
-  { uid:'UID-0000456789', name:'Phạm Minh Tuấn',           type:'INDIVIDUAL', group:'B2C',        phone:'0978111222', orders:86,   revenue:'9.400.000',   segment:'Có nguy cơ rời bỏ',      status:'ACTIVE',   updated:'26/06/2026' },
-  { uid:'UID-0000334411', name:'Trần Quốc Bảo',            type:'INDIVIDUAL', group:'B2C',        phone:'0905556677', orders:412,  revenue:'78.500.000',  segment:'Khách hàng trung thành',  status:'ACTIVE',   updated:'28/06/2026' },
-  { uid:'UID-0000220088', name:'Cửa hàng Mẹ & Bé Sunny',  type:'BUSINESS',   group:'SME',        phone:'0933221100', orders:2310, revenue:'612.000.000', segment:'Chủ shop hoạt động cao',  status:'ACTIVE',   updated:'29/06/2026' },
-  { uid:'UID-0000771122', name:'Lê Thị Hằng',              type:'INDIVIDUAL', group:'B2C',        phone:'0918887766', orders:24,   revenue:'1.800.000',   segment:'Khách hàng mới',          status:'ACTIVE',   updated:'22/06/2026' },
-  { uid:'UID-0000559900', name:'Công ty CP Logistics XYZ', type:'BUSINESS',   group:'KHL',        phone:'0966554433', orders:9870, revenue:'3.410.000.000',segment:'KHL giá trị cao',        status:'ACTIVE',   updated:'29/06/2026' },
-  { uid:'UID-0000662200', name:'Đỗ Văn Khải',              type:'INDIVIDUAL', group:'B2C',        phone:'0944332211', orders:153,  revenue:'19.200.000',  segment:'Có nguy cơ rời bỏ',       status:'INACTIVE', updated:'28/04/2026' },
+  { uid:'UID-0000123456', name:'Nguyễn Thị Hương',         type:'INDIVIDUAL', group:'SME',        phone:'0901234567', orders:1275, revenue:'458.200.000', segment:'Khách hàng trung thành', status:'ACTIVE',   updated:'29/06/2026', pillar:'BCCP + Logistics + TCBC + TMĐT' },
+  { uid:'UID-0000987654', name:'Công ty TNHH TM ABC',      type:'BUSINESS',   group:'KHL',        phone:'0987654321', orders:18450,revenue:'6.820.000.000',segment:'KHL giá trị cao',        status:'ACTIVE',   updated:'29/06/2026', pillar:'Đủ 7 mảng' },
+  { uid:'UID-0000456789', name:'Phạm Minh Tuấn',           type:'INDIVIDUAL', group:'B2C',        phone:'0978111222', orders:86,   revenue:'9.400.000',   segment:'Có nguy cơ rời bỏ',      status:'ACTIVE',   updated:'26/06/2026', pillar:'BCCP + HCC + MVNO' },
+  { uid:'UID-0000334411', name:'Trần Quốc Bảo',            type:'INDIVIDUAL', group:'B2C',        phone:'0905556677', orders:412,  revenue:'78.500.000',  segment:'Khách hàng trung thành',  status:'ACTIVE',   updated:'28/06/2026', pillar:'BCCP' },
+  { uid:'UID-0000220088', name:'Cửa hàng Mẹ & Bé Sunny',  type:'BUSINESS',   group:'SME',        phone:'0933221100', orders:2310, revenue:'612.000.000', segment:'Chủ shop hoạt động cao',  status:'ACTIVE',   updated:'29/06/2026', pillar:'BCCP + TMĐT' },
+  { uid:'UID-0000771122', name:'Lê Thị Hằng',              type:'INDIVIDUAL', group:'B2C',        phone:'0918887766', orders:24,   revenue:'1.800.000',   segment:'Khách hàng mới',          status:'ACTIVE',   updated:'22/06/2026', pillar:'HCC' },
+  { uid:'UID-0000559900', name:'Công ty CP Logistics XYZ', type:'BUSINESS',   group:'KHL',        phone:'0966554433', orders:9870, revenue:'3.410.000.000',segment:'KHL giá trị cao',        status:'ACTIVE',   updated:'29/06/2026', pillar:'Logistics + BCCP' },
+  { uid:'UID-0000662200', name:'Đỗ Văn Khải',              type:'INDIVIDUAL', group:'B2C',        phone:'0944332211', orders:153,  revenue:'19.200.000',  segment:'Có nguy cơ rời bỏ',       status:'INACTIVE', updated:'28/04/2026', pillar:'BCCP' },
 ];
 
 // Dữ liệu nhóm hồ sơ — mỗi nhóm có N hồ sơ từ N nguồn khác nhau
@@ -127,6 +183,9 @@ const GROUPS = [
 const KH_DETAIL = {
   'UID-0000123456': {
     uid:'UID-0000123456', type:'INDIVIDUAL', group:'SME', status:'ACTIVE', name:'Nguyễn Thị Hương',
+    activePillars:['BCCP','Logistics','TCBC','TMDT'],
+    activeSystems:['MyVNPost App', 'MPITS', 'PayPost'],
+    lastInteraction:'24/06/2026 09:12 (App)',
     phone:'0901234567', email:'huong.nguyen@gmail.com', cccd:'012********', postId:'PID-889234',
     crmId:'CRM-55120', postOffice:'BĐ Cầu Giấy', completeness:82,
     gender:'Nữ', birthDate:'15/03/1988', customerCode:'CUS-SME-00892',
@@ -216,6 +275,9 @@ const KH_DETAIL = {
   },
   'UID-0000987654': {
     uid:'UID-0000987654', type:'BUSINESS', group:'KHL', status:'ACTIVE', name:'Công ty TNHH Thương mại ABC',
+    activePillars:['BCCP','TCBC','PPBL','HCC','Logistics','TMDT','MVNO'],
+    activeSystems:['Portal KHL', 'MPITS', 'PayPost', 'CRM'],
+    lastInteraction:'24/06/2026 10:00 (API)',
     phone:'0987654321', email:'info@abc.vn', cccd:'N/A', postId:'N/A',
     gender:'—', birthDate:'—', customerCode:'CUS-KHL-00156',
     lastOrder:{ id:'ORD-1781700012240', amount:'12.400.000', date:'24/06/2026', type:'Bưu kiện loạt' },
@@ -310,6 +372,9 @@ const KH_DETAIL = {
   },
   'UID-0000456789': {
     uid:'UID-0000456789', type:'INDIVIDUAL', group:'B2C', status:'ACTIVE', name:'Phạm Minh Tuấn',
+    activePillars:['BCCP','HCC','MVNO'],
+    activeSystems:['CAS', 'PNS/DingDong'],
+    lastInteraction:'21/06/2026 13:00 (Call Center)',
     phone:'0978111222', email:'Chưa có dữ liệu', cccd:'Chưa có dữ liệu', postId:'PID-220145',
     gender:'Nam', birthDate:'01/01/1995', customerCode:'CUS-B2C-04562',
     lastOrder:{ id:'ORD-1781600088123', amount:'85.000', date:'18/06/2026', type:'Hoàn trả' },
@@ -378,6 +443,19 @@ const SEGMENTS = [
   { name:'Khách hàng mới',            desc:'KH tạo tài khoản hoặc phát sinh giao dịch đầu tiên trong vòng 30 ngày gần nhất',           count:'4.430', type:'Động', updated:'29/06/2026', status:'Đang hoạt động' },
 ];
 
+// 7 mảng dịch vụ chính của VNPost dùng cho Dashboard và tab "Hoạt động theo mảng dịch vụ chính".
+// Lưu ý: "Hệ thống sử dụng" của PPBL và TMĐT là suy luận nghiệp vụ hợp lý dựa trên đặc thù VNPost,
+// cần đối chiếu lại với chủ nghiệp vụ/kiến trúc hệ thống trước khi chốt vào tài liệu chính thức.
+const PILLARS = [
+  { id:'BCCP',      label:'BCCP — Bưu chính chuyển phát', system:'MPITS, CAS, PNS/DingDong',       highlight:['Gửi/nhận đơn', 'Thu hộ COD', 'Tracking', 'Giao theo tuyến'] },
+  { id:'TCBC',      label:'TCBC — Tài chính bưu chính',   system:'PayPost',                         highlight:['Thu hộ · chi hộ', 'Chuyển tiền', 'Thanh toán tại quầy'] },
+  { id:'PPBL',      label:'PPBL — Phân phối bán lẻ',      system:'POS tại quầy',                    highlight:['Bán tại quầy', 'Phân phối qua đại lý'] },
+  { id:'HCC',       label:'HCC — Hành chính công',        system:'Cổng HCC, Một cửa quốc gia',      highlight:['Nộp hồ sơ', 'Trả kết quả tại nhà', 'Tra cứu thủ tục'] },
+  { id:'Logistics', label:'Logistics',                     system:'TMS / WMS',                       highlight:['Kho bãi', 'Fulfillment', 'Giao đa điểm'] },
+  { id:'TMDT',      label:'TMĐT — Thương mại điện tử',    system:'Sàn TMĐT, PNS/DingDong',          highlight:['Shop online', 'Giao chặng cuối', 'Quản lý hoàn'] },
+  { id:'MVNO',      label:'MVNO — Mạng di động ảo',       system:'BSS, CRM MVNO',                   highlight:['Đăng ký gói cước', 'Nạp cước', 'Sử dụng data'] },
+];
+
 // ============================================================
 // UTILS
 // ============================================================
@@ -398,6 +476,7 @@ const GROUP_LABEL = { SME:'SME', KHL:'KHL', B2C:'Cá nhân thường' };
 const CONFIDENCE_LABEL = { HIGH:'Cao', MEDIUM:'Trung bình', LOW:'Thấp' };
 const ALIAS_TYPE_LABEL = { PHONE:'SĐT', POST_ID:'Post ID', CRM_ID:'Mã CRM', TAX_ID:'MST', KHL_CODE:'Mã KHL', USER_APP_ID:'ID App', EMAIL:'Email' };
 const ADDR_TYPE_LABEL   = { SENDER:'Địa chỉ gửi', RECEIVER:'Địa chỉ nhận', BUSINESS:'Trụ sở', WAREHOUSE:'Kho hàng' };
+const ROLE_LABEL = { SENDER:'Người gửi', RECEIVER:'Người nhận', SHOP_OWNER:'Chủ shop', KHL:'Khách hàng lớn' };
 const SEGMENT_RISK = ['Có nguy cơ rời bỏ','Tỷ lệ hoàn cao','Có nguy cơ gian lận'];
 const SEGMENT_GREEN = ['Khách hàng trung thành','KHL giá trị cao','Chủ shop hoạt động cao'];
 const segBadgeColor = (s) => SEGMENT_RISK.some(r => s.includes(r.slice(0,6))) || s.includes('rời bỏ') || s.includes('hoàn') || s.includes('gian lận') ? 'badge-red' : SEGMENT_GREEN.some(g => s.includes(g.slice(0,6))) || s.includes('trung thành') || s.includes('KHL') || s.includes('shop') ? 'badge-green' : 'badge-blue';
@@ -459,60 +538,181 @@ function Icon({ name }) {
     filter: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>,
     plus: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
     trash: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>,
+    dashboard: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>,
   };
   return icons[name] || null;
 }
 
 function Sidebar({ active, onNav }) {
-  const items = [
-    { key:'customers',label:'Khách hàng', icon:'users'   },
-    { key:'segments', label:'Phân khúc',  icon:'segment' },
+  const mainItems = [
+    { key:'dashboard', label:'Dashboard tổng quan', icon:'dashboard' },
+    { key:'customers', label:'Danh sách khách hàng', icon:'users' },
+    { key:'segments',  label:'Phân khúc',  icon:'segment' },
   ];
-  // kafka và c360 ẩn khỏi sidebar — kafka giữ code, c360 mở từ Customer List
   return (
-    <aside style={{ width:220, flexShrink:0, background:'white', borderRight:'1px solid #E5E7EB', display:'flex', flexDirection:'column', height:'100vh', position:'sticky', top:0 }}>
-      <div style={{ padding:'20px 16px 12px', borderBottom:'1px solid #E5E7EB' }}>
-        <div className="flex items-center gap-2">
-          <div style={{ width:32, height:32, background:'#E30613', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <span style={{ color:'white', fontWeight:800, fontSize:14 }}>C</span>
+    <aside style={{ width:228, flexShrink:0, background:'white', borderRight:'1px solid var(--border)', display:'flex', flexDirection:'column', height:'100vh', position:'sticky', top:0 }}>
+      {/* Brand */}
+      <div style={{ padding:'18px 16px 14px', borderBottom:'1px solid var(--border)' }}>
+        <div className="flex items-center gap-3">
+          <div style={{ width:38, height:38, background:'linear-gradient(180deg,#F4B400,#efb000)', borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 6px rgba(244,180,0,.35)' }}>
+            <span style={{ color:'#1A1A1A', fontWeight:900, fontSize:16 }}>C</span>
           </div>
           <div>
-            <div style={{ fontWeight:700, fontSize:13, color:'#1A1A1A' }}>CDP VNPost</div>
-            <div style={{ fontSize:11, color:'#6B7280' }}>Hệ thống Nội bộ</div>
+            <div style={{ fontWeight:800, fontSize:13, color:'var(--text)' }}>CDP VNPost</div>
+            <div style={{ fontSize:11, color:'var(--muted)' }}>Hệ thống nội bộ</div>
           </div>
         </div>
       </div>
-      <nav style={{ flex:1, padding:'8px 0' }}>
-        {items.map(it => (
+      {/* Nav */}
+      <nav style={{ flex:1, padding:'10px 8px', overflowY:'auto' }}>
+        <div className="sidebar-section-label">Điều hướng chính</div>
+        {mainItems.map(it => (
           <button key={it.key} onClick={() => onNav(it.key)}
-            className={`sidebar-item w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-600 cursor-pointer border-0 bg-transparent ${active===it.key ? 'active':''}`}
-            style={{ transition:'all .15s' }}>
+            className={`sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-gray-600 cursor-pointer border-0 bg-transparent rounded-lg mb-0.5 ${active===it.key ? 'active':''}`}>
             <Icon name={it.icon} />
             <span>{it.label}</span>
           </button>
         ))}
       </nav>
-      <div style={{ padding:'12px 16px', borderTop:'1px solid #E5E7EB', fontSize:12, color:'#6B7280' }}>
-        <div className="font-medium text-gray-800">Admin VNPost</div>
+      {/* Footer */}
+      <div style={{ padding:'12px 16px', borderTop:'1px solid var(--border)', fontSize:12, color:'var(--muted)' }}>
+        <div style={{ fontWeight:700, color:'var(--text-2)', marginBottom:2 }}>Admin VNPost</div>
         <div>admin@vnpost.vn</div>
       </div>
     </aside>
   );
 }
 
-function Header({ title, onNav }) {
+const NAV_META = {
+  dashboard: 'Toàn cảnh dữ liệu khách hàng, vận hành và phân khúc',
+  customers:  'Tìm kiếm và lọc danh sách khách hàng theo nhiều tiêu chí',
+  segments:   'Xây dựng và quản lý phân khúc động theo điều kiện CDP',
+  identity:   'Rà soát, xác nhận và phê duyệt hợp nhất định danh đa nguồn',
+  c360:       'Hồ sơ khách hàng 360° — toàn bộ dữ liệu từ mọi hệ thống nguồn',
+  kafka:      'Giám sát luồng dữ liệu Kafka theo thời gian thực',
+};
+
+function Header({ title, nav }) {
   return (
-    <header style={{ background:'white', borderBottom:'1px solid #E5E7EB', padding:'0 24px', height:56, display:'flex', alignItems:'center', gap:16, position:'sticky', top:0, zIndex:10 }}>
-      <div style={{ flex:1, fontWeight:700, fontSize:16, color:'#1A1A1A' }}>{title}</div>
-      <div className="flex items-center gap-2" style={{ background:'#F7F8FA', border:'1px solid #E5E7EB', borderRadius:8, padding:'6px 12px', flex:'0 0 240px' }}>
-        <Icon name="search" />
-        <input placeholder="Tìm kiếm mã KH / tên / SĐT / MST..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
+    <header style={{ background:'white', borderBottom:'1px solid var(--border)', padding:'0 24px', height:64, display:'flex', alignItems:'center', gap:16, position:'sticky', top:0, zIndex:10, boxShadow:'0 1px 3px rgba(0,0,0,.04)' }}>
+      <div style={{ flex:1 }}>
+        <div style={{ fontWeight:800, fontSize:16, color:'var(--text)' }}>{title}</div>
+        {NAV_META[nav] && <div style={{ fontSize:12, color:'var(--muted)', marginTop:2 }}>{NAV_META[nav]}</div>}
       </div>
-      <button style={{ background:'none', border:'none', cursor:'pointer', color:'#6B7280', position:'relative' }}>
+      <div className="flex items-center gap-2" style={{ background:'var(--bg)', border:'1px solid var(--border)', borderRadius:12, padding:'7px 13px', flex:'0 0 260px', boxShadow:'var(--shadow-xs)' }}>
+        <Icon name="search" />
+        <input placeholder="Tìm mã KH / tên / SĐT / MST..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
+      </div>
+      <button style={{ background:'white', border:'1px solid var(--border)', borderRadius:10, width:40, height:40, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', position:'relative', boxShadow:'var(--shadow-xs)' }}>
         <Icon name="bell" />
-        <span style={{ position:'absolute', top:-4, right:-4, width:16, height:16, background:'#DC2626', color:'white', borderRadius:'50%', fontSize:10, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center' }}>3</span>
+        <span style={{ position:'absolute', top:-4, right:-4, width:17, height:17, background:'var(--brand)', color:'#1A1A1A', borderRadius:'50%', fontSize:10, fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid white' }}>3</span>
       </button>
     </header>
+  );
+}
+
+// ============================================================
+// CN0 — DASHBOARD TỔNG QUAN
+// ============================================================
+function DashboardScreen() {
+  const activeSegments = SEGMENTS.filter(s => s.status === 'Đang hoạt động');
+  const topSegments = [...SEGMENTS]
+    .sort((a,b) => parseInt(b.count.replace(/\./g,'')) - parseInt(a.count.replace(/\./g,'')))
+    .slice(0,4);
+
+  const kpis = [
+    { label:'Tổng hồ sơ nguồn',            value:'12,45 triệu', sub:'Từ 14 hệ thống nguồn kết nối',              color:'var(--brand)' },
+    { label:'Hồ sơ đã hợp nhất',           value:'8,92 triệu',  sub:'71,7% tổng hồ sơ nguồn',                   color:'var(--success)' },
+    { label:'Hồ sơ chưa hợp nhất',         value:'3,53 triệu',  sub:'28,3% tổng hồ sơ nguồn — còn tồn tại rời rạc', color:'var(--warn)' },
+    { label:'Phân khúc đang chạy',         value:String(activeSegments.length), sub:`/${SEGMENTS.length} phân khúc đang hoạt động`, color:'var(--info)' },
+    { label:'Khách hàng thuộc phân khúc',  value:'20.450',      sub:'Tổng KH đang được gắn vào các phân khúc',  color:'var(--purple)' },
+    { label:'Nguồn dữ liệu realtime',      value:'7/14',        sub:'Hệ thống nguồn cập nhật theo thời gian thực', color:'var(--text-2)' },
+  ];
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:20 }}>
+
+      {/* KPI tổng quan */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:12 }}>
+        {kpis.map((k,i) => (
+          <div key={i} className="kpi-card" style={{ borderTop:`3px solid ${k.color}`, transition:'transform .15s, box-shadow .15s' }}
+            onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='var(--shadow-sm)'}}
+            onMouseLeave={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='var(--shadow-xs)'}}>
+            <div className="tabular-nums" style={{ fontSize:22, fontWeight:900, color:k.color, letterSpacing:'-.02em' }}>{k.value}</div>
+            <div style={{ fontSize:12, fontWeight:700, color:'var(--text)', marginTop:5 }}>{k.label}</div>
+            <div style={{ fontSize:11, color:'var(--muted)', marginTop:3, lineHeight:1.4 }}>{k.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display:'grid', gridTemplateColumns:'1.3fr 0.9fr', gap:16 }}>
+        {/* Toàn cảnh theo mảng dịch vụ chính */}
+        <div className="panel" style={{ padding:20 }}>
+          <div style={{ fontWeight:700, fontSize:14, marginBottom:4 }}>Toàn cảnh theo mảng dịch vụ chính</div>
+          <div style={{ fontSize:12, color:'#6B7280', marginBottom:12 }}>Các mảng dịch vụ đang được hợp nhất dữ liệu trong CDP và hệ thống nguồn tương ứng.</div>
+          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+            <thead>
+              <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+                {['Mảng dịch vụ','Hệ thống sử dụng','Hoạt động nổi bật'].map(h => (
+                  <th key={h} style={{ padding:'8px 10px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {PILLARS.map(p => (
+                <tr key={p.id} style={{ borderBottom:'1px solid var(--line)' }}>
+                  <td style={{ padding:'9px 10px', fontWeight:700, fontSize:13 }}>{p.label}</td>
+                  <td style={{ padding:'9px 10px', color:'var(--muted)', fontSize:12, whiteSpace:'nowrap' }}>{p.system}</td>
+                  <td style={{ padding:'9px 10px' }}>
+                    <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+                      {p.highlight.map((h,i) => (
+                        <span key={i} style={{ display:'inline-block', padding:'2px 8px', borderRadius:6, background:'var(--bg)', border:'1px solid var(--border)', fontSize:11, color:'var(--text-2)', whiteSpace:'nowrap' }}>{h}</span>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Chất lượng dữ liệu hợp nhất */}
+        <div className="panel" style={{ padding:20 }}>
+          <div style={{ fontWeight:700, fontSize:14, marginBottom:12 }}>Chất lượng dữ liệu hợp nhất</div>
+          <div style={{ textAlign:'center', marginBottom:14 }}>
+            <div style={{ fontSize:30, fontWeight:800, color:'#F4B400' }} className="tabular-nums">65%</div>
+            <div style={{ fontSize:12, color:'#6B7280' }}>Mức độ đầy đủ dữ liệu trung bình toàn hệ thống</div>
+            <div className="score-bar" style={{ marginTop:8 }}>
+              <div className="score-fill" style={{ width:'65%', background:'#F4B400' }}></div>
+            </div>
+          </div>
+          <div>
+            {[
+              ['Tự động hợp nhất thành công', '87%', '#16A34A'],
+              ['Trường dữ liệu xung đột cần xử lý', '146.220', '#F59E0B'],
+              ['Dữ liệu có sự đồng ý hợp lệ', '72%', '#1A1A1A'],
+              ['Nguồn cập nhật theo thời gian thực', '7 / 14', '#1A1A1A'],
+            ].map(([l,v,c],i) => (
+              <div key={i} style={{ display:'flex', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid #F3F4F6' }}>
+                <span style={{ fontSize:12, color:'#6B7280' }}>{l}</span>
+                <span className="tabular-nums" style={{ fontSize:13, fontWeight:700, color:c }}>{v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Top phân khúc quan trọng */}
+      <div className="panel" style={{ padding:20 }}>
+        <div style={{ fontWeight:800, fontSize:14, marginBottom:14 }}>Top phân khúc quan trọng</div>
+        {topSegments.map((s,i) => (
+          <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 0', borderBottom: i<topSegments.length-1 ? '1px solid var(--line)' : 'none' }}>
+            <span className={`badge ${segBadgeColor(s.name)}`}>{s.name}</span>
+            <span className="tabular-nums" style={{ fontSize:13, fontWeight:700, color:'var(--text-2)' }}>{s.count} KH</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -565,7 +765,7 @@ function KafkaScreen() {
           <div style={{ display:'flex', alignItems:'flex-end', gap:4, height:100, padding:'0 4px' }}>
             {chartData.map((v,i) => (
               <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:2 }}>
-                <div style={{ width:'100%', height: `${(v/500)*90}px`, background:i>=10 ? '#DC2626' : '#E30613', borderRadius:'3px 3px 0 0', opacity: i>=10 ? 0.5 : 0.85 }}></div>
+                <div style={{ width:'100%', height: `${(v/500)*90}px`, background:i>=10 ? '#DC2626' : '#F4B400', borderRadius:'3px 3px 0 0', opacity: i>=10 ? 0.5 : 0.85 }}></div>
               </div>
             ))}
           </div>
@@ -573,7 +773,7 @@ function KafkaScreen() {
             <span>-{timeRange}</span><span>Hiện tại</span>
           </div>
           <div className="flex gap-4 mt-3" style={{ fontSize:12, color:'#6B7280' }}>
-            <span><span style={{ display:'inline-block', width:10, height:10, background:'#E30613', borderRadius:2, marginRight:4 }}></span>Thành công</span>
+            <span><span style={{ display:'inline-block', width:10, height:10, background:'#F4B400', borderRadius:2, marginRight:4 }}></span>Thành công</span>
             <span><span style={{ display:'inline-block', width:10, height:10, background:'#DC2626', opacity:.5, borderRadius:2, marginRight:4 }}></span>Lỗi</span>
           </div>
         </div>
@@ -672,8 +872,8 @@ function KafkaScreen() {
             </div>
           )}
           <div className="mt-5 flex gap-2">
-            <button style={{ flex:1, padding:'8px', background:'#E30613', color:'white', border:'none', borderRadius:7, fontSize:13, fontWeight:600, cursor:'pointer' }}>Retry consumer</button>
-            <button style={{ flex:1, padding:'8px', background:'#f3f4f6', color:'#1A1A1A', border:'none', borderRadius:7, fontSize:13, fontWeight:600, cursor:'pointer' }}>Tạm dừng</button>
+            <button className="btn-primary" style={{ flex:1, padding:'9px', fontSize:13 }}>Retry consumer</button>
+            <button className="btn-ghost" style={{ flex:1, padding:'9px', fontSize:13 }}>Tạm dừng</button>
           </div>
         </div>
       )}
@@ -687,6 +887,8 @@ function KafkaScreen() {
 function CustomerListScreen({ onC360, initSegment }) {
   const [search, setSearch] = React.useState('');
   const [typeFilter, setTypeFilter] = React.useState('ALL');
+  const [groupFilter, setGroupFilter] = React.useState('ALL');
+  const [pillarFilter, setPillarFilter] = React.useState('ALL');
   const [statusFilter, setStatusFilter] = React.useState('ALL');
   const [segmentFilter, setSegmentFilter] = React.useState(initSegment || 'ALL');
 
@@ -694,31 +896,42 @@ function CustomerListScreen({ onC360, initSegment }) {
     const q = search.toLowerCase();
     const matchQ = !q || c.name.toLowerCase().includes(q) || c.uid.toLowerCase().includes(q) || c.phone.includes(q);
     const matchT = typeFilter === 'ALL' || c.type === typeFilter;
+    const matchG = groupFilter === 'ALL' || c.group === groupFilter;
+    const matchP = pillarFilter === 'ALL' || c.pillar.toUpperCase().includes(pillarFilter.toUpperCase());
     const matchS = statusFilter === 'ALL' || c.status === statusFilter;
     const matchSeg = segmentFilter === 'ALL' || c.segment === segmentFilter;
-    return matchQ && matchT && matchS && matchSeg;
+    return matchQ && matchT && matchG && matchP && matchS && matchSeg;
   });
 
   return (
     <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
       {/* Toolbar */}
-      <div className="panel" style={{ padding:16 }}>
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2" style={{ background:'#F7F8FA', border:'1px solid #E5E7EB', borderRadius:8, padding:'6px 12px', flex:'1', minWidth:200 }}>
+      <div className="panel" style={{ padding:'14px 16px' }}>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2" style={{ background:'var(--bg)', border:'1px solid var(--border)', borderRadius:10, padding:'7px 13px', flex:'1', minWidth:220, boxShadow:'var(--shadow-xs)' }}>
             <Icon name="search" />
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tìm theo mã KH, tên khách hàng..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tìm mã KH, tên, SĐT..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
           </div>
-          <select value={typeFilter} onChange={e=>setTypeFilter(e.target.value)} style={{ fontSize:13 }}>
+          <span style={{ fontSize:12, color:'var(--muted)', whiteSpace:'nowrap' }}>Lọc:</span>
+          <select value={typeFilter} onChange={e=>setTypeFilter(e.target.value)} style={{ fontSize:12 }}>
             <option value="ALL">Tất cả loại</option>
             <option value="INDIVIDUAL">Cá nhân</option>
             <option value="BUSINESS">Doanh nghiệp</option>
           </select>
-          <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)} style={{ fontSize:13 }}>
+          <select value={groupFilter} onChange={e=>setGroupFilter(e.target.value)} style={{ fontSize:12 }}>
+            <option value="ALL">Tất cả nhóm</option>
+            {Object.keys(GROUP_LABEL).map(g => <option key={g} value={g}>{GROUP_LABEL[g]}</option>)}
+          </select>
+          <select value={pillarFilter} onChange={e=>setPillarFilter(e.target.value)} style={{ fontSize:12 }}>
+            <option value="ALL">Tất cả mảng dịch vụ</option>
+            {PILLARS.map(p => <option key={p.id} value={p.id}>{p.id} — {p.label.split('—')[1]?.trim()||p.label}</option>)}
+          </select>
+          <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)} style={{ fontSize:12 }}>
             <option value="ALL">Tất cả trạng thái</option>
             <option value="ACTIVE">Đang hoạt động</option>
             <option value="INACTIVE">Không hoạt động</option>
           </select>
-          <select value={segmentFilter} onChange={e=>setSegmentFilter(e.target.value)} style={{ fontSize:13 }}>
+          <select value={segmentFilter} onChange={e=>setSegmentFilter(e.target.value)} style={{ fontSize:12 }}>
             <option value="ALL">Tất cả phân khúc</option>
             {SEGMENTS.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
           </select>
@@ -727,11 +940,12 @@ function CustomerListScreen({ onC360, initSegment }) {
 
       {/* Table */}
       <div className="panel">
+        <div style={{ overflowX:'auto' }}>
         <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
           <thead>
             <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
-              {['Mã khách hàng','Tên / Công ty','Loại','Nhóm','SĐT','Tổng đơn','Doanh thu','Phân khúc','Trạng thái','Cập nhật'].map(h => (
-                <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', whiteSpace:'nowrap' }}>{h}</th>
+              {['Mã khách hàng','Tên / Công ty','Loại','Nhóm','Mảng dịch vụ chính','SĐT','Tổng đơn','Doanh thu 12 tháng','Phân khúc','Trạng thái','Cập nhật'].map(h => (
+                <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:800, color:'var(--muted)', whiteSpace:'nowrap', background:'var(--bg-2)', letterSpacing:'.03em' }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -743,7 +957,8 @@ function CustomerListScreen({ onC360, initSegment }) {
                 <td style={{ padding:'10px 12px' }}>
                   <span className={`badge ${c.type==='INDIVIDUAL' ? 'badge-blue':'badge-purple'}`}>{c.type==='INDIVIDUAL' ? 'Cá nhân':'Doanh nghiệp'}</span>
                 </td>
-                <td style={{ padding:'10px 12px' }}><span className="badge badge-gray">{c.group}</span></td>
+                <td style={{ padding:'10px 12px' }}><span className="badge badge-gray">{GROUP_LABEL[c.group]||c.group}</span></td>
+                <td style={{ padding:'10px 12px', fontSize:12, fontWeight:600, color:'#374151', whiteSpace:'nowrap' }}>{c.pillar}</td>
                 <td style={{ padding:'10px 12px', fontFamily:'monospace' }}>{c.phone.slice(0,3)+'***'+c.phone.slice(-3)}</td>
                 <td style={{ padding:'10px 12px', textAlign:'right' }} className="tabular-nums">{c.orders.toLocaleString()}</td>
                 <td style={{ padding:'10px 12px', textAlign:'right', fontWeight:600 }} className="tabular-nums">{c.revenue} ₫</td>
@@ -756,6 +971,7 @@ function CustomerListScreen({ onC360, initSegment }) {
             ))}
           </tbody>
         </table>
+        </div>
         <div style={{ padding:'10px 16px', borderTop:'1px solid #F3F4F6', fontSize:12, color:'#6B7280' }}>
           Hiển thị {filtered.length} / {CUSTOMERS.length} khách hàng
         </div>
@@ -839,7 +1055,7 @@ function IdentityScreen({ onC360 }) {
                 <span className="badge badge-blue">{g.matchKey}</span>
                 {g.warn && <span className="badge badge-red">⚠️ Có conflict</span>}
                 <span style={{ marginLeft:'auto', fontSize:12, color:'#6B7280' }}>{g.profiles.length} nguồn</span>
-                <span style={{ fontSize:12, color:'#E30613', fontWeight:600 }}>Xem chi tiết →</span>
+                <span style={{ fontSize:12, color:'#8a5a00', fontWeight:600 }}>Xem chi tiết →</span>
               </div>
               {/* Card grid nguồn — preview nhỏ */}
               <div style={{ padding:16, display:'flex', gap:10, flexWrap:'wrap' }}>
@@ -966,7 +1182,7 @@ function IdentityScreen({ onC360 }) {
               {modal==='later' && 'Nhóm vẫn còn trong danh sách chờ.'}
             </div>
             <button onClick={() => { setModal(null); setSelectedGroup(null); }}
-              style={{ width:'100%', padding:'10px', background:'#E30613', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer' }}>
+              className="btn-primary" style={{ width:'100%', padding:'10px', fontSize:14 }}>
               Đóng
             </button>
           </div>
@@ -1112,17 +1328,17 @@ function IdentityScreen({ onC360 }) {
         <div style={{ fontSize:12, color:'#6B7280', marginBottom:12 }}>
           Quyết định của bạn được ghi nhận và BE xử lý merge. BE tự chọn Hồ sơ chuẩn master và ưu tiên field theo rule nguồn dữ liệu.
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <button onClick={() => handleDecision('confirmed')}
-            style={{ flex:2, padding:'11px', background:'#16A34A', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:700, cursor:'pointer' }}>
+            style={{ flex:2, padding:'11px', background:'var(--success)', color:'white', border:'none', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:'0 2px 6px rgba(22,163,74,.25)' }}>
             ✓ Cùng người — Xác nhận merge {selectedGroup.profiles.length} hồ sơ
           </button>
           <button onClick={() => handleDecision('different')}
-            style={{ flex:2, padding:'11px', background:'#f3f4f6', color:'#1A1A1A', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer' }}>
+            className="btn-ghost" style={{ flex:2, padding:'11px', fontSize:13 }}>
             ✗ Tách nhóm — Không phải cùng người
           </button>
           <button onClick={() => handleDecision('later')}
-            style={{ flex:1, padding:'11px', background:'#f3f4f6', color:'#6B7280', border:'none', borderRadius:8, fontSize:13, cursor:'pointer' }}>
+            style={{ flex:1, padding:'11px', background:'transparent', color:'var(--muted)', border:'1px solid var(--border)', borderRadius:10, fontSize:12, cursor:'pointer' }}>
             Để sau
           </button>
         </div>
@@ -1148,6 +1364,7 @@ const UNMERGE_REQUESTS = [
 function Customer360Screen({ uid, onBack }) {
   const [role, setRole] = React.useState('Admin');
   const [tab, setTab] = React.useState('overview');
+  const [pillarSubTab, setPillarSubTab] = React.useState(null);
   const [sourceTab, setSourceTab] = React.useState('compare');
   const kh = KH_DETAIL[uid] || KH_DETAIL['UID-0000123456'];
 
@@ -1170,6 +1387,7 @@ function Customer360Screen({ uid, onBack }) {
     { key:'mergehist',  label:'Hồ sơ đa nguồn' },
     { key:'address',    label:'Địa chỉ' },
     ...(kh.type==='BUSINESS' ? [{ key:'business', label:'Doanh nghiệp' }] : []),
+    { key:'pillars',    label:'Hoạt động theo mảng dịch vụ chính' },
     { key:'transaction',label:'GD & COD' },
     { key:'behavior',   label:'Hành vi số' },
     { key:'cskh',       label:'CSKH' },
@@ -1192,7 +1410,7 @@ function Customer360Screen({ uid, onBack }) {
       {/* Header card */}
       <div className="panel" style={{ padding:20 }}>
         <div className="flex items-start gap-4">
-          <div style={{ width:56, height:56, borderRadius:12, background:'#E30613', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, fontWeight:800, flexShrink:0 }}>
+          <div style={{ width:60, height:60, borderRadius:16, background:'linear-gradient(180deg,var(--brand),#efb000)', color:'#1A1A1A', display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, fontWeight:900, flexShrink:0, boxShadow:'0 4px 12px rgba(244,180,0,.35)' }}>
             {kh.name.charAt(0)}
           </div>
           <div style={{ flex:1 }}>
@@ -1211,21 +1429,43 @@ function Customer360Screen({ uid, onBack }) {
           </div>
         </div>
 
-        {/* KPI strip */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:12, marginTop:16, paddingTop:16, borderTop:'1px solid #E5E7EB' }}>
+        {/* Thông tin phụ — dải inline gọn: Mảng dịch vụ / Hệ thống / Tương tác gần nhất */}
+        <div style={{ display:'flex', alignItems:'center', gap:20, flexWrap:'wrap', marginTop:14, paddingTop:14, borderTop:'1px solid var(--border)' }}>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span style={{ fontSize:11, color:'var(--muted)', fontWeight:600 }}>Mảng dịch vụ:</span>
+            {(kh.activePillars||[]).map(id => {
+              const p = PILLARS.find(x=>x.id===id);
+              return <span key={id} className="badge badge-yellow">{p ? p.id : id}</span>;
+            })}
+            {(!kh.activePillars||kh.activePillars.length===0) && <span style={{ fontSize:12, color:'var(--muted)' }}>—</span>}
+          </div>
+          <div style={{ width:1, height:16, background:'var(--border)' }}></div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span style={{ fontSize:11, color:'var(--muted)', fontWeight:600 }}>Hệ thống:</span>
+            {(kh.activeSystems||kh.sources||[]).map(s => <span key={s} className="badge badge-blue">{s}</span>)}
+          </div>
+          <div style={{ width:1, height:16, background:'var(--border)' }}></div>
+          <div className="flex items-center gap-2">
+            <span style={{ fontSize:11, color:'var(--muted)', fontWeight:600 }}>Tương tác gần nhất:</span>
+            <span style={{ fontSize:13, fontWeight:600, color:'var(--text-2)' }}>{kh.lastInteraction || kh.appLogin || 'Chưa có dữ liệu'}</span>
+          </div>
+        </div>
+
+        {/* KPI strip — 6 chỉ số chính */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:10, marginTop:12 }}>
           {[
             { label:'Tổng đơn', value: kh.orders.toLocaleString(), unit:'' },
-            { label:'Doanh thu', value: kh.revenue, unit:' ₫' },
-            { label:'Tỷ lệ phát', value: kh.deliveryRate, unit:'%', color: kh.deliveryRate>=90 ? '#16A34A':'#F59E0B' },
-            { label:'Tỷ lệ hoàn', value: kh.returnRate, unit:'%', color: kh.returnRate>=20 ? '#DC2626':'#F59E0B' },
-            { label:'Điểm tích lũy', value: kh.loyalty?.points != null ? kh.loyalty.points.toLocaleString() : '—', unit:'', color:'#7c3aed' },
+            { label:'Doanh thu 12 tháng', value: kh.revenue, unit:' ₫', color:'var(--success)' },
+            { label:'Tỷ lệ phát', value: kh.deliveryRate, unit:'%', color: kh.deliveryRate>=90 ? 'var(--success)':'var(--warn)' },
+            { label:'Tỷ lệ hoàn', value: kh.returnRate, unit:'%', color: kh.returnRate>=20 ? 'var(--danger)':'var(--warn)' },
+            { label:'Điểm tích lũy', value: kh.loyalty?.points != null ? kh.loyalty.points.toLocaleString() : '—', unit:' pt', color:'var(--purple)' },
             { label:'Độ đầy đủ hồ sơ', value: kh.completeness, unit:'%', color: completenessColor },
           ].map((k,i) => (
-            <div key={i}>
-              <div style={{ fontSize:11, color:'#6B7280', marginBottom:2 }}>{k.label}</div>
-              <div style={{ fontSize:18, fontWeight:800, color:k.color||'#1A1A1A' }} className="tabular-nums">{k.value}{k.unit}</div>
+            <div key={i} style={{ padding:'8px 10px', background:'var(--bg)', borderRadius:8, border:'1px solid var(--line)' }}>
+              <div style={{ fontSize:10, color:'var(--muted)', marginBottom:2, fontWeight:600 }}>{k.label}</div>
+              <div style={{ fontSize:15, fontWeight:900, color:k.color||'var(--text)', letterSpacing:'-.01em' }} className="tabular-nums">{k.value}{k.unit}</div>
               {k.label==='Độ đầy đủ hồ sơ' && (
-                <div style={{ height:4, borderRadius:2, background:'#E5E7EB', marginTop:4 }}>
+                <div style={{ height:3, borderRadius:2, background:'var(--border)', marginTop:5 }}>
                   <div style={{ width:`${kh.completeness}%`, height:'100%', background:completenessColor, borderRadius:2 }}></div>
                 </div>
               )}
@@ -1235,7 +1475,7 @@ function Customer360Screen({ uid, onBack }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 flex-wrap">
+      <div className="tabs-strip">
         {tabs.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)} className={`tab-btn ${tab===t.key ? 'active':''}`}>{t.label}</button>
         ))}
@@ -1268,7 +1508,7 @@ function Customer360Screen({ uid, onBack }) {
               <div className="section-title">Vai trò giao dịch</div>
               <div className="flex gap-2 mb-3">
                 {kh.roles.map(r => (
-                  <span key={r} className={`badge ${r===kh.primaryRole ? 'badge-red':'badge-blue'}`}>{r} {r===kh.primaryRole ? '(chính)':''}</span>
+                  <span key={r} className={`badge ${r===kh.primaryRole ? 'badge-red':'badge-blue'}`}>{ROLE_LABEL[r]||r} {r===kh.primaryRole ? '(chính)':''}</span>
                 ))}
               </div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
@@ -1298,7 +1538,7 @@ function Customer360Screen({ uid, onBack }) {
               <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
                 <thead>
                   <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
-                    {['Loại ID','Giá trị','Nguồn','Độ tin cậy','Reliability','Chính'].map(h => (
+                    {['Loại ID','Giá trị','Nguồn','Độ tin cậy','Chính'].map(h => (
                       <th key={h} style={{ padding:'8px 10px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
                     ))}
                   </tr>
@@ -1311,14 +1551,6 @@ function Customer360Screen({ uid, onBack }) {
                       <td style={{ padding:'8px 10px', color:'#6B7280' }}>{a.source}</td>
                       <td style={{ padding:'8px 10px' }}>
                         <span className={`badge ${a.confidence==='HIGH' ? 'badge-green' : a.confidence==='MEDIUM' ? 'badge-yellow' : 'badge-gray'}`}>{CONFIDENCE_LABEL[a.confidence]||a.confidence}</span>
-                      </td>
-                      <td style={{ padding:'8px 10px' }}>
-                        <div className="flex items-center gap-2">
-                          <div style={{ flex:1, height:6, borderRadius:3, background:'#E5E7EB', overflow:'hidden', minWidth:60 }}>
-                            <div style={{ width:`${a.reliability}%`, height:'100%', background: a.reliability>=80 ? '#16A34A' : a.reliability>=60 ? '#F59E0B' : '#DC2626', borderRadius:3 }}></div>
-                          </div>
-                          <span className="tabular-nums" style={{ fontSize:12, fontWeight:700 }}>{a.reliability}</span>
-                        </div>
                       </td>
                       <td style={{ padding:'8px 10px' }}>{a.primary ? '✓' : ''}</td>
                     </tr>
@@ -1371,40 +1603,11 @@ function Customer360Screen({ uid, onBack }) {
               dataKey: 'dinh_danh',
             },
             {
-              group: 'Địa chỉ',
-              fields: [
-                { key:'guiHang',  label:'Địa chỉ gửi hàng',  golden: kh.addresses?.find(a=>a.type==='SENDER'&&a.primary)?.detail + ', ' + kh.addresses?.find(a=>a.type==='SENDER'&&a.primary)?.province || '—' },
-                { key:'nhanHang', label:'Địa chỉ nhận hàng', golden: kh.addresses?.find(a=>a.type==='RECEIVER')?.detail + ', ' + kh.addresses?.find(a=>a.type==='RECEIVER')?.province || '—' },
-                { key:'vpostcode',label:'VPostCode',          golden: kh.addresses?.find(a=>a.primary)?.vpostcode || '—' },
-              ],
-              dataKey: 'dia_chi',
-            },
-            {
-              group: 'Vai trò & Giao dịch',
-              fields: [
-                { key:'vaiTro',   label:'Vai trò chính',   golden: kh.primaryRole || '—' },
-                { key:'tongDon',  label:'Tổng đơn',         golden: String(kh.orders?.toLocaleString() || '—') },
-                { key:'doanhThu', label:'Doanh thu',        golden: kh.revenue || '—' },
-                { key:'tyLeHoan', label:'Tỷ lệ hoàn',      golden: kh.returnRate ? kh.returnRate + '%' : '—' },
-                { key:'cod',      label:'COD thu được',     golden: kh.cod?.collected || '—' },
-              ],
-              dataKey: 'giao_dich',
-            },
-            {
-              group: 'Hành vi số',
-              fields: [
-                { key:'appLogin',    label:'Đăng nhập App gần nhất', golden: kh.appLogin || '—' },
-                { key:'device',      label:'Thiết bị',               golden: kh.device || '—' },
-                { key:'sessions30d', label:'Sessions 30 ngày',       golden: kh.sessions30d != null ? String(kh.sessions30d) : '—' },
-              ],
-              dataKey: 'hanh_vi',
-            },
-            {
               group: 'Tài chính / Hợp đồng',
               fields: [
                 { key:'mst',     label:'Mã số thuế',  golden: kh.taxId || '—' },
-                { key:'hopDong', label:'Hợp đồng',    golden: kh.contract ? `${kh.contract.status} — ${kh.contract.start} → ${kh.contract.end}` : '—' },
-                { key:'congNo',  label:'Công nợ',     golden: kh.debt ? `${kh.debt.unpaid} (${kh.debt.status})` : '—' },
+                { key:'hopDong', label:'Hợp đồng',    golden: kh.contract ? `${kh.contract.status==='ACTIVE' ? 'Đang hiệu lực' : kh.contract.status} — ${kh.contract.start} → ${kh.contract.end}` : '—' },
+                { key:'congNo',  label:'Công nợ',     golden: kh.debt ? `${kh.debt.unpaid} (${kh.debt.status==='OVERDUE' ? 'Quá hạn' : kh.debt.status==='MATCHED' ? 'Khớp' : kh.debt.status})` : '—' },
               ],
               dataKey: 'tai_chinh',
             },
@@ -1549,20 +1752,32 @@ function Customer360Screen({ uid, onBack }) {
         })()}
 
         {/* ĐỊA CHỈ */}
-        {tab==='address' && (
-          <div>
-            <div className="section-title">Địa chỉ gửi hàng</div>
-            {kh.addresses.filter(a => a.type === 'SENDER').map((a,i) => (
-              <div key={i} style={{ padding:14, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:10 }}>
-                <div className="flex items-center gap-2 mb-2">
-                  {a.primary && <span className="badge badge-green">Chính</span>}
+        {tab==='address' && (() => {
+          const byType = kh.addresses.filter(a => a.type !== 'RECEIVER').reduce((acc,a) => { (acc[a.type] = acc[a.type]||[]).push(a); return acc; }, {});
+          return (
+            <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+              {Object.keys(byType).map(type => (
+                <div key={type}>
+                  <div className="section-title">{ADDR_TYPE_LABEL[type] || type}</div>
+                  {byType[type].map((a,i) => (
+                    <div key={i} style={{ padding:14, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:10 }}>
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        {a.primary && <span className="badge badge-green">Địa chỉ chính</span>}
+                        <span className={`badge ${a.status==='STANDARDIZED' ? 'badge-blue' : 'badge-yellow'}`}>{a.status==='STANDARDIZED' ? 'Đã chuẩn hoá' : 'Chưa đầy đủ'}</span>
+                        <span className={`badge ${a.version==='NEW' ? 'badge-green' : 'badge-gray'}`}>{a.version==='NEW' ? 'Dữ liệu mới' : 'Dữ liệu cũ (legacy)'}</span>
+                      </div>
+                      <div style={{ fontWeight:600, fontSize:14 }}>{a.detail}, {a.ward}, {a.province}</div>
+                      <div style={{ fontSize:12, color:'#6B7280', marginTop:4 }}>VPostCode: {a.vpostcode}</div>
+                    </div>
+                  ))}
                 </div>
-                <div style={{ fontWeight:600, fontSize:14 }}>{a.detail}, {a.ward}, {a.province}</div>
-                <div style={{ fontSize:12, color:'#6B7280', marginTop:4 }}>VPostCode: {a.vpostcode}</div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+              {Object.keys(byType).length===0 && (
+                <div style={{ padding:32, textAlign:'center', color:'#6B7280' }}>Chưa có dữ liệu địa chỉ</div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* DOANH NGHIỆP */}
         {tab==='business' && kh.type==='BUSINESS' && (
@@ -1575,7 +1790,7 @@ function Customer360Screen({ uid, onBack }) {
                   ['Mã số thuế', kh.taxId],
                   ['Mã KHL', kh.khlCode],
                   ['Đại diện pháp lý', kh.representative],
-                  ['Hợp đồng', kh.contract?.status],
+                  ['Hợp đồng', kh.contract?.status==='ACTIVE' ? 'Đang hiệu lực' : kh.contract?.status],
                   ['Hiệu lực', `${kh.contract?.start} → ${kh.contract?.end}`],
                   ['Ngành nghề', kh.contract?.segment],
                 ].map(([l,v]) => (
@@ -1653,51 +1868,155 @@ function Customer360Screen({ uid, onBack }) {
           </div>
         )}
 
+        {/* HOẠT ĐỘNG THEO MẢNG DỊCH VỤ CHÍNH */}
+        {tab==='pillars' && (() => {
+          // Mỗi mảng dịch vụ tổng hợp bộ chỉ số đặc thù riêng — hầu hết đều có doanh thu riêng,
+          // trừ HCC (dịch vụ công) dùng "số hồ sơ đã xử lý" thay cho doanh thu.
+          // Dữ liệu mock cho prototype: tất cả mảng đều hiển thị chỉ số để stakeholder hình dung đầy đủ.
+          const PILLAR_MOCK = {
+            BCCP:      { fields:[['Doanh thu cước 12 tháng', `${kh.revenue} ₫`],['Tổng đơn gửi/nhận', `${kh.orders.toLocaleString()} đơn`],['Tỷ lệ phát thành công', `${kh.deliveryRate}%`],['Tỷ lệ hoàn', `${kh.returnRate}%`],['Tổng COD đã thu', '312.400.000 ₫'],['Thời gian giao trung bình', '2,4 ngày']], signal: kh.returnRate>=20 ? { text:'Tỷ lệ hoàn cao — cần theo dõi', color:'var(--danger)' } : { text:'Hoạt động ổn định', color:'var(--success)' } },
+            TCBC:      { fields:[['Doanh thu phí dịch vụ', '18.500.000 ₫'],['Tổng giá trị giao dịch', '2.340.000.000 ₫'],['Số giao dịch 12 tháng', '412 giao dịch'],['Giá trị giao dịch TB', '5.680.000 ₫'],['Kênh chính', 'Tại quầy'],['Loại giao dịch nhiều nhất', 'Thu hộ COD']], signal:{ text:'Tiềm năng upsell: PayPost thu hộ online', color:'var(--info)' } },
+            PPBL:      { fields:[['Doanh thu bán lẻ 12 tháng', '96.700.000 ₫'],['Tổng đơn mua tại quầy', '284 đơn'],['Giá trị đơn trung bình', '340.000 ₫'],['Tần suất mua', '~24 đơn/tháng'],['Nhóm hàng mua nhiều', 'Tem, bao bì, VPP'],['Điểm bán thường dùng', 'BĐ Cầu Giấy']], signal:{ text:'Khách mua đều — có thể mời chương trình khách thân thiết', color:'var(--info)' } },
+            HCC:       { fields:[['Số hồ sơ đã xử lý', '17 hồ sơ'],['Hồ sơ trả tại nhà', '12 hồ sơ'],['Thủ tục hay dùng', 'Cấp đổi giấy tờ'],['Tỷ lệ hồ sơ thành công', '94%'],['Thời gian xử lý TB', '3,2 ngày'],['Phí dịch vụ đã thu', '1.360.000 ₫']], signal:{ text:'Sử dụng ổn định dịch vụ hành chính công', color:'var(--success)' } },
+            Logistics: { fields:[['Doanh thu logistics 12 tháng', '512.000.000 ₫'],['Điểm kho đang dùng', '3 điểm'],['Sản lượng fulfillment', '8.240 đơn'],['SLA giao hàng', '96%'],['Tồn kho hiện tại', '1.850 SKU'],['Tỷ lệ giao đúng hẹn', '93%']], signal:{ text:'SLA ổn định, cần theo dõi tồn kho', color:'var(--warn)' } },
+            TMDT:      { fields:[['Doanh thu qua sàn 12 tháng', '268.000.000 ₫'],['GMV (tổng giá trị bán)', '1.240.000.000 ₫'],['Số shop online', '2 shop'],['Đơn giao chặng cuối', '1.560 đơn'],['Tỷ lệ hoàn TMĐT', '11%'],['Sàn chính', 'Shopee, TikTok Shop']], signal:{ text:'Shop online đang mở rộng — tiềm năng tăng trưởng', color:'var(--info)' } },
+            MVNO:      { fields:[['Doanh thu cước viễn thông', '2.400.000 ₫'],['Gói cước đang dùng', 'Gói data 4G tháng'],['Tổng nạp cước 12 tháng', '2.400.000 ₫'],['Lưu lượng data đã dùng', '84 GB'],['Ngày hết hạn gói', '15/07/2026'],['Số thuê bao', '1 thuê bao']], signal:{ text:'Gói cước sắp hết hạn — nhắc gia hạn', color:'var(--warn)' } },
+          };
+          const rows = PILLARS.map(p => {
+            const isActive = (kh.activePillars||[]).includes(p.id);
+            const mock = PILLAR_MOCK[p.id] || { fields:[], signal:{ text:'Chưa sử dụng', color:'var(--muted)' } };
+            return { ...p, active: isActive, fields: isActive ? mock.fields : [], signal: isActive ? mock.signal : { text:'Chưa sử dụng', color:'var(--muted)' } };
+          });
+          const current = pillarSubTab ? rows.find(r => r.id===pillarSubTab) : null;
+          const active = current || rows[0];
+          return (
+            <div>
+              <div style={{ fontSize:12, color:'var(--muted)', marginBottom:14, lineHeight:1.6 }}>
+                Chọn từng mảng dịch vụ để xem chỉ số riêng. Xem chi tiết giao dịch và đối soát COD tại tab <strong>GD &amp; COD</strong>.
+              </div>
+              <div className="tabs-strip" style={{ marginBottom:16 }}>
+                {rows.map(r => (
+                  <button key={r.id} onClick={() => setPillarSubTab(r.id)}
+                    className={`tab-btn ${(active.id===r.id) ? 'active':''}`}>
+                    {r.label.split('—')[0].trim()} {r.active ? '●' : '○'}
+                  </button>
+                ))}
+              </div>
+              <div style={{ border:'1px solid var(--border)', borderRadius:10, padding:20 }}>
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                  <span style={{ fontWeight:800, fontSize:14 }}>{active.label}</span>
+                  <span className={`badge ${active.active ? 'badge-green' : 'badge-gray'}`}>{active.active ? 'Đang dùng' : 'Chưa dùng'}</span>
+                </div>
+                <div style={{ fontSize:12, color:'var(--muted)', marginBottom:14 }}>Hệ thống sử dụng: {active.system}</div>
+                {active.fields.length>0 ? (
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:12, marginBottom:14 }}>
+                    {active.fields.map(([l,v],i) => (
+                      <div key={i} style={{ padding:'10px 12px', background:'var(--bg)', borderRadius:10, border:'1px solid var(--line)' }}>
+                        <div style={{ fontSize:11, color:'var(--muted)', marginBottom:4, fontWeight:600 }}>{l}</div>
+                        <div style={{ fontSize:15, fontWeight:800 }} className="tabular-nums">{v}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ padding:20, textAlign:'center', color:'var(--muted)', fontSize:13, background:'var(--bg)', borderRadius:10, marginBottom:14 }}>Chưa phát sinh dữ liệu cho mảng dịch vụ này</div>
+                )}
+                <div style={{ fontSize:12, fontWeight:600, color:active.signal.color }}>Tín hiệu / Rủi ro: {active.signal.text}</div>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* GIAO DỊCH & COD */}
         {tab==='transaction' && (
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
-            <div>
-              <div className="section-title">Tổng hợp giao dịch</div>
-              {[
-                ['Tổng đơn', kh.orders.toLocaleString()],
-                ['Tổng doanh thu', `${kh.revenue} ₫`],
-                ['Trung bình đơn/tháng', kh.avgMonthly],
-                ['Dịch vụ chính', kh.service || 'Chưa có dữ liệu'],
-                ['Tỷ lệ phát thành công', `${kh.deliveryRate}%`],
-                ['Tỷ lệ hoàn', `${kh.returnRate}%`],
-              ].map(([l,v]) => (
-                <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
-                  <span className="field-label" style={{ margin:0 }}>{l}</span>
-                  <span style={{ fontSize:13, fontWeight:600 }} className="tabular-nums">{v}</span>
-                </div>
-              ))}
+          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+            <div style={{ fontSize:12, color:'var(--muted)', lineHeight:1.6 }}>
+              Chi tiết giao dịch và đối soát COD của mảng <strong>BCCP</strong>. Xem tổng hợp đa mảng tại tab <strong>Hoạt động theo mảng dịch vụ chính</strong>.
             </div>
-            <div>
-              <div className="section-title">COD — Thu hộ</div>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:12 }}>
-                <div style={{ background:'#f0fdf4', borderRadius:8, padding:12 }}>
-                  <div style={{ fontSize:11, color:'#6B7280' }}>Tổng COD</div>
-                  <div style={{ fontSize:15, fontWeight:800, color:'#1A1A1A' }} className="tabular-nums">{kh.cod.total} ₫</div>
-                </div>
-                <div style={{ background:'#eff6ff', borderRadius:8, padding:12 }}>
-                  <div style={{ fontSize:11, color:'#6B7280' }}>Đã thu</div>
-                  <div style={{ fontSize:15, fontWeight:800, color:'#2563EB' }} className="tabular-nums">{kh.cod.collected} ₫</div>
-                </div>
-                <div style={{ background: parseFloat(kh.cod.pending.replace(/\./g,''))>0 ? '#fff5f5':'#f9fafb', borderRadius:8, padding:12 }}>
-                  <div style={{ fontSize:11, color:'#6B7280' }}>Chưa thu</div>
-                  <div style={{ fontSize:15, fontWeight:800, color: parseFloat(kh.cod.pending.replace(/\./g,''))>0 ? '#DC2626':'#1A1A1A' }} className="tabular-nums">{kh.cod.pending} ₫</div>
-                </div>
-                <div style={{ padding:12, borderRadius:8, background: kh.cod.status==='MATCHED' ? '#f0fdf4' : kh.cod.status==='DISCREPANCY' ? '#fff5f5' : '#fffbeb' }}>
-                  <div style={{ fontSize:11, color:'#6B7280' }}>Đối soát</div>
-                  <span className={`badge ${kh.cod.status==='MATCHED' ? 'badge-green' : kh.cod.status==='DISCREPANCY' ? 'badge-red' : 'badge-yellow'}`}>{kh.cod.status==='MATCHED' ? 'Khớp' : kh.cod.status==='DISCREPANCY' ? 'Chênh lệch' : kh.cod.status}</span>
+
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+              {/* Tổng hợp giao dịch */}
+              <div>
+                <div className="section-title">Tổng hợp giao dịch</div>
+                {[
+                  ['Tổng đơn', kh.orders.toLocaleString()],
+                  ['Doanh thu 12 tháng', `${kh.revenue} ₫`],
+                  ['Trung bình đơn/tháng', kh.avgMonthly],
+                  ['Dịch vụ chính', kh.service || 'Chưa có dữ liệu'],
+                  ['Tỷ lệ phát thành công', `${kh.deliveryRate}%`],
+                  ['Tỷ lệ hoàn', `${kh.returnRate}%`],
+                ].map(([l,v]) => (
+                  <div key={l} className="info-row">
+                    <span>{l}</span>
+                    <b className="tabular-nums">{v}</b>
+                  </div>
+                ))}
+              </div>
+
+              {/* COD */}
+              <div>
+                <div className="section-title">COD — Thu hộ</div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:14 }}>
+                  {[
+                    { label:'Tổng COD', value:kh.cod.total+' ₫', bg:'var(--success-soft)', color:'var(--success)' },
+                    { label:'Đã thu',   value:kh.cod.collected+' ₫', bg:'var(--info-soft)', color:'var(--info)' },
+                    { label:'Chưa thu', value:kh.cod.pending+' ₫', bg: parseFloat(kh.cod.pending.replace(/\./g,''))>0 ? 'var(--danger-soft)':'var(--line)', color: parseFloat(kh.cod.pending.replace(/\./g,''))>0 ? 'var(--danger)':'var(--muted)' },
+                    { label:'Đối soát', value: kh.cod.status==='MATCHED'?'Khớp':kh.cod.status==='DISCREPANCY'?'Chênh lệch':'Đang chờ', bg: kh.cod.status==='MATCHED'?'var(--success-soft)':kh.cod.status==='DISCREPANCY'?'var(--danger-soft)':'var(--warn-soft)', color: kh.cod.status==='MATCHED'?'var(--success)':kh.cod.status==='DISCREPANCY'?'var(--danger)':'var(--warn)' },
+                  ].map((k,i) => (
+                    <div key={i} style={{ background:k.bg, borderRadius:10, padding:12 }}>
+                      <div style={{ fontSize:11, color:'var(--muted)', marginBottom:4 }}>{k.label}</div>
+                      <div style={{ fontSize:14, fontWeight:800, color:k.color }} className="tabular-nums">{k.value}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
+
+            {/* Đóng góp theo nguồn dữ liệu */}
+            {(() => {
+              const srcRows = (kh.sourcesData||[])
+                .filter(s => s.giao_dich && (s.giao_dich.tongDon > 0 || s.giao_dich.cod !== '—'))
+                .map(s => ({
+                  source: s.source,
+                  vaiTro: s.giao_dich.vaiTro || '—',
+                  tongDon: s.giao_dich.tongDon > 0 ? s.giao_dich.tongDon.toLocaleString() : '—',
+                  cod: s.giao_dich.cod || '—',
+                }));
+              if (srcRows.length === 0) return null;
+              return (
+                <div>
+                  <div className="section-title">Đóng góp theo nguồn dữ liệu</div>
+                  <div style={{ overflow:'auto', borderRadius:10, border:'1px solid var(--border)' }}>
+                    <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                      <thead>
+                        <tr style={{ background:'var(--bg-2)', borderBottom:'1px solid var(--border)' }}>
+                          {['Nguồn','Vai trò','Số đơn','COD đóng góp'].map(h => (
+                            <th key={h} style={{ padding:'9px 12px', textAlign:'left', fontSize:11, fontWeight:800, color:'var(--muted)' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {srcRows.map((r,i) => (
+                          <tr key={i} style={{ borderBottom:'1px solid var(--line)' }}>
+                            <td style={{ padding:'9px 12px' }}><span className="badge badge-blue">{r.source}</span></td>
+                            <td style={{ padding:'9px 12px', fontSize:12 }}>{r.vaiTro}</td>
+                            <td style={{ padding:'9px 12px', fontSize:12, fontWeight:600 }} className="tabular-nums">{r.tongDon}</td>
+                            <td style={{ padding:'9px 12px', fontSize:12, fontWeight:600, color: r.cod!=='—'?'var(--success)':'var(--muted)' }} className="tabular-nums">{r.cod !== '—' ? r.cod+' ₫' : '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
 
         {/* HÀNH VI SỐ */}
-        {tab==='behavior' && (
+        {tab==='behavior' && (() => {
+          const channels = [...new Set((kh.timeline||[]).map(e => e.channel))];
+          const lastCampaign = (kh.timeline||[]).find(e => e.type === 'campaign');
+          return (
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
             <div>
               <div className="section-title">Thông tin thiết bị & App</div>
@@ -1711,6 +2030,19 @@ function Customer360Screen({ uid, onBack }) {
                   <span style={{ fontSize:13, fontWeight:500 }}>{v}</span>
                 </div>
               ))}
+
+              <div className="section-title mt-4">Mức độ tương tác</div>
+              {[
+                ['Điểm tương tác (Engagement)', canSee('engagement') ? `${kh.scores.engagement}/100` : '🔒 Không có quyền xem'],
+                ['Số kênh đã tương tác', channels.length ? `${channels.length} kênh (${channels.join(', ')})` : 'Chưa có dữ liệu'],
+                ['Phản hồi chiến dịch gần nhất', lastCampaign ? `${lastCampaign.label} — ${lastCampaign.time}` : 'Chưa ghi nhận phản hồi campaign'],
+              ].map(([l,v]) => (
+                <div key={l} style={{ display:'flex', justifyContent:'space-between', gap:12, padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                  <span className="field-label" style={{ margin:0 }}>{l}</span>
+                  <span style={{ fontSize:13, fontWeight:500, textAlign:'right' }}>{v}</span>
+                </div>
+              ))}
+
               {kh.lastOrder && (
                 <div style={{ marginTop:16 }}>
                   <div className="section-title">Đơn hàng gần nhất</div>
@@ -1746,7 +2078,8 @@ function Customer360Screen({ uid, onBack }) {
               </div>
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* CSKH */}
         {tab==='cskh' && (
@@ -1776,7 +2109,7 @@ function Customer360Screen({ uid, onBack }) {
             {/* RFM */}
             {canSee('rfm') ? (
               <div style={{ padding:16, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:16 }}>
-                <div style={{ fontWeight:700, fontSize:13, marginBottom:10 }}>RFM — Nhóm: <span style={{ color:'#E30613' }}>{kh.scores.rfmGroup}</span></div>
+                <div style={{ fontWeight:700, fontSize:13, marginBottom:10 }}>RFM — Nhóm: <span style={{ color:'#8a5a00' }}>{kh.scores.rfmGroup}</span></div>
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
                   {[['R — Gần đây',kh.scores.rfmR],['F — Tần suất',kh.scores.rfmF],['M — Giá trị',kh.scores.rfmM]].map(([l,v]) => (
                     <div key={l}>
@@ -1808,29 +2141,73 @@ function Customer360Screen({ uid, onBack }) {
           </div>
         )}
 
-        {/* CONSENT */}
-        {tab==='consent' && (
-          <div>
-            {kh.consent.deletionRequested && (
-              <div style={{ padding:12, background:'#fee2e2', border:'1px solid #DC2626', borderRadius:8, marginBottom:16, fontWeight:700, color:'#DC2626', fontSize:14 }}>
-                🚫 Khách hàng đã yêu cầu xóa dữ liệu (data_deletion_requested = true)
+        {/* ĐỒNG Ý DỮ LIỆU */}
+        {tab==='consent' && (() => {
+          const matrix = [
+            { purpose:'Thông báo vận hành',   desc:'Trạng thái đơn hàng, dịch vụ đang sử dụng — cần thiết để cung cấp dịch vụ',  sms:'in', email:'in', zalo:'in', push:'in' },
+            { purpose:'Chăm sóc khách hàng',  desc:'Gọi điện/nhắn tin hỗ trợ, khảo sát mức độ hài lòng',                          sms:kh.consent.sms, email:kh.consent.email, zalo:kh.consent.zalo, push:kh.consent.push },
+            { purpose:'Tiếp thị & ưu đãi',    desc:'Giới thiệu dịch vụ mới, chương trình khuyến mãi',                            sms:kh.consent.sms, email:kh.consent.email, zalo:kh.consent.zalo, push:'out' },
+          ];
+          const CHANNEL_LABEL = { sms:'SMS', email:'Email', zalo:'Zalo OA', push:'Thông báo đẩy (Push)' };
+          const cellChip = (v) => {
+            const cls = v==='in' ? 'consent-in' : v==='out' ? 'consent-out' : 'consent-unknown';
+            const txt = v==='in' ? 'Cho phép' : v==='out' ? 'Từ chối' : 'Chưa xác định';
+            return <span className={`consent-chip ${cls}`}>{v==='in' ? '✓' : v==='out' ? '✕' : '?'} {txt}</span>;
+          };
+          return (
+            <div>
+              {kh.consent.deletionRequested && (
+                <div style={{ padding:12, background:'#fee2e2', border:'1px solid #DC2626', borderRadius:8, marginBottom:16, fontWeight:700, color:'#DC2626', fontSize:14 }}>
+                  🚫 Khách hàng đã yêu cầu xoá dữ liệu cá nhân — không sử dụng hồ sơ này cho bất kỳ mục đích nào ngoài nghĩa vụ pháp lý.
+                </div>
+              )}
+
+              <div style={{ fontSize:12, color:'#6B7280', marginBottom:14, lineHeight:1.6 }}>
+                Bảng dưới đây cho biết khách hàng <strong>cho phép hay từ chối</strong> nhận liên hệ theo từng <strong>mục đích</strong> (hàng) và từng <strong>kênh liên hệ</strong> (cột).
+                Ví dụ: nếu ô "Tiếp thị & ưu đãi" × "SMS" hiển thị <strong>Cho phép</strong>, nghĩa là được phép gửi SMS khuyến mãi cho khách hàng này; nếu <strong>Từ chối</strong> thì tuyệt đối không gửi.
+                "Thông báo vận hành" luôn ở trạng thái Cho phép vì là nghĩa vụ thực hiện dịch vụ, không thuộc phạm vi xin sự đồng ý.
               </div>
-            )}
-            <div style={{ maxWidth:360 }}>
-              <div className="section-title">Trạng thái Consent theo kênh</div>
-              <div style={{ border:'1px solid #E5E7EB', borderRadius:8, padding:'4px 12px' }}>
-                {consentChip(kh.consent.sms,  'SMS')}
-                {consentChip(kh.consent.email,'Email')}
-                {consentChip(kh.consent.zalo, 'Zalo OA')}
-                {consentChip(kh.consent.push, 'Push Notification')}
+
+              <div className="table-wrap-x" style={{ overflow:'auto', border:'1px solid #E5E7EB', borderRadius:8 }}>
+                <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13, minWidth:640 }}>
+                  <thead>
+                    <tr style={{ background:'#F7F8FA', borderBottom:'1px solid #E5E7EB' }}>
+                      <th style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', minWidth:200 }}>Mục đích liên hệ</th>
+                      {Object.keys(CHANNEL_LABEL).map(ch => (
+                        <th key={ch} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{CHANNEL_LABEL[ch]}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {matrix.map((row,i) => (
+                      <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                        <td style={{ padding:'10px 12px' }}>
+                          <div style={{ fontWeight:700, fontSize:13 }}>{row.purpose}</div>
+                          <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>{row.desc}</div>
+                        </td>
+                        {Object.keys(CHANNEL_LABEL).map(ch => (
+                          <td key={ch} style={{ padding:'10px 12px' }}>{cellChip(row[ch])}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <div style={{ marginTop:12, fontSize:12, color:'#6B7280' }}>
-                ⚠️ Kiểm tra consent bắt buộc trước mọi activation marketing.<br/>
+
+              {/* Metadata consent */}
+              <div className="meta-strip" style={{ marginTop:14 }}>
+                <span>Nguồn thu thập: <b>MyVNPost App</b></span>
+                <span>Ngày cập nhật: <b>18/06/2026 10:05</b></span>
+                <span>Phiên bản điều khoản: <b>v2.1</b></span>
+              </div>
+
+              <div style={{ marginTop:12, padding:'10px 14px', background:'var(--warn-soft)', border:'1px solid #F59E0B', borderRadius:10, fontSize:12, color:'var(--warn)', lineHeight:1.6 }}>
+                ⚠️ Bắt buộc kiểm tra bảng này trước khi đưa khách hàng vào chiến dịch kích hoạt.<br/>
                 Tuân thủ Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15.
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* AUDIT */}
         {tab==='audit' && (
@@ -1869,6 +2246,9 @@ function SegmentScreen({ onViewKH }) {
   const [selectedSeg, setSelectedSeg] = React.useState(null);
   const [previewCount, setPreviewCount] = React.useState(null);
   const [segName, setSegName] = React.useState('');
+  const [segType, setSegType] = React.useState('Phân khúc động');
+  const [segPillar, setSegPillar] = React.useState('ALL');
+  const [segFreq, setSegFreq] = React.useState('Hàng ngày lúc 02:00');
   const [rules, setRules] = React.useState([
     { field:'Điểm rời bỏ', op:'≥', value:'70' },
     { field:'Ngày GD gần nhất', op:'<', value:'90 ngày trước' },
@@ -1891,7 +2271,7 @@ function SegmentScreen({ onViewKH }) {
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <div style={{ fontSize:16, fontWeight:700, marginBottom:8 }}>✅ Phân khúc đã được lưu</div>
             <div style={{ fontSize:13, color:'#6B7280', marginBottom:16 }}>Phân khúc "{segName||'Không có tên'}" đã được tạo và sẽ cập nhật tự động mỗi ngày.</div>
-            <button onClick={() => { setModal(false); setView('list'); }} style={{ width:'100%', padding:'10px', background:'#E30613', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer' }}>
+            <button onClick={() => { setModal(false); setView('list'); }} className="btn-primary" style={{ width:'100%', padding:'10px', fontSize:14 }}>
               Đóng
             </button>
           </div>
@@ -1945,64 +2325,126 @@ function SegmentScreen({ onViewKH }) {
       )}
 
       {view === 'builder' && (
-        <div className="panel" style={{ padding:20, maxWidth:640 }}>
-          <div style={{ fontWeight:700, fontSize:15, marginBottom:16 }}>Tạo phân khúc mới</div>
-          <div style={{ marginBottom:14 }}>
-            <label className="field-label">Tên phân khúc</label>
-            <input value={segName} onChange={e=>setSegName(e.target.value)} placeholder="VD: Khách hàng nguy cơ rời bỏ Q3" style={{ width:'100%', marginTop:4 }} />
-          </div>
-          <div style={{ marginBottom:14 }}>
-            <label className="field-label">Mô tả</label>
-            <input placeholder="Mô tả ngắn gọn mục tiêu phân khúc..." style={{ width:'100%', marginTop:4 }} />
-          </div>
+        <div style={{ display:'grid', gridTemplateColumns:'1.3fr 1fr', gap:16 }}>
+          <div className="panel" style={{ padding:20 }}>
+            <div style={{ fontWeight:700, fontSize:15, marginBottom:16 }}>Tạo phân khúc mới</div>
+            <div style={{ marginBottom:14 }}>
+              <label className="field-label">Tên phân khúc</label>
+              <input value={segName} onChange={e=>setSegName(e.target.value)} placeholder="VD: Khách hàng nguy cơ rời bỏ Q3" style={{ width:'100%', marginTop:4 }} />
+            </div>
+            <div style={{ marginBottom:14 }}>
+              <label className="field-label">Mô tả</label>
+              <input placeholder="Mô tả ngắn gọn mục tiêu phân khúc..." style={{ width:'100%', marginTop:4 }} />
+            </div>
 
-          <div className="flex items-center justify-between mb-3">
-            <div style={{ fontWeight:700, fontSize:13 }}>Điều kiện lọc</div>
-            <div className="flex items-center gap-2">
-              <span style={{ fontSize:12, color:'#6B7280' }}>Logic:</span>
-              {['AND','OR'].map(l => (
-                <button key={l} onClick={() => setLogic(l)} className={`tab-btn ${logic===l ? 'active':''}`} style={{ padding:'3px 10px', fontSize:11 }}>{l}</button>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12, marginBottom:14 }}>
+              <div>
+                <label className="field-label">Loại phân khúc</label>
+                <select value={segType} onChange={e=>setSegType(e.target.value)} style={{ width:'100%', marginTop:4, fontSize:12 }}>
+                  <option>Phân khúc động</option>
+                  <option>Phân khúc tĩnh</option>
+                </select>
+              </div>
+              <div>
+                <label className="field-label">Mảng dịch vụ trọng tâm</label>
+                <select value={segPillar} onChange={e=>setSegPillar(e.target.value)} style={{ width:'100%', marginTop:4, fontSize:12 }}>
+                  <option value="ALL">Tất cả mảng</option>
+                  {PILLARS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="field-label">Tần suất cập nhật</label>
+                <select value={segFreq} onChange={e=>setSegFreq(e.target.value)} style={{ width:'100%', marginTop:4, fontSize:12 }}>
+                  <option>Hàng ngày lúc 02:00</option>
+                  <option>Mỗi giờ</option>
+                  <option>Thời gian thực</option>
+                  <option>Thủ công</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mb-3">
+              <div style={{ fontWeight:700, fontSize:13 }}>Điều kiện lọc (Rule builder)</div>
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize:12, color:'#6B7280' }}>Logic:</span>
+                {['AND','OR'].map(l => (
+                  <button key={l} onClick={() => setLogic(l)} className={`tab-btn ${logic===l ? 'active':''}`} style={{ padding:'3px 10px', fontSize:11 }}>{l}</button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              {rules.map((r,i) => (
+                <div key={i}>
+                  {i > 0 && <div style={{ fontSize:11, fontWeight:700, color:'#8a5a00', padding:'4px 0', textAlign:'center' }}>{logic}</div>}
+                  <div className="rule-row">
+                    <select value={r.field} onChange={e => setRules(rules => rules.map((x,j) => j===i ? {...x, field:e.target.value}:x))} style={{ flex:2, fontSize:12 }}>
+                      {FIELDS.map(f => <option key={f}>{f}</option>)}
+                    </select>
+                    <select value={r.op} onChange={e => setRules(rules => rules.map((x,j) => j===i ? {...x, op:e.target.value}:x))} style={{ flex:1, fontSize:12 }}>
+                      {OPS.map(o => <option key={o}>{o}</option>)}
+                    </select>
+                    <input value={r.value} onChange={e => setRules(rules => rules.map((x,j) => j===i ? {...x, value:e.target.value}:x))} placeholder="Giá trị" style={{ flex:2, fontSize:12 }} />
+                    <button onClick={() => removeRule(i)} style={{ background:'none', border:'none', cursor:'pointer', color:'#DC2626' }}><Icon name="trash" /></button>
+                  </div>
+                </div>
               ))}
             </div>
+
+            <button onClick={addRule} style={{ width:'100%', marginTop:12, padding:'8px', background:'#f3f4f6', border:'1px dashed #E5E7EB', borderRadius:8, fontSize:13, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4, color:'#6B7280' }}>
+              <Icon name="plus" /> Thêm điều kiện
+            </button>
+
+            <div className="flex gap-3 mt-5">
+              <button onClick={() => setPreviewCount(8560)} className="btn-ghost" style={{ flex:1, padding:'10px', fontSize:13 }}>
+                Ước tính số KH
+              </button>
+              <button onClick={() => setModal(true)} className="btn-primary" style={{ flex:2, padding:'10px', fontSize:13 }}>
+                Lưu phân khúc
+              </button>
+            </div>
           </div>
 
-          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-            {rules.map((r,i) => (
-              <div key={i}>
-                {i > 0 && <div style={{ fontSize:11, fontWeight:700, color:'#E30613', padding:'4px 0', textAlign:'center' }}>{logic}</div>}
-                <div className="rule-row">
-                  <select value={r.field} onChange={e => setRules(rules => rules.map((x,j) => j===i ? {...x, field:e.target.value}:x))} style={{ flex:2, fontSize:12 }}>
-                    {FIELDS.map(f => <option key={f}>{f}</option>)}
-                  </select>
-                  <select value={r.op} onChange={e => setRules(rules => rules.map((x,j) => j===i ? {...x, op:e.target.value}:x))} style={{ flex:1, fontSize:12 }}>
-                    {OPS.map(o => <option key={o}>{o}</option>)}
-                  </select>
-                  <input value={r.value} onChange={e => setRules(rules => rules.map((x,j) => j===i ? {...x, value:e.target.value}:x))} placeholder="Giá trị" style={{ flex:2, fontSize:12 }} />
-                  <button onClick={() => removeRule(i)} style={{ background:'none', border:'none', cursor:'pointer', color:'#DC2626' }}><Icon name="trash" /></button>
+          {/* Xem trước kết quả */}
+          <div className="panel" style={{ padding:20 }}>
+            <div style={{ fontWeight:700, fontSize:15, marginBottom:16 }}>Xem trước kết quả</div>
+            {previewCount !== null ? (
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                <div className="kpi-card">
+                  <div className="field-label" style={{ margin:0 }}>Quy mô dự kiến</div>
+                  <div style={{ fontSize:24, fontWeight:800, marginTop:4 }} className="tabular-nums">{previewCount.toLocaleString()}</div>
+                  <div style={{ fontSize:12, color:'#6B7280', marginTop:2 }}>khách hàng khớp điều kiện · tăng khoảng +6,2% trong 30 ngày gần nhất</div>
+                </div>
+                <div className="kpi-card">
+                  <div className="field-label" style={{ margin:0 }}>Kênh kích hoạt phù hợp</div>
+                  <div style={{ fontSize:14, fontWeight:700, marginTop:4 }}>SMS · Zalo OA · Tác vụ CRM</div>
+                  <div style={{ fontSize:12, color:'#6B7280', marginTop:2 }}>Đã lọc theo trạng thái Đồng ý dữ liệu tại tab Consent của từng khách hàng</div>
+                </div>
+                <div className="kpi-card">
+                  <div className="field-label" style={{ margin:0 }}>Top hành vi chung</div>
+                  <div style={{ fontSize:13, fontWeight:600, marginTop:4 }}>
+                    {segPillar !== 'ALL' && segPillar.includes('BCCP') ? 'COD cao · gửi đơn đều · có cửa hàng online' : 'Tương tác thường xuyên trên App/Web · phát sinh giao dịch gần đây'}
+                  </div>
+                </div>
+                <div style={{ padding:'10px 12px', background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:8, fontSize:12, color:'#92400E' }}>
+                  Khuyến nghị: kiểm tra lại Consent trước khi kích hoạt chiến dịch cho phân khúc này.
                 </div>
               </div>
-            ))}
-          </div>
+            ) : (
+              <div style={{ textAlign:'center', padding:'28px 12px', color:'#6B7280', fontSize:13 }}>
+                Bấm <strong>"Ước tính số KH"</strong> để xem trước quy mô và kênh kích hoạt phù hợp.
+              </div>
+            )}
 
-          <button onClick={addRule} style={{ width:'100%', marginTop:12, padding:'8px', background:'#f3f4f6', border:'1px dashed #E5E7EB', borderRadius:8, fontSize:13, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4, color:'#6B7280' }}>
-            <Icon name="plus" /> Thêm điều kiện
-          </button>
-
-          {/* Inline preview count */}
-          {previewCount !== null && (
-            <div style={{ marginTop:12, padding:'10px 14px', background:'#EFF6FF', border:'1px solid #BFDBFE', borderRadius:8, display:'flex', alignItems:'center', gap:12 }}>
-              <span style={{ fontSize:22, fontWeight:800, color:'#2563EB' }} className="tabular-nums">{previewCount.toLocaleString()}</span>
-              <span style={{ fontSize:13, color:'#2563EB' }}>khách hàng khớp điều kiện</span>
+            <div className="section-title mt-4">Phân khúc đang hoạt động</div>
+            <div>
+              {SEGMENTS.filter(s => s.status === 'Đang hoạt động').slice(0,4).map((s,i) => (
+                <div key={i} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6', fontSize:12 }}>
+                  <span>{s.name}</span>
+                  <span style={{ fontWeight:700 }} className="tabular-nums">{s.count}</span>
+                </div>
+              ))}
             </div>
-          )}
-
-          <div className="flex gap-3 mt-5">
-            <button onClick={() => setPreviewCount(8560)} style={{ flex:1, padding:'9px', background:'#f3f4f6', color:'#1A1A1A', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>
-              Ước tính số KH
-            </button>
-            <button onClick={() => setModal(true)} style={{ flex:2, padding:'9px', background:'#E30613', color:'white', border:'none', borderRadius:8, fontSize:13, fontWeight:700, cursor:'pointer' }}>
-              Lưu phân khúc
-            </button>
           </div>
         </div>
       )}
@@ -2050,7 +2492,7 @@ function SegmentScreen({ onViewKH }) {
                 <div style={{ display:'flex', flexDirection:'column', gap:8, marginTop:4 }}>
                   {rules.map((r,i) => (
                     <div key={i} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 12px', background:'#F7F8FA', borderRadius:8, fontSize:13 }}>
-                      {i > 0 && <span style={{ fontSize:11, fontWeight:700, color:'#E30613', minWidth:28 }}>AND</span>}
+                      {i > 0 && <span style={{ fontSize:11, fontWeight:700, color:'#8a5a00', minWidth:28 }}>AND</span>}
                       {i === 0 && <span style={{ minWidth:28 }}></span>}
                       <span style={{ fontWeight:600, color:'#1A1A1A' }}>{r.field}</span>
                       <span style={{ color:'#6B7280' }}>{r.op}</span>
@@ -2077,16 +2519,17 @@ function SegmentScreen({ onViewKH }) {
 // APP
 // ============================================================
 function App() {
-  const [nav, setNav] = React.useState('customers');
+  const [nav, setNav] = React.useState('dashboard');
   const [c360uid, setC360uid] = React.useState(null);
   const [segmentNavFilter, setSegmentNavFilter] = React.useState(null);
 
   const navLabels = {
+    dashboard:'Dashboard tổng quan',
     kafka:'Kafka Integration',
-    customers:'Khách hàng',
-    identity:'Đối soát hồ sơ',
-    c360:'Customer 360',
-    segments:'Phân khúc',
+    customers:'Danh sách khách hàng',
+    identity:'Đối soát & hợp nhất hồ sơ',
+    c360:'Customer 360°',
+    segments:'Quản lý phân khúc',
   };
 
   const goC360 = (uid) => {
@@ -2103,10 +2546,12 @@ function App() {
     <div style={{ display:'flex', height:'100vh', overflow:'hidden' }}>
       <Sidebar active={nav} onNav={handleNav} />
       <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden' }}>
-        <Header title={navLabels[nav]} />
+        <Header title={navLabels[nav]} nav={nav} />
         <main style={{ flex:1, overflowY:'auto' }}>
+          {nav==='dashboard' && <DashboardScreen />}
           {nav==='kafka'     && <KafkaScreen />}
           {nav==='customers' && <CustomerListScreen onC360={goC360} initSegment={segmentNavFilter} />}
+          {nav==='identity'  && <IdentityScreen onC360={goC360} />}
           {nav==='c360'      && <Customer360Screen uid={c360uid} onBack={c360uid ? () => setNav('customers') : null} />}
           {nav==='segments'  && <SegmentScreen onViewKH={(seg) => { setSegmentNavFilter(seg); setNav('customers'); }} />}
         </main>
