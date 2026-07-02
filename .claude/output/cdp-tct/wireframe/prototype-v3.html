@@ -476,6 +476,7 @@ const GROUP_LABEL = { SME:'SME', KHL:'KHL', B2C:'Cá nhân thường' };
 const CONFIDENCE_LABEL = { HIGH:'Cao', MEDIUM:'Trung bình', LOW:'Thấp' };
 const ALIAS_TYPE_LABEL = { PHONE:'SĐT', POST_ID:'Post ID', CRM_ID:'Mã CRM', TAX_ID:'MST', KHL_CODE:'Mã KHL', USER_APP_ID:'ID App', EMAIL:'Email' };
 const ADDR_TYPE_LABEL   = { SENDER:'Địa chỉ gửi', RECEIVER:'Địa chỉ nhận', BUSINESS:'Trụ sở', WAREHOUSE:'Kho hàng' };
+const ROLE_LABEL = { SENDER:'Người gửi', RECEIVER:'Người nhận', SHOP_OWNER:'Chủ shop', KHL:'Khách hàng lớn' };
 const SEGMENT_RISK = ['Có nguy cơ rời bỏ','Tỷ lệ hoàn cao','Có nguy cơ gian lận'];
 const SEGMENT_GREEN = ['Khách hàng trung thành','KHL giá trị cao','Chủ shop hoạt động cao'];
 const segBadgeColor = (s) => SEGMENT_RISK.some(r => s.includes(r.slice(0,6))) || s.includes('rời bỏ') || s.includes('hoàn') || s.includes('gian lận') ? 'badge-red' : SEGMENT_GREEN.some(g => s.includes(g.slice(0,6))) || s.includes('trung thành') || s.includes('KHL') || s.includes('shop') ? 'badge-green' : 'badge-blue';
@@ -547,7 +548,6 @@ function Sidebar({ active, onNav }) {
     { key:'dashboard', label:'Dashboard tổng quan', icon:'dashboard' },
     { key:'customers', label:'Danh sách khách hàng', icon:'users' },
     { key:'segments',  label:'Phân khúc',  icon:'segment' },
-    { key:'identity',  label:'Đối soát hồ sơ', icon:'merge' },
   ];
   return (
     <aside style={{ width:228, flexShrink:0, background:'white', borderRight:'1px solid var(--border)', display:'flex', flexDirection:'column', height:'100vh', position:'sticky', top:0 }}>
@@ -616,18 +616,17 @@ function Header({ title, nav }) {
 // ============================================================
 function DashboardScreen() {
   const activeSegments = SEGMENTS.filter(s => s.status === 'Đang hoạt động');
-  const churnSegment = SEGMENTS.find(s => s.name === 'Có nguy cơ rời bỏ');
   const topSegments = [...SEGMENTS]
     .sort((a,b) => parseInt(b.count.replace(/\./g,'')) - parseInt(a.count.replace(/\./g,'')))
     .slice(0,4);
 
   const kpis = [
     { label:'Tổng hồ sơ nguồn',            value:'12,45 triệu', sub:'Từ 14 hệ thống nguồn kết nối',              color:'var(--brand)' },
-    { label:'Hồ sơ hợp nhất',              value:'8,92 triệu',  sub:'71,7% tổng hồ sơ nguồn',                   color:'var(--success)' },
+    { label:'Hồ sơ đã hợp nhất',           value:'8,92 triệu',  sub:'71,7% tổng hồ sơ nguồn',                   color:'var(--success)' },
+    { label:'Hồ sơ chưa hợp nhất',         value:'3,53 triệu',  sub:'28,3% tổng hồ sơ nguồn — còn tồn tại rời rạc', color:'var(--warn)' },
     { label:'Phân khúc đang chạy',         value:String(activeSegments.length), sub:`/${SEGMENTS.length} phân khúc đang hoạt động`, color:'var(--info)' },
-    { label:'Tỷ lệ hợp nhất tự động',      value:'87%',         sub:'3.180 hồ sơ cần xác nhận thủ công',        color:'var(--purple)' },
-    { label:'Nguy cơ rời bỏ',              value: churnSegment ? churnSegment.count : '—', sub:'Cần ưu tiên chăm sóc giữ chân', color:'var(--danger)' },
-    { label:'Chờ rà soát định danh',       value:'3.180',       sub:'Đang chờ Data Steward xử lý',              color:'var(--warn)' },
+    { label:'Khách hàng thuộc phân khúc',  value:'20.450',      sub:'Tổng KH đang được gắn vào các phân khúc',  color:'var(--purple)' },
+    { label:'Nguồn dữ liệu realtime',      value:'7/14',        sub:'Hệ thống nguồn cập nhật theo thời gian thực', color:'var(--text-2)' },
   ];
 
   return (
@@ -706,24 +705,12 @@ function DashboardScreen() {
       {/* Top phân khúc quan trọng */}
       <div className="panel" style={{ padding:20 }}>
         <div style={{ fontWeight:800, fontSize:14, marginBottom:14 }}>Top phân khúc quan trọng</div>
-        {(() => {
-          const maxCount = Math.max(...topSegments.map(s => parseInt(s.count.replace(/\./g,''))));
-          return topSegments.map((s,i) => {
-            const cnt = parseInt(s.count.replace(/\./g,''));
-            const pct = Math.round(cnt/maxCount*100);
-            return (
-              <div key={i} style={{ marginBottom: i<topSegments.length-1 ? 12 : 0 }}>
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:5 }}>
-                  <span className={`badge ${segBadgeColor(s.name)}`}>{s.name}</span>
-                  <span className="tabular-nums" style={{ fontSize:13, fontWeight:700, color:'var(--text-2)' }}>{s.count} KH</span>
-                </div>
-                <div style={{ height:5, borderRadius:3, background:'var(--line)' }}>
-                  <div style={{ width:`${pct}%`, height:'100%', borderRadius:3, background: segBadgeColor(s.name)==='badge-red' ? 'var(--danger)' : segBadgeColor(s.name)==='badge-green' ? 'var(--success)' : 'var(--info)' }}></div>
-                </div>
-              </div>
-            );
-          });
-        })()}
+        {topSegments.map((s,i) => (
+          <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 0', borderBottom: i<topSegments.length-1 ? '1px solid var(--line)' : 'none' }}>
+            <span className={`badge ${segBadgeColor(s.name)}`}>{s.name}</span>
+            <span className="tabular-nums" style={{ fontSize:13, fontWeight:700, color:'var(--text-2)' }}>{s.count} KH</span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -953,6 +940,7 @@ function CustomerListScreen({ onC360, initSegment }) {
 
       {/* Table */}
       <div className="panel">
+        <div style={{ overflowX:'auto' }}>
         <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
           <thead>
             <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
@@ -983,6 +971,7 @@ function CustomerListScreen({ onC360, initSegment }) {
             ))}
           </tbody>
         </table>
+        </div>
         <div style={{ padding:'10px 16px', borderTop:'1px solid #F3F4F6', fontSize:12, color:'#6B7280' }}>
           Hiển thị {filtered.length} / {CUSTOMERS.length} khách hàng
         </div>
@@ -1375,6 +1364,7 @@ const UNMERGE_REQUESTS = [
 function Customer360Screen({ uid, onBack }) {
   const [role, setRole] = React.useState('Admin');
   const [tab, setTab] = React.useState('overview');
+  const [pillarSubTab, setPillarSubTab] = React.useState(null);
   const [sourceTab, setSourceTab] = React.useState('compare');
   const kh = KH_DETAIL[uid] || KH_DETAIL['UID-0000123456'];
 
@@ -1431,28 +1421,6 @@ function Customer360Screen({ uid, onBack }) {
               <span className="badge badge-gray">{GROUP_LABEL[kh.group]||kh.group}</span>
               {custStatusBadge(kh.status)}
             </div>
-            <div style={{ display:'flex', gap:16, flexWrap:'wrap', marginTop:10 }}>
-              <div>
-                <div style={{ fontSize:11, color:'var(--muted)', fontWeight:600, textTransform:'uppercase', letterSpacing:'.04em', marginBottom:3 }}>Mảng dịch vụ chính</div>
-                <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
-                  {(kh.activePillars||[]).map(id => {
-                    const p = PILLARS.find(x=>x.id===id);
-                    return <span key={id} className="badge badge-yellow">{p ? p.id : id}</span>;
-                  })}
-                  {(!kh.activePillars||kh.activePillars.length===0) && <span style={{ fontSize:12, color:'var(--muted)' }}>Chưa có dữ liệu</span>}
-                </div>
-              </div>
-              <div>
-                <div style={{ fontSize:11, color:'var(--muted)', fontWeight:600, textTransform:'uppercase', letterSpacing:'.04em', marginBottom:3 }}>Hệ thống sử dụng</div>
-                <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
-                  {(kh.activeSystems||kh.sources||[]).map(s => <span key={s} className="badge badge-blue">{s}</span>)}
-                </div>
-              </div>
-              <div>
-                <div style={{ fontSize:11, color:'var(--muted)', fontWeight:600, textTransform:'uppercase', letterSpacing:'.04em', marginBottom:3 }}>Tương tác gần nhất</div>
-                <div style={{ fontSize:13, fontWeight:600, color:'var(--text-2)' }}>{kh.lastInteraction || kh.appLogin || 'Chưa có dữ liệu'}</div>
-              </div>
-            </div>
           </div>
           <div className="flex gap-2">
             <select value={role} onChange={e=>setRole(e.target.value)} style={{ fontSize:12, borderRadius:6 }}>
@@ -1461,8 +1429,30 @@ function Customer360Screen({ uid, onBack }) {
           </div>
         </div>
 
-        {/* KPI strip */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:10, marginTop:16, paddingTop:16, borderTop:'1px solid var(--border)' }}>
+        {/* Thông tin phụ — dải inline gọn: Mảng dịch vụ / Hệ thống / Tương tác gần nhất */}
+        <div style={{ display:'flex', alignItems:'center', gap:20, flexWrap:'wrap', marginTop:14, paddingTop:14, borderTop:'1px solid var(--border)' }}>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span style={{ fontSize:11, color:'var(--muted)', fontWeight:600 }}>Mảng dịch vụ:</span>
+            {(kh.activePillars||[]).map(id => {
+              const p = PILLARS.find(x=>x.id===id);
+              return <span key={id} className="badge badge-yellow">{p ? p.id : id}</span>;
+            })}
+            {(!kh.activePillars||kh.activePillars.length===0) && <span style={{ fontSize:12, color:'var(--muted)' }}>—</span>}
+          </div>
+          <div style={{ width:1, height:16, background:'var(--border)' }}></div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span style={{ fontSize:11, color:'var(--muted)', fontWeight:600 }}>Hệ thống:</span>
+            {(kh.activeSystems||kh.sources||[]).map(s => <span key={s} className="badge badge-blue">{s}</span>)}
+          </div>
+          <div style={{ width:1, height:16, background:'var(--border)' }}></div>
+          <div className="flex items-center gap-2">
+            <span style={{ fontSize:11, color:'var(--muted)', fontWeight:600 }}>Tương tác gần nhất:</span>
+            <span style={{ fontSize:13, fontWeight:600, color:'var(--text-2)' }}>{kh.lastInteraction || kh.appLogin || 'Chưa có dữ liệu'}</span>
+          </div>
+        </div>
+
+        {/* KPI strip — 6 chỉ số chính */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:10, marginTop:12 }}>
           {[
             { label:'Tổng đơn', value: kh.orders.toLocaleString(), unit:'' },
             { label:'Doanh thu 12 tháng', value: kh.revenue, unit:' ₫', color:'var(--success)' },
@@ -1471,11 +1461,11 @@ function Customer360Screen({ uid, onBack }) {
             { label:'Điểm tích lũy', value: kh.loyalty?.points != null ? kh.loyalty.points.toLocaleString() : '—', unit:' pt', color:'var(--purple)' },
             { label:'Độ đầy đủ hồ sơ', value: kh.completeness, unit:'%', color: completenessColor },
           ].map((k,i) => (
-            <div key={i} style={{ padding:'10px 12px', background:'var(--bg)', borderRadius:10, border:'1px solid var(--line)' }}>
-              <div style={{ fontSize:11, color:'var(--muted)', marginBottom:4, fontWeight:600 }}>{k.label}</div>
-              <div style={{ fontSize:17, fontWeight:900, color:k.color||'var(--text)', letterSpacing:'-.01em' }} className="tabular-nums">{k.value}{k.unit}</div>
+            <div key={i} style={{ padding:'8px 10px', background:'var(--bg)', borderRadius:8, border:'1px solid var(--line)' }}>
+              <div style={{ fontSize:10, color:'var(--muted)', marginBottom:2, fontWeight:600 }}>{k.label}</div>
+              <div style={{ fontSize:15, fontWeight:900, color:k.color||'var(--text)', letterSpacing:'-.01em' }} className="tabular-nums">{k.value}{k.unit}</div>
               {k.label==='Độ đầy đủ hồ sơ' && (
-                <div style={{ height:3, borderRadius:2, background:'var(--border)', marginTop:6 }}>
+                <div style={{ height:3, borderRadius:2, background:'var(--border)', marginTop:5 }}>
                   <div style={{ width:`${kh.completeness}%`, height:'100%', background:completenessColor, borderRadius:2 }}></div>
                 </div>
               )}
@@ -1518,7 +1508,7 @@ function Customer360Screen({ uid, onBack }) {
               <div className="section-title">Vai trò giao dịch</div>
               <div className="flex gap-2 mb-3">
                 {kh.roles.map(r => (
-                  <span key={r} className={`badge ${r===kh.primaryRole ? 'badge-red':'badge-blue'}`}>{r} {r===kh.primaryRole ? '(chính)':''}</span>
+                  <span key={r} className={`badge ${r===kh.primaryRole ? 'badge-red':'badge-blue'}`}>{ROLE_LABEL[r]||r} {r===kh.primaryRole ? '(chính)':''}</span>
                 ))}
               </div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
@@ -1548,7 +1538,7 @@ function Customer360Screen({ uid, onBack }) {
               <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
                 <thead>
                   <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
-                    {['Loại ID','Giá trị','Nguồn','Độ tin cậy','Reliability','Chính'].map(h => (
+                    {['Loại ID','Giá trị','Nguồn','Độ tin cậy','Chính'].map(h => (
                       <th key={h} style={{ padding:'8px 10px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
                     ))}
                   </tr>
@@ -1561,14 +1551,6 @@ function Customer360Screen({ uid, onBack }) {
                       <td style={{ padding:'8px 10px', color:'#6B7280' }}>{a.source}</td>
                       <td style={{ padding:'8px 10px' }}>
                         <span className={`badge ${a.confidence==='HIGH' ? 'badge-green' : a.confidence==='MEDIUM' ? 'badge-yellow' : 'badge-gray'}`}>{CONFIDENCE_LABEL[a.confidence]||a.confidence}</span>
-                      </td>
-                      <td style={{ padding:'8px 10px' }}>
-                        <div className="flex items-center gap-2">
-                          <div style={{ flex:1, height:6, borderRadius:3, background:'#E5E7EB', overflow:'hidden', minWidth:60 }}>
-                            <div style={{ width:`${a.reliability}%`, height:'100%', background: a.reliability>=80 ? '#16A34A' : a.reliability>=60 ? '#F59E0B' : '#DC2626', borderRadius:3 }}></div>
-                          </div>
-                          <span className="tabular-nums" style={{ fontSize:12, fontWeight:700 }}>{a.reliability}</span>
-                        </div>
                       </td>
                       <td style={{ padding:'8px 10px' }}>{a.primary ? '✓' : ''}</td>
                     </tr>
@@ -1771,7 +1753,7 @@ function Customer360Screen({ uid, onBack }) {
 
         {/* ĐỊA CHỈ */}
         {tab==='address' && (() => {
-          const byType = kh.addresses.reduce((acc,a) => { (acc[a.type] = acc[a.type]||[]).push(a); return acc; }, {});
+          const byType = kh.addresses.filter(a => a.type !== 'RECEIVER').reduce((acc,a) => { (acc[a.type] = acc[a.type]||[]).push(a); return acc; }, {});
           return (
             <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
               {Object.keys(byType).map(type => (
@@ -1790,7 +1772,7 @@ function Customer360Screen({ uid, onBack }) {
                   ))}
                 </div>
               ))}
-              {(!kh.addresses || kh.addresses.length===0) && (
+              {Object.keys(byType).length===0 && (
                 <div style={{ padding:32, textAlign:'center', color:'#6B7280' }}>Chưa có dữ liệu địa chỉ</div>
               )}
             </div>
@@ -1888,51 +1870,56 @@ function Customer360Screen({ uid, onBack }) {
 
         {/* HOẠT ĐỘNG THEO MẢNG DỊCH VỤ CHÍNH */}
         {tab==='pillars' && (() => {
+          // Mỗi mảng dịch vụ tổng hợp bộ chỉ số đặc thù riêng — hầu hết đều có doanh thu riêng,
+          // trừ HCC (dịch vụ công) dùng "số hồ sơ đã xử lý" thay cho doanh thu.
           const PILLAR_MOCK = {
-            BCCP:      { metric:`${kh.orders.toLocaleString()} đơn / 12 tháng`, revenue:`${kh.revenue} ₫`, highlight2:`Tỷ lệ phát ${kh.deliveryRate}% · Tỷ lệ hoàn ${kh.returnRate}%`, signal: kh.returnRate>=20 ? { text:'Tỷ lệ hoàn cao — cần theo dõi', color:'var(--danger)' } : { text:'Hoạt động ổn định', color:'var(--success)' } },
-            TCBC:      { metric:'Đối soát đều hàng tháng', revenue:'—', highlight2:'Thanh toán tại quầy, chưa dùng thu hộ online', signal:{ text:'Tiềm năng upsell: PayPost thu hộ', color:'var(--info)' } },
-            PPBL:      { metric:'—', revenue:'—', highlight2:'Chưa phát sinh giao dịch', signal:{ text:'Chưa sử dụng', color:'var(--muted)' } },
-            HCC:       { metric:'—', revenue:'—', highlight2:'Chưa phát sinh giao dịch', signal:{ text:'Chưa sử dụng', color:'var(--muted)' } },
-            Logistics: { metric:'3 điểm kho đang dùng', revenue:'—', highlight2:'Giao đa điểm, tăng trước sale', signal:{ text:'SLA ổn định, cần theo dõi tồn kho', color:'var(--warn)' } },
-            TMDT:      { metric:'—', revenue:'—', highlight2:'Chưa phát sinh giao dịch', signal:{ text:'Tiềm năng: shop online đang mở rộng', color:'var(--info)' } },
-            MVNO:      { metric:'—', revenue:'—', highlight2:'Chưa phát sinh giao dịch', signal:{ text:'Chưa sử dụng', color:'var(--muted)' } },
+            BCCP:      { active:true,  fields:[['Doanh thu cước 12 tháng', `${kh.revenue} ₫`],['Tổng đơn gửi/nhận', `${kh.orders.toLocaleString()} đơn`],['Tỷ lệ phát thành công', `${kh.deliveryRate}%`],['Tỷ lệ hoàn', `${kh.returnRate}%`]], signal: kh.returnRate>=20 ? { text:'Tỷ lệ hoàn cao — cần theo dõi', color:'var(--danger)' } : { text:'Hoạt động ổn định', color:'var(--success)' } },
+            TCBC:      { active:true,  fields:[['Doanh thu phí dịch vụ', '18.500.000 ₫'],['Tổng giá trị giao dịch', '2.340.000.000 ₫'],['Số giao dịch 12 tháng', '412 giao dịch'],['Kênh chính', 'Tại quầy']], signal:{ text:'Tiềm năng upsell: PayPost thu hộ online', color:'var(--info)' } },
+            PPBL:      { active:true,  fields:[['Doanh thu bán lẻ 12 tháng', '96.700.000 ₫'],['Tổng đơn mua tại quầy', '284 đơn'],['Giá trị đơn trung bình', '340.000 ₫'],['Tần suất mua', '~24 đơn/tháng']], signal:{ text:'Khách mua đều — có thể mời chương trình khách thân thiết', color:'var(--info)' } },
+            HCC:       { active:true,  fields:[['Số hồ sơ đã xử lý', '17 hồ sơ'],['Hồ sơ trả tại nhà', '12 hồ sơ'],['Thủ tục hay dùng', 'Cấp đổi giấy tờ'],['Tỷ lệ hồ sơ thành công', '94%']], signal:{ text:'Sử dụng ổn định dịch vụ hành chính công', color:'var(--success)' } },
+            Logistics: { active:true,  fields:[['Doanh thu logistics 12 tháng', '512.000.000 ₫'],['Điểm kho đang dùng', '3 điểm'],['Sản lượng fulfillment', '8.240 đơn'],['SLA giao hàng', '96%']], signal:{ text:'SLA ổn định, cần theo dõi tồn kho', color:'var(--warn)' } },
+            TMDT:      { active:true,  fields:[['Doanh thu qua sàn 12 tháng', '268.000.000 ₫'],['Số shop online', '2 shop'],['Đơn giao chặng cuối', '1.560 đơn'],['Tỷ lệ hoàn TMĐT', '11%']], signal:{ text:'Shop online đang mở rộng — tiềm năng tăng trưởng', color:'var(--info)' } },
+            MVNO:      { active:true,  fields:[['Doanh thu cước viễn thông', '2.400.000 ₫'],['Gói cước đang dùng', 'Gói data 4G tháng'],['Tổng nạp cước 12 tháng', '2.400.000 ₫'],['Ngày hết hạn gói', '15/07/2026']], signal:{ text:'Gói cước sắp hết hạn — nhắc gia hạn', color:'var(--warn)' } },
           };
           const rows = PILLARS.map(p => {
             const isActive = (kh.activePillars||[]).includes(p.id);
-            const mock = PILLAR_MOCK[p.id] || {};
-            return { ...p, active:isActive, ...(isActive ? mock : { metric:'—', revenue:'—', highlight2:'Chưa phát sinh dữ liệu cho khách hàng này', signal:{ text:'Chưa sử dụng', color:'var(--muted)' } }) };
+            const mock = PILLAR_MOCK[p.id] || { active:false, fields:[], signal:{ text:'Chưa sử dụng', color:'var(--muted)' } };
+            return { ...p, active: isActive && mock.active, fields: (isActive && mock.active) ? mock.fields : [], signal: mock.signal };
           });
+          const current = pillarSubTab ? rows.find(r => r.id===pillarSubTab) : null;
+          const active = current || rows[0];
           return (
             <div>
               <div style={{ fontSize:12, color:'var(--muted)', marginBottom:14, lineHeight:1.6 }}>
-                Tổng hợp mức độ sử dụng theo từng mảng dịch vụ chính. Xem chi tiết giao dịch và đối soát COD tại tab <strong>GD &amp; COD</strong>.
+                Chọn từng mảng dịch vụ để xem chỉ số riêng. Xem chi tiết giao dịch và đối soát COD tại tab <strong>GD &amp; COD</strong>.
               </div>
-              <div style={{ overflow:'auto', borderRadius:10, border:'1px solid var(--border)' }}>
-                <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
-                  <thead>
-                    <tr style={{ background:'var(--bg-2)', borderBottom:'2px solid var(--border)' }}>
-                      {['Mảng dịch vụ','Trạng thái','Chỉ số nổi bật','Doanh thu 12 tháng','Hoạt động / Ghi chú','Tín hiệu / Rủi ro'].map(h => (
-                        <th key={h} style={{ padding:'9px 12px', textAlign:'left', fontSize:11, fontWeight:800, color:'var(--muted)', letterSpacing:'.04em', whiteSpace:'nowrap' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map(r => (
-                      <tr key={r.id} style={{ borderBottom:'1px solid var(--line)', background: r.active ? 'white' : 'var(--bg-2)' }}>
-                        <td style={{ padding:'11px 12px', fontWeight:700, fontSize:13 }}>{r.label}</td>
-                        <td style={{ padding:'11px 12px' }}>
-                          <span className={`badge ${r.active ? 'badge-green' : 'badge-gray'}`}>{r.active ? '● Đang dùng' : '○ Chưa dùng'}</span>
-                        </td>
-                        <td style={{ padding:'11px 12px', fontSize:12, fontWeight:600, color: r.active ? 'var(--text)' : 'var(--muted)' }} className="tabular-nums">{r.metric}</td>
-                        <td style={{ padding:'11px 12px', fontSize:12, fontWeight:600, color: r.revenue!=='—' ? 'var(--success)' : 'var(--muted)' }} className="tabular-nums">{r.revenue}</td>
-                        <td style={{ padding:'11px 12px', fontSize:12, color:'var(--muted)' }}>{r.highlight2}</td>
-                        <td style={{ padding:'11px 12px' }}>
-                          <span style={{ fontSize:12, fontWeight:600, color:r.signal.color }}>{r.signal.text}</span>
-                        </td>
-                      </tr>
+              <div className="tabs-strip" style={{ marginBottom:16 }}>
+                {rows.map(r => (
+                  <button key={r.id} onClick={() => setPillarSubTab(r.id)}
+                    className={`tab-btn ${(active.id===r.id) ? 'active':''}`}>
+                    {r.label.split('—')[0].trim()} {r.active ? '●' : '○'}
+                  </button>
+                ))}
+              </div>
+              <div style={{ border:'1px solid var(--border)', borderRadius:10, padding:20 }}>
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                  <span style={{ fontWeight:800, fontSize:14 }}>{active.label}</span>
+                  <span className={`badge ${active.active ? 'badge-green' : 'badge-gray'}`}>{active.active ? 'Đang dùng' : 'Chưa dùng'}</span>
+                </div>
+                <div style={{ fontSize:12, color:'var(--muted)', marginBottom:14 }}>Hệ thống sử dụng: {active.system}</div>
+                {active.fields.length>0 ? (
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:12, marginBottom:14 }}>
+                    {active.fields.map(([l,v],i) => (
+                      <div key={i} style={{ padding:'10px 12px', background:'var(--bg)', borderRadius:10, border:'1px solid var(--line)' }}>
+                        <div style={{ fontSize:11, color:'var(--muted)', marginBottom:4, fontWeight:600 }}>{l}</div>
+                        <div style={{ fontSize:15, fontWeight:800 }} className="tabular-nums">{v}</div>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+                ) : (
+                  <div style={{ padding:20, textAlign:'center', color:'var(--muted)', fontSize:13, background:'var(--bg)', borderRadius:10, marginBottom:14 }}>Chưa phát sinh dữ liệu cho mảng dịch vụ này</div>
+                )}
+                <div style={{ fontSize:12, fontWeight:600, color:active.signal.color }}>Tín hiệu / Rủi ro: {active.signal.text}</div>
               </div>
             </div>
           );
