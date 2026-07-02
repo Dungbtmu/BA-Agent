@@ -1,0 +1,2578 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CDP VNPost — Prototype v3</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --brand: #F4B400; --brand-soft: #FEF7E0; --brand-2: #ffd44d;
+    --text: #1A1A1A; --text-2: #374151; --muted: #6B7280;
+    --border: #E5E7EB; --line: #F3F4F6; --bg: #F7F8FA; --bg-2: #fafbfc;
+    --success: #16A34A; --success-soft: #dcfce7;
+    --info: #2563EB; --info-soft: #dbeafe;
+    --warn: #d97706; --warn-soft: #fef9c3;
+    --danger: #DC2626; --danger-soft: #fee2e2;
+    --purple: #7c3aed; --purple-soft: #ede9fe;
+    --radius: 14px; --radius-sm: 8px;
+    --shadow-xs: 0 2px 6px rgba(17,24,39,.05);
+    --shadow-sm: 0 4px 14px rgba(17,24,39,.07);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+  :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+  /* Sidebar */
+  .sidebar-item { transition: background .15s; }
+  .sidebar-item:hover { background: var(--brand-soft); }
+  .sidebar-item.active { background: var(--brand-soft); color: #8a5a00; border-right: 3px solid var(--brand); }
+  .sidebar-item.active svg { color: #8a5a00; }
+  .sidebar-section-label { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #9CA3AF; padding: 10px 16px 4px; }
+
+  /* Badges */
+  .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .badge-green  { background: var(--success-soft); color: var(--success); }
+  .badge-red    { background: var(--danger-soft);  color: var(--danger); }
+  .badge-yellow { background: var(--warn-soft);    color: var(--warn); }
+  .badge-blue   { background: var(--info-soft);    color: var(--info); }
+  .badge-gray   { background: var(--line);         color: var(--muted); }
+  .badge-purple { background: var(--purple-soft);  color: var(--purple); }
+
+  /* Table */
+  .table-row:hover { background: #fffdf6; cursor: pointer; }
+
+  /* Score bar */
+  .score-bar { height: 6px; border-radius: 3px; background: var(--border); }
+  .score-fill { height: 100%; border-radius: 3px; }
+
+  /* Tabs */
+  .tab-btn { padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--muted); transition: all .15s; white-space: nowrap; }
+  .tab-btn.active { background: linear-gradient(180deg, var(--brand), #efb000); color: #1A1A1A; border-color: #e1ad1f; box-shadow: var(--shadow-xs); }
+  .tab-btn:hover:not(.active) { background: var(--line); color: var(--text); }
+  .tabs-strip { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .tabs-strip::-webkit-scrollbar { display: none; }
+
+  /* Cards & Panels */
+  .kpi-card { background: white; border-radius: var(--radius); padding: 16px 18px; border: 1px solid rgba(17,24,39,.06); box-shadow: var(--shadow-xs); }
+  .panel { background: white; border-radius: var(--radius); border: 1px solid rgba(17,24,39,.06); overflow: hidden; box-shadow: var(--shadow-xs); }
+
+  /* Typography */
+  .section-title { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+  .field-label { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+  .field-value { font-size: 14px; color: var(--text); font-weight: 500; }
+
+  /* Consent */
+  .consent-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 8px; font-size: 12px; font-weight: 700; }
+  .consent-in  { background: var(--success-soft); color: var(--success); }
+  .consent-out { background: var(--danger-soft);  color: var(--danger); }
+  .consent-unknown { background: var(--line); color: var(--muted); }
+
+  /* Timeline */
+  .timeline-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+
+  /* Rule builder */
+  .rule-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--bg-2); border-radius: 10px; border: 1px solid var(--border); }
+
+  /* Modals */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(2px); }
+  .modal-box { background: white; border-radius: 16px; padding: 28px; width: 440px; max-width: 90vw; box-shadow: var(--shadow-sm); }
+
+  /* Gauge */
+  .gauge-outer { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; }
+
+  /* Inputs */
+  input, select { border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font-size: 13px; background: white; color: var(--text); transition: border-color .15s; }
+  input:focus, select:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-color: transparent; }
+
+  /* Slide panel */
+  .slide-panel { position: fixed; top: 0; right: 0; height: 100vh; width: 440px; max-width: 95vw; background: white; box-shadow: -6px 0 28px rgba(0,0,0,.1); z-index: 40; overflow-y: auto; padding: 24px; }
+
+  /* Buttons */
+  .btn-primary { background: linear-gradient(180deg, var(--brand), #efb000); color: #1A1A1A; border: 1px solid #e1ad1f; border-radius: 10px; font-weight: 700; cursor: pointer; }
+  .btn-primary:hover { filter: brightness(1.04); }
+  .btn-ghost { background: var(--line); color: var(--text); border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* Info row (key-value) */
+  .info-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+  .info-row:last-child { border-bottom: none; }
+  .info-row span:first-child { color: var(--muted); font-size: 13px; }
+  .info-row b { text-align: right; font-size: 13px; }
+
+  /* Metadata strip */
+  .meta-strip { display: flex; gap: 16px; flex-wrap: wrap; padding: 10px 14px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; font-size: 12px; color: var(--muted); }
+  .meta-strip b { color: var(--text-2); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+// ============================================================
+// DATA
+// ============================================================
+const TOPICS = [
+  { id:1, status:'HEALTHY', name:'cdp.customer.profile',     source:'CAS',          type:'Khách hàng',      msgMin:145, msg24h:'208.000', lag:12,    lagWarn:false, err24h:0,  updated:'5s trước' },
+  { id:2, status:'HEALTHY', name:'cdp.customer.profile.crm', source:'CRM',          type:'Khách hàng',      msgMin:60,  msg24h:'86.000',  lag:4,     lagWarn:false, err24h:2,  updated:'8s trước' },
+  { id:3, status:'HEALTHY', name:'cdp.order.created',        source:'MPITS',        type:'Đơn hàng',        msgMin:320, msg24h:'461.000', lag:30,    lagWarn:false, err24h:5,  updated:'2s trước' },
+  { id:4, status:'WARNING', name:'cdp.delivery.status',      source:'PNS/DingDong', type:'Trạng thái phát', msgMin:210, msg24h:'302.000', lag:8400,  lagWarn:true,  err24h:12, updated:'1m trước' },
+  { id:5, status:'ERROR',   name:'cdp.cod.payment',          source:'PayPost',      type:'COD',             msgMin:0,   msg24h:'54.000',  lag:11200, lagWarn:true,  err24h:48, updated:'15m trước' },
+  { id:6, status:'HEALTHY', name:'cdp.behavior.event',       source:'MyVNPost',     type:'Hành vi',         msgMin:480, msg24h:'690.000', lag:55,    lagWarn:false, err24h:8,  updated:'1s trước' },
+  { id:7, status:'HEALTHY', name:'cdp.customer.khl',         source:'Portal KHL',   type:'Khách hàng',      msgMin:12,  msg24h:'17.000',  lag:0,     lagWarn:false, err24h:0,  updated:'20s trước' },
+  { id:8, status:'IDLE',    name:'cdp.address.update',       source:'VPostCode',    type:'Địa chỉ',         msgMin:0,   msg24h:'1.200',   lag:0,     lagWarn:false, err24h:0,  updated:'2h trước' },
+];
+
+const ALERTS = [
+  { level:'ERROR',   time:'10:42', topic:'cdp.cod.payment',    msg:'PayPost ngừng đẩy message 15 phút, lag 11.200' },
+  { level:'WARNING', time:'10:30', topic:'cdp.delivery.status',msg:'Consumer lag vượt ngưỡng 8.000' },
+  { level:'ERROR',   time:'09:15', topic:'cdp.cod.payment',    msg:'48 message lỗi schema trong 1 giờ' },
+];
+
+const CUSTOMERS = [
+  { uid:'UID-0000123456', name:'Nguyễn Thị Hương',         type:'INDIVIDUAL', group:'SME',        phone:'0901234567', orders:1275, revenue:'458.200.000', segment:'Khách hàng trung thành', status:'ACTIVE',   updated:'29/06/2026', pillar:'BCCP + Logistics' },
+  { uid:'UID-0000987654', name:'Công ty TNHH TM ABC',      type:'BUSINESS',   group:'KHL',        phone:'0987654321', orders:18450,revenue:'6.820.000.000',segment:'KHL giá trị cao',        status:'ACTIVE',   updated:'29/06/2026', pillar:'BCCP + TCBC' },
+  { uid:'UID-0000456789', name:'Phạm Minh Tuấn',           type:'INDIVIDUAL', group:'B2C',        phone:'0978111222', orders:86,   revenue:'9.400.000',   segment:'Có nguy cơ rời bỏ',      status:'ACTIVE',   updated:'26/06/2026', pillar:'BCCP' },
+  { uid:'UID-0000334411', name:'Trần Quốc Bảo',            type:'INDIVIDUAL', group:'B2C',        phone:'0905556677', orders:412,  revenue:'78.500.000',  segment:'Khách hàng trung thành',  status:'ACTIVE',   updated:'28/06/2026', pillar:'BCCP' },
+  { uid:'UID-0000220088', name:'Cửa hàng Mẹ & Bé Sunny',  type:'BUSINESS',   group:'SME',        phone:'0933221100', orders:2310, revenue:'612.000.000', segment:'Chủ shop hoạt động cao',  status:'ACTIVE',   updated:'29/06/2026', pillar:'BCCP + TMĐT' },
+  { uid:'UID-0000771122', name:'Lê Thị Hằng',              type:'INDIVIDUAL', group:'B2C',        phone:'0918887766', orders:24,   revenue:'1.800.000',   segment:'Khách hàng mới',          status:'ACTIVE',   updated:'22/06/2026', pillar:'HCC' },
+  { uid:'UID-0000559900', name:'Công ty CP Logistics XYZ', type:'BUSINESS',   group:'KHL',        phone:'0966554433', orders:9870, revenue:'3.410.000.000',segment:'KHL giá trị cao',        status:'ACTIVE',   updated:'29/06/2026', pillar:'Logistics + BCCP' },
+  { uid:'UID-0000662200', name:'Đỗ Văn Khải',              type:'INDIVIDUAL', group:'B2C',        phone:'0944332211', orders:153,  revenue:'19.200.000',  segment:'Có nguy cơ rời bỏ',       status:'INACTIVE', updated:'28/04/2026', pillar:'BCCP' },
+];
+
+// Dữ liệu nhóm hồ sơ — mỗi nhóm có N hồ sơ từ N nguồn khác nhau
+const GROUPS = [
+  {
+    id:'GRP-0041', matchKey:'SĐT 0901234567 · Tên gần đúng', type:'INDIVIDUAL',
+    profiles:[
+      { uid:'CAS-0009912',  source:'CAS',          name:'Nguyễn Thị Hương',  phone:'0901234567',  email:'huong.nguyen@gmail.com', cccd:'012********',       address:'Hà Nội',   orders:1275, role:'Người gửi',   confidence:82 },
+      { uid:'CRM-0000192',  source:'CRM',          name:'Nguyen Thi Huong',  phone:'0901234567',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'—',           confidence:78 },
+      { uid:'MVN-4421009',  source:'MyVNPost',     name:'Hương Nguyễn',      phone:'090123xxxx',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:12,   role:'Người gửi',   confidence:76 },
+      { uid:'PNS-8819001',  source:'PNS/DingDong', name:'N.T. Hương',        phone:'0901234567',  email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'Người nhận',  confidence:71 },
+      { uid:'PAY-2200441',  source:'PayPost',      name:'Nguyễn Hương',      phone:'090123xxx',   email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'—',           confidence:68 },
+      { uid:'VPC-0031122',  source:'VPostCode',    name:'—',                 phone:'—',           email:'—',                      cccd:'—',                 address:'Hà Nội',   orders:0,    role:'—',           confidence:61 },
+    ],
+    conflicts:['SĐT không nhất quán ở MyVNPost, PayPost (thiếu số cuối)', 'Tên viết tắt/không dấu ở 3/6 nguồn'],
+    warn: true,
+  },
+  {
+    id:'GRP-0042', matchKey:'MST 0312345678', type:'BUSINESS',
+    profiles:[
+      { uid:'KHL-0987654',  source:'Portal KHL',   name:'Công ty TNHH TM ABC',  phone:'0987654321',  email:'info@abc.vn',            cccd:'MST:0312345678',    address:'TP.HCM',   orders:18450,role:'KHL',         confidence:88 },
+      { uid:'CRM-0000987',  source:'CRM',          name:'Cong ty TNHH TM ABC',  phone:'—',           email:'contact@abc.com.vn',     cccd:'MST:0312345678',    address:'TP.HCM',   orders:0,    role:'—',           confidence:79 },
+      { uid:'CAS-0041200',  source:'CAS',          name:'TNHH TM ABC',          phone:'0987654321',  email:'—',                      cccd:'MST:0312345678',    address:'TP.HCM',   orders:320,  role:'Người gửi',   confidence:74 },
+    ],
+    conflicts:['Tên công ty viết tắt/không dấu ở CRM, CAS', 'Email khác nhau giữa Portal KHL và CRM'],
+    warn: true,
+  },
+  {
+    id:'GRP-0043', matchKey:'SĐT 0978111222', type:'INDIVIDUAL',
+    profiles:[
+      { uid:'CAS-0456789',  source:'CAS',          name:'Phạm Minh Tuấn',       phone:'0978111222',  email:'—',                      cccd:'—',                 address:'TP.HCM',   orders:86,   role:'Người gửi',   confidence:80 },
+      { uid:'PNS-0456120',  source:'PNS/DingDong', name:'Pham M. Tuan',         phone:'0978111222',  email:'—',                      cccd:'—',                 address:'TP.HCM',   orders:0,    role:'Người nhận',  confidence:68 },
+    ],
+    conflicts:['Tên không dấu ở PNS/DingDong', 'Vai trò khác nhau (gửi vs nhận)'],
+    warn: true,
+  },
+];
+
+const KH_DETAIL = {
+  'UID-0000123456': {
+    uid:'UID-0000123456', type:'INDIVIDUAL', group:'SME', status:'ACTIVE', name:'Nguyễn Thị Hương',
+    activePillars:['BCCP','Logistics'],
+    activeSystems:['MyVNPost App', 'MPITS', 'PayPost'],
+    lastInteraction:'24/06/2026 09:12 (App)',
+    phone:'0901234567', email:'huong.nguyen@gmail.com', cccd:'012********', postId:'PID-889234',
+    crmId:'CRM-55120', postOffice:'BĐ Cầu Giấy', completeness:82,
+    gender:'Nữ', birthDate:'15/03/1988', customerCode:'CUS-SME-00892',
+    lastOrder:{ id:'ORD-1781765944387', amount:'350.000', date:'23/06/2026', type:'EMS' },
+    roles:['SENDER','SHOP_OWNER'], primaryRole:'SENDER', senderCount:1240, receiverCount:35,
+    orders:1275, revenue:'458.200.000', avgMonthly:106, service:'EMS',
+    routes:['HN→HCM','HN→ĐN','HN→HP'], deliveryRate:94, returnRate:8,
+    cod:{ total:'1.250.000.000', collected:'1.180.000.000', pending:'70.000.000', status:'MATCHED' },
+    loyalty:{ tier:'GOLD', points:12400, expiry:'2026-12-31' },
+    segments:['Khách hàng trung thành','Chủ shop hoạt động cao'],
+    scores:{ rfmR:5, rfmF:5, rfmM:4, rfmGroup:'Champions', clv:'620.000.000', churn:18, engagement:88, codRisk:22, fraud:9, updatedAt:'24/06 08:00' },
+    consent:{ sms:'in', email:'in', zalo:'in', push:'out', deletionRequested:false },
+    appLogin:'24/06 09:12', device:'Android', sessions30d:47,
+    complaints:{ total:3, open:0, satisfaction:4.5, sla:98 },
+    sources:['CAS','CRM','MyVNPost','PayPost','PostID','PNS'],
+    aliases:[
+      { type:'PHONE', value:'0901234567', source:'MyVNPost', confidence:'HIGH', reliability:90, primary:true },
+      { type:'POST_ID', value:'PID-889234', source:'PostID', confidence:'HIGH', reliability:95, primary:true },
+      { type:'CRM_ID', value:'CRM-55120', source:'CRM', confidence:'HIGH', reliability:85, primary:true },
+      { type:'USER_APP_ID', value:'APP-99213', source:'MyVNPost', confidence:'MEDIUM', reliability:70, primary:false },
+    ],
+    addresses:[
+      { type:'SENDER',   primary:true,  detail:'Số 5 ngõ 12 Trần Thái Tông', ward:'P.Dịch Vọng',        province:'Hà Nội',  vpostcode:'100123', status:'STANDARDIZED', version:'NEW' },
+      { type:'RECEIVER', primary:false, detail:'22 Lê Văn Sỹ',                ward:'P.13',               province:'TP HCM',  vpostcode:'700789', status:'STANDARDIZED', version:'NEW' },
+      { type:'SENDER',   primary:false, detail:'88 Bạch Đằng',                ward:'P.Hải Châu 1',       province:'Đà Nẵng', vpostcode:'550123', status:'PARTIAL',      version:'LEGACY' },
+    ],
+    timeline:[
+      { time:'24/06 09:12', type:'app', icon:'📱', label:'Đăng nhập App', channel:'APP', color:'#2563EB' },
+      { time:'23/06 14:30', type:'order', icon:'📦', label:'Tạo đơn hàng EMS HN→HCM', channel:'APP', color:'#16A34A' },
+      { time:'20/06 10:00', type:'complaint', icon:'💬', label:'Khiếu nại — Đơn giao chậm', channel:'CALL_CENTER', color:'#F59E0B' },
+      { time:'15/06 08:45', type:'order', icon:'📦', label:'Tạo đơn hàng EMS HN→ĐN', channel:'APP', color:'#16A34A' },
+      { time:'10/06 16:00', type:'campaign', icon:'📣', label:'Phản hồi Campaign Email SALE06', channel:'EMAIL', color:'#7c3aed' },
+    ],
+    sourcesData:[
+      {
+        sourceId:'CAS-0881234', source:'CAS', mergedAt:'15/06/2026 06:00', confidence:92, matchKey:'SĐT 0901234567',
+        dinh_danh:{ ten:'Nguyễn Thị Hương', sdt:'0901234567', email:'—', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'Số 5 ngõ 12 Trần Thái Tông, P.Dịch Vọng, Hà Nội', nhanHang:'22 Lê Văn Sỹ, P.13, TP HCM', vpostcode:'100123' },
+        giao_dich:{ vaiTro:'Người gửi', tongDon:1240, doanhThu:'440.000.000', tyLeHoan:'8%', cod:'1.180.000.000' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+      },
+      {
+        sourceId:'CRM-0000192', source:'CRM', mergedAt:'20/06/2026 08:45', confidence:78, matchKey:'SĐT 0901234567',
+        dinh_danh:{ ten:'Nguyen Thi Huong', sdt:'0901234567', email:'huong.nt@gmail.com', cccd:'—', gioiTinh:'Nữ', ngaySinh:'15/03/1988', postId:'—' },
+        dia_chi:{ guiHang:'Số 5 ngõ 12 Trần Thái Tông, Hà Nội', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'Người gửi', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+        note:'Tên không dấu',
+      },
+      {
+        sourceId:'MVN-4421009', source:'MyVNPost', mergedAt:'20/06/2026 08:46', confidence:76, matchKey:'SĐT 090123xxxx · Tên gần đúng',
+        dinh_danh:{ ten:'Nguyễn Hương', sdt:'090123xxxx', email:'—', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'Hà Nội', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'—', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'24/06 09:12', device:'Android', sessions30d:47 },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+        note:'SĐT thiếu số cuối',
+      },
+      {
+        sourceId:'PID-889234', source:'PostID', mergedAt:'18/06/2026 07:00', confidence:95, matchKey:'PostID PID-889234',
+        dinh_danh:{ ten:'Nguyễn Thị Hương', sdt:'0901234567', email:'—', cccd:'012********', gioiTinh:'Nữ', ngaySinh:'15/03/1988', postId:'PID-889234' },
+        dia_chi:{ guiHang:'Số 5 ngõ 12 Trần Thái Tông, P.Dịch Vọng, Hà Nội', nhanHang:'88 Bạch Đằng, P.Hải Châu 1, Đà Nẵng', vpostcode:'100123' },
+        giao_dich:{ vaiTro:'—', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+      },
+      {
+        sourceId:'PNS-0044120', source:'PNS/DingDong', mergedAt:'19/06/2026 10:00', confidence:65, matchKey:'Tên gần đúng · SĐT 0901234567',
+        dinh_danh:{ ten:'Nguyen Huong', sdt:'0901234567', email:'—', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'Ha Noi', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'Người nhận', tongDon:12, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+        note:'Tên không dấu, không dấu cách',
+      },
+      {
+        sourceId:'PAY-2200441', source:'PayPost', mergedAt:'20/06/2026 08:47', confidence:68, matchKey:'SĐT 0901234567',
+        dinh_danh:{ ten:'Nguyễn Hương', sdt:'0901234567', email:'huong.nguyen@gmail.com', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'—', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'—', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'70.000.000' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+      },
+    ],
+  },
+  'UID-0000987654': {
+    uid:'UID-0000987654', type:'BUSINESS', group:'KHL', status:'ACTIVE', name:'Công ty TNHH Thương mại ABC',
+    activePillars:['BCCP','TCBC'],
+    activeSystems:['Portal KHL', 'MPITS', 'PayPost', 'CRM'],
+    lastInteraction:'24/06/2026 10:00 (API)',
+    phone:'0987654321', email:'info@abc.vn', cccd:'N/A', postId:'N/A',
+    gender:'—', birthDate:'—', customerCode:'CUS-KHL-00156',
+    lastOrder:{ id:'ORD-1781700012240', amount:'12.400.000', date:'24/06/2026', type:'Bưu kiện loạt' },
+    taxId:'0312345678', khlCode:'KHL-2024-0156', representative:'Trần Văn Nam',
+    contract:{ status:'ACTIVE', start:'2024-01-15', end:'2026-12-31', segment:'Bán lẻ TMĐT' },
+    debt:{ unpaid:'1.100.000.000', dueDate:'30/06/2026', overdue:'320.000.000', overdueDays:12, status:'OVERDUE' },
+    codHistory:[
+      { month:'06/2026', total:'2.800.000.000', collected:'1.700.000.000', pending:'1.100.000.000', status:'DISCREPANCY' },
+      { month:'05/2026', total:'3.100.000.000', collected:'3.100.000.000', pending:'0',             status:'MATCHED' },
+      { month:'04/2026', total:'2.950.000.000', collected:'2.950.000.000', pending:'0',             status:'MATCHED' },
+      { month:'03/2026', total:'2.600.000.000', collected:'2.480.000.000', pending:'120.000.000',   status:'DISCREPANCY' },
+      { month:'02/2026', total:'2.100.000.000', collected:'2.100.000.000', pending:'0',             status:'MATCHED' },
+    ],
+    contacts:[
+      { name:'Trần Văn Nam', phone:'0987654321', email:'nam.tran@abc.vn', role:'Giám đốc', primary:true },
+      { name:'Lê Thị Mai',   phone:'0911222333', email:'mai.le@abc.vn',   role:'Kế toán',  primary:false },
+    ],
+    postOffice:'BĐ Q.1 HCM', completeness:91,
+    roles:['SENDER','KHL'], primaryRole:'KHL', senderCount:18450, receiverCount:0,
+    orders:18450, revenue:'6.820.000.000', avgMonthly:1537, service:'Bưu kiện thường',
+    routes:['HCM→HN','HCM→HP','HCM→ĐN'], deliveryRate:91, returnRate:14,
+    cod:{ total:'14.200.000.000', collected:'13.100.000.000', pending:'1.100.000.000', status:'DISCREPANCY' },
+    loyalty:{ tier:null, points:null, expiry:null },
+    segments:['KHL giá trị cao','Tỷ lệ hoàn cao'],
+    scores:{ rfmR:5, rfmF:5, rfmM:5, rfmGroup:'Champions', clv:'9.500.000.000', churn:35, engagement:60, codRisk:58, fraud:21, updatedAt:'24/06 08:00' },
+    consent:{ sms:'in', email:'in', zalo:'unknown', push:'unknown', deletionRequested:false },
+    appLogin:'Chưa có dữ liệu', device:'Chưa có dữ liệu', sessions30d:null,
+    complaints:{ total:24, open:3, satisfaction:3.8, sla:86 },
+    sources:['Portal KHL','CRM','CAS','MPITS','PayPost'],
+    aliases:[
+      { type:'TAX_ID',  value:'0312345678',   source:'Portal KHL', confidence:'HIGH',   reliability:95, primary:true },
+      { type:'KHL_CODE',value:'KHL-2024-0156', source:'Portal KHL', confidence:'HIGH',   reliability:90, primary:true },
+      { type:'PHONE',   value:'0987654321',    source:'CRM',        confidence:'HIGH',   reliability:80, primary:true },
+      { type:'EMAIL',   value:'info@abc.vn',   source:'CRM',        confidence:'MEDIUM', reliability:70, primary:true },
+    ],
+    addresses:[
+      { type:'BUSINESS',  primary:true,  detail:'123 Nguyễn Thị Minh Khai', ward:'P.6',          province:'TP HCM',  vpostcode:'700123', status:'STANDARDIZED', version:'NEW' },
+      { type:'WAREHOUSE', primary:false, detail:'KCN Sóng Thần, Lô B12',    ward:'P.Dĩ An',      province:'Bình Dương', vpostcode:'820123', status:'STANDARDIZED', version:'NEW' },
+      { type:'BUSINESS',  primary:false, detail:'45 Lý Thường Kiệt',         ward:'P.Hoàn Kiếm',  province:'Hà Nội',  vpostcode:'100456', status:'PARTIAL',      version:'LEGACY' },
+    ],
+    timeline:[
+      { time:'24/06 10:00', type:'order', icon:'📦', label:'Đơn loạt — 240 đơn bưu kiện HCM→HN', channel:'API', color:'#16A34A' },
+      { time:'22/06 15:00', type:'complaint', icon:'💬', label:'Khiếu nại — Đối soát COD sai', channel:'CRM', color:'#F59E0B' },
+      { time:'20/06 09:00', type:'merge', icon:'🔗', label:'Hồ sơ CRM (CRM-0000987) được gộp vào — MST khớp', channel:'SYSTEM', color:'#6B7280' },
+      { time:'15/01 00:00', type:'contract', icon:'📄', label:'Hợp đồng KHL ký kết 2024-01-15', channel:'CRM', color:'#2563EB' },
+    ],
+    sourcesData:[
+      {
+        sourceId:'KHL-0987654', source:'Portal KHL', mergedAt:'15/01/2024 00:00', confidence:95, matchKey:'MST 0312345678',
+        dinh_danh:{ ten:'Công ty TNHH Thương mại ABC', sdt:'0987654321', email:'info@abc.vn', cccd:'MST:0312345678', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'123 Nguyễn Thị Minh Khai, P.6, TP HCM', nhanHang:'—', vpostcode:'700123' },
+        giao_dich:{ vaiTro:'KHL', tongDon:18450, doanhThu:'6.820.000.000', tyLeHoan:'14%', cod:'13.100.000.000' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'0312345678', hopDong:'ACTIVE — 2024-01-15 → 2026-12-31', congNo:'1.100.000.000 (OVERDUE)' },
+      },
+      {
+        sourceId:'CRM-0000987', source:'CRM', mergedAt:'20/06/2026 09:00', confidence:79, matchKey:'MST 0312345678',
+        dinh_danh:{ ten:'Cong ty TNHH TM ABC', sdt:'—', email:'contact@abc.com.vn', cccd:'MST:0312345678', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'123 Nguyễn Thị Minh Khai, TP HCM', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'—', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'0312345678', hopDong:'—', congNo:'—' },
+        note:'Tên không dấu, email khác',
+      },
+      {
+        sourceId:'CAS-0041200', source:'CAS', mergedAt:'20/06/2026 09:01', confidence:74, matchKey:'MST 0312345678 · SĐT 0987654321',
+        dinh_danh:{ ten:'TNHH TM ABC', sdt:'0987654321', email:'—', cccd:'MST:0312345678', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'KCN Sóng Thần, Lô B12, Bình Dương', nhanHang:'—', vpostcode:'820123' },
+        giao_dich:{ vaiTro:'Người gửi', tongDon:320, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'0312345678', hopDong:'—', congNo:'—' },
+        note:'Tên viết tắt',
+      },
+      {
+        sourceId:'MPITS-00441', source:'MPITS', mergedAt:'20/06/2026 09:02', confidence:71, matchKey:'MST 0312345678',
+        dinh_danh:{ ten:'Công ty TNHH TM ABC', sdt:'0987654321', email:'—', cccd:'MST:0312345678', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'45 Lý Thường Kiệt, P.Hoàn Kiếm, Hà Nội', nhanHang:'—', vpostcode:'100456' },
+        giao_dich:{ vaiTro:'Người gửi', tongDon:85, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'0312345678', hopDong:'—', congNo:'—' },
+      },
+      {
+        sourceId:'PAY-9900123', source:'PayPost', mergedAt:'22/06/2026 10:00', confidence:68, matchKey:'SĐT 0987654321',
+        dinh_danh:{ ten:'ABC Company', sdt:'0987654321', email:'—', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'—', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'—', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'1.100.000.000' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'1.100.000.000 (PENDING)' },
+        note:'Tên tiếng Anh',
+      },
+    ],
+  },
+  'UID-0000456789': {
+    uid:'UID-0000456789', type:'INDIVIDUAL', group:'B2C', status:'ACTIVE', name:'Phạm Minh Tuấn',
+    activePillars:['BCCP'],
+    activeSystems:['CAS', 'PNS/DingDong'],
+    lastInteraction:'21/06/2026 13:00 (Call Center)',
+    phone:'0978111222', email:'Chưa có dữ liệu', cccd:'Chưa có dữ liệu', postId:'PID-220145',
+    gender:'Nam', birthDate:'01/01/1995', customerCode:'CUS-B2C-04562',
+    lastOrder:{ id:'ORD-1781600088123', amount:'85.000', date:'18/06/2026', type:'Hoàn trả' },
+    postOffice:'Chưa có dữ liệu', completeness:54,
+    roles:['SENDER','RECEIVER'], primaryRole:'RECEIVER', senderCount:30, receiverCount:56,
+    orders:86, revenue:'9.400.000', avgMonthly:8, service:'Chưa có dữ liệu',
+    routes:[], deliveryRate:72, returnRate:31,
+    cod:{ total:'24.000.000', collected:'15.500.000', pending:'8.500.000', status:'PENDING' },
+    loyalty:{ tier:null, points:null, expiry:null },
+    segments:['Có nguy cơ rời bỏ','Tỷ lệ hoàn cao'],
+    scores:{ rfmR:2, rfmF:2, rfmM:2, rfmGroup:'At Risk', clv:'Chưa có dữ liệu', churn:78, engagement:25, codRisk:71, fraud:44, updatedAt:'24/06 08:00' },
+    consent:{ sms:'out', email:'unknown', zalo:'unknown', push:'unknown', deletionRequested:false },
+    appLogin:'Chưa có dữ liệu', device:'Chưa có dữ liệu', sessions30d:null,
+    complaints:{ total:7, open:2, satisfaction:2.9, sla:71 },
+    sources:['CAS','PNS','PayPost'],
+    aliases:[
+      { type:'PHONE',   value:'0978111222', source:'CAS',   confidence:'HIGH',   reliability:60, primary:true },
+      { type:'POST_ID', value:'PID-220145', source:'PostID',confidence:'HIGH',   reliability:90, primary:true },
+    ],
+    addresses:[
+      { type:'RECEIVER', primary:true,  detail:'45 Trần Hưng Đạo',    ward:'P.Nguyễn Cư Trinh', province:'TP HCM',  vpostcode:'700456', status:'PARTIAL',      version:'LEGACY' },
+      { type:'SENDER',   primary:false, detail:'12 Nguyễn Trãi',       ward:'P.Bến Thành',       province:'TP HCM',  vpostcode:'700111', status:'STANDARDIZED', version:'NEW' },
+    ],
+    timeline:[
+      { time:'21/06 13:00', type:'complaint', icon:'💬', label:'Khiếu nại — Đơn mất', channel:'CALL_CENTER', color:'#DC2626' },
+      { time:'18/06 10:30', type:'order', icon:'📦', label:'Tạo đơn — Hoàn trả', channel:'APP', color:'#F59E0B' },
+      { time:'10/06 09:00', type:'order', icon:'📦', label:'Nhận hàng — Bưu kiện thường', channel:'COUNTER', color:'#16A34A' },
+    ],
+    sourcesData:[
+      {
+        sourceId:'CAS-0456789', source:'CAS', mergedAt:'10/06/2026 09:00', confidence:80, matchKey:'SĐT 0978111222',
+        dinh_danh:{ ten:'Phạm Minh Tuấn', sdt:'0978111222', email:'—', cccd:'—', gioiTinh:'Nam', ngaySinh:'01/01/1995', postId:'—' },
+        dia_chi:{ guiHang:'12 Nguyễn Trãi, P.Bến Thành, TP HCM', nhanHang:'45 Trần Hưng Đạo, TP HCM', vpostcode:'700111' },
+        giao_dich:{ vaiTro:'Người gửi', tongDon:30, doanhThu:'—', tyLeHoan:'31%', cod:'15.500.000' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'8.500.000' },
+      },
+      {
+        sourceId:'PNS-0456120', source:'PNS/DingDong', mergedAt:'12/06/2026 11:00', confidence:68, matchKey:'SĐT 0978111222',
+        dinh_danh:{ ten:'Pham M. Tuan', sdt:'0978111222', email:'—', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'TP HCM', nhanHang:'TP HCM', vpostcode:'—' },
+        giao_dich:{ vaiTro:'Người nhận', tongDon:56, doanhThu:'—', tyLeHoan:'—', cod:'—' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'—' },
+        note:'Tên viết tắt không dấu',
+      },
+      {
+        sourceId:'PAY-0078912', source:'PayPost', mergedAt:'15/06/2026 08:00', confidence:60, matchKey:'SĐT 0978111222',
+        dinh_danh:{ ten:'Phạm Tuấn', sdt:'0978111222', email:'—', cccd:'—', gioiTinh:'—', ngaySinh:'—', postId:'—' },
+        dia_chi:{ guiHang:'—', nhanHang:'—', vpostcode:'—' },
+        giao_dich:{ vaiTro:'—', tongDon:0, doanhThu:'—', tyLeHoan:'—', cod:'8.500.000' },
+        hanh_vi:{ appLogin:'—', device:'—', sessions30d:null },
+        tai_chinh:{ mst:'—', hopDong:'—', congNo:'8.500.000' },
+        note:'Tên viết tắt',
+      },
+    ],
+  },
+};
+
+const SEGMENTS = [
+  { name:'Khách hàng trung thành',    desc:'Nhóm KH giao dịch thường xuyên, giá trị cao, ít rủi ro — RFM nhóm Champions',              count:'2.180', type:'Động', updated:'29/06/2026', status:'Đang hoạt động' },
+  { name:'KHL giá trị cao',           desc:'Khách hàng doanh nghiệp có doanh thu tích lũy trên 1 tỷ đồng',                             count:'1.240', type:'Động', updated:'29/06/2026', status:'Đang hoạt động' },
+  { name:'Có nguy cơ rời bỏ',         desc:'KH có điểm churn từ 70 trở lên và không phát sinh giao dịch trong 90 ngày gần nhất',       count:'8.560', type:'Động', updated:'28/06/2026', status:'Đang hoạt động' },
+  { name:'Tỷ lệ hoàn cao',            desc:'KH có tỷ lệ hoàn trả trên 20% và có từ 50 đơn trở lên — cần theo dõi rủi ro',             count:'3.120', type:'Động', updated:'26/06/2026', status:'Đang hoạt động' },
+  { name:'Chủ shop hoạt động cao',    desc:'KH có vai trò chủ shop và trung bình trên 50 đơn mỗi tháng',                               count:'920',   type:'Động', updated:'22/06/2026', status:'Đang hoạt động' },
+  { name:'Khách hàng mới',            desc:'KH tạo tài khoản hoặc phát sinh giao dịch đầu tiên trong vòng 30 ngày gần nhất',           count:'4.430', type:'Động', updated:'29/06/2026', status:'Đang hoạt động' },
+];
+
+// 7 mảng dịch vụ chính của VNPost dùng cho Dashboard và tab "Hoạt động theo mảng dịch vụ chính".
+// Lưu ý: "Hệ thống sử dụng" của PPBL và TMĐT là suy luận nghiệp vụ hợp lý dựa trên đặc thù VNPost,
+// cần đối chiếu lại với chủ nghiệp vụ/kiến trúc hệ thống trước khi chốt vào tài liệu chính thức.
+const PILLARS = [
+  { id:'BCCP',      label:'BCCP — Bưu chính chuyển phát', system:'MPITS, CAS, PNS/DingDong',       highlight:['Gửi/nhận đơn', 'Thu hộ COD', 'Tracking', 'Giao theo tuyến'] },
+  { id:'TCBC',      label:'TCBC — Tài chính bưu chính',   system:'PayPost',                         highlight:['Thu hộ · chi hộ', 'Chuyển tiền', 'Thanh toán tại quầy'] },
+  { id:'PPBL',      label:'PPBL — Phân phối bán lẻ',      system:'POS tại quầy',                    highlight:['Bán tại quầy', 'Phân phối qua đại lý'] },
+  { id:'HCC',       label:'HCC — Hành chính công',        system:'Cổng HCC, Một cửa quốc gia',      highlight:['Nộp hồ sơ', 'Trả kết quả tại nhà', 'Tra cứu thủ tục'] },
+  { id:'Logistics', label:'Logistics',                     system:'TMS / WMS',                       highlight:['Kho bãi', 'Fulfillment', 'Giao đa điểm'] },
+  { id:'TMDT',      label:'TMĐT — Thương mại điện tử',    system:'Sàn TMĐT, PNS/DingDong',          highlight:['Shop online', 'Giao chặng cuối', 'Quản lý hoàn'] },
+  { id:'MVNO',      label:'MVNO — Mạng di động ảo',       system:'BSS, CRM MVNO',                   highlight:['Đăng ký gói cước', 'Nạp cước', 'Sử dụng data'] },
+];
+
+// ============================================================
+// UTILS
+// ============================================================
+const fmt = (n) => n;
+
+const statusBadge = (s) => {
+  const map = { HEALTHY:'badge-green', WARNING:'badge-yellow', ERROR:'badge-red', IDLE:'badge-gray' };
+  return <span className={`badge ${map[s]||'badge-gray'}`}>{s}</span>;
+};
+
+const custStatusBadge = (s) => {
+  const colorMap = { ACTIVE:'badge-green', INACTIVE:'badge-gray', BLOCKED:'badge-red', MERGED:'badge-blue' };
+  const labelMap = { ACTIVE:'Hoạt động', INACTIVE:'Không hoạt động', BLOCKED:'Bị khóa', MERGED:'Đã gộp' };
+  return <span className={`badge ${colorMap[s]||'badge-gray'}`}>{labelMap[s]||s}</span>;
+};
+
+const GROUP_LABEL = { SME:'SME', KHL:'KHL', B2C:'Cá nhân thường' };
+const CONFIDENCE_LABEL = { HIGH:'Cao', MEDIUM:'Trung bình', LOW:'Thấp' };
+const ALIAS_TYPE_LABEL = { PHONE:'SĐT', POST_ID:'Post ID', CRM_ID:'Mã CRM', TAX_ID:'MST', KHL_CODE:'Mã KHL', USER_APP_ID:'ID App', EMAIL:'Email' };
+const ADDR_TYPE_LABEL   = { SENDER:'Địa chỉ gửi', RECEIVER:'Địa chỉ nhận', BUSINESS:'Trụ sở', WAREHOUSE:'Kho hàng' };
+const SEGMENT_RISK = ['Có nguy cơ rời bỏ','Tỷ lệ hoàn cao','Có nguy cơ gian lận'];
+const SEGMENT_GREEN = ['Khách hàng trung thành','KHL giá trị cao','Chủ shop hoạt động cao'];
+const segBadgeColor = (s) => SEGMENT_RISK.some(r => s.includes(r.slice(0,6))) || s.includes('rời bỏ') || s.includes('hoàn') || s.includes('gian lận') ? 'badge-red' : SEGMENT_GREEN.some(g => s.includes(g.slice(0,6))) || s.includes('trung thành') || s.includes('KHL') || s.includes('shop') ? 'badge-green' : 'badge-blue';
+
+const lagBadge = (lag, warn) => {
+  if (warn) return <span className="tabular-nums text-red-600 font-bold">{lag.toLocaleString()}</span>;
+  if (lag > 1000) return <span className="tabular-nums text-yellow-600 font-semibold">{lag.toLocaleString()}</span>;
+  return <span className="tabular-nums text-gray-500">{lag}</span>;
+};
+
+const scoreGauge = (val, label) => {
+  let bg = '#16A34A';
+  if (val >= 70) bg = '#DC2626';
+  else if (val >= 40) bg = '#F59E0B';
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <div className="gauge-outer" style={{ border: `4px solid ${bg}`, color: bg }}>{val}</div>
+      <div className="text-xs text-gray-500">{label}</div>
+    </div>
+  );
+};
+
+const rfmDot = (val) => {
+  const colors = ['','#DC2626','#F59E0B','#d97706','#16A34A','#15803d'];
+  return (
+    <span className="inline-flex items-center gap-0.5">
+      {[1,2,3,4,5].map(i => (
+        <span key={i} style={{ width:10, height:10, borderRadius:'50%', background: i<=val ? colors[val] : '#e5e7eb', display:'inline-block' }}></span>
+      ))}
+      <span className="ml-1 font-bold tabular-nums" style={{ color: colors[val] }}>{val}</span>
+    </span>
+  );
+};
+
+const consentChip = (v, label) => {
+  const cls = v==='in' ? 'consent-in' : v==='out' ? 'consent-out' : 'consent-unknown';
+  const txt = v==='in' ? 'OPT IN' : v==='out' ? 'OPT OUT' : 'UNKNOWN';
+  return <div className="flex items-center justify-between py-1.5 border-b border-gray-100 last:border-0">
+    <span className="text-sm text-gray-600">{label}</span>
+    <span className={`consent-chip ${cls}`}>{v==='in' ? '✓' : v==='out' ? '✕' : '?'} {txt}</span>
+  </div>;
+};
+
+// ============================================================
+// COMPONENTS
+// ============================================================
+
+function Icon({ name }) {
+  const icons = {
+    kafka: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="5" y2="17"/><line x1="12" y1="7" x2="19" y2="17"/></svg>,
+    users: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+    merge: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>,
+    person: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+    segment: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>,
+    bell: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
+    search: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+    x: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    chevRight: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="9 18 15 12 9 6"/></svg>,
+    filter: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>,
+    plus: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    trash: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>,
+    dashboard: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>,
+  };
+  return icons[name] || null;
+}
+
+function Sidebar({ active, onNav }) {
+  const mainItems = [
+    { key:'dashboard', label:'Dashboard tổng quan', icon:'dashboard' },
+    { key:'customers', label:'Danh sách khách hàng', icon:'users' },
+    { key:'segments',  label:'Phân khúc',  icon:'segment' },
+    { key:'identity',  label:'Đối soát hồ sơ', icon:'merge' },
+  ];
+  return (
+    <aside style={{ width:228, flexShrink:0, background:'white', borderRight:'1px solid var(--border)', display:'flex', flexDirection:'column', height:'100vh', position:'sticky', top:0 }}>
+      {/* Brand */}
+      <div style={{ padding:'18px 16px 14px', borderBottom:'1px solid var(--border)' }}>
+        <div className="flex items-center gap-3">
+          <div style={{ width:38, height:38, background:'linear-gradient(180deg,#F4B400,#efb000)', borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 6px rgba(244,180,0,.35)' }}>
+            <span style={{ color:'#1A1A1A', fontWeight:900, fontSize:16 }}>C</span>
+          </div>
+          <div>
+            <div style={{ fontWeight:800, fontSize:13, color:'var(--text)' }}>CDP VNPost</div>
+            <div style={{ fontSize:11, color:'var(--muted)' }}>Hệ thống nội bộ</div>
+          </div>
+        </div>
+      </div>
+      {/* Nav */}
+      <nav style={{ flex:1, padding:'10px 8px', overflowY:'auto' }}>
+        <div className="sidebar-section-label">Điều hướng chính</div>
+        {mainItems.map(it => (
+          <button key={it.key} onClick={() => onNav(it.key)}
+            className={`sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-gray-600 cursor-pointer border-0 bg-transparent rounded-lg mb-0.5 ${active===it.key ? 'active':''}`}>
+            <Icon name={it.icon} />
+            <span>{it.label}</span>
+          </button>
+        ))}
+      </nav>
+      {/* Footer */}
+      <div style={{ padding:'12px 16px', borderTop:'1px solid var(--border)', fontSize:12, color:'var(--muted)' }}>
+        <div style={{ fontWeight:700, color:'var(--text-2)', marginBottom:2 }}>Admin VNPost</div>
+        <div>admin@vnpost.vn</div>
+      </div>
+    </aside>
+  );
+}
+
+const NAV_META = {
+  dashboard: 'Toàn cảnh dữ liệu khách hàng, vận hành và phân khúc',
+  customers:  'Tìm kiếm và lọc danh sách khách hàng theo nhiều tiêu chí',
+  segments:   'Xây dựng và quản lý phân khúc động theo điều kiện CDP',
+  identity:   'Rà soát, xác nhận và phê duyệt hợp nhất định danh đa nguồn',
+  c360:       'Hồ sơ khách hàng 360° — toàn bộ dữ liệu từ mọi hệ thống nguồn',
+  kafka:      'Giám sát luồng dữ liệu Kafka theo thời gian thực',
+};
+
+function Header({ title, nav }) {
+  return (
+    <header style={{ background:'white', borderBottom:'1px solid var(--border)', padding:'0 24px', height:64, display:'flex', alignItems:'center', gap:16, position:'sticky', top:0, zIndex:10, boxShadow:'0 1px 3px rgba(0,0,0,.04)' }}>
+      <div style={{ flex:1 }}>
+        <div style={{ fontWeight:800, fontSize:16, color:'var(--text)' }}>{title}</div>
+        {NAV_META[nav] && <div style={{ fontSize:12, color:'var(--muted)', marginTop:2 }}>{NAV_META[nav]}</div>}
+      </div>
+      <div className="flex items-center gap-2" style={{ background:'var(--bg)', border:'1px solid var(--border)', borderRadius:12, padding:'7px 13px', flex:'0 0 260px', boxShadow:'var(--shadow-xs)' }}>
+        <Icon name="search" />
+        <input placeholder="Tìm mã KH / tên / SĐT / MST..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
+      </div>
+      <button style={{ background:'white', border:'1px solid var(--border)', borderRadius:10, width:40, height:40, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', position:'relative', boxShadow:'var(--shadow-xs)' }}>
+        <Icon name="bell" />
+        <span style={{ position:'absolute', top:-4, right:-4, width:17, height:17, background:'var(--brand)', color:'#1A1A1A', borderRadius:'50%', fontSize:10, fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid white' }}>3</span>
+      </button>
+    </header>
+  );
+}
+
+// ============================================================
+// CN0 — DASHBOARD TỔNG QUAN
+// ============================================================
+function DashboardScreen() {
+  const activeSegments = SEGMENTS.filter(s => s.status === 'Đang hoạt động');
+  const churnSegment = SEGMENTS.find(s => s.name === 'Có nguy cơ rời bỏ');
+  const topSegments = [...SEGMENTS]
+    .sort((a,b) => parseInt(b.count.replace(/\./g,'')) - parseInt(a.count.replace(/\./g,'')))
+    .slice(0,4);
+
+  const kpis = [
+    { label:'Tổng hồ sơ nguồn',            value:'12,45 triệu', sub:'Từ 14 hệ thống nguồn kết nối',              color:'var(--brand)' },
+    { label:'Hồ sơ hợp nhất',              value:'8,92 triệu',  sub:'71,7% tổng hồ sơ nguồn',                   color:'var(--success)' },
+    { label:'Phân khúc đang chạy',         value:String(activeSegments.length), sub:`/${SEGMENTS.length} phân khúc đang hoạt động`, color:'var(--info)' },
+    { label:'Tỷ lệ hợp nhất tự động',      value:'87%',         sub:'3.180 hồ sơ cần xác nhận thủ công',        color:'var(--purple)' },
+    { label:'Nguy cơ rời bỏ',              value: churnSegment ? churnSegment.count : '—', sub:'Cần ưu tiên chăm sóc giữ chân', color:'var(--danger)' },
+    { label:'Chờ rà soát định danh',       value:'3.180',       sub:'Đang chờ Data Steward xử lý',              color:'var(--warn)' },
+  ];
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:20 }}>
+
+      {/* KPI tổng quan */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:12 }}>
+        {kpis.map((k,i) => (
+          <div key={i} className="kpi-card" style={{ borderTop:`3px solid ${k.color}`, transition:'transform .15s, box-shadow .15s' }}
+            onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='var(--shadow-sm)'}}
+            onMouseLeave={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='var(--shadow-xs)'}}>
+            <div className="tabular-nums" style={{ fontSize:22, fontWeight:900, color:k.color, letterSpacing:'-.02em' }}>{k.value}</div>
+            <div style={{ fontSize:12, fontWeight:700, color:'var(--text)', marginTop:5 }}>{k.label}</div>
+            <div style={{ fontSize:11, color:'var(--muted)', marginTop:3, lineHeight:1.4 }}>{k.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display:'grid', gridTemplateColumns:'1.3fr 0.9fr', gap:16 }}>
+        {/* Toàn cảnh theo mảng dịch vụ chính */}
+        <div className="panel" style={{ padding:20 }}>
+          <div style={{ fontWeight:700, fontSize:14, marginBottom:4 }}>Toàn cảnh theo mảng dịch vụ chính</div>
+          <div style={{ fontSize:12, color:'#6B7280', marginBottom:12 }}>Các mảng dịch vụ đang được hợp nhất dữ liệu trong CDP và hệ thống nguồn tương ứng.</div>
+          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+            <thead>
+              <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+                {['Mảng dịch vụ','Hệ thống sử dụng','Hoạt động nổi bật'].map(h => (
+                  <th key={h} style={{ padding:'8px 10px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {PILLARS.map(p => (
+                <tr key={p.id} style={{ borderBottom:'1px solid var(--line)' }}>
+                  <td style={{ padding:'9px 10px', fontWeight:700, fontSize:13 }}>{p.label}</td>
+                  <td style={{ padding:'9px 10px', color:'var(--muted)', fontSize:12, whiteSpace:'nowrap' }}>{p.system}</td>
+                  <td style={{ padding:'9px 10px' }}>
+                    <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+                      {p.highlight.map((h,i) => (
+                        <span key={i} style={{ display:'inline-block', padding:'2px 8px', borderRadius:6, background:'var(--bg)', border:'1px solid var(--border)', fontSize:11, color:'var(--text-2)', whiteSpace:'nowrap' }}>{h}</span>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Chất lượng dữ liệu hợp nhất */}
+        <div className="panel" style={{ padding:20 }}>
+          <div style={{ fontWeight:700, fontSize:14, marginBottom:12 }}>Chất lượng dữ liệu hợp nhất</div>
+          <div style={{ textAlign:'center', marginBottom:14 }}>
+            <div style={{ fontSize:30, fontWeight:800, color:'#F4B400' }} className="tabular-nums">65%</div>
+            <div style={{ fontSize:12, color:'#6B7280' }}>Mức độ đầy đủ dữ liệu trung bình toàn hệ thống</div>
+            <div className="score-bar" style={{ marginTop:8 }}>
+              <div className="score-fill" style={{ width:'65%', background:'#F4B400' }}></div>
+            </div>
+          </div>
+          <div>
+            {[
+              ['Tự động hợp nhất thành công', '87%', '#16A34A'],
+              ['Trường dữ liệu xung đột cần xử lý', '146.220', '#F59E0B'],
+              ['Dữ liệu có sự đồng ý hợp lệ', '72%', '#1A1A1A'],
+              ['Nguồn cập nhật theo thời gian thực', '7 / 14', '#1A1A1A'],
+            ].map(([l,v,c],i) => (
+              <div key={i} style={{ display:'flex', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid #F3F4F6' }}>
+                <span style={{ fontSize:12, color:'#6B7280' }}>{l}</span>
+                <span className="tabular-nums" style={{ fontSize:13, fontWeight:700, color:c }}>{v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Top phân khúc quan trọng */}
+      <div className="panel" style={{ padding:20 }}>
+        <div style={{ fontWeight:800, fontSize:14, marginBottom:14 }}>Top phân khúc quan trọng</div>
+        {(() => {
+          const maxCount = Math.max(...topSegments.map(s => parseInt(s.count.replace(/\./g,''))));
+          return topSegments.map((s,i) => {
+            const cnt = parseInt(s.count.replace(/\./g,''));
+            const pct = Math.round(cnt/maxCount*100);
+            return (
+              <div key={i} style={{ marginBottom: i<topSegments.length-1 ? 12 : 0 }}>
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:5 }}>
+                  <span className={`badge ${segBadgeColor(s.name)}`}>{s.name}</span>
+                  <span className="tabular-nums" style={{ fontSize:13, fontWeight:700, color:'var(--text-2)' }}>{s.count} KH</span>
+                </div>
+                <div style={{ height:5, borderRadius:3, background:'var(--line)' }}>
+                  <div style={{ width:`${pct}%`, height:'100%', borderRadius:3, background: segBadgeColor(s.name)==='badge-red' ? 'var(--danger)' : segBadgeColor(s.name)==='badge-green' ? 'var(--success)' : 'var(--info)' }}></div>
+                </div>
+              </div>
+            );
+          });
+        })()}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// CN1 — KAFKA INTEGRATION
+// ============================================================
+function KafkaScreen() {
+  const [selected, setSelected] = React.useState(null);
+  const [filter, setFilter] = React.useState('ALL');
+  const [timeRange, setTimeRange] = React.useState('6h');
+
+  const topics = filter === 'ALL' ? TOPICS : TOPICS.filter(t => t.status === filter);
+
+  const chartData = [45, 60, 80, 120, 200, 310, 480, 390, 320, 280, 350, 420];
+
+  const kpis = [
+    { label:'Topic giám sát', value:'8', sub:'tổng cộng', color:'#2563EB' },
+    { label:'Healthy', value:'5', sub:'hoạt động tốt', color:'#16A34A' },
+    { label:'Warning', value:'1', sub:'cần theo dõi', color:'#F59E0B' },
+    { label:'Error', value:'1', sub:'cần xử lý ngay', color:'#DC2626' },
+    { label:'Throughput', value:'1.227', sub:'msg/phút hiện tại', color:'#7c3aed' },
+    { label:'Message lỗi 24h', value:'75', sub:'cần xem lại', color:'#DC2626' },
+  ];
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:20 }}>
+      {/* KPIs */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:12 }}>
+        {kpis.map((k,i) => (
+          <div key={i} className="kpi-card" style={{ borderTop:`3px solid ${k.color}` }}>
+            <div className="tabular-nums" style={{ fontSize:22, fontWeight:800, color:k.color }}>{k.value}</div>
+            <div style={{ fontSize:13, fontWeight:600, color:'#1A1A1A', marginTop:2 }}>{k.label}</div>
+            <div style={{ fontSize:11, color:'#6B7280' }}>{k.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Chart + Alerts */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 340px', gap:16 }}>
+        {/* Chart */}
+        <div className="panel" style={{ padding:20 }}>
+          <div className="flex items-center justify-between mb-4">
+            <div style={{ fontWeight:700, fontSize:14 }}>Throughput message theo thời gian</div>
+            <div className="flex gap-1">
+              {['1h','6h','24h','7 ngày'].map(r => (
+                <button key={r} onClick={() => setTimeRange(r)} className={`tab-btn ${timeRange===r ? 'active':''}`} style={{ padding:'4px 10px', fontSize:12 }}>{r}</button>
+              ))}
+            </div>
+          </div>
+          <div style={{ display:'flex', alignItems:'flex-end', gap:4, height:100, padding:'0 4px' }}>
+            {chartData.map((v,i) => (
+              <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:2 }}>
+                <div style={{ width:'100%', height: `${(v/500)*90}px`, background:i>=10 ? '#DC2626' : '#F4B400', borderRadius:'3px 3px 0 0', opacity: i>=10 ? 0.5 : 0.85 }}></div>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between mt-1" style={{ fontSize:11, color:'#6B7280' }}>
+            <span>-{timeRange}</span><span>Hiện tại</span>
+          </div>
+          <div className="flex gap-4 mt-3" style={{ fontSize:12, color:'#6B7280' }}>
+            <span><span style={{ display:'inline-block', width:10, height:10, background:'#F4B400', borderRadius:2, marginRight:4 }}></span>Thành công</span>
+            <span><span style={{ display:'inline-block', width:10, height:10, background:'#DC2626', opacity:.5, borderRadius:2, marginRight:4 }}></span>Lỗi</span>
+          </div>
+        </div>
+
+        {/* Alert feed */}
+        <div className="panel" style={{ padding:20 }}>
+          <div style={{ fontWeight:700, fontSize:14, marginBottom:12 }}>Cảnh báo gần đây</div>
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            {ALERTS.map((a,i) => (
+              <div key={i} style={{ padding:10, borderRadius:8, background: a.level==='ERROR' ? '#fff5f5' : '#fffbeb', borderLeft:`3px solid ${a.level==='ERROR' ? '#DC2626' : '#F59E0B'}` }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`badge ${a.level==='ERROR' ? 'badge-red':'badge-yellow'}`} style={{ fontSize:10 }}>{a.level}</span>
+                  <span style={{ fontSize:12, color:'#6B7280' }}>{a.time}</span>
+                </div>
+                <div style={{ fontSize:12, fontWeight:600, color:'#1A1A1A' }}>{a.topic}</div>
+                <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>{a.msg}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Topic Table */}
+      <div className="panel">
+        <div className="flex items-center gap-3 p-4 border-b border-gray-100">
+          <div style={{ fontWeight:700, fontSize:14 }}>Kafka Topics</div>
+          <div className="flex gap-1 ml-2">
+            {['ALL','HEALTHY','WARNING','ERROR','IDLE'].map(f => (
+              <button key={f} onClick={() => setFilter(f)} className={`tab-btn ${filter===f ? 'active':''}`} style={{ padding:'3px 10px', fontSize:11 }}>{f}</button>
+            ))}
+          </div>
+        </div>
+        <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+          <thead>
+            <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+              {['Trạng thái','Tên Topic','Nguồn','Loại DL','Msg/phút','Tổng 24h','Lag','Lỗi 24h','Cập nhật'].map(h => (
+                <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', whiteSpace:'nowrap' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {topics.map(t => (
+              <tr key={t.id} className="table-row" onClick={() => setSelected(t)} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                <td style={{ padding:'10px 12px' }}>{statusBadge(t.status)}</td>
+                <td style={{ padding:'10px 12px', fontWeight:600, color:'#2563EB', fontFamily:'monospace', fontSize:12 }}>{t.name}</td>
+                <td style={{ padding:'10px 12px', color:'#6B7280' }}>{t.source}</td>
+                <td style={{ padding:'10px 12px', color:'#6B7280' }}>{t.type}</td>
+                <td style={{ padding:'10px 12px', textAlign:'right' }} className="tabular-nums">{t.msgMin}</td>
+                <td style={{ padding:'10px 12px', textAlign:'right' }} className="tabular-nums">{t.msg24h}</td>
+                <td style={{ padding:'10px 12px', textAlign:'right' }}>{lagBadge(t.lag, t.lagWarn)}</td>
+                <td style={{ padding:'10px 12px', textAlign:'right', color: t.err24h>10 ? '#DC2626' : t.err24h>0 ? '#F59E0B' : '#16A34A', fontWeight:600 }} className="tabular-nums">{t.err24h}</td>
+                <td style={{ padding:'10px 12px', color:'#6B7280', fontSize:12 }}>{t.updated}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Slide panel chi tiết Topic */}
+      {selected && (
+        <div className="slide-panel">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <div style={{ fontWeight:700, fontSize:15 }}>Chi tiết Topic</div>
+              <div style={{ fontFamily:'monospace', fontSize:12, color:'#2563EB', marginTop:2 }}>{selected.name}</div>
+            </div>
+            <button onClick={() => setSelected(null)} style={{ background:'#f3f4f6', border:'none', borderRadius:6, padding:'6px 8px', cursor:'pointer' }}><Icon name="x" /></button>
+          </div>
+          {statusBadge(selected.status)}
+          <div className="mt-4" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            {[
+              ['Hệ thống nguồn', selected.source],
+              ['Loại dữ liệu', selected.type],
+              ['Msg/phút', selected.msgMin],
+              ['Tổng 24h', selected.msg24h],
+              ['Consumer lag', <span className={selected.lagWarn ? 'text-red-600 font-bold':''}>{selected.lag.toLocaleString()}</span>],
+              ['Lỗi 24h', selected.err24h],
+              ['Partition', '3'],
+              ['Consumer group', `cdp.${selected.source.toLowerCase().replace(/\//g,'-')}.consumer`],
+            ].map(([l,v],i) => (
+              <div key={i}>
+                <div className="field-label">{l}</div>
+                <div className="field-value tabular-nums">{v}</div>
+              </div>
+            ))}
+          </div>
+          {selected.err24h > 0 && (
+            <div className="mt-5">
+              <div className="section-title">Message lỗi gần nhất</div>
+              {[...Array(Math.min(selected.err24h, 3))].map((_,i) => (
+                <div key={i} style={{ padding:'8px 10px', background:'#fff5f5', borderRadius:6, marginBottom:6, fontSize:12 }}>
+                  <div style={{ fontWeight:600, color:'#DC2626' }}>Schema validation error</div>
+                  <div style={{ color:'#6B7280', marginTop:2 }}>10:{30+i*5} — Offset {120034+i} — Field "customer_id" null</div>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="mt-5 flex gap-2">
+            <button className="btn-primary" style={{ flex:1, padding:'9px', fontSize:13 }}>Retry consumer</button>
+            <button className="btn-ghost" style={{ flex:1, padding:'9px', fontSize:13 }}>Tạm dừng</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+// CN2 — CUSTOMER MANAGEMENT
+// ============================================================
+function CustomerListScreen({ onC360, initSegment }) {
+  const [search, setSearch] = React.useState('');
+  const [typeFilter, setTypeFilter] = React.useState('ALL');
+  const [groupFilter, setGroupFilter] = React.useState('ALL');
+  const [pillarFilter, setPillarFilter] = React.useState('ALL');
+  const [statusFilter, setStatusFilter] = React.useState('ALL');
+  const [segmentFilter, setSegmentFilter] = React.useState(initSegment || 'ALL');
+
+  const filtered = CUSTOMERS.filter(c => {
+    const q = search.toLowerCase();
+    const matchQ = !q || c.name.toLowerCase().includes(q) || c.uid.toLowerCase().includes(q) || c.phone.includes(q);
+    const matchT = typeFilter === 'ALL' || c.type === typeFilter;
+    const matchG = groupFilter === 'ALL' || c.group === groupFilter;
+    const matchP = pillarFilter === 'ALL' || c.pillar.toUpperCase().includes(pillarFilter.toUpperCase());
+    const matchS = statusFilter === 'ALL' || c.status === statusFilter;
+    const matchSeg = segmentFilter === 'ALL' || c.segment === segmentFilter;
+    return matchQ && matchT && matchG && matchP && matchS && matchSeg;
+  });
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
+      {/* Toolbar */}
+      <div className="panel" style={{ padding:'14px 16px' }}>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2" style={{ background:'var(--bg)', border:'1px solid var(--border)', borderRadius:10, padding:'7px 13px', flex:'1', minWidth:220, boxShadow:'var(--shadow-xs)' }}>
+            <Icon name="search" />
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tìm mã KH, tên, SĐT..." style={{ border:'none', background:'transparent', outline:'none', fontSize:13, width:'100%', padding:0 }} />
+          </div>
+          <span style={{ fontSize:12, color:'var(--muted)', whiteSpace:'nowrap' }}>Lọc:</span>
+          <select value={typeFilter} onChange={e=>setTypeFilter(e.target.value)} style={{ fontSize:12 }}>
+            <option value="ALL">Tất cả loại</option>
+            <option value="INDIVIDUAL">Cá nhân</option>
+            <option value="BUSINESS">Doanh nghiệp</option>
+          </select>
+          <select value={groupFilter} onChange={e=>setGroupFilter(e.target.value)} style={{ fontSize:12 }}>
+            <option value="ALL">Tất cả nhóm</option>
+            {Object.keys(GROUP_LABEL).map(g => <option key={g} value={g}>{GROUP_LABEL[g]}</option>)}
+          </select>
+          <select value={pillarFilter} onChange={e=>setPillarFilter(e.target.value)} style={{ fontSize:12 }}>
+            <option value="ALL">Tất cả mảng dịch vụ</option>
+            {PILLARS.map(p => <option key={p.id} value={p.id}>{p.id} — {p.label.split('—')[1]?.trim()||p.label}</option>)}
+          </select>
+          <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)} style={{ fontSize:12 }}>
+            <option value="ALL">Tất cả trạng thái</option>
+            <option value="ACTIVE">Đang hoạt động</option>
+            <option value="INACTIVE">Không hoạt động</option>
+          </select>
+          <select value={segmentFilter} onChange={e=>setSegmentFilter(e.target.value)} style={{ fontSize:12 }}>
+            <option value="ALL">Tất cả phân khúc</option>
+            {SEGMENTS.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="panel">
+        <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+          <thead>
+            <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+              {['Mã khách hàng','Tên / Công ty','Loại','Nhóm','Mảng dịch vụ chính','SĐT','Tổng đơn','Doanh thu 12 tháng','Phân khúc','Trạng thái','Cập nhật'].map(h => (
+                <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:800, color:'var(--muted)', whiteSpace:'nowrap', background:'var(--bg-2)', letterSpacing:'.03em' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((c,i) => (
+              <tr key={i} className="table-row" onClick={() => onC360(c.uid)} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                <td style={{ padding:'10px 12px', fontFamily:'monospace', fontSize:11, color:'#6B7280' }}>{c.uid}</td>
+                <td style={{ padding:'10px 12px', fontWeight:600, color:'#2563EB' }}>{c.name}</td>
+                <td style={{ padding:'10px 12px' }}>
+                  <span className={`badge ${c.type==='INDIVIDUAL' ? 'badge-blue':'badge-purple'}`}>{c.type==='INDIVIDUAL' ? 'Cá nhân':'Doanh nghiệp'}</span>
+                </td>
+                <td style={{ padding:'10px 12px' }}><span className="badge badge-gray">{GROUP_LABEL[c.group]||c.group}</span></td>
+                <td style={{ padding:'10px 12px', fontSize:12, fontWeight:600, color:'#374151', whiteSpace:'nowrap' }}>{c.pillar}</td>
+                <td style={{ padding:'10px 12px', fontFamily:'monospace' }}>{c.phone.slice(0,3)+'***'+c.phone.slice(-3)}</td>
+                <td style={{ padding:'10px 12px', textAlign:'right' }} className="tabular-nums">{c.orders.toLocaleString()}</td>
+                <td style={{ padding:'10px 12px', textAlign:'right', fontWeight:600 }} className="tabular-nums">{c.revenue} ₫</td>
+                <td style={{ padding:'10px 12px' }}>
+                  <span className={`badge ${segBadgeColor(c.segment)}`}>{c.segment}</span>
+                </td>
+                <td style={{ padding:'10px 12px' }}>{custStatusBadge(c.status)}</td>
+                <td style={{ padding:'10px 12px', color:'#6B7280', fontSize:12 }}>{c.updated}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div style={{ padding:'10px 16px', borderTop:'1px solid #F3F4F6', fontSize:12, color:'#6B7280' }}>
+          Hiển thị {filtered.length} / {CUSTOMERS.length} khách hàng
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// CN3 — IDENTITY RESOLUTION
+// ============================================================
+// ============================================================
+// IDENTITY SCREEN — 2-tầng: Card grid tổng quan → Bảng so sánh chi tiết
+// ============================================================
+function IdentityScreen({ onC360 }) {
+  const [screenTab, setScreenTab] = React.useState('pending');
+  const [selectedGroup, setSelectedGroup] = React.useState(null);
+  const [compareView, setCompareView] = React.useState(false);
+  const [selectedSources, setSelectedSources] = React.useState([]);
+  const [modal, setModal] = React.useState(null);
+  const [decisions, setDecisions] = React.useState({});
+
+  const pendingGroups = GROUPS.filter(g => decisions[g.id] !== 'different');
+
+  const confColor = (c) => c >= 90 ? '#16A34A' : c >= 75 ? '#F59E0B' : '#DC2626';
+  const confBg    = (c) => c >= 90 ? '#dcfce7' : c >= 75 ? '#fef9c3' : '#fee2e2';
+
+  const COMPARE_FIELDS = [
+    { key:'name',    label:'Họ tên / Tên DN' },
+    { key:'phone',   label:'Số điện thoại' },
+    { key:'email',   label:'Email' },
+    { key:'cccd',    label:'CCCD / MST' },
+    { key:'address', label:'Tỉnh/TP' },
+    { key:'role',    label:'Vai trò' },
+    { key:'orders',  label:'Tổng đơn' },
+  ];
+
+  const openGroup = (g) => {
+    setSelectedGroup(g);
+    setSelectedSources(g.profiles.slice(0,3).map(p=>p.uid));
+    setCompareView(false);
+  };
+
+  const toggleSource = (uid) => {
+    setSelectedSources(prev =>
+      prev.includes(uid) ? prev.filter(u => u !== uid) : [...prev, uid]
+    );
+  };
+
+  const handleDecision = (type) => {
+    setDecisions(d => ({ ...d, [selectedGroup.id]: type }));
+    setModal(type);
+  };
+
+  // ── TẦNG 1: Danh sách nhóm ──
+  if (!selectedGroup) return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
+      <div style={{ display:'flex', gap:8, marginBottom:4 }}>
+        {[
+          { key:'pending', label:`Chờ xem xét (${pendingGroups.length})` },
+          { key:'history', label:'Lịch sử merge' },
+          { key:'unmerge', label:`Yêu cầu tách hồ sơ (${UNMERGE_REQUESTS.filter(r=>r.status==='CHỜ DUYỆT').length})` },
+        ].map(t => (
+          <button key={t.key} onClick={() => setScreenTab(t.key)}
+            className={`tab-btn ${screenTab===t.key ? 'active':''}`}>{t.label}</button>
+        ))}
+      </div>
+
+      {screenTab==='pending' && (
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          <div style={{ fontSize:12, color:'#6B7280' }}>
+            Mỗi nhóm gồm các hồ sơ từ nhiều hệ thống mà BE xác định có thể là cùng 1 người. Độ tương đồng 60–89% — cần xác nhận thủ công.
+          </div>
+          {pendingGroups.map(g => (
+            <div key={g.id} className="panel" style={{ padding:0, overflow:'hidden', cursor:'pointer' }}
+              onClick={() => openGroup(g)}>
+              {/* Header nhóm */}
+              <div style={{ padding:'12px 16px', background:'#F7F8FA', borderBottom:'1px solid #E5E7EB', display:'flex', alignItems:'center', gap:12 }}>
+                <div style={{ fontWeight:700, fontSize:13 }}>{g.id}</div>
+                <span className={`badge ${g.type==='INDIVIDUAL' ? 'badge-blue':'badge-purple'}`}>{g.type==='INDIVIDUAL' ? 'Cá nhân':'Doanh nghiệp'}</span>
+                <span className="badge badge-blue">{g.matchKey}</span>
+                {g.warn && <span className="badge badge-red">⚠️ Có conflict</span>}
+                <span style={{ marginLeft:'auto', fontSize:12, color:'#6B7280' }}>{g.profiles.length} nguồn</span>
+                <span style={{ fontSize:12, color:'#8a5a00', fontWeight:600 }}>Xem chi tiết →</span>
+              </div>
+              {/* Card grid nguồn — preview nhỏ */}
+              <div style={{ padding:16, display:'flex', gap:10, flexWrap:'wrap' }}>
+                {g.profiles.map(p => (
+                  <div key={p.uid} style={{ minWidth:140, padding:'10px 12px', border:'1px solid #E5E7EB', borderRadius:8, background:'white', position:'relative' }}>
+                    <div style={{ fontSize:10, fontWeight:700, color:'#6B7280', marginBottom:4 }}>{p.source}</div>
+                    <div style={{ fontSize:12, fontWeight:600, marginBottom:2 }}>{p.name}</div>
+                    <div style={{ fontSize:11, color:'#6B7280', fontFamily:'monospace' }}>{p.phone}</div>
+                    <div style={{ marginTop:8, display:'flex', alignItems:'center', gap:6 }}>
+                      <div style={{ flex:1, height:4, borderRadius:2, background:'#E5E7EB' }}>
+                        <div style={{ width:`${p.confidence}%`, height:'100%', borderRadius:2, background:confColor(p.confidence) }}></div>
+                      </div>
+                      <span style={{ fontSize:11, fontWeight:700, color:confColor(p.confidence) }}>{p.confidence}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Conflict summary */}
+              {g.conflicts.length > 0 && (
+                <div style={{ padding:'8px 16px', borderTop:'1px solid #FEF9C3', background:'#FFFBEB' }}>
+                  {g.conflicts.map((c,i) => (
+                    <div key={i} style={{ fontSize:12, color:'#d97706' }}>⚠️ {c}</div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+          {pendingGroups.length === 0 && (
+            <div style={{ padding:40, textAlign:'center', color:'#6B7280' }}>✅ Không còn nhóm nào chờ xem xét</div>
+          )}
+        </div>
+      )}
+
+      {screenTab==='history' && (
+        <div className="panel" style={{ overflow:'hidden' }}>
+          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+            <thead>
+              <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
+                {['ID','Loại','Mã KH chính','Mã KH gộp vào','Độ tin cậy','Khóa trùng','Người quyết định','Thời điểm'].map(h => (
+                  <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', whiteSpace:'nowrap' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {MERGE_HISTORY.map(m => (
+                <tr key={m.id} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                  <td style={{ padding:'10px 12px', fontFamily:'monospace', fontSize:12 }}>{m.id}</td>
+                  <td style={{ padding:'10px 12px' }}>
+                    <span className={`badge ${m.type==='AUTO_MERGE' ? 'badge-blue':'badge-green'}`}>{m.type==='AUTO_MERGE' ? 'Tự động':'Thủ công'}</span>
+                  </td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#2563EB', fontFamily:'monospace' }}>{m.uidMaster}</td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#7c3aed', fontFamily:'monospace' }}>{m.uidMerged}</td>
+                  <td style={{ padding:'10px 12px', fontWeight:700, color:confColor(m.confidence) }}>{m.confidence}%</td>
+                  <td style={{ padding:'10px 12px', fontSize:12 }}><span className="badge badge-blue">{m.matchKeys}</span></td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280' }}>{m.by}</td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{m.at}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {screenTab==='unmerge' && (
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          <div style={{ padding:12, background:'#fef9c3', border:'1px solid #F59E0B', borderRadius:8, fontSize:12, color:'#d97706' }}>
+            Chỉ Admin mới có thể phê duyệt hoặc từ chối yêu cầu Unmerge.
+          </div>
+          <div className="panel" style={{ overflow:'hidden' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+              <thead>
+                <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
+                  {['ID','Mã KH liên quan','Người báo cáo','Thời gian','Lý do','Trạng thái',''].map(h => (
+                    <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {UNMERGE_REQUESTS.map(r => (
+                  <tr key={r.id} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                    <td style={{ padding:'10px 12px', fontFamily:'monospace', fontSize:12 }}>{r.id}</td>
+                    <td style={{ padding:'10px 12px', fontSize:12, color:'#2563EB', fontFamily:'monospace' }}>{r.uidMaster}</td>
+                    <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280' }}>{r.reporter}</td>
+                    <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{r.reportedAt}</td>
+                    <td style={{ padding:'10px 12px', fontSize:12, maxWidth:260 }}>{r.reason}</td>
+                    <td style={{ padding:'10px 12px' }}><span className="badge badge-yellow">{r.status}</span></td>
+                    <td style={{ padding:'10px 12px' }}>
+                      <div className="flex gap-2">
+                        <button style={{ padding:'5px 10px', background:'#DC2626', color:'white', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer' }}>Phê duyệt</button>
+                        <button style={{ padding:'5px 10px', background:'#f3f4f6', color:'#6B7280', border:'none', borderRadius:6, fontSize:12, cursor:'pointer' }}>Từ chối</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  // ── TẦNG 2: Chi tiết nhóm (card grid đầy đủ + bảng so sánh) ──
+  const compareCols = selectedGroup.profiles.filter(p => selectedSources.includes(p.uid));
+
+  // Kiểm tra field có conflict trong nhóm đang chọn không
+  const hasConflict = (fieldKey) => {
+    const vals = compareCols.map(p => String(p[fieldKey]||'—').toLowerCase().trim());
+    const filled = vals.filter(v => v !== '—' && v !== '');
+    return filled.length > 1 && new Set(filled).size > 1;
+  };
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
+      {modal && (
+        <div className="modal-overlay" onClick={() => setModal(null)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize:16, fontWeight:700, marginBottom:8 }}>
+              {modal==='confirmed' ? '✅ Đã ghi nhận — Cùng người' : modal==='different' ? '🚫 Đã ghi nhận — Tách nhóm' : '⏳ Để lại sau'}
+            </div>
+            <div style={{ fontSize:13, color:'#6B7280', marginBottom:16 }}>
+              {modal==='confirmed' && 'Quyết định đã ghi nhận. BE sẽ merge toàn bộ hồ sơ trong nhóm thành 1 Hồ sơ chuẩn.'}
+              {modal==='different' && 'Nhóm này sẽ được đánh dấu tách và không xuất hiện lại.'}
+              {modal==='later' && 'Nhóm vẫn còn trong danh sách chờ.'}
+            </div>
+            <button onClick={() => { setModal(null); setSelectedGroup(null); }}
+              className="btn-primary" style={{ width:'100%', padding:'10px', fontSize:14 }}>
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2">
+        <button onClick={() => setSelectedGroup(null)} style={{ background:'#f3f4f6', border:'none', borderRadius:6, padding:'6px 12px', fontSize:13, cursor:'pointer' }}>← Danh sách nhóm</button>
+        <span style={{ color:'#6B7280', fontSize:13 }}>/</span>
+        <span style={{ fontWeight:700, fontSize:14 }}>{selectedGroup.id}</span>
+        <span className="badge badge-yellow" style={{ marginLeft:4 }}>PENDING</span>
+        {selectedGroup.warn && <span className="badge badge-red">⚠️ Có conflict</span>}
+      </div>
+
+      {/* Toggle tầng 1/2 */}
+      <div className="flex gap-2">
+        <button onClick={() => setCompareView(false)}
+          className={`tab-btn ${!compareView ? 'active':''}`}>📋 Tổng quan nguồn</button>
+        <button onClick={() => setCompareView(true)}
+          className={`tab-btn ${compareView ? 'active':''}`}>🔍 So sánh chi tiết</button>
+      </div>
+
+      {/* ── TẦNG 1: Card grid tổng quan ── */}
+      {!compareView && (
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          <div style={{ fontSize:12, color:'#6B7280' }}>
+            Khóa trùng: <strong>{selectedGroup.matchKey}</strong> · {selectedGroup.profiles.length} hồ sơ từ {selectedGroup.profiles.length} nguồn
+          </div>
+
+          {/* Cards */}
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:12 }}>
+            {selectedGroup.profiles.map(p => (
+              <div key={p.uid} style={{ border:`2px solid ${confColor(p.confidence)}22`, borderRadius:10, padding:14, background:'white', position:'relative' }}>
+                {/* Source badge + confidence */}
+                <div className="flex items-center justify-between mb-2">
+                  <span style={{ fontSize:11, fontWeight:700, color:'white', background: p.confidence>=90 ? '#16A34A' : p.confidence>=75 ? '#F59E0B':'#DC2626', padding:'2px 8px', borderRadius:4 }}>
+                    {p.source}
+                  </span>
+                  <span style={{ fontSize:12, fontWeight:800, color:confColor(p.confidence) }}>{p.confidence}%</span>
+                </div>
+                {/* UID */}
+                <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace', marginBottom:6 }}>{p.uid}</div>
+                {/* Fields */}
+                {[
+                  { label:'Tên',    val:p.name },
+                  { label:'SĐT',    val:p.phone },
+                  { label:'Email',  val:p.email },
+                  { label:'Địa chỉ',val:p.address },
+                  { label:'Vai trò',val:p.role },
+                  { label:'Đơn',    val:p.orders > 0 ? p.orders.toLocaleString() : '—' },
+                ].map(f => (
+                  <div key={f.label} style={{ display:'flex', justifyContent:'space-between', padding:'3px 0', borderBottom:'1px solid #F3F4F6' }}>
+                    <span style={{ fontSize:11, color:'#9CA3AF' }}>{f.label}</span>
+                    <span style={{ fontSize:11, fontWeight:500, color: f.val==='—' ? '#D1D5DB':'#1A1A1A', maxWidth:110, textAlign:'right', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{f.val}</span>
+                  </div>
+                ))}
+                {/* Confidence bar */}
+                <div style={{ marginTop:10, height:4, borderRadius:2, background:'#E5E7EB' }}>
+                  <div style={{ width:`${p.confidence}%`, height:'100%', borderRadius:2, background:confColor(p.confidence) }}></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Conflict summary */}
+          {selectedGroup.conflicts.length > 0 && (
+            <div style={{ padding:12, background:'#FFFBEB', border:'1px solid #F59E0B', borderRadius:8 }}>
+              <div style={{ fontSize:12, fontWeight:700, color:'#d97706', marginBottom:6 }}>⚠️ Conflict phát hiện</div>
+              {selectedGroup.conflicts.map((c,i) => <div key={i} style={{ fontSize:12, color:'#92400E' }}>• {c}</div>)}
+            </div>
+          )}
+
+          <div style={{ fontSize:12, color:'#6B7280' }}>
+            Muốn so sánh field-by-field? Chọn tab <strong>So sánh chi tiết</strong> và chọn các nguồn cần xem.
+          </div>
+        </div>
+      )}
+
+      {/* ── TẦNG 2: Bảng so sánh chi tiết ── */}
+      {compareView && (
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          {/* Chọn nguồn để so sánh */}
+          <div style={{ padding:12, background:'#F7F8FA', borderRadius:8, border:'1px solid #E5E7EB' }}>
+            <div style={{ fontSize:12, fontWeight:600, marginBottom:8 }}>Chọn nguồn để so sánh:</div>
+            <div className="flex gap-2 flex-wrap">
+              {selectedGroup.profiles.map(p => (
+                <button key={p.uid} onClick={() => toggleSource(p.uid)}
+                  style={{ padding:'5px 12px', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer', border:`2px solid ${selectedSources.includes(p.uid) ? confColor(p.confidence) : '#E5E7EB'}`, background: selectedSources.includes(p.uid) ? confBg(p.confidence) : 'white', color: selectedSources.includes(p.uid) ? confColor(p.confidence) : '#6B7280' }}>
+                  {p.source} ({p.confidence}%)
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Bảng so sánh */}
+          <div className="panel" style={{ overflow:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+              <thead>
+                <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
+                  <th style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', width:120, position:'sticky', left:0, background:'#F7F8FA' }}>Trường</th>
+                  {compareCols.map(p => (
+                    <th key={p.uid} style={{ padding:'10px 12px', fontSize:11, fontWeight:700, minWidth:160 }}>
+                      <div style={{ color:confColor(p.confidence) }}>{p.source}</div>
+                      <div style={{ fontFamily:'monospace', fontWeight:400, color:'#6B7280', fontSize:10 }}>{p.uid}</div>
+                      <div style={{ marginTop:4, height:3, borderRadius:2, background:'#E5E7EB' }}>
+                        <div style={{ width:`${p.confidence}%`, height:'100%', borderRadius:2, background:confColor(p.confidence) }}></div>
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARE_FIELDS.map(f => {
+                  const conflict = hasConflict(f.key);
+                  return (
+                    <tr key={f.key} style={{ borderBottom:'1px solid #F3F4F6', background: conflict ? '#FFFBEB':'white' }}>
+                      <td style={{ padding:'9px 12px', fontWeight:600, color:'#6B7280', fontSize:12, position:'sticky', left:0, background: conflict ? '#FFFBEB':'white' }}>
+                        {conflict && <span style={{ color:'#d97706', marginRight:4 }}>⚠️</span>}
+                        {f.label}
+                      </td>
+                      {compareCols.map(p => {
+                        const val = String(p[f.key]||'—');
+                        const isEmpty = val === '—' || val === '';
+                        return (
+                          <td key={p.uid} style={{ padding:'9px 12px', color: isEmpty ? '#D1D5DB':'#1A1A1A', fontStyle: isEmpty ? 'italic':'' }}>
+                            {!isEmpty && conflict && <span style={{ color:'#16A34A', marginRight:4 }}>•</span>}
+                            {val}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Nút quyết định */}
+      <div style={{ padding:16, background:'#F7F8FA', borderRadius:8, border:'1px solid #E5E7EB' }}>
+        <div style={{ fontSize:12, color:'#6B7280', marginBottom:12 }}>
+          Quyết định của bạn được ghi nhận và BE xử lý merge. BE tự chọn Hồ sơ chuẩn master và ưu tiên field theo rule nguồn dữ liệu.
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => handleDecision('confirmed')}
+            style={{ flex:2, padding:'11px', background:'var(--success)', color:'white', border:'none', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:'0 2px 6px rgba(22,163,74,.25)' }}>
+            ✓ Cùng người — Xác nhận merge {selectedGroup.profiles.length} hồ sơ
+          </button>
+          <button onClick={() => handleDecision('different')}
+            className="btn-ghost" style={{ flex:2, padding:'11px', fontSize:13 }}>
+            ✗ Tách nhóm — Không phải cùng người
+          </button>
+          <button onClick={() => handleDecision('later')}
+            style={{ flex:1, padding:'11px', background:'transparent', color:'var(--muted)', border:'1px solid var(--border)', borderRadius:10, fontSize:12, cursor:'pointer' }}>
+            Để sau
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Data mẫu lịch sử merge (audit log)
+const MERGE_HISTORY = [
+  { id:'MG-001', type:'AUTO_MERGE', uidMaster:'UID-0000123456', uidMerged:'UID-0000123999', confidence:94, matchKeys:'SĐT + Tên gần đúng', by:'SYSTEM', at:'12/06/2026 09:12', scoresBefore:'CLV 680 / COD Risk 42', scoresAfter:'CLV 742 / COD Risk 38' },
+  { id:'MG-002', type:'MANUAL',     uidMaster:'UID-0000987654', uidMerged:'UID-0000987001', confidence:78, matchKeys:'MST + Tên DN', by:'ds_trung@vnpost.vn', at:'10/06/2026 14:30', scoresBefore:'CLV 1100 / COD Risk 15', scoresAfter:'CLV 1248 / COD Risk 12' },
+  { id:'MG-003', type:'AUTO_MERGE', uidMaster:'UID-0000334411', uidMerged:'UID-0000334900', confidence:91, matchKeys:'SĐT', by:'SYSTEM', at:'08/06/2026 07:45', scoresBefore:'CLV 200 / COD Risk 55', scoresAfter:'CLV 220 / COD Risk 52' },
+];
+
+const UNMERGE_REQUESTS = [
+  { id:'UR-001', uidMaster:'UID-0000220088', reporter:'ds_lan@vnpost.vn', reportedAt:'25/06/2026 10:15', reason:'Hai cửa hàng khác nhau, trùng SĐT chủ nhưng là pháp nhân riêng biệt', status:'CHỜ DUYỆT', mergeRef:'MG-004' },
+];
+
+// ============================================================
+// CN4 — CUSTOMER 360
+// ============================================================
+function Customer360Screen({ uid, onBack }) {
+  const [role, setRole] = React.useState('Admin');
+  const [tab, setTab] = React.useState('overview');
+  const [sourceTab, setSourceTab] = React.useState('compare');
+  const kh = KH_DETAIL[uid] || KH_DETAIL['UID-0000123456'];
+
+  const canSee = (field) => {
+    const rbac = {
+      rfm:          ['CSKH','Marketing','Kinh doanh','Admin'],
+      clv:          ['CSKH','Marketing','Kinh doanh','Admin'],
+      churn:        ['CSKH','Marketing','Kinh doanh','Admin'],
+      engagement:   ['CSKH','Marketing','Admin'],
+      codRisk:      ['Kinh doanh','Vận hành','Admin'],
+      fraud:        ['Kinh doanh','Vận hành','Admin'],
+      linkedProfiles:['CSKH','Marketing','Kinh doanh','Vận hành','Data Steward','Admin'],
+    };
+    return (rbac[field]||[]).includes(role);
+  };
+
+  const tabs = [
+    { key:'overview',   label:'Tổng quan' },
+    { key:'linked',     label:'Hồ sơ liên kết' },
+    { key:'mergehist',  label:'Hồ sơ đa nguồn' },
+    { key:'address',    label:'Địa chỉ' },
+    ...(kh.type==='BUSINESS' ? [{ key:'business', label:'Doanh nghiệp' }] : []),
+    { key:'pillars',    label:'Hoạt động theo mảng dịch vụ chính' },
+    { key:'transaction',label:'GD & COD' },
+    { key:'behavior',   label:'Hành vi số' },
+    { key:'cskh',       label:'CSKH' },
+    { key:'scores',     label:'Điểm số & Phân khúc' },
+    { key:'consent',    label:'Đồng ý dữ liệu' },
+    { key:'audit',      label:'Nhật ký' },
+  ];
+
+  const completenessColor = kh.completeness >= 80 ? '#16A34A' : kh.completeness >= 60 ? '#F59E0B' : '#DC2626';
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
+      {/* Back btn */}
+      {onBack && (
+        <button onClick={onBack} style={{ alignSelf:'flex-start', background:'#f3f4f6', border:'none', borderRadius:6, padding:'6px 12px', fontSize:13, cursor:'pointer' }}>
+          ← Quay lại danh sách
+        </button>
+      )}
+
+      {/* Header card */}
+      <div className="panel" style={{ padding:20 }}>
+        <div className="flex items-start gap-4">
+          <div style={{ width:60, height:60, borderRadius:16, background:'linear-gradient(180deg,var(--brand),#efb000)', color:'#1A1A1A', display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, fontWeight:900, flexShrink:0, boxShadow:'0 4px 12px rgba(244,180,0,.35)' }}>
+            {kh.name.charAt(0)}
+          </div>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:20, fontWeight:800, color:'#1A1A1A' }}>{kh.name}</div>
+            <div style={{ fontSize:12, color:'#6B7280', fontFamily:'monospace', marginTop:2 }}>{kh.uid}</div>
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              <span className={`badge ${kh.type==='INDIVIDUAL' ? 'badge-blue':'badge-purple'}`}>{kh.type==='INDIVIDUAL' ? 'Cá nhân':'Doanh nghiệp'}</span>
+              <span className="badge badge-gray">{GROUP_LABEL[kh.group]||kh.group}</span>
+              {custStatusBadge(kh.status)}
+            </div>
+            <div style={{ display:'flex', gap:16, flexWrap:'wrap', marginTop:10 }}>
+              <div>
+                <div style={{ fontSize:11, color:'var(--muted)', fontWeight:600, textTransform:'uppercase', letterSpacing:'.04em', marginBottom:3 }}>Mảng dịch vụ chính</div>
+                <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+                  {(kh.activePillars||[]).map(id => {
+                    const p = PILLARS.find(x=>x.id===id);
+                    return <span key={id} className="badge badge-yellow">{p ? p.id : id}</span>;
+                  })}
+                  {(!kh.activePillars||kh.activePillars.length===0) && <span style={{ fontSize:12, color:'var(--muted)' }}>Chưa có dữ liệu</span>}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize:11, color:'var(--muted)', fontWeight:600, textTransform:'uppercase', letterSpacing:'.04em', marginBottom:3 }}>Hệ thống sử dụng</div>
+                <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+                  {(kh.activeSystems||kh.sources||[]).map(s => <span key={s} className="badge badge-blue">{s}</span>)}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize:11, color:'var(--muted)', fontWeight:600, textTransform:'uppercase', letterSpacing:'.04em', marginBottom:3 }}>Tương tác gần nhất</div>
+                <div style={{ fontSize:13, fontWeight:600, color:'var(--text-2)' }}>{kh.lastInteraction || kh.appLogin || 'Chưa có dữ liệu'}</div>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <select value={role} onChange={e=>setRole(e.target.value)} style={{ fontSize:12, borderRadius:6 }}>
+              {['CSKH','Marketing','Kinh doanh','Vận hành','Data Steward','Admin'].map(r => <option key={r}>{r}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* KPI strip */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:10, marginTop:16, paddingTop:16, borderTop:'1px solid var(--border)' }}>
+          {[
+            { label:'Tổng đơn', value: kh.orders.toLocaleString(), unit:'' },
+            { label:'Doanh thu 12 tháng', value: kh.revenue, unit:' ₫', color:'var(--success)' },
+            { label:'Tỷ lệ phát', value: kh.deliveryRate, unit:'%', color: kh.deliveryRate>=90 ? 'var(--success)':'var(--warn)' },
+            { label:'Tỷ lệ hoàn', value: kh.returnRate, unit:'%', color: kh.returnRate>=20 ? 'var(--danger)':'var(--warn)' },
+            { label:'Điểm tích lũy', value: kh.loyalty?.points != null ? kh.loyalty.points.toLocaleString() : '—', unit:' pt', color:'var(--purple)' },
+            { label:'Độ đầy đủ hồ sơ', value: kh.completeness, unit:'%', color: completenessColor },
+          ].map((k,i) => (
+            <div key={i} style={{ padding:'10px 12px', background:'var(--bg)', borderRadius:10, border:'1px solid var(--line)' }}>
+              <div style={{ fontSize:11, color:'var(--muted)', marginBottom:4, fontWeight:600 }}>{k.label}</div>
+              <div style={{ fontSize:17, fontWeight:900, color:k.color||'var(--text)', letterSpacing:'-.01em' }} className="tabular-nums">{k.value}{k.unit}</div>
+              {k.label==='Độ đầy đủ hồ sơ' && (
+                <div style={{ height:3, borderRadius:2, background:'var(--border)', marginTop:6 }}>
+                  <div style={{ width:`${kh.completeness}%`, height:'100%', background:completenessColor, borderRadius:2 }}></div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="tabs-strip">
+        {tabs.map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)} className={`tab-btn ${tab===t.key ? 'active':''}`}>{t.label}</button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      <div className="panel" style={{ padding:20 }}>
+
+        {/* TỔNG QUAN */}
+        {tab==='overview' && (
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+            <div>
+              <div className="section-title">Thông tin định danh</div>
+              {[
+                ['Giới tính', kh.gender || 'Chưa có dữ liệu'],
+                ['Ngày sinh', kh.birthDate || 'Chưa có dữ liệu'],
+                ['SĐT', kh.phone],
+                ['Email', kh.email],
+                ['CCCD', kh.cccd],
+                ['PostID', kh.postId || 'Chưa có dữ liệu'],
+                ['Bưu cục quản lý', kh.postOffice || 'Chưa có dữ liệu'],
+              ].map(([l,v]) => (
+                <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                  <span className="field-label" style={{ margin:0 }}>{l}</span>
+                  <span style={{ fontSize:13, fontWeight:500 }}>{v}</span>
+                </div>
+              ))}
+            </div>
+            <div>
+              <div className="section-title">Vai trò giao dịch</div>
+              <div className="flex gap-2 mb-3">
+                {kh.roles.map(r => (
+                  <span key={r} className={`badge ${r===kh.primaryRole ? 'badge-red':'badge-blue'}`}>{r} {r===kh.primaryRole ? '(chính)':''}</span>
+                ))}
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+                <div style={{ background:'#f0fdf4', borderRadius:8, padding:12 }}>
+                  <div style={{ fontSize:22, fontWeight:800, color:'#16A34A' }} className="tabular-nums">{kh.senderCount.toLocaleString()}</div>
+                  <div style={{ fontSize:12, color:'#6B7280' }}>lần là Người gửi</div>
+                </div>
+                <div style={{ background:'#eff6ff', borderRadius:8, padding:12 }}>
+                  <div style={{ fontSize:22, fontWeight:800, color:'#2563EB' }} className="tabular-nums">{kh.receiverCount}</div>
+                  <div style={{ fontSize:12, color:'#6B7280' }}>lần là Người nhận</div>
+                </div>
+              </div>
+              <div className="section-title mt-4">Phân khúc hiện tại</div>
+              <div className="flex gap-2 flex-wrap">
+                {kh.segments.map(s => <span key={s} className={`badge ${segBadgeColor(s)}`}>{s}</span>)}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ĐỊNH DANH */}
+        {tab==='linked' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+            {/* Định danh liên kết */}
+            <div>
+              <div className="section-title">Định danh liên kết</div>
+              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                <thead>
+                  <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+                    {['Loại ID','Giá trị','Nguồn','Độ tin cậy','Reliability','Chính'].map(h => (
+                      <th key={h} style={{ padding:'8px 10px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {kh.aliases.map((a,i) => (
+                    <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                      <td style={{ padding:'8px 10px' }}><span className="badge badge-blue">{ALIAS_TYPE_LABEL[a.type]||a.type}</span></td>
+                      <td style={{ padding:'8px 10px', fontFamily:'monospace', fontWeight:600 }}>{a.value}</td>
+                      <td style={{ padding:'8px 10px', color:'#6B7280' }}>{a.source}</td>
+                      <td style={{ padding:'8px 10px' }}>
+                        <span className={`badge ${a.confidence==='HIGH' ? 'badge-green' : a.confidence==='MEDIUM' ? 'badge-yellow' : 'badge-gray'}`}>{CONFIDENCE_LABEL[a.confidence]||a.confidence}</span>
+                      </td>
+                      <td style={{ padding:'8px 10px' }}>
+                        <div className="flex items-center gap-2">
+                          <div style={{ flex:1, height:6, borderRadius:3, background:'#E5E7EB', overflow:'hidden', minWidth:60 }}>
+                            <div style={{ width:`${a.reliability}%`, height:'100%', background: a.reliability>=80 ? '#16A34A' : a.reliability>=60 ? '#F59E0B' : '#DC2626', borderRadius:3 }}></div>
+                          </div>
+                          <span className="tabular-nums" style={{ fontSize:12, fontWeight:700 }}>{a.reliability}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding:'8px 10px' }}>{a.primary ? '✓' : ''}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Nghi ngờ merge sai */}
+            <div style={{ padding:'12px 14px', background:'#FFF7ED', border:'1px solid #FED7AA', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div>
+                <div style={{ fontSize:13, fontWeight:600, color:'#92400E' }}>Nghi ngờ merge sai?</div>
+                <div style={{ fontSize:12, color:'#B45309', marginTop:2 }}>Nếu hồ sơ này bị gộp nhầm, bạn có thể gửi yêu cầu để Data Steward xem xét.</div>
+              </div>
+              <button style={{ padding:'6px 14px', background:'#D97706', color:'white', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer', flexShrink:0, marginLeft:12 }}
+                onClick={() => alert('Yêu cầu báo cáo merge sai đã được ghi nhận. Data Steward sẽ xem xét trong 1–2 ngày làm việc.')}>
+                Báo cáo
+              </button>
+            </div>
+
+            {/* Link sang tab Hồ sơ đa nguồn */}
+            <div style={{ padding:'10px 14px', background:'#EFF6FF', border:'1px solid #BFDBFE', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ fontSize:12, color:'#2563EB' }}>Xem chi tiết dữ liệu từng hệ thống nguồn và so sánh field-by-field tại tab <strong>Hồ sơ đa nguồn</strong>.</div>
+              <button onClick={() => setTab('mergehist')} style={{ padding:'6px 14px', background:'#2563EB', color:'white', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer', flexShrink:0, marginLeft:12 }}>
+                → Xem Hồ sơ đa nguồn
+              </button>
+            </div>
+
+          </div>
+        )}
+
+        {/* HỒ SƠ ĐA NGUỒN */}
+        {tab==='mergehist' && (() => {
+          const sources = kh.sourcesData || [];
+          const confColor = (c) => c >= 90 ? '#16A34A' : c >= 75 ? '#F59E0B' : '#DC2626';
+          const confBg    = (c) => c >= 90 ? '#dcfce7' : c >= 75 ? '#fef9c3' : '#fee2e2';
+
+          const FIELD_GROUPS = [
+            {
+              group: 'Định danh',
+              fields: [
+                { key:'ten',      label:'Họ tên / Tên DN',  golden: kh.name },
+                { key:'sdt',      label:'Số điện thoại',    golden: kh.phone },
+                { key:'email',    label:'Email',             golden: kh.email },
+                { key:'cccd',     label:'CCCD / MST',        golden: kh.cccd || kh.taxId || '—' },
+                { key:'gioiTinh', label:'Giới tính',         golden: kh.gender || '—' },
+                { key:'ngaySinh', label:'Ngày sinh',         golden: kh.birthDate || '—' },
+                { key:'postId',   label:'PostID',            golden: kh.postId || '—' },
+              ],
+              dataKey: 'dinh_danh',
+            },
+            {
+              group: 'Tài chính / Hợp đồng',
+              fields: [
+                { key:'mst',     label:'Mã số thuế',  golden: kh.taxId || '—' },
+                { key:'hopDong', label:'Hợp đồng',    golden: kh.contract ? `${kh.contract.status==='ACTIVE' ? 'Đang hiệu lực' : kh.contract.status} — ${kh.contract.start} → ${kh.contract.end}` : '—' },
+                { key:'congNo',  label:'Công nợ',     golden: kh.debt ? `${kh.debt.unpaid} (${kh.debt.status==='OVERDUE' ? 'Quá hạn' : kh.debt.status==='MATCHED' ? 'Khớp' : kh.debt.status})` : '—' },
+              ],
+              dataKey: 'tai_chinh',
+            },
+          ];
+
+          const getVal = (src, groupKey, fieldKey) => {
+            const g = src[groupKey] || {};
+            const v = g[fieldKey];
+            if (v === null || v === undefined) return '—';
+            return String(v);
+          };
+
+          const isAbsent = (v) => !v || v === '—' || v === 'null' || v === 'undefined';
+
+          const hasConflict = (golden, srcVal) => {
+            if (isAbsent(golden) || isAbsent(srcVal)) return false;
+            return golden.toLowerCase().trim() !== srcVal.toLowerCase().trim();
+          };
+
+          if (sources.length === 0) {
+            return <div style={{ padding:32, textAlign:'center', color:'#6B7280' }}>Chưa có dữ liệu nguồn</div>;
+          }
+
+          return (
+            <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+
+              {/* Toggle so sánh / timeline */}
+              <div className="flex gap-2">
+                <button onClick={() => setSourceTab('compare')} className={`tab-btn ${sourceTab==='compare' ? 'active':''}`}>🔍 So sánh chi tiết</button>
+                <button onClick={() => setSourceTab('timeline')} className={`tab-btn ${sourceTab==='timeline' ? 'active':''}`}>📅 Timeline gộp hồ sơ</button>
+              </div>
+
+              {/* TẦNG 2 — Bảng so sánh tất tần tật */}
+              {sourceTab === 'compare' && (
+                <div style={{ overflow:'auto', borderRadius:10, border:'1px solid #E5E7EB' }}>
+                  <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12, minWidth: 200 + sources.length * 180 }}>
+                    <thead>
+                      <tr style={{ background:'#F7F8FA', borderBottom:'2px solid #E5E7EB' }}>
+                        <th style={{ padding:'10px 14px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', width:160, position:'sticky', left:0, background:'#F7F8FA', zIndex:2 }}>Trường dữ liệu</th>
+                        {/* Hồ sơ chuẩn */}
+                        <th style={{ padding:'10px 14px', minWidth:180, textAlign:'left' }}>
+                          <div style={{ fontSize:11, fontWeight:700, color:'white', background:'#16A34A', display:'inline-block', padding:'2px 8px', borderRadius:4, marginBottom:2 }}>✦ Hồ sơ chuẩn</div>
+                          <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace' }}>{kh.uid}</div>
+                        </th>
+                        {sources.map((s,i) => (
+                          <th key={i} style={{ padding:'10px 14px', minWidth:180, textAlign:'left' }}>
+                            <div style={{ fontSize:11, fontWeight:700, color:'white', background:confColor(s.confidence), display:'inline-block', padding:'2px 8px', borderRadius:4, marginBottom:2 }}>{s.source}</div>
+                            <div style={{ fontSize:10, color:'#6B7280', fontFamily:'monospace' }}>{s.sourceId}</div>
+                            <div style={{ marginTop:4, height:3, borderRadius:2, background:'#E5E7EB' }}>
+                              <div style={{ width:`${s.confidence}%`, height:'100%', borderRadius:2, background:confColor(s.confidence) }}></div>
+                            </div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {FIELD_GROUPS.map((fg, gi) => (
+                        <React.Fragment key={gi}>
+                          {/* Group header */}
+                          <tr style={{ background:'#F0F4FF' }}>
+                            <td colSpan={2 + sources.length} style={{ padding:'7px 14px', fontSize:11, fontWeight:700, color:'#2563EB', letterSpacing:'0.4px', position:'sticky', left:0 }}>
+                              {fg.group.toUpperCase()}
+                            </td>
+                          </tr>
+                          {fg.fields.map((f, fi) => {
+                            const goldenVal = String(f.golden || '—');
+                            const srcVals = sources.map(s => getVal(s, fg.dataKey, f.key));
+                            const anyConflict = srcVals.some(v => hasConflict(goldenVal, v));
+                            return (
+                              <tr key={fi} style={{ borderBottom:'1px solid #F3F4F6', background: anyConflict ? '#FFFBEB' : 'white' }}>
+                                <td style={{ padding:'9px 14px', fontWeight:600, color:'#6B7280', fontSize:11, position:'sticky', left:0, background: anyConflict ? '#FFFBEB' : 'white', whiteSpace:'nowrap' }}>
+                                  {anyConflict && <span style={{ color:'#d97706', marginRight:4 }}>⚠️</span>}
+                                  {f.label}
+                                </td>
+                                {/* Hồ sơ chuẩn */}
+                                <td style={{ padding:'9px 14px', background:'#f0fdf4', borderLeft:'3px solid #16A34A', fontWeight:500, color: isAbsent(goldenVal) ? '#D1D5DB' : '#1A1A1A', fontStyle: isAbsent(goldenVal) ? 'italic':'normal' }}>
+                                  {goldenVal}
+                                </td>
+                                {/* Nguồn */}
+                                {srcVals.map((v, si) => {
+                                  const conflict = hasConflict(goldenVal, v);
+                                  const absent = isAbsent(v);
+                                  return (
+                                    <td key={si} style={{ padding:'9px 14px', background: conflict ? '#FFFBEB' : absent ? '#FAFAFA' : 'white', color: conflict ? '#d97706' : absent ? '#D1D5DB' : '#1A1A1A', fontStyle: absent ? 'italic':'normal' }}>
+                                      {absent ? <span style={{ fontSize:11 }}>Không có</span> : v}
+                                      {conflict && <span className="badge badge-yellow" style={{ marginLeft:6, fontSize:10 }}>Khác biệt</span>}
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            );
+                          })}
+                        </React.Fragment>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* TẦNG 3 — Timeline */}
+              {sourceTab === 'timeline' && (
+                <div style={{ display:'flex', flexDirection:'column', gap:0 }}>
+                  <div style={{ fontSize:12, color:'#6B7280', marginBottom:12 }}>
+                    Thứ tự các hệ thống nguồn được CDP nhận diện và gộp vào Hồ sơ chuẩn.
+                  </div>
+                  {/* Hồ sơ chuẩn — điểm cuối */}
+                  <div style={{ display:'flex', gap:16, alignItems:'flex-start', paddingBottom:16 }}>
+                    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:0 }}>
+                      <div style={{ width:14, height:14, borderRadius:50, background:'#16A34A', border:'3px solid white', boxShadow:'0 0 0 2px #16A34A', flexShrink:0 }}></div>
+                      <div style={{ width:2, height:40, background:'#E5E7EB' }}></div>
+                    </div>
+                    <div style={{ paddingTop:0 }}>
+                      <div style={{ fontWeight:700, fontSize:13, color:'#16A34A' }}>✦ Hồ sơ chuẩn tạo thành</div>
+                      <div style={{ fontSize:11, color:'#6B7280', fontFamily:'monospace' }}>{kh.uid}</div>
+                      <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>Tổng hợp từ {sources.length} nguồn · Hoàn chỉnh {kh.completeness}%</div>
+                    </div>
+                  </div>
+                  {[...sources].sort((a,b) => new Date(b.mergedAt.split(' ')[0].split('/').reverse().join('-')) - new Date(a.mergedAt.split(' ')[0].split('/').reverse().join('-'))).map((s, i, arr) => (
+                    <div key={i} style={{ display:'flex', gap:16, alignItems:'flex-start', paddingBottom: i < arr.length-1 ? 16 : 0 }}>
+                      <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+                        <div style={{ width:12, height:12, borderRadius:50, background:confColor(s.confidence), flexShrink:0 }}></div>
+                        {i < arr.length-1 && <div style={{ width:2, flex:1, minHeight:32, background:'#E5E7EB' }}></div>}
+                      </div>
+                      <div style={{ flex:1, paddingBottom: i < arr.length-1 ? 0:0 }}>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span style={{ fontWeight:700, fontSize:13 }}>{s.source}</span>
+                          <span style={{ fontFamily:'monospace', fontSize:11, color:'#7c3aed' }}>{s.sourceId}</span>
+                          <span style={{ fontSize:12, fontWeight:700, color:confColor(s.confidence) }}>{s.confidence}%</span>
+                          {s.note && <span className="badge badge-yellow" style={{ fontSize:10 }}>⚠️ {s.note}</span>}
+                        </div>
+                        <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>
+                          Khóa trùng: <strong>{s.matchKey}</strong> · Gộp lúc {s.mergedAt}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+            </div>
+          );
+        })()}
+
+        {/* ĐỊA CHỈ */}
+        {tab==='address' && (() => {
+          const byType = kh.addresses.reduce((acc,a) => { (acc[a.type] = acc[a.type]||[]).push(a); return acc; }, {});
+          return (
+            <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+              {Object.keys(byType).map(type => (
+                <div key={type}>
+                  <div className="section-title">{ADDR_TYPE_LABEL[type] || type}</div>
+                  {byType[type].map((a,i) => (
+                    <div key={i} style={{ padding:14, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:10 }}>
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        {a.primary && <span className="badge badge-green">Địa chỉ chính</span>}
+                        <span className={`badge ${a.status==='STANDARDIZED' ? 'badge-blue' : 'badge-yellow'}`}>{a.status==='STANDARDIZED' ? 'Đã chuẩn hoá' : 'Chưa đầy đủ'}</span>
+                        <span className={`badge ${a.version==='NEW' ? 'badge-green' : 'badge-gray'}`}>{a.version==='NEW' ? 'Dữ liệu mới' : 'Dữ liệu cũ (legacy)'}</span>
+                      </div>
+                      <div style={{ fontWeight:600, fontSize:14 }}>{a.detail}, {a.ward}, {a.province}</div>
+                      <div style={{ fontSize:12, color:'#6B7280', marginTop:4 }}>VPostCode: {a.vpostcode}</div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+              {(!kh.addresses || kh.addresses.length===0) && (
+                <div style={{ padding:32, textAlign:'center', color:'#6B7280' }}>Chưa có dữ liệu địa chỉ</div>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* DOANH NGHIỆP */}
+        {tab==='business' && kh.type==='BUSINESS' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+            {/* Row 1: Thông tin DN + Người liên hệ */}
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+              <div>
+                <div className="section-title">Thông tin doanh nghiệp</div>
+                {[
+                  ['Mã số thuế', kh.taxId],
+                  ['Mã KHL', kh.khlCode],
+                  ['Đại diện pháp lý', kh.representative],
+                  ['Hợp đồng', kh.contract?.status==='ACTIVE' ? 'Đang hiệu lực' : kh.contract?.status],
+                  ['Hiệu lực', `${kh.contract?.start} → ${kh.contract?.end}`],
+                  ['Ngành nghề', kh.contract?.segment],
+                ].map(([l,v]) => (
+                  <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                    <span className="field-label" style={{ margin:0 }}>{l}</span>
+                    <span style={{ fontSize:13, fontWeight:500 }}>{v}</span>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div className="section-title">Người liên hệ</div>
+                {kh.contacts?.map((c,i) => (
+                  <div key={i} style={{ padding:12, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:8 }}>
+                    <div className="flex items-center gap-2">
+                      <span style={{ fontWeight:600 }}>{c.name}</span>
+                      {c.primary && <span className="badge badge-green">Chính</span>}
+                    </div>
+                    <div style={{ fontSize:12, color:'#6B7280' }}>{c.role}</div>
+                    <div style={{ fontSize:12, fontFamily:'monospace', marginTop:4 }}>{c.phone} · {c.email}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Row 2: Công nợ hiện tại */}
+            {kh.debt && (
+              <div>
+                <div className="section-title">Công nợ hiện tại</div>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12 }}>
+                  {[
+                    { label:'Chưa thanh toán', value:kh.debt.unpaid+' ₫', color:'#DC2626' },
+                    { label:'Hạn thanh toán',  value:kh.debt.dueDate,     color:'#1A1A1A' },
+                    { label:'Quá hạn',         value:kh.debt.overdue+' ₫', color: kh.debt.overdueDays>0 ? '#DC2626':'#16A34A' },
+                    { label:'Số ngày quá hạn', value: kh.debt.overdueDays>0 ? `${kh.debt.overdueDays} ngày`:'—', color: kh.debt.overdueDays>0 ? '#DC2626':'#16A34A' },
+                  ].map((k,i) => (
+                    <div key={i} className="kpi-card">
+                      <div style={{ fontSize:11, color:'#6B7280', marginBottom:4 }}>{k.label}</div>
+                      <div style={{ fontSize:15, fontWeight:800, color:k.color }} className="tabular-nums">{k.value}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Row 3: Lịch sử đối soát COD theo tháng */}
+            {kh.codHistory && (
+              <div>
+                <div className="section-title">Lịch sử đối soát COD theo tháng</div>
+                <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                  <thead>
+                    <tr style={{ borderBottom:'1px solid #E5E7EB', background:'#F7F8FA' }}>
+                      {['Tháng','Tổng COD','Đã thu','Còn lại','Trạng thái'].map(h => (
+                        <th key={h} style={{ padding:'9px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {kh.codHistory.map((r,i) => (
+                      <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                        <td style={{ padding:'9px 12px', fontWeight:600 }}>{r.month}</td>
+                        <td style={{ padding:'9px 12px' }} className="tabular-nums">{r.total} ₫</td>
+                        <td style={{ padding:'9px 12px', color:'#16A34A' }} className="tabular-nums">{r.collected} ₫</td>
+                        <td style={{ padding:'9px 12px', color: r.status==='DISCREPANCY' ? '#DC2626':'#6B7280' }} className="tabular-nums">{r.pending} ₫</td>
+                        <td style={{ padding:'9px 12px' }}>
+                          <span className={`badge ${r.status==='MATCHED' ? 'badge-green':'badge-red'}`}>
+                            {r.status==='MATCHED' ? 'Khớp':'Chênh lệch'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* HOẠT ĐỘNG THEO MẢNG DỊCH VỤ CHÍNH */}
+        {tab==='pillars' && (() => {
+          const PILLAR_MOCK = {
+            BCCP:      { metric:`${kh.orders.toLocaleString()} đơn / 12 tháng`, revenue:`${kh.revenue} ₫`, highlight2:`Tỷ lệ phát ${kh.deliveryRate}% · Tỷ lệ hoàn ${kh.returnRate}%`, signal: kh.returnRate>=20 ? { text:'Tỷ lệ hoàn cao — cần theo dõi', color:'var(--danger)' } : { text:'Hoạt động ổn định', color:'var(--success)' } },
+            TCBC:      { metric:'Đối soát đều hàng tháng', revenue:'—', highlight2:'Thanh toán tại quầy, chưa dùng thu hộ online', signal:{ text:'Tiềm năng upsell: PayPost thu hộ', color:'var(--info)' } },
+            PPBL:      { metric:'—', revenue:'—', highlight2:'Chưa phát sinh giao dịch', signal:{ text:'Chưa sử dụng', color:'var(--muted)' } },
+            HCC:       { metric:'—', revenue:'—', highlight2:'Chưa phát sinh giao dịch', signal:{ text:'Chưa sử dụng', color:'var(--muted)' } },
+            Logistics: { metric:'3 điểm kho đang dùng', revenue:'—', highlight2:'Giao đa điểm, tăng trước sale', signal:{ text:'SLA ổn định, cần theo dõi tồn kho', color:'var(--warn)' } },
+            TMDT:      { metric:'—', revenue:'—', highlight2:'Chưa phát sinh giao dịch', signal:{ text:'Tiềm năng: shop online đang mở rộng', color:'var(--info)' } },
+            MVNO:      { metric:'—', revenue:'—', highlight2:'Chưa phát sinh giao dịch', signal:{ text:'Chưa sử dụng', color:'var(--muted)' } },
+          };
+          const rows = PILLARS.map(p => {
+            const isActive = (kh.activePillars||[]).includes(p.id);
+            const mock = PILLAR_MOCK[p.id] || {};
+            return { ...p, active:isActive, ...(isActive ? mock : { metric:'—', revenue:'—', highlight2:'Chưa phát sinh dữ liệu cho khách hàng này', signal:{ text:'Chưa sử dụng', color:'var(--muted)' } }) };
+          });
+          return (
+            <div>
+              <div style={{ fontSize:12, color:'var(--muted)', marginBottom:14, lineHeight:1.6 }}>
+                Tổng hợp mức độ sử dụng theo từng mảng dịch vụ chính. Xem chi tiết giao dịch và đối soát COD tại tab <strong>GD &amp; COD</strong>.
+              </div>
+              <div style={{ overflow:'auto', borderRadius:10, border:'1px solid var(--border)' }}>
+                <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                  <thead>
+                    <tr style={{ background:'var(--bg-2)', borderBottom:'2px solid var(--border)' }}>
+                      {['Mảng dịch vụ','Trạng thái','Chỉ số nổi bật','Doanh thu 12 tháng','Hoạt động / Ghi chú','Tín hiệu / Rủi ro'].map(h => (
+                        <th key={h} style={{ padding:'9px 12px', textAlign:'left', fontSize:11, fontWeight:800, color:'var(--muted)', letterSpacing:'.04em', whiteSpace:'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map(r => (
+                      <tr key={r.id} style={{ borderBottom:'1px solid var(--line)', background: r.active ? 'white' : 'var(--bg-2)' }}>
+                        <td style={{ padding:'11px 12px', fontWeight:700, fontSize:13 }}>{r.label}</td>
+                        <td style={{ padding:'11px 12px' }}>
+                          <span className={`badge ${r.active ? 'badge-green' : 'badge-gray'}`}>{r.active ? '● Đang dùng' : '○ Chưa dùng'}</span>
+                        </td>
+                        <td style={{ padding:'11px 12px', fontSize:12, fontWeight:600, color: r.active ? 'var(--text)' : 'var(--muted)' }} className="tabular-nums">{r.metric}</td>
+                        <td style={{ padding:'11px 12px', fontSize:12, fontWeight:600, color: r.revenue!=='—' ? 'var(--success)' : 'var(--muted)' }} className="tabular-nums">{r.revenue}</td>
+                        <td style={{ padding:'11px 12px', fontSize:12, color:'var(--muted)' }}>{r.highlight2}</td>
+                        <td style={{ padding:'11px 12px' }}>
+                          <span style={{ fontSize:12, fontWeight:600, color:r.signal.color }}>{r.signal.text}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* GIAO DỊCH & COD */}
+        {tab==='transaction' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+            <div style={{ fontSize:12, color:'var(--muted)', lineHeight:1.6 }}>
+              Chi tiết giao dịch và đối soát COD của mảng <strong>BCCP</strong>. Xem tổng hợp đa mảng tại tab <strong>Hoạt động theo mảng dịch vụ chính</strong>.
+            </div>
+
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+              {/* Tổng hợp giao dịch */}
+              <div>
+                <div className="section-title">Tổng hợp giao dịch</div>
+                {[
+                  ['Tổng đơn', kh.orders.toLocaleString()],
+                  ['Doanh thu 12 tháng', `${kh.revenue} ₫`],
+                  ['Trung bình đơn/tháng', kh.avgMonthly],
+                  ['Dịch vụ chính', kh.service || 'Chưa có dữ liệu'],
+                  ['Tỷ lệ phát thành công', `${kh.deliveryRate}%`],
+                  ['Tỷ lệ hoàn', `${kh.returnRate}%`],
+                ].map(([l,v]) => (
+                  <div key={l} className="info-row">
+                    <span>{l}</span>
+                    <b className="tabular-nums">{v}</b>
+                  </div>
+                ))}
+              </div>
+
+              {/* COD */}
+              <div>
+                <div className="section-title">COD — Thu hộ</div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:14 }}>
+                  {[
+                    { label:'Tổng COD', value:kh.cod.total+' ₫', bg:'var(--success-soft)', color:'var(--success)' },
+                    { label:'Đã thu',   value:kh.cod.collected+' ₫', bg:'var(--info-soft)', color:'var(--info)' },
+                    { label:'Chưa thu', value:kh.cod.pending+' ₫', bg: parseFloat(kh.cod.pending.replace(/\./g,''))>0 ? 'var(--danger-soft)':'var(--line)', color: parseFloat(kh.cod.pending.replace(/\./g,''))>0 ? 'var(--danger)':'var(--muted)' },
+                    { label:'Đối soát', value: kh.cod.status==='MATCHED'?'Khớp':kh.cod.status==='DISCREPANCY'?'Chênh lệch':'Đang chờ', bg: kh.cod.status==='MATCHED'?'var(--success-soft)':kh.cod.status==='DISCREPANCY'?'var(--danger-soft)':'var(--warn-soft)', color: kh.cod.status==='MATCHED'?'var(--success)':kh.cod.status==='DISCREPANCY'?'var(--danger)':'var(--warn)' },
+                  ].map((k,i) => (
+                    <div key={i} style={{ background:k.bg, borderRadius:10, padding:12 }}>
+                      <div style={{ fontSize:11, color:'var(--muted)', marginBottom:4 }}>{k.label}</div>
+                      <div style={{ fontSize:14, fontWeight:800, color:k.color }} className="tabular-nums">{k.value}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Đóng góp theo nguồn dữ liệu */}
+            {(() => {
+              const srcRows = (kh.sourcesData||[])
+                .filter(s => s.giao_dich && (s.giao_dich.tongDon > 0 || s.giao_dich.cod !== '—'))
+                .map(s => ({
+                  source: s.source,
+                  vaiTro: s.giao_dich.vaiTro || '—',
+                  tongDon: s.giao_dich.tongDon > 0 ? s.giao_dich.tongDon.toLocaleString() : '—',
+                  cod: s.giao_dich.cod || '—',
+                }));
+              if (srcRows.length === 0) return null;
+              return (
+                <div>
+                  <div className="section-title">Đóng góp theo nguồn dữ liệu</div>
+                  <div style={{ overflow:'auto', borderRadius:10, border:'1px solid var(--border)' }}>
+                    <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                      <thead>
+                        <tr style={{ background:'var(--bg-2)', borderBottom:'1px solid var(--border)' }}>
+                          {['Nguồn','Vai trò','Số đơn','COD đóng góp'].map(h => (
+                            <th key={h} style={{ padding:'9px 12px', textAlign:'left', fontSize:11, fontWeight:800, color:'var(--muted)' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {srcRows.map((r,i) => (
+                          <tr key={i} style={{ borderBottom:'1px solid var(--line)' }}>
+                            <td style={{ padding:'9px 12px' }}><span className="badge badge-blue">{r.source}</span></td>
+                            <td style={{ padding:'9px 12px', fontSize:12 }}>{r.vaiTro}</td>
+                            <td style={{ padding:'9px 12px', fontSize:12, fontWeight:600 }} className="tabular-nums">{r.tongDon}</td>
+                            <td style={{ padding:'9px 12px', fontSize:12, fontWeight:600, color: r.cod!=='—'?'var(--success)':'var(--muted)' }} className="tabular-nums">{r.cod !== '—' ? r.cod+' ₫' : '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+
+        {/* HÀNH VI SỐ */}
+        {tab==='behavior' && (() => {
+          const channels = [...new Set((kh.timeline||[]).map(e => e.channel))];
+          const lastCampaign = (kh.timeline||[]).find(e => e.type === 'campaign');
+          return (
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+            <div>
+              <div className="section-title">Thông tin thiết bị & App</div>
+              {[
+                ['Lần đăng nhập cuối', kh.appLogin],
+                ['Thiết bị', kh.device],
+                ['Phiên/30 ngày', kh.sessions30d ?? 'Chưa có dữ liệu'],
+              ].map(([l,v]) => (
+                <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                  <span className="field-label" style={{ margin:0 }}>{l}</span>
+                  <span style={{ fontSize:13, fontWeight:500 }}>{v}</span>
+                </div>
+              ))}
+
+              <div className="section-title mt-4">Mức độ tương tác</div>
+              {[
+                ['Điểm tương tác (Engagement)', canSee('engagement') ? `${kh.scores.engagement}/100` : '🔒 Không có quyền xem'],
+                ['Số kênh đã tương tác', channels.length ? `${channels.length} kênh (${channels.join(', ')})` : 'Chưa có dữ liệu'],
+                ['Phản hồi chiến dịch gần nhất', lastCampaign ? `${lastCampaign.label} — ${lastCampaign.time}` : 'Chưa ghi nhận phản hồi campaign'],
+              ].map(([l,v]) => (
+                <div key={l} style={{ display:'flex', justifyContent:'space-between', gap:12, padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                  <span className="field-label" style={{ margin:0 }}>{l}</span>
+                  <span style={{ fontSize:13, fontWeight:500, textAlign:'right' }}>{v}</span>
+                </div>
+              ))}
+
+              {kh.lastOrder && (
+                <div style={{ marginTop:16 }}>
+                  <div className="section-title">Đơn hàng gần nhất</div>
+                  {[
+                    ['Mã đơn', kh.lastOrder.id],
+                    ['Loại dịch vụ', kh.lastOrder.type],
+                    ['Giá trị', `${kh.lastOrder.amount} ₫`],
+                    ['Ngày tạo', kh.lastOrder.date],
+                  ].map(([l,v]) => (
+                    <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                      <span className="field-label" style={{ margin:0 }}>{l}</span>
+                      <span style={{ fontSize:13, fontWeight:500, fontFamily: l==='Mã đơn' ? 'monospace':'inherit' }}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div>
+              <div className="section-title">Timeline sự kiện</div>
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                {kh.timeline.map((e,i) => (
+                  <div key={i} className="flex gap-3">
+                    <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+                      <div className="timeline-dot" style={{ background:e.color, marginTop:2 }}></div>
+                      {i<kh.timeline.length-1 && <div style={{ width:2, flex:1, background:'#E5E7EB', minHeight:20 }}></div>}
+                    </div>
+                    <div style={{ paddingBottom:10 }}>
+                      <div style={{ fontSize:12, color:'#6B7280' }}>{e.time} · {e.channel}</div>
+                      <div style={{ fontSize:13, fontWeight:600, color:'#1A1A1A' }}>{e.icon} {e.label}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          );
+        })()}
+
+        {/* CSKH */}
+        {tab==='cskh' && (
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12 }}>
+            {[
+              { label:'Tổng khiếu nại', value:kh.complaints.total, color:'#1A1A1A' },
+              { label:'Đang mở', value:kh.complaints.open, color: kh.complaints.open>0 ? '#DC2626' : '#16A34A' },
+              { label:'Điểm hài lòng', value:`${kh.complaints.satisfaction}/5`, color: kh.complaints.satisfaction>=4 ? '#16A34A' : kh.complaints.satisfaction>=3 ? '#F59E0B' : '#DC2626' },
+              { label:'SLA đúng hạn', value:`${kh.complaints.sla}%`, color: kh.complaints.sla>=90 ? '#16A34A' : '#F59E0B' },
+            ].map((k,i) => (
+              <div key={i} className="kpi-card" style={{ textAlign:'center' }}>
+                <div style={{ fontSize:28, fontWeight:800, color:k.color }} className="tabular-nums">{k.value}</div>
+                <div style={{ fontSize:12, color:'#6B7280', marginTop:4 }}>{k.label}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ĐIỂM SỐ */}
+        {tab==='scores' && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="section-title" style={{ margin:0 }}>Điểm số & Phân khúc (vai trò: {role})</div>
+              <div style={{ fontSize:12, color:'#6B7280' }}>Cập nhật: {kh.scores.updatedAt}</div>
+            </div>
+
+            {/* RFM */}
+            {canSee('rfm') ? (
+              <div style={{ padding:16, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:16 }}>
+                <div style={{ fontWeight:700, fontSize:13, marginBottom:10 }}>RFM — Nhóm: <span style={{ color:'#8a5a00' }}>{kh.scores.rfmGroup}</span></div>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
+                  {[['R — Gần đây',kh.scores.rfmR],['F — Tần suất',kh.scores.rfmF],['M — Giá trị',kh.scores.rfmM]].map(([l,v]) => (
+                    <div key={l}>
+                      <div style={{ fontSize:11, color:'#6B7280', marginBottom:4 }}>{l}</div>
+                      {rfmDot(v)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : <div style={{ padding:12, background:'#f3f4f6', borderRadius:8, marginBottom:16, color:'#6B7280', fontSize:13 }}>🔒 Vai trò {role} không có quyền xem RFM</div>}
+
+            {/* Giá trị vòng đời */}
+            {canSee('clv') ? (
+              <div style={{ padding:14, border:'1px solid #E5E7EB', borderRadius:8, marginBottom:12, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <div>
+                  <div style={{ fontSize:11, color:'#6B7280' }}>Giá trị vòng đời khách hàng (CLV)</div>
+                  <div style={{ fontSize:20, fontWeight:800, color:'#16A34A' }} className="tabular-nums">{kh.scores.clv} ₫</div>
+                </div>
+              </div>
+            ) : null}
+
+            {/* Score gauges */}
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12 }}>
+              {canSee('churn') && scoreGauge(kh.scores.churn, 'Điểm rời bỏ')}
+              {canSee('engagement') && scoreGauge(kh.scores.engagement, 'Mức độ tương tác')}
+              {canSee('codRisk') ? scoreGauge(kh.scores.codRisk, 'Rủi ro COD') : <div style={{ textAlign:'center', fontSize:12, color:'#6B7280' }}>🔒 Rủi ro COD<br/>Không có quyền</div>}
+              {canSee('fraud') ? scoreGauge(kh.scores.fraud, 'Điểm gian lận') : <div style={{ textAlign:'center', fontSize:12, color:'#6B7280' }}>🔒 Điểm gian lận<br/>Không có quyền</div>}
+            </div>
+          </div>
+        )}
+
+        {/* ĐỒNG Ý DỮ LIỆU */}
+        {tab==='consent' && (() => {
+          const matrix = [
+            { purpose:'Thông báo vận hành',   desc:'Trạng thái đơn hàng, dịch vụ đang sử dụng — cần thiết để cung cấp dịch vụ',  sms:'in', email:'in', zalo:'in', push:'in' },
+            { purpose:'Chăm sóc khách hàng',  desc:'Gọi điện/nhắn tin hỗ trợ, khảo sát mức độ hài lòng',                          sms:kh.consent.sms, email:kh.consent.email, zalo:kh.consent.zalo, push:kh.consent.push },
+            { purpose:'Tiếp thị & ưu đãi',    desc:'Giới thiệu dịch vụ mới, chương trình khuyến mãi',                            sms:kh.consent.sms, email:kh.consent.email, zalo:kh.consent.zalo, push:'out' },
+          ];
+          const CHANNEL_LABEL = { sms:'SMS', email:'Email', zalo:'Zalo OA', push:'Thông báo đẩy (Push)' };
+          const cellChip = (v) => {
+            const cls = v==='in' ? 'consent-in' : v==='out' ? 'consent-out' : 'consent-unknown';
+            const txt = v==='in' ? 'Cho phép' : v==='out' ? 'Từ chối' : 'Chưa xác định';
+            return <span className={`consent-chip ${cls}`}>{v==='in' ? '✓' : v==='out' ? '✕' : '?'} {txt}</span>;
+          };
+          return (
+            <div>
+              {kh.consent.deletionRequested && (
+                <div style={{ padding:12, background:'#fee2e2', border:'1px solid #DC2626', borderRadius:8, marginBottom:16, fontWeight:700, color:'#DC2626', fontSize:14 }}>
+                  🚫 Khách hàng đã yêu cầu xoá dữ liệu cá nhân — không sử dụng hồ sơ này cho bất kỳ mục đích nào ngoài nghĩa vụ pháp lý.
+                </div>
+              )}
+
+              <div style={{ fontSize:12, color:'#6B7280', marginBottom:14, lineHeight:1.6 }}>
+                Bảng dưới đây cho biết khách hàng <strong>cho phép hay từ chối</strong> nhận liên hệ theo từng <strong>mục đích</strong> (hàng) và từng <strong>kênh liên hệ</strong> (cột).
+                Ví dụ: nếu ô "Tiếp thị & ưu đãi" × "SMS" hiển thị <strong>Cho phép</strong>, nghĩa là được phép gửi SMS khuyến mãi cho khách hàng này; nếu <strong>Từ chối</strong> thì tuyệt đối không gửi.
+                "Thông báo vận hành" luôn ở trạng thái Cho phép vì là nghĩa vụ thực hiện dịch vụ, không thuộc phạm vi xin sự đồng ý.
+              </div>
+
+              <div className="table-wrap-x" style={{ overflow:'auto', border:'1px solid #E5E7EB', borderRadius:8 }}>
+                <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13, minWidth:640 }}>
+                  <thead>
+                    <tr style={{ background:'#F7F8FA', borderBottom:'1px solid #E5E7EB' }}>
+                      <th style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280', minWidth:200 }}>Mục đích liên hệ</th>
+                      {Object.keys(CHANNEL_LABEL).map(ch => (
+                        <th key={ch} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{CHANNEL_LABEL[ch]}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {matrix.map((row,i) => (
+                      <tr key={i} style={{ borderBottom:'1px solid #F3F4F6' }}>
+                        <td style={{ padding:'10px 12px' }}>
+                          <div style={{ fontWeight:700, fontSize:13 }}>{row.purpose}</div>
+                          <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>{row.desc}</div>
+                        </td>
+                        {Object.keys(CHANNEL_LABEL).map(ch => (
+                          <td key={ch} style={{ padding:'10px 12px' }}>{cellChip(row[ch])}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Metadata consent */}
+              <div className="meta-strip" style={{ marginTop:14 }}>
+                <span>Nguồn thu thập: <b>MyVNPost App</b></span>
+                <span>Ngày cập nhật: <b>18/06/2026 10:05</b></span>
+                <span>Phiên bản điều khoản: <b>v2.1</b></span>
+              </div>
+
+              <div style={{ marginTop:12, padding:'10px 14px', background:'var(--warn-soft)', border:'1px solid #F59E0B', borderRadius:10, fontSize:12, color:'var(--warn)', lineHeight:1.6 }}>
+                ⚠️ Bắt buộc kiểm tra bảng này trước khi đưa khách hàng vào chiến dịch kích hoạt.<br/>
+                Tuân thủ Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15.
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* AUDIT */}
+        {tab==='audit' && (
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+            <div>
+              <div className="section-title">Nguồn dữ liệu đóng góp</div>
+              <div className="flex gap-2 flex-wrap">
+                {kh.sources.map(s => <span key={s} className="badge badge-blue">{s}</span>)}
+              </div>
+              <div className="section-title mt-4">Thông tin hồ sơ</div>
+              {[
+                ['Ngày tạo', '10/01/2023'],
+                ['Lần cập nhật cuối', kh.appLogin || 'Chưa có dữ liệu'],
+                ['Phiên bản hồ sơ', 'v14'],
+                ['Tạo bởi hệ thống', 'CAS'],
+              ].map(([l,v]) => (
+                <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                  <span className="field-label" style={{ margin:0 }}>{l}</span>
+                  <span style={{ fontSize:13, fontWeight:500 }}>{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// CN5 — SEGMENT MANAGEMENT
+// ============================================================
+function SegmentScreen({ onViewKH }) {
+  const [view, setView] = React.useState('list');
+  const [selectedSeg, setSelectedSeg] = React.useState(null);
+  const [previewCount, setPreviewCount] = React.useState(null);
+  const [segName, setSegName] = React.useState('');
+  const [segType, setSegType] = React.useState('Phân khúc động');
+  const [segPillar, setSegPillar] = React.useState('ALL');
+  const [segFreq, setSegFreq] = React.useState('Hàng ngày lúc 02:00');
+  const [rules, setRules] = React.useState([
+    { field:'Điểm rời bỏ', op:'≥', value:'70' },
+    { field:'Ngày GD gần nhất', op:'<', value:'90 ngày trước' },
+  ]);
+  const [logic, setLogic] = React.useState('AND');
+  const [modal, setModal] = React.useState(false);
+  const [statuses, setStatuses] = React.useState(SEGMENTS.map(s => s.status));
+
+  const FIELDS = ['Loại khách hàng','Nhóm khách hàng','Tỉnh / Thành phố','Điểm rời bỏ','Điểm rủi ro COD','Tỷ lệ hoàn','Tổng đơn','Tổng doanh thu','Nhóm RFM','Ngày GD gần nhất','Vai trò'];
+  const OPS = ['=','≠','>','<','≥','≤','chứa','thuộc'];
+
+  const addRule = () => setRules(r => [...r, { field:'Điểm rời bỏ', op:'≥', value:'' }]);
+  const removeRule = (i) => setRules(r => r.filter((_,j) => j!==i));
+  const toggleStatus = (i) => setStatuses(prev => prev.map((s,j) => j===i ? (s==='Đang hoạt động' ? 'Tạm dừng' : 'Đang hoạt động') : s));
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
+      {modal && (
+        <div className="modal-overlay" onClick={() => setModal(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize:16, fontWeight:700, marginBottom:8 }}>✅ Phân khúc đã được lưu</div>
+            <div style={{ fontSize:13, color:'#6B7280', marginBottom:16 }}>Phân khúc "{segName||'Không có tên'}" đã được tạo và sẽ cập nhật tự động mỗi ngày.</div>
+            <button onClick={() => { setModal(false); setView('list'); }} className="btn-primary" style={{ width:'100%', padding:'10px', fontSize:14 }}>
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between">
+        <div style={{ fontWeight:700, fontSize:16 }}>
+          {view==='detail' && selectedSeg!==null
+            ? <span><button onClick={() => setView('list')} style={{ background:'none', border:'none', color:'#6B7280', cursor:'pointer', fontSize:13, padding:0, marginRight:6 }}>← Danh sách</button>{SEGMENTS[selectedSeg]?.name}</span>
+            : 'Quản lý Phân khúc'}
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => setView('list')} className={`tab-btn ${view==='list' ? 'active':''}`}>Danh sách</button>
+          <button onClick={() => setView('builder')} className={`tab-btn ${view==='builder' ? 'active':''}`}>+ Tạo phân khúc</button>
+        </div>
+      </div>
+
+      {view === 'list' && (
+        <div className="panel">
+          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+            <thead>
+              <tr style={{ borderBottom:'1px solid #E5E7EB' }}>
+                {['Tên phân khúc','Điều kiện','Loại','Cập nhật','Trạng thái',''].map(h => (
+                  <th key={h} style={{ padding:'10px 12px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6B7280' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {SEGMENTS.map((s,i) => (
+                <tr key={i} className="table-row" onClick={() => { setSelectedSeg(i); setView('detail'); }} style={{ borderBottom:'1px solid #F3F4F6', cursor:'pointer' }}>
+                  <td style={{ padding:'10px 12px', fontWeight:700 }}>{s.name}</td>
+                  <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280', maxWidth:260 }}>{s.desc}</td>
+                  <td style={{ padding:'10px 12px' }}>
+                    <span className="badge badge-blue" title="Tự động cập nhật hàng ngày theo điều kiện">{s.type}</span>
+                  </td>
+                  <td style={{ padding:'10px 12px', color:'#6B7280', fontSize:12 }}>{s.updated}</td>
+                  <td style={{ padding:'10px 12px' }}>
+                    <button onClick={e => { e.stopPropagation(); toggleStatus(i); }} style={{ padding:'4px 12px', background: statuses[i]==='Đang hoạt động' ? '#dcfce7' : '#F3F4F6', color: statuses[i]==='Đang hoạt động' ? '#16A34A' : '#6B7280', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer' }}>
+                      {statuses[i]==='Đang hoạt động' ? '● Đang hoạt động' : '○ Tạm dừng'}
+                    </button>
+                  </td>
+                  <td style={{ padding:'10px 12px' }} onClick={e => e.stopPropagation()}>
+                    <button onClick={() => onViewKH && onViewKH(s.name)} style={{ padding:'4px 10px', background:'#EFF6FF', color:'#2563EB', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer' }}>Xem KH</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {view === 'builder' && (
+        <div style={{ display:'grid', gridTemplateColumns:'1.3fr 1fr', gap:16 }}>
+          <div className="panel" style={{ padding:20 }}>
+            <div style={{ fontWeight:700, fontSize:15, marginBottom:16 }}>Tạo phân khúc mới</div>
+            <div style={{ marginBottom:14 }}>
+              <label className="field-label">Tên phân khúc</label>
+              <input value={segName} onChange={e=>setSegName(e.target.value)} placeholder="VD: Khách hàng nguy cơ rời bỏ Q3" style={{ width:'100%', marginTop:4 }} />
+            </div>
+            <div style={{ marginBottom:14 }}>
+              <label className="field-label">Mô tả</label>
+              <input placeholder="Mô tả ngắn gọn mục tiêu phân khúc..." style={{ width:'100%', marginTop:4 }} />
+            </div>
+
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12, marginBottom:14 }}>
+              <div>
+                <label className="field-label">Loại phân khúc</label>
+                <select value={segType} onChange={e=>setSegType(e.target.value)} style={{ width:'100%', marginTop:4, fontSize:12 }}>
+                  <option>Phân khúc động</option>
+                  <option>Phân khúc tĩnh</option>
+                </select>
+              </div>
+              <div>
+                <label className="field-label">Mảng dịch vụ trọng tâm</label>
+                <select value={segPillar} onChange={e=>setSegPillar(e.target.value)} style={{ width:'100%', marginTop:4, fontSize:12 }}>
+                  <option value="ALL">Tất cả mảng</option>
+                  {PILLARS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="field-label">Tần suất cập nhật</label>
+                <select value={segFreq} onChange={e=>setSegFreq(e.target.value)} style={{ width:'100%', marginTop:4, fontSize:12 }}>
+                  <option>Hàng ngày lúc 02:00</option>
+                  <option>Mỗi giờ</option>
+                  <option>Thời gian thực</option>
+                  <option>Thủ công</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mb-3">
+              <div style={{ fontWeight:700, fontSize:13 }}>Điều kiện lọc (Rule builder)</div>
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize:12, color:'#6B7280' }}>Logic:</span>
+                {['AND','OR'].map(l => (
+                  <button key={l} onClick={() => setLogic(l)} className={`tab-btn ${logic===l ? 'active':''}`} style={{ padding:'3px 10px', fontSize:11 }}>{l}</button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              {rules.map((r,i) => (
+                <div key={i}>
+                  {i > 0 && <div style={{ fontSize:11, fontWeight:700, color:'#8a5a00', padding:'4px 0', textAlign:'center' }}>{logic}</div>}
+                  <div className="rule-row">
+                    <select value={r.field} onChange={e => setRules(rules => rules.map((x,j) => j===i ? {...x, field:e.target.value}:x))} style={{ flex:2, fontSize:12 }}>
+                      {FIELDS.map(f => <option key={f}>{f}</option>)}
+                    </select>
+                    <select value={r.op} onChange={e => setRules(rules => rules.map((x,j) => j===i ? {...x, op:e.target.value}:x))} style={{ flex:1, fontSize:12 }}>
+                      {OPS.map(o => <option key={o}>{o}</option>)}
+                    </select>
+                    <input value={r.value} onChange={e => setRules(rules => rules.map((x,j) => j===i ? {...x, value:e.target.value}:x))} placeholder="Giá trị" style={{ flex:2, fontSize:12 }} />
+                    <button onClick={() => removeRule(i)} style={{ background:'none', border:'none', cursor:'pointer', color:'#DC2626' }}><Icon name="trash" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={addRule} style={{ width:'100%', marginTop:12, padding:'8px', background:'#f3f4f6', border:'1px dashed #E5E7EB', borderRadius:8, fontSize:13, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:4, color:'#6B7280' }}>
+              <Icon name="plus" /> Thêm điều kiện
+            </button>
+
+            <div className="flex gap-3 mt-5">
+              <button onClick={() => setPreviewCount(8560)} className="btn-ghost" style={{ flex:1, padding:'10px', fontSize:13 }}>
+                Ước tính số KH
+              </button>
+              <button onClick={() => setModal(true)} className="btn-primary" style={{ flex:2, padding:'10px', fontSize:13 }}>
+                Lưu phân khúc
+              </button>
+            </div>
+          </div>
+
+          {/* Xem trước kết quả */}
+          <div className="panel" style={{ padding:20 }}>
+            <div style={{ fontWeight:700, fontSize:15, marginBottom:16 }}>Xem trước kết quả</div>
+            {previewCount !== null ? (
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                <div className="kpi-card">
+                  <div className="field-label" style={{ margin:0 }}>Quy mô dự kiến</div>
+                  <div style={{ fontSize:24, fontWeight:800, marginTop:4 }} className="tabular-nums">{previewCount.toLocaleString()}</div>
+                  <div style={{ fontSize:12, color:'#6B7280', marginTop:2 }}>khách hàng khớp điều kiện · tăng khoảng +6,2% trong 30 ngày gần nhất</div>
+                </div>
+                <div className="kpi-card">
+                  <div className="field-label" style={{ margin:0 }}>Kênh kích hoạt phù hợp</div>
+                  <div style={{ fontSize:14, fontWeight:700, marginTop:4 }}>SMS · Zalo OA · Tác vụ CRM</div>
+                  <div style={{ fontSize:12, color:'#6B7280', marginTop:2 }}>Đã lọc theo trạng thái Đồng ý dữ liệu tại tab Consent của từng khách hàng</div>
+                </div>
+                <div className="kpi-card">
+                  <div className="field-label" style={{ margin:0 }}>Top hành vi chung</div>
+                  <div style={{ fontSize:13, fontWeight:600, marginTop:4 }}>
+                    {segPillar !== 'ALL' && segPillar.includes('BCCP') ? 'COD cao · gửi đơn đều · có cửa hàng online' : 'Tương tác thường xuyên trên App/Web · phát sinh giao dịch gần đây'}
+                  </div>
+                </div>
+                <div style={{ padding:'10px 12px', background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:8, fontSize:12, color:'#92400E' }}>
+                  Khuyến nghị: kiểm tra lại Consent trước khi kích hoạt chiến dịch cho phân khúc này.
+                </div>
+              </div>
+            ) : (
+              <div style={{ textAlign:'center', padding:'28px 12px', color:'#6B7280', fontSize:13 }}>
+                Bấm <strong>"Ước tính số KH"</strong> để xem trước quy mô và kênh kích hoạt phù hợp.
+              </div>
+            )}
+
+            <div className="section-title mt-4">Phân khúc đang hoạt động</div>
+            <div>
+              {SEGMENTS.filter(s => s.status === 'Đang hoạt động').slice(0,4).map((s,i) => (
+                <div key={i} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6', fontSize:12 }}>
+                  <span>{s.name}</span>
+                  <span style={{ fontWeight:700 }} className="tabular-nums">{s.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {view === 'detail' && selectedSeg !== null && (() => {
+        const s = SEGMENTS[selectedSeg];
+        const seg_idx = selectedSeg;
+        // Mock data biến động số KH 6 tuần gần nhất
+        // Mock rules theo phân khúc
+        const mockRules = {
+          'Khách hàng trung thành':   [{ field:'Nhóm RFM', op:'=', value:'Champions' }, { field:'Điểm rời bỏ', op:'<', value:'30' }],
+          'KHL giá trị cao':          [{ field:'Nhóm khách hàng', op:'=', value:'KHL' }, { field:'Tổng doanh thu', op:'≥', value:'1.000.000.000' }],
+          'Có nguy cơ rời bỏ':        [{ field:'Điểm rời bỏ', op:'≥', value:'70' }, { field:'Ngày GD gần nhất', op:'<', value:'90 ngày trước' }],
+          'Tỷ lệ hoàn cao':           [{ field:'Tỷ lệ hoàn', op:'>', value:'20%' }, { field:'Tổng đơn', op:'≥', value:'50' }],
+          'Chủ shop hoạt động cao':   [{ field:'Vai trò', op:'chứa', value:'SHOP_OWNER' }, { field:'Tổng đơn / tháng', op:'≥', value:'50' }],
+          'Khách hàng mới':           [{ field:'Ngày GD đầu tiên', op:'>', value:'30 ngày trước' }],
+        };
+        const rules = mockRules[s.name] || [];
+
+        return (
+          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+            {/* Row 1: Thông tin + Điều kiện */}
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+              {/* Thông tin chung */}
+              <div className="panel" style={{ padding:20 }}>
+                <div className="section-title">Thông tin phân khúc</div>
+                {[
+                  ['Tên', s.name],
+                  ['Loại', s.type],
+                  ['Số KH hiện tại', s.count + ' KH'],
+                  ['Cập nhật lần cuối', s.updated],
+                  ['Trạng thái', statuses[seg_idx]],
+                ].map(([l,v]) => (
+                  <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #F3F4F6' }}>
+                    <span style={{ fontSize:12, color:'#6B7280' }}>{l}</span>
+                    <span style={{ fontSize:13, fontWeight:600 }}>{v}</span>
+                  </div>
+                ))}
+                <div style={{ marginTop:12, fontSize:12, color:'#6B7280', lineHeight:1.6 }}>{s.desc}</div>
+              </div>
+
+              {/* Điều kiện lọc */}
+              <div className="panel" style={{ padding:20 }}>
+                <div className="section-title">Điều kiện lọc — Logic AND</div>
+                <div style={{ display:'flex', flexDirection:'column', gap:8, marginTop:4 }}>
+                  {rules.map((r,i) => (
+                    <div key={i} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 12px', background:'#F7F8FA', borderRadius:8, fontSize:13 }}>
+                      {i > 0 && <span style={{ fontSize:11, fontWeight:700, color:'#8a5a00', minWidth:28 }}>AND</span>}
+                      {i === 0 && <span style={{ minWidth:28 }}></span>}
+                      <span style={{ fontWeight:600, color:'#1A1A1A' }}>{r.field}</span>
+                      <span style={{ color:'#6B7280' }}>{r.op}</span>
+                      <span style={{ color:'#2563EB', fontWeight:600 }}>{r.value}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ marginTop:16 }}>
+                  <button onClick={() => setView('builder')} style={{ padding:'7px 16px', background:'#f3f4f6', border:'none', borderRadius:7, fontSize:12, fontWeight:600, cursor:'pointer', color:'#1A1A1A' }}>
+                    Chỉnh sửa điều kiện
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+// ============================================================
+// APP
+// ============================================================
+function App() {
+  const [nav, setNav] = React.useState('dashboard');
+  const [c360uid, setC360uid] = React.useState(null);
+  const [segmentNavFilter, setSegmentNavFilter] = React.useState(null);
+
+  const navLabels = {
+    dashboard:'Dashboard tổng quan',
+    kafka:'Kafka Integration',
+    customers:'Danh sách khách hàng',
+    identity:'Đối soát & hợp nhất hồ sơ',
+    c360:'Customer 360°',
+    segments:'Quản lý phân khúc',
+  };
+
+  const goC360 = (uid) => {
+    setC360uid(uid);
+    setNav('c360');
+  };
+
+  const handleNav = (key) => {
+    setNav(key);
+    if (key !== 'c360') setC360uid(null);
+  };
+
+  return (
+    <div style={{ display:'flex', height:'100vh', overflow:'hidden' }}>
+      <Sidebar active={nav} onNav={handleNav} />
+      <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden' }}>
+        <Header title={navLabels[nav]} nav={nav} />
+        <main style={{ flex:1, overflowY:'auto' }}>
+          {nav==='dashboard' && <DashboardScreen />}
+          {nav==='kafka'     && <KafkaScreen />}
+          {nav==='customers' && <CustomerListScreen onC360={goC360} initSegment={segmentNavFilter} />}
+          {nav==='identity'  && <IdentityScreen onC360={goC360} />}
+          {nav==='c360'      && <Customer360Screen uid={c360uid} onBack={c360uid ? () => setNav('customers') : null} />}
+          {nav==='segments'  && <SegmentScreen onViewKH={(seg) => { setSegmentNavFilter(seg); setNav('customers'); }} />}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+</body>
+</html>
