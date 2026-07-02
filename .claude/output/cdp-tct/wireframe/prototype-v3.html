@@ -134,9 +134,9 @@ const ALERTS = [
 ];
 
 const CUSTOMERS = [
-  { uid:'UID-0000123456', name:'Nguyễn Thị Hương',         type:'INDIVIDUAL', group:'SME',        phone:'0901234567', orders:1275, revenue:'458.200.000', segment:'Khách hàng trung thành', status:'ACTIVE',   updated:'29/06/2026', pillar:'BCCP + Logistics' },
-  { uid:'UID-0000987654', name:'Công ty TNHH TM ABC',      type:'BUSINESS',   group:'KHL',        phone:'0987654321', orders:18450,revenue:'6.820.000.000',segment:'KHL giá trị cao',        status:'ACTIVE',   updated:'29/06/2026', pillar:'BCCP + TCBC' },
-  { uid:'UID-0000456789', name:'Phạm Minh Tuấn',           type:'INDIVIDUAL', group:'B2C',        phone:'0978111222', orders:86,   revenue:'9.400.000',   segment:'Có nguy cơ rời bỏ',      status:'ACTIVE',   updated:'26/06/2026', pillar:'BCCP' },
+  { uid:'UID-0000123456', name:'Nguyễn Thị Hương',         type:'INDIVIDUAL', group:'SME',        phone:'0901234567', orders:1275, revenue:'458.200.000', segment:'Khách hàng trung thành', status:'ACTIVE',   updated:'29/06/2026', pillar:'BCCP + Logistics + TCBC + TMĐT' },
+  { uid:'UID-0000987654', name:'Công ty TNHH TM ABC',      type:'BUSINESS',   group:'KHL',        phone:'0987654321', orders:18450,revenue:'6.820.000.000',segment:'KHL giá trị cao',        status:'ACTIVE',   updated:'29/06/2026', pillar:'Đủ 7 mảng' },
+  { uid:'UID-0000456789', name:'Phạm Minh Tuấn',           type:'INDIVIDUAL', group:'B2C',        phone:'0978111222', orders:86,   revenue:'9.400.000',   segment:'Có nguy cơ rời bỏ',      status:'ACTIVE',   updated:'26/06/2026', pillar:'BCCP + HCC + MVNO' },
   { uid:'UID-0000334411', name:'Trần Quốc Bảo',            type:'INDIVIDUAL', group:'B2C',        phone:'0905556677', orders:412,  revenue:'78.500.000',  segment:'Khách hàng trung thành',  status:'ACTIVE',   updated:'28/06/2026', pillar:'BCCP' },
   { uid:'UID-0000220088', name:'Cửa hàng Mẹ & Bé Sunny',  type:'BUSINESS',   group:'SME',        phone:'0933221100', orders:2310, revenue:'612.000.000', segment:'Chủ shop hoạt động cao',  status:'ACTIVE',   updated:'29/06/2026', pillar:'BCCP + TMĐT' },
   { uid:'UID-0000771122', name:'Lê Thị Hằng',              type:'INDIVIDUAL', group:'B2C',        phone:'0918887766', orders:24,   revenue:'1.800.000',   segment:'Khách hàng mới',          status:'ACTIVE',   updated:'22/06/2026', pillar:'HCC' },
@@ -183,7 +183,7 @@ const GROUPS = [
 const KH_DETAIL = {
   'UID-0000123456': {
     uid:'UID-0000123456', type:'INDIVIDUAL', group:'SME', status:'ACTIVE', name:'Nguyễn Thị Hương',
-    activePillars:['BCCP','Logistics'],
+    activePillars:['BCCP','Logistics','TCBC','TMDT'],
     activeSystems:['MyVNPost App', 'MPITS', 'PayPost'],
     lastInteraction:'24/06/2026 09:12 (App)',
     phone:'0901234567', email:'huong.nguyen@gmail.com', cccd:'012********', postId:'PID-889234',
@@ -275,7 +275,7 @@ const KH_DETAIL = {
   },
   'UID-0000987654': {
     uid:'UID-0000987654', type:'BUSINESS', group:'KHL', status:'ACTIVE', name:'Công ty TNHH Thương mại ABC',
-    activePillars:['BCCP','TCBC'],
+    activePillars:['BCCP','TCBC','PPBL','HCC','Logistics','TMDT','MVNO'],
     activeSystems:['Portal KHL', 'MPITS', 'PayPost', 'CRM'],
     lastInteraction:'24/06/2026 10:00 (API)',
     phone:'0987654321', email:'info@abc.vn', cccd:'N/A', postId:'N/A',
@@ -372,7 +372,7 @@ const KH_DETAIL = {
   },
   'UID-0000456789': {
     uid:'UID-0000456789', type:'INDIVIDUAL', group:'B2C', status:'ACTIVE', name:'Phạm Minh Tuấn',
-    activePillars:['BCCP'],
+    activePillars:['BCCP','HCC','MVNO'],
     activeSystems:['CAS', 'PNS/DingDong'],
     lastInteraction:'21/06/2026 13:00 (Call Center)',
     phone:'0978111222', email:'Chưa có dữ liệu', cccd:'Chưa có dữ liệu', postId:'PID-220145',
@@ -1872,19 +1872,20 @@ function Customer360Screen({ uid, onBack }) {
         {tab==='pillars' && (() => {
           // Mỗi mảng dịch vụ tổng hợp bộ chỉ số đặc thù riêng — hầu hết đều có doanh thu riêng,
           // trừ HCC (dịch vụ công) dùng "số hồ sơ đã xử lý" thay cho doanh thu.
+          // Dữ liệu mock cho prototype: tất cả mảng đều hiển thị chỉ số để stakeholder hình dung đầy đủ.
           const PILLAR_MOCK = {
-            BCCP:      { active:true,  fields:[['Doanh thu cước 12 tháng', `${kh.revenue} ₫`],['Tổng đơn gửi/nhận', `${kh.orders.toLocaleString()} đơn`],['Tỷ lệ phát thành công', `${kh.deliveryRate}%`],['Tỷ lệ hoàn', `${kh.returnRate}%`]], signal: kh.returnRate>=20 ? { text:'Tỷ lệ hoàn cao — cần theo dõi', color:'var(--danger)' } : { text:'Hoạt động ổn định', color:'var(--success)' } },
-            TCBC:      { active:true,  fields:[['Doanh thu phí dịch vụ', '18.500.000 ₫'],['Tổng giá trị giao dịch', '2.340.000.000 ₫'],['Số giao dịch 12 tháng', '412 giao dịch'],['Kênh chính', 'Tại quầy']], signal:{ text:'Tiềm năng upsell: PayPost thu hộ online', color:'var(--info)' } },
-            PPBL:      { active:true,  fields:[['Doanh thu bán lẻ 12 tháng', '96.700.000 ₫'],['Tổng đơn mua tại quầy', '284 đơn'],['Giá trị đơn trung bình', '340.000 ₫'],['Tần suất mua', '~24 đơn/tháng']], signal:{ text:'Khách mua đều — có thể mời chương trình khách thân thiết', color:'var(--info)' } },
-            HCC:       { active:true,  fields:[['Số hồ sơ đã xử lý', '17 hồ sơ'],['Hồ sơ trả tại nhà', '12 hồ sơ'],['Thủ tục hay dùng', 'Cấp đổi giấy tờ'],['Tỷ lệ hồ sơ thành công', '94%']], signal:{ text:'Sử dụng ổn định dịch vụ hành chính công', color:'var(--success)' } },
-            Logistics: { active:true,  fields:[['Doanh thu logistics 12 tháng', '512.000.000 ₫'],['Điểm kho đang dùng', '3 điểm'],['Sản lượng fulfillment', '8.240 đơn'],['SLA giao hàng', '96%']], signal:{ text:'SLA ổn định, cần theo dõi tồn kho', color:'var(--warn)' } },
-            TMDT:      { active:true,  fields:[['Doanh thu qua sàn 12 tháng', '268.000.000 ₫'],['Số shop online', '2 shop'],['Đơn giao chặng cuối', '1.560 đơn'],['Tỷ lệ hoàn TMĐT', '11%']], signal:{ text:'Shop online đang mở rộng — tiềm năng tăng trưởng', color:'var(--info)' } },
-            MVNO:      { active:true,  fields:[['Doanh thu cước viễn thông', '2.400.000 ₫'],['Gói cước đang dùng', 'Gói data 4G tháng'],['Tổng nạp cước 12 tháng', '2.400.000 ₫'],['Ngày hết hạn gói', '15/07/2026']], signal:{ text:'Gói cước sắp hết hạn — nhắc gia hạn', color:'var(--warn)' } },
+            BCCP:      { fields:[['Doanh thu cước 12 tháng', `${kh.revenue} ₫`],['Tổng đơn gửi/nhận', `${kh.orders.toLocaleString()} đơn`],['Tỷ lệ phát thành công', `${kh.deliveryRate}%`],['Tỷ lệ hoàn', `${kh.returnRate}%`],['Tổng COD đã thu', '312.400.000 ₫'],['Thời gian giao trung bình', '2,4 ngày']], signal: kh.returnRate>=20 ? { text:'Tỷ lệ hoàn cao — cần theo dõi', color:'var(--danger)' } : { text:'Hoạt động ổn định', color:'var(--success)' } },
+            TCBC:      { fields:[['Doanh thu phí dịch vụ', '18.500.000 ₫'],['Tổng giá trị giao dịch', '2.340.000.000 ₫'],['Số giao dịch 12 tháng', '412 giao dịch'],['Giá trị giao dịch TB', '5.680.000 ₫'],['Kênh chính', 'Tại quầy'],['Loại giao dịch nhiều nhất', 'Thu hộ COD']], signal:{ text:'Tiềm năng upsell: PayPost thu hộ online', color:'var(--info)' } },
+            PPBL:      { fields:[['Doanh thu bán lẻ 12 tháng', '96.700.000 ₫'],['Tổng đơn mua tại quầy', '284 đơn'],['Giá trị đơn trung bình', '340.000 ₫'],['Tần suất mua', '~24 đơn/tháng'],['Nhóm hàng mua nhiều', 'Tem, bao bì, VPP'],['Điểm bán thường dùng', 'BĐ Cầu Giấy']], signal:{ text:'Khách mua đều — có thể mời chương trình khách thân thiết', color:'var(--info)' } },
+            HCC:       { fields:[['Số hồ sơ đã xử lý', '17 hồ sơ'],['Hồ sơ trả tại nhà', '12 hồ sơ'],['Thủ tục hay dùng', 'Cấp đổi giấy tờ'],['Tỷ lệ hồ sơ thành công', '94%'],['Thời gian xử lý TB', '3,2 ngày'],['Phí dịch vụ đã thu', '1.360.000 ₫']], signal:{ text:'Sử dụng ổn định dịch vụ hành chính công', color:'var(--success)' } },
+            Logistics: { fields:[['Doanh thu logistics 12 tháng', '512.000.000 ₫'],['Điểm kho đang dùng', '3 điểm'],['Sản lượng fulfillment', '8.240 đơn'],['SLA giao hàng', '96%'],['Tồn kho hiện tại', '1.850 SKU'],['Tỷ lệ giao đúng hẹn', '93%']], signal:{ text:'SLA ổn định, cần theo dõi tồn kho', color:'var(--warn)' } },
+            TMDT:      { fields:[['Doanh thu qua sàn 12 tháng', '268.000.000 ₫'],['GMV (tổng giá trị bán)', '1.240.000.000 ₫'],['Số shop online', '2 shop'],['Đơn giao chặng cuối', '1.560 đơn'],['Tỷ lệ hoàn TMĐT', '11%'],['Sàn chính', 'Shopee, TikTok Shop']], signal:{ text:'Shop online đang mở rộng — tiềm năng tăng trưởng', color:'var(--info)' } },
+            MVNO:      { fields:[['Doanh thu cước viễn thông', '2.400.000 ₫'],['Gói cước đang dùng', 'Gói data 4G tháng'],['Tổng nạp cước 12 tháng', '2.400.000 ₫'],['Lưu lượng data đã dùng', '84 GB'],['Ngày hết hạn gói', '15/07/2026'],['Số thuê bao', '1 thuê bao']], signal:{ text:'Gói cước sắp hết hạn — nhắc gia hạn', color:'var(--warn)' } },
           };
           const rows = PILLARS.map(p => {
             const isActive = (kh.activePillars||[]).includes(p.id);
-            const mock = PILLAR_MOCK[p.id] || { active:false, fields:[], signal:{ text:'Chưa sử dụng', color:'var(--muted)' } };
-            return { ...p, active: isActive && mock.active, fields: (isActive && mock.active) ? mock.fields : [], signal: mock.signal };
+            const mock = PILLAR_MOCK[p.id] || { fields:[], signal:{ text:'Chưa sử dụng', color:'var(--muted)' } };
+            return { ...p, active: isActive, fields: isActive ? mock.fields : [], signal: isActive ? mock.signal : { text:'Chưa sử dụng', color:'var(--muted)' } };
           });
           const current = pillarSubTab ? rows.find(r => r.id===pillarSubTab) : null;
           const active = current || rows[0];
