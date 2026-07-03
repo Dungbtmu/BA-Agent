@@ -24,13 +24,18 @@ Tài liệu được tổ chức lại theo sơ đồ vòng đời CVM. Mỗi nh
 | Nhóm vòng đời | Nhánh nghiệp vụ | NearRealtime | Batch/CSV |
 |---|---|---|---|
 | NHÓM 1 — Kích hoạt | VIỄN THÔNG | E01 | Không có |
-| NHÓM 1 — Kích hoạt | APP | Không có | E02 |
-| NHÓM 2 — Sử dụng | VIỄN THÔNG | U01, U03, E08, E_DATA_100, E_VOICE_100, E06, E_ZERO_BALANCE, E_CANCEL_PLAN | E05, U04, E13, E_USAGE_NEED_ANALYSIS, U09, U10, E_SEGMENT_UPDATE, E_NO_PLAN_X_DAYS, E11, U02, U05, U06, U07 |
-| NHÓM 2 — Sử dụng | APP | E03, E_CONTENT_FAIL, E_APP_RATING | E04, E07, E09, E_APP_INACTIVE_X_DAYS |
-| NHÓM 3 — Gia hạn gói/dịch vụ | GIA HẠN | Không có | U08, U_PRE_EXPIRY, U_POST_EXPIRY |
-| NHÓM 4 — Khóa 1c/Khóa 2c | KHÓA 1C/2C | E_LOCK_2C | E_LOCK_1C, E_PRE_LOCK_2C |
+| NHÓM 1 — Kích hoạt | APP | E02 | Không có |
+| NHÓM 2 — Sử dụng | VIỄN THÔNG | U01, U03, E08, E_DATA_100, E_VOICE_100, E06, E_ZERO_BALANCE, E_CANCEL_PLAN, E05, E_CHURN_RISK | U04, E13, E_USAGE_NEED_ANALYSIS, U09, U10, E_SEGMENT_UPDATE, E_NO_PLAN_X_DAYS, E11, U02, U05-A, U05-B, U06, U07 |
+| NHÓM 2 — Sử dụng | APP | E03, E_CONTENT_FAIL, E_APP_RATING, E04, E09 | E07, E_APP_INACTIVE_X_DAYS |
+| NHÓM 3 — Gia hạn gói/dịch vụ | GIA HẠN | U_PRE_EXPIRY, U_POST_EXPIRY | U08 |
+| NHÓM 4 — Khóa 1c/Khóa 2c | KHÓA 1C/2C | E_LOCK_2C, E_LOCK_1C, E_PRE_LOCK_2C | Không có |
 
 > **Bổ sung theo xác nhận BA:** `E_DATA_100` được thêm cho trigger hết 100% data theo NearRealtime; `E_APP_INACTIVE_X_DAYS` được thêm cho trigger X ngày KH không truy cập APP theo Batch/CSV. `E_ZERO_BALANCE` được chuẩn hóa thành API NearRealtime.
+>
+> **Cập nhật 2026-07-03 — chốt theo bảng trigger đầy đủ (cột "Loại xử lý"):**
+> - Chuyển sang **NearRealtime**: `E02` (chưa cài app 24h), `E04` (chưa mở app 24h), `E05` (chưa phát sinh cước 72h), `E09` (hành trình mua SIM/gói bỏ dở), `U_PRE_EXPIRY`, `U_POST_EXPIRY`, `E_LOCK_1C`, `E_PRE_LOCK_2C`.
+> - Thêm trigger **`E_CHURN_RISK`** — cảnh báo thuê bao có nguy cơ rời mạng (không lưu lượng 5–7 ngày, không cước 30 ngày, doanh thu giảm ≥80% so với trung bình 2 tháng, tỷ lệ bật/tắt sóng SIM).
+> - Tách **`U05`** thành **`U05-A`** (gói data tháng) và **`U05-B`** (pattern hết quota data ngày) để đồng bộ với `data-contract-template.md`.
 
 ---
 
@@ -98,20 +103,20 @@ Không có file Batch/CSV trong phạm vi hiện tại.
 
 #### Kỹ thuật — NearRealtime
 
-Không có trigger NearRealtime trong phạm vi hiện tại.
+##### 2.1 Event: CHƯA_CÀI_APP_SAU_24H (E02)
 
-#### Kỹ thuật — Batch/CSV
-
-##### 2.1 File: `no_app_install_D1_{YYYYMMDD}.csv` (E02)
-
-**Mô tả:** Danh sách KH kích hoạt SIM ngày N-1 nhưng chưa cài app sau 24h
+**Mô tả:** KH kích hoạt SIM nhưng chưa cài app sau 24h tính từ thời điểm E01
 **Trigger bởi:** BSS
-**Thời điểm push:** 02:00–04:00 hàng ngày
-**CVM đọc:** 04:00–08:00, gửi USSD lúc 09:00
+**Yêu cầu kỹ thuật:** BSS gọi API CVM ngay khi phát hiện đủ 24h từ E01 mà chưa có bản ghi cài app. CVM gửi USSD/tin nhắn nhắc cài app trong vòng vài phút sau khi nhận event.
+**Timing:** Ngay khi đủ 24h tính từ E01 mà chưa cài app
 
-| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+> **Cập nhật timing (2026-07-03):** Chuyển từ Batch/CSV sang **NearRealtime** theo bảng trigger đã chốt. Payload dưới đây thay cho file CSV `no_app_install_D1` trước đây.
+
+| Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
+| `event_type` | string | ✅ | Loại sự kiện | BSS — event name cố định | `NO_APP_INSTALL_24H` |
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `event_timestamp` | datetime | ✅ | Thời điểm phát hiện đủ 24h chưa cài app | BSS — thời điểm quét đủ điều kiện | `2026-05-14 08:30:00` |
 | `full_name` | string(64) | ✅ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
 | `activation_date` | datetime | ✅ | Thời điểm kích hoạt SIM (NGAY_0) | `resource.msisdn_status_history.change_date` (lần ACTIVATED đầu tiên) | `2026-05-13 08:30:00` |
 | `sim_type` | string | ✅ | Loại SIM | `resource.sims.sim_type` | `PHYSICAL` |
@@ -215,11 +220,13 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 
 ---
 
-##### 1.3 Event: DATA_NGÀY_80_PHẦN_TRĂM (E08)
+##### 1.3 Event: DATA_NGÀY_SẮP_HẾT (E08)
 
 **Trigger bởi:** OCS
-**Yêu cầu kỹ thuật:** OCS gọi API CVM ngay khi lưu lượng data trong ngày vượt ngưỡng 80% hạn mức. CVM phải xử lý và gửi USSD trong vòng 2 giờ sau khi nhận event.
-**Timing:** Ngay khi vượt ngưỡng 80%
+**Yêu cầu kỹ thuật:** OCS gọi API CVM ngay khi lưu lượng data trong ngày vượt ngưỡng x% hạn mức (đề xuất **90%**). CVM phải xử lý và gửi USSD trong vòng 2 giờ sau khi nhận event.
+**Timing:** Ngay khi vượt ngưỡng x% (đề xuất 90%)
+
+> **Rule tần suất gửi (2026-07-03):** Mỗi ngày CVM chỉ gửi **1 lần** khi KH chạm ngưỡng x%. Nếu KH lặp lại pattern chạm ngưỡng nhiều ngày, CVM đếm số lần: **đến lần thứ 3** (bắt trigger lần 3) mới chuyển sang đề xuất gói khác (nâng gói/đổi gói) thay vì chỉ nhắc mua thêm data ngày. Ngưỡng x% (90%) và số lần (3) do CVM cấu hình.
 
 | Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
@@ -231,6 +238,8 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 | `daily_data_used_mb` | integer | ✅ | Data đã dùng trong ngày (MB) | OCS — lưu lượng realtime | `1638` |
 | `daily_data_pct` | float | ✅ | % data đã dùng | OCS — tính: `daily_data_used_mb / daily_data_quota_mb × 100` | `80.0` |
 | `days_remaining` | integer | ✅ | Số ngày còn lại trong chu kỳ gói | OCS — số ngày còn lại trong chu kỳ gói | `12` |
+| `threshold_pct` | integer | ✅ | Ngưỡng cảnh báo áp dụng (do CVM cấu hình, đề xuất 90) | CVM cấu hình | `90` |
+| `depleted_trigger_count` | integer | ✅ | Số ngày liên tiếp KH chạm ngưỡng — đến lần thứ 3 CVM chuyển sang đề xuất đổi/nâng gói | OCS/CVM đếm theo chu kỳ | `1` |
 | `addon_purchased_today` | boolean | ✅ | Đã mua gói bổ sung hôm nay chưa | OCS — lịch sử giao dịch trong ngày | `false` |
 
 **Param template:**
@@ -399,24 +408,69 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 
 ---
 
-#### Kỹ thuật — Batch/CSV
+##### Event: THUÊ_BAO_NGUY_CƠ_RỜI_MẠNG (E_CHURN_RISK)
 
-##### 2.3 File: `zero_usage_D3_{YYYYMMDD}.csv` (E05)
+**Mô tả:** KH có dấu hiệu nguy cơ rời mạng, xác định qua tổ hợp tín hiệu hành vi: không phát sinh lưu lượng liên tiếp 5–7 ngày, không phát sinh cước trong 30 ngày, doanh thu suy giảm ≥80% so với trung bình 2 tháng gần nhất, tỷ lệ bật/tắt sóng SIM bất thường.
+**Trigger bởi:** OCS/BSS gọi API CVM (phân tích tổ hợp tín hiệu nhiều ngày)
+**Yêu cầu kỹ thuật:** BSS/OCS phân tích tổ hợp tín hiệu theo chu kỳ (nightly), khi KH vượt ngưỡng nguy cơ rời mạng thì gọi API CVM. CVM đưa vào luồng giữ chân (retention). Các ngưỡng (số ngày không lưu lượng, % suy giảm doanh thu) do CVM cấu hình, BSS/OCS không hardcode.
+**Timing:** Ngay khi phát hiện KH vượt ngưỡng nguy cơ rời mạng (theo chu kỳ phân tích)
 
-**Mô tả:** Danh sách KH chưa phát sinh cước sau 72 giờ kích hoạt SIM, tức tổng data + thoại + SMS = 0 trong 3 ngày.
-**Trigger bởi:** OCS → BSS → CSV `zero_usage_D3` → CVM
-**Thời điểm push:** 02:00–04:00 ngày N+3
-**Kênh gợi ý:** Tooltip trong app hoặc tin nhắn ngắn để tránh gây phiền.
+> **Phân biệt với E_SEGMENT_UPDATE:** `E_CHURN_RISK` là trigger phát hiện nguy cơ rời mạng dựa trên các tiêu chí hành vi cụ thể ở đây. `E_SEGMENT_UPDATE` là sự kiện cập nhật phân khúc tổng hợp (bao gồm cả CHURN_RISK) sau khi hệ thống đã tính điểm phân khúc — có thể dùng E_CHURN_RISK làm một tín hiệu đầu vào cho phân khúc. Cần xác nhận với Tech Lead xem tính churn ở BSS/OCS hay CVM nội bộ (Q23).
 
-| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+| Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
+| `event_type` | string | ✅ | Loại sự kiện | BSS/OCS — event name cố định | `CHURN_RISK_DETECTED` |
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `event_timestamp` | datetime | ✅ | Thời điểm phát hiện nguy cơ rời mạng | BSS/OCS — thời điểm phân tích đủ điều kiện | `2026-06-03 03:00:00` |
+| `no_usage_days` | integer | ✅ | Số ngày liên tiếp không phát sinh lưu lượng (data/thoại/SMS) | OCS/BSS tính từ CDR | `6` |
+| `no_charge_days` | integer | ✅ | Số ngày không phát sinh cước | OCS/BSS tính từ CDR/giao dịch | `30` |
+| `revenue_current` | integer | ❌ | Doanh thu kỳ hiện tại (đồng) | OCS/BSS tổng hợp | `10000` |
+| `revenue_avg_2months` | integer | ❌ | Doanh thu trung bình 2 tháng gần nhất (đồng) | OCS/BSS tổng hợp | `80000` |
+| `revenue_drop_pct` | float | ✅ | % suy giảm doanh thu so với trung bình 2 tháng gần nhất | BSS tính: `(revenue_avg_2months - revenue_current) / revenue_avg_2months × 100` | `87.5` |
+| `sim_on_off_ratio` | float | ❌ | Tỷ lệ bật/tắt sóng của SIM trong kỳ (dấu hiệu SIM ít cắm máy) | HLR/BSS — tỷ lệ thời gian tắt sóng | `0.65` |
+| `churn_risk_level` | string | ❌ | Mức độ nguy cơ để CVM ưu tiên xử lý | BSS/CVM phân loại theo tổ hợp tín hiệu | `HIGH` hoặc `MEDIUM` |
+| `full_name` | string(64) | ❌ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
+| `gender` | string | ❌ | Giới tính KH | `ekyc_data` → `gender` — chưa xác nhận nguồn | `MALE` |
+| `age_segment` | string | ❌ | Tuổi/phân khúc tuổi KH | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `25-34` |
+| `subscriber_tenure_days` | integer | ❌ | Tuổi thuê bao (số ngày đã dùng mạng) | BSS tính từ `resource.msisdn_status_history` | `540` |
+| `current_plan` | string | ❌ | Gói đang dùng (nếu còn) | OCS — tên gói đang active | `GOI_DATA_70K` |
+| `promotion_code` | string | ❌ | Chương trình khuyến mãi giữ chân áp dụng (nếu có) | OCS/CVM — chương trình KM đang chạy | `KM_GIUCHAN_30PCT` |
+
+**Param template:**
+
+| Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
+|---|---|---|---|---|---|---|
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH có nguy cơ rời mạng | Văn bản | Payload `msisdn` | — | `0901234567` |
+| `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin nhắn giữ chân | Văn bản | Payload `full_name` hoặc CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{so_ngay_khong_dung}}` | ❌ | Số ngày không phát sinh lưu lượng — làm ngữ cảnh nhắc | Số | Payload `no_usage_days` | không hiển thị | `6 ngày` |
+| `{{muc_do_nguy_co}}` | ❌ | Mức độ nguy cơ để CVM chọn cường độ chiến dịch giữ chân | Văn bản | Payload `churn_risk_level` | dùng mức mặc định | `HIGH` |
+| `{{chuong_trinh_km}}` | ❌ | Chương trình khuyến mãi giữ chân để tăng động lực ở lại | Văn bản | Payload `promotion_code` | không hiện KM | `Giảm 30% khi gia hạn` |
+| `{{goi_giu_chan_de_xuat}}` | ❌ | Tên gói/ưu đãi CVM đề xuất để giữ chân KH | Văn bản | CVM NBO dựa trên hành vi | không hiện gợi ý | `GOI_GIAM_GIA_30PCT` |
+
+---
+
+##### 2.3 Event: CHƯA_PHÁT_SINH_CƯỚC_72H (E05)
+
+**Mô tả:** KH chưa phát sinh cước sau 72 giờ tính từ thời điểm kích hoạt thành công, tức tổng data + thoại + SMS = 0 trong 3 ngày. Phân ra 2 trường hợp: (1) **chưa mua gói** nào, (2) **đã mua gói nhưng chưa phát sinh lưu lượng**.
+**Trigger bởi:** OCS → BSS gọi API CVM
+**Yêu cầu kỹ thuật:** BSS/OCS gọi API CVM ngay khi phát hiện đủ 72h từ kích hoạt mà lưu lượng vẫn = 0. CVM gửi gợi ý (tooltip trong app hoặc tin nhắn ngắn) để tránh gây phiền.
+**Timing:** Ngay khi đủ 72h tính từ thời điểm kích hoạt mà chưa phát sinh cước
+
+> **Cập nhật timing (2026-07-03):** Chuyển từ Batch/CSV `zero_usage_D3` sang **NearRealtime** theo bảng trigger đã chốt. Bổ sung `usage_scenario` để phân biệt 2 trường hợp chưa mua gói / đã mua chưa dùng.
+
+| Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+|---|---|---|---|---|---|
+| `event_type` | string | ✅ | Loại sự kiện | BSS/OCS — event name cố định | `NO_USAGE_72H` |
+| `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `event_timestamp` | datetime | ✅ | Thời điểm phát hiện đủ 72h chưa phát sinh cước | BSS/OCS — thời điểm đủ điều kiện | `2026-05-14 09:00:00` |
 | `activation_date` | datetime | ✅ | NGAY_0 | `resource.msisdn_status_history.change_date` (lần ACTIVATED đầu tiên) | `2026-05-11 09:00:00` |
-| `data_usage_d1_mb` | float | ✅ | Lưu lượng data ngày 1 (MB) | OCS → BSS nightly batch | `0` |
-| `data_usage_d2_mb` | float | ✅ | Lưu lượng data ngày 2 (MB) | OCS → BSS nightly batch | `0` |
-| `data_usage_d3_mb` | float | ✅ | Lưu lượng data ngày 3 (MB) | OCS → BSS nightly batch | `0` |
-| `voice_usage_d3_min` | float | ✅ | Lưu lượng thoại ngày 3 (phút) | OCS → BSS nightly batch | `0` |
-| `sms_count_d3` | integer | ✅ | Số SMS ngày 3 | OCS → BSS nightly batch | `0` |
+| `usage_scenario` | string | ✅ | Phân loại: chưa mua gói hay đã mua gói nhưng chưa dùng | BSS/OCS — kiểm tra tồn tại gói active | `NO_PLAN` hoặc `HAS_PLAN_NO_USAGE` |
+| `current_plan` | string | ❌ | Gói đang có (nếu `usage_scenario = HAS_PLAN_NO_USAGE`) | OCS — tên gói đang active | `GOI_DATA_70K` |
+| `data_usage_d1_mb` | float | ✅ | Lưu lượng data ngày 1 (MB) | OCS — lưu lượng realtime | `0` |
+| `data_usage_d2_mb` | float | ✅ | Lưu lượng data ngày 2 (MB) | OCS — lưu lượng realtime | `0` |
+| `data_usage_d3_mb` | float | ✅ | Lưu lượng data ngày 3 (MB) | OCS — lưu lượng realtime | `0` |
+| `voice_usage_d3_min` | float | ✅ | Lưu lượng thoại ngày 3 (phút) | OCS — lưu lượng realtime | `0` |
+| `sms_count_d3` | integer | ✅ | Số SMS ngày 3 | OCS — lưu lượng realtime | `0` |
 | `device_type` | string | ❌ | Loại thiết bị | `app_install_log.device_type` (SuperApp → Kafka → BSS) | `ANDROID` |
 | `has_app` | boolean | ❌ | Đã cài app chưa | Kiểm tra tồn tại bản ghi trong `app_install_log` theo `msisdn` | `true` |
 | `apn_configured` | boolean | ❌ | Cài đặt điểm truy cập APN nếu có | OCS/BSS hoặc nguồn cấu hình thiết bị — cần xác nhận | `true` |
@@ -426,12 +480,15 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 | Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
 |---|---|---|---|---|---|---|
 | `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin nhắn kích hoạt dùng mạng | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
-| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH chưa phát sinh cước sau D+3 | Văn bản | CSV `msisdn` | — | `0901234567` |
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH chưa phát sinh cước sau 72h | Văn bản | Payload `msisdn` | — | `0901234567` |
+| `{{truong_hop_su_dung}}` | ✅ | Phân nhánh nội dung: chưa mua gói (gợi ý mua gói) hoặc đã mua chưa dùng (hướng dẫn dùng) | Văn bản | Payload `usage_scenario` | — | `NO_PLAN` |
 | `{{so_ngay_chua_dung}}` | ✅ | Số ngày từ khi kích hoạt đến nay KH chưa dùng data/thoại/SMS | Số | CVM tính = `ngay_hien_tai - activation_date` | — | `3 ngày` |
-| `{{loai_thiet_bi}}` | ❌ | Loại thiết bị để gợi ý hướng dẫn cài đặt phù hợp | Văn bản | CSV `device_type` | không đề cập thiết bị | `IOS` |
+| `{{loai_thiet_bi}}` | ❌ | Loại thiết bị để gợi ý hướng dẫn cài đặt phù hợp | Văn bản | Payload `device_type` | không đề cập thiết bị | `IOS` |
 | `{{huong_dan_su_dung}}` | ❌ | Hướng dẫn ngắn để KH bắt đầu dùng dịch vụ hoặc kiểm tra APN | Văn bản | CVM cấu hình tĩnh theo `device_type`/`apn_configured` | nội dung hướng dẫn mặc định | `Mở dữ liệu di động và kiểm tra APN` |
 
 ---
+
+#### Kỹ thuật — Batch/CSV
 
 ##### 2.9 File: `otp_detection_{YYYYMMDD}.csv` (U04)
 
@@ -439,6 +496,8 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 **Trigger bởi:** HLR (Home Location Register — Hệ thống Đăng ký vị trí thuê bao)
 **Cơ chế:** HLR phát hiện SMS OTP → đẩy qua Kafka → export CSV trực tiếp vào SFTP CVM (không đi qua BSS)
 **Thời điểm push:** 02:00–04:00 hàng ngày
+
+> **Phạm vi áp dụng (2026-07-03):** Chỉ áp dụng cho KH đang dùng **gói data tháng (MONTHLY)** — CVM lọc theo `current_plan` có chu kỳ tháng trước khi gửi gợi ý. KH dùng gói ngày/tuần hoặc không có gói data tháng thì bỏ qua.
 
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
@@ -463,17 +522,20 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 
 ##### 2.6 File: `traffic_spike_{YYYYMMDD}.csv` (E13)
 
-**Mô tả:** Danh sách KH có lưu lượng tăng đột biến > 3x mức nền
+**Mô tả:** Danh sách KH có lưu lượng tăng đột biến x lần so với cùng kỳ (đề xuất ngưỡng **3 lần**)
 **Trigger bởi:** OCS → BSS (nightly) + CDR (baseline)
-**Thời điểm push:** 02:00–04:00 hàng ngày
+**Thời điểm push:** 02:00–04:00 hàng ngày (hoặc cuối tuần nếu đánh giá theo tuần)
+
+> **Chu kỳ đánh giá (2026-07-03):** Ngưỡng đột biến đề xuất **x = 3 lần** so với cùng kỳ. Đề xuất cho phép chọn **chu kỳ đánh giá theo ngày hoặc theo tuần** (`spike_period`): so sánh lưu lượng ngày với baseline ngày cùng khung giờ, hoặc so sánh tổng lưu lượng tuần với baseline tuần. Ngưỡng x và chu kỳ do CVM cấu hình.
 
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
 | `spike_timestamp` | datetime | ✅ | Thời điểm phát hiện tăng đột biến | OCS → BSS nightly batch | `2026-05-13 23:00:00` |
-| `spike_hour` | integer | ✅ | Giờ xảy ra (0–23) | OCS → BSS nightly batch | `22` |
-| `traffic_spike_mb` | float | ✅ | Lưu lượng giờ đột biến (MB) | OCS → BSS nightly batch | `512` |
-| `baseline_mb` | float | ✅ | Mức nền cùng khung giờ (MB) | BSS tính từ `cdr.*` lịch sử 30 ngày cùng khung giờ | `150` |
+| `spike_period` | string | ✅ | Chu kỳ đánh giá đột biến | CVM cấu hình | `DAILY` hoặc `WEEKLY` |
+| `spike_hour` | integer | ❌ | Giờ xảy ra (0–23) — chỉ áp dụng khi `spike_period = DAILY` | OCS → BSS nightly batch | `22` |
+| `traffic_spike_mb` | float | ✅ | Lưu lượng kỳ đột biến (MB) | OCS → BSS nightly batch | `512` |
+| `baseline_mb` | float | ✅ | Mức nền cùng kỳ (MB) | BSS tính từ `cdr.*` lịch sử cùng kỳ | `150` |
 | `spike_ratio` | float | ✅ | Tỉ lệ tăng (spike/baseline) | BSS tính: `traffic_spike_mb / baseline_mb` | `3.41` |
 | `device_type` | string | ❌ | Loại thiết bị | `app_install_log.device_type` (SuperApp → Kafka → BSS) | `ANDROID` |
 
@@ -492,9 +554,11 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 
 ##### 2.16 File: `usage_need_analysis_{YYYYMMDD}.csv` (E_USAGE_NEED_ANALYSIS)
 
-**Mô tả:** Danh sách KH cần tư vấn gói cước theo nhu cầu sử dụng thực tế. CVM/BSS phân tích mức sử dụng data/thoại so với gói hiện tại để xác định KH có **nhu cầu lớn** cần tư vấn gói lớn hơn, hoặc **nhu cầu nhỏ** cần tư vấn gói nhỏ/tiết kiệm hơn.
-**Trigger bởi:** OCS → BSS (nightly batch, phân tích mức sử dụng theo chu kỳ)
+**Mô tả:** Danh sách KH cần tư vấn gói cước theo nhu cầu sử dụng thực tế. CVM/BSS phân tích tập thuê bao trong **2 tháng liên tiếp** để xác định **ai cần nâng gói** (nhu cầu lớn hơn gói đang dùng) và **ai cần hạ gói** (nhu cầu nhỏ hơn, cần gói tiết kiệm hơn).
+**Trigger bởi:** OCS → BSS (nightly batch, phân tích mức sử dụng 2 tháng liên tiếp)
 **Thời điểm push:** 02:00–04:00 hàng ngày
+
+> **Chốt cửa sổ phân tích (2026-07-03):** Phân tích tập thuê bao trong **2 tháng liên tiếp** (nhất quán với U05-A). Bổ sung trường thông tin KH và kênh/hình thức đăng ký theo cột Mô tả trong bảng trigger.
 
 > **Rule phân loại nhu cầu:** `usage_need_segment = HIGH_NEED` khi mức sử dụng thực tế cao hơn đáng kể so với hạn mức/giá trị gói hiện tại; CVM tư vấn gói lớn hơn. `usage_need_segment = LOW_NEED` khi mức sử dụng thực tế thấp hơn đáng kể so với gói hiện tại; CVM tư vấn gói nhỏ hơn hoặc gói tiết kiệm hơn. Ngưỡng cụ thể do PO/CVM cấu hình theo từng loại tài nguyên và từng nhóm gói.
 >
@@ -504,7 +568,16 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 |---|---|---|---|---|---|
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
 | `current_plan` | string | ✅ | Gói đang dùng | OCS → BSS nightly batch | `GOI_DATA_70K` |
-| `analysis_period_cycles` | integer | ✅ | Số chu kỳ gần nhất dùng để phân tích nhu cầu | BSS/CVM cấu hình | `3` |
+| `current_plan_price` | integer | ❌ | Giá gói hiện tại (đồng) | OCS — bảng giá gói | `70000` |
+| `plan_cycle` | string | ❌ | Chu kỳ gói hiện tại | OCS — định nghĩa gói | `MONTHLY` |
+| `analysis_period_cycles` | integer | ✅ | Số chu kỳ gần nhất dùng để phân tích nhu cầu — chốt **2** (2 tháng liên tiếp) | BSS/CVM cấu hình | `2` |
+| `full_name` | string(64) | ❌ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
+| `gender` | string | ❌ | Giới tính KH | `ekyc_data` → `gender` — chưa xác nhận nguồn | `MALE` |
+| `age_segment` | string | ❌ | Tuổi/phân khúc tuổi KH | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `25-34` |
+| `subscriber_tenure_days` | integer | ❌ | Tuổi thuê bao (số ngày đã dùng mạng) | BSS tính từ `resource.msisdn_status_history` | `365` |
+| `register_channel` | string | ❌ | Kênh đăng ký gói của KH | OCS/BSS — kênh giao dịch đăng ký | `APP` hoặc `USSD` hoặc `AGENCY` |
+| `register_method` | string | ❌ | Hình thức đăng ký | OCS/BSS — hình thức giao dịch | `MANUAL` hoặc `AUTO` |
+| `promotion_code` | string | ❌ | Chương trình khuyến mãi đang áp dụng (nếu có) | OCS/CVM — chương trình KM | `KM_NANGGOI_15PCT` |
 | `avg_data_usage_mb` | float | ❌ | Data trung bình KH đã dùng trong mỗi chu kỳ phân tích | OCS → BSS nightly batch | `35840` |
 | `avg_voice_usage_min` | float | ❌ | Số phút thoại trung bình KH đã dùng trong mỗi chu kỳ phân tích | OCS → BSS nightly batch | `420` |
 | `current_plan_data_quota_mb` | float | ❌ | Hạn mức data của gói hiện tại trong mỗi chu kỳ | OCS — định nghĩa gói | `20480` |
@@ -532,16 +605,18 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 
 ##### 2.14 File: `birthday_list_{YYYYMMDD}.csv` (U09)
 
-**Mô tả:** Danh sách KH có sinh nhật hoặc kỷ niệm mua SIM trong ngày
+**Mô tả:** Danh sách KH có sinh nhật, kỷ niệm tròn x năm kích hoạt SIM, hoặc sinh nhật nhà mạng trong ngày
 **Trigger bởi:** BSS (quét hàng ngày)
 **Thời điểm push:** 02:00–04:00 hàng ngày
+
+> **Bổ sung sự kiện (2026-07-03):** Ngoài `BIRTHDAY` (sinh nhật KH) và `SIM_ANNIVERSARY` (tròn x năm kích hoạt SIM), thêm `OPERATOR_ANNIVERSARY` — sinh nhật nhà mạng, gửi cho toàn bộ tập KH vào ngày cố định (CVM cấu hình).
 
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
 | `full_name` | string(64) | ✅ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
-| `event_type` | string | ✅ | Loại sự kiện | BSS tổng hợp: `BIRTHDAY` nếu khớp `birthday`, `SIM_ANNIVERSARY` nếu khớp `activation_date` | `BIRTHDAY` hoặc `SIM_ANNIVERSARY` |
-| `event_year` | integer | ✅ | Số năm (tuổi hoặc năm thứ mấy dùng SIM) | BSS tính từ `crm.customers.birthday` (tuổi) hoặc `resource.sims.activation_date` (năm dùng SIM) | `25` |
+| `event_type` | string | ✅ | Loại sự kiện | BSS tổng hợp: `BIRTHDAY` nếu khớp `birthday`, `SIM_ANNIVERSARY` nếu khớp `activation_date`, `OPERATOR_ANNIVERSARY` nếu trùng ngày sinh nhật nhà mạng (CVM cấu hình) | `BIRTHDAY` hoặc `SIM_ANNIVERSARY` hoặc `OPERATOR_ANNIVERSARY` |
+| `event_year` | integer | ❌ | Số năm (tuổi hoặc năm thứ mấy dùng SIM); không áp dụng cho `OPERATOR_ANNIVERSARY` | BSS tính từ `crm.customers.birthday` (tuổi) hoặc `resource.sims.activation_date` (năm dùng SIM) | `25` |
 | `zalo_oa_id` | string | ❌ | Zalo OA ID nếu KH đã liên kết | `crm.customers.zalo_oa_id` (nếu có trường này) | `84901234567` |
 | `current_plan` | string | ❌ | Gói đang dùng (từ OCS) | OCS → BSS nightly batch | `GOI_DATA_70K` |
 
@@ -599,7 +674,7 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
-| `new_segment` | string | ✅ | Phân khúc mới | BSS hoặc CVM nội bộ | `CHURN_RISK` hoặc `GAMING` hoặc `ENTERTAINMENT` |
+| `new_segment` | string | ✅ | Phân khúc mới — gồm phân khúc hành vi (CHURN_RISK, GAMING...) và phân khúc nhân khẩu/nghề nghiệp | BSS hoặc CVM nội bộ | `HSSV` / `FREELANCER_DRIVER` / `OFFICER_CNVVP` / `KOL_KOC_REVIEWER` / `RETIRED` / `CHURN_RISK` / `GAMING` |
 | `previous_segment` | string | ❌ | Phân khúc cũ (nếu có) | BSS/CVM — lịch sử phân khúc | `NORMAL` |
 | `segment_score` | float | ❌ | Điểm churn/engagement để CVM ưu tiên xử lý | BSS hoặc CVM nội bộ | `0.82` |
 | `segment_date` | date | ✅ | Ngày phân khúc được cập nhật | BSS/CVM nội bộ | `2026-06-02` |
@@ -618,18 +693,27 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 
 ##### 2.19 File: `no_plan_x_days_{YYYYMMDD}.csv` (E_NO_PLAN_X_DAYS)
 
-**Mô tả:** Danh sách KH trạng thái ACTIVE nhưng không có gói cước nào đang active trong x ngày liên tiếp (x do CVM cấu hình, mặc định 7 ngày)
+**Mô tả:** Danh sách KH trạng thái ACTIVE nhưng không có gói cước nào đang active trong x ngày liên tiếp. Đề xuất các mốc nhắc nhiều tầng: **x, x+7 và x=10 ngày** (x do CVM cấu hình).
 **Trigger bởi:** BSS (quét hàng ngày từ `resource.msisdns`)
 **Thời điểm push:** 02:00–04:00 hàng ngày
+
+> **Mốc nhắc nhiều tầng (2026-07-03):** Đề xuất nhắc theo nhiều mốc: mốc đầu (x ngày), mốc x+7, và mốc **10 ngày** — mỗi mốc dùng nội dung khác nhau (nhắc nhẹ → thúc mạnh). Bổ sung trường thông tin KH và kênh/hình thức đăng ký theo cột Mô tả trong bảng trigger.
 
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
-| `days_without_plan` | integer | ✅ | Số ngày không có gói cước | BSS tính từ ngày gói cuối hết hạn | `7` |
+| `days_without_plan` | integer | ✅ | Số ngày không có gói cước | BSS tính từ ngày gói cuối hết hạn | `10` |
+| `reminder_tier` | string | ❌ | Mốc nhắc hiện tại (để CVM phân nhánh nội dung) | CVM cấu hình theo `days_without_plan` | `TIER_X` hoặc `TIER_X7` hoặc `TIER_10` |
+| `full_name` | string(64) | ❌ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
+| `gender` | string | ❌ | Giới tính KH | `ekyc_data` → `gender` — chưa xác nhận nguồn | `MALE` |
+| `age_segment` | string | ❌ | Tuổi/phân khúc tuổi KH | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `25-34` |
 | `last_plan_name` | string | ❌ | Tên gói cuối cùng KH từng dùng | OCS → BSS nightly batch | `GOI_DATA_70K` |
 | `last_plan_expiry_date` | date | ✅ | Ngày hết hạn gói cuối | `resource.msisdns.expiry_date` (BSS) | `2026-05-26` |
+| `promotion_code` | string | ❌ | Chương trình khuyến mãi đăng ký lại (nếu có) | OCS/CVM — chương trình KM | `KM_QUAYLAI_20PCT` |
+| `register_channel` | string | ❌ | Kênh đăng ký gói gợi ý | CVM cấu hình | `APP` hoặc `USSD` |
+| `register_method` | string | ❌ | Hình thức đăng ký | CVM cấu hình | `MANUAL` hoặc `AUTO` |
 | `balance` | integer | ✅ | Số dư tài khoản hiện tại (đồng) | OCS → BSS nightly batch | `15000` |
-| `subscriber_tenure_days` | integer | ❌ | Số ngày KH đã dùng mạng | BSS tính từ `resource.msisdn_status_history` | `365` |
+| `subscriber_tenure_days` | integer | ❌ | Tuổi thuê bao (số ngày KH đã dùng mạng) | BSS tính từ `resource.msisdn_status_history` | `365` |
 
 **Param template:**
 
@@ -693,6 +777,7 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
 | `plan_name` | string | ✅ | Tên gói đã đăng ký | OCS → BSS nightly batch | `GOI_DATA_120K` |
 | `plan_type` | string | ✅ | Loại gói | OCS → BSS nightly batch | `DATA` hoặc `VOICE` hoặc `COMBO` |
+| `plan_cycle` | string | ✅ | Chu kỳ gói — dùng làm bộ lọc gói theo chu kỳ | OCS → BSS nightly batch | `DAILY` hoặc `WEEKLY` hoặc `MONTHLY` |
 | `plan_expiry_date` | date | ✅ | Ngày hết hạn gói | `resource.msisdns.expiry_date` (BSS) | `2026-06-14` |
 | `plan_register_count` | integer | ✅ | Tổng số lần đăng ký gói | OCS → BSS nightly batch (tổng tích lũy) | `3` |
 | `register_timestamp` | datetime | ✅ | Thời điểm đăng ký | OCS → BSS nightly batch | `2026-05-13 18:30:00` |
@@ -711,11 +796,13 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 
 ---
 
-##### 2.10 File: `billing_2month_{YYYYMM}.csv` (U05)
+##### 2.10 File: `billing_2month_{YYYYMM}.csv` (U05-A)
 
-**Mô tả:** Danh sách KH hết data sớm (trước ngày 25) trong 2 tháng liên tiếp
+**Mô tả:** Danh sách KH dùng **gói data tháng (MONTHLY)** hết data sớm (trước ngày 25) trong 2 tháng liên tiếp
 **Trigger bởi:** OCS → BSS (nightly), export đầu tháng thứ 3
 **Thời điểm push:** 02:00–04:00 ngày 1 của tháng thứ 3
+
+> **Phạm vi áp dụng:** Chỉ KH đang dùng gói có hạn mức data cố định theo tháng. Không áp dụng cho gói data/ngày — xem file `daily_quota_pattern_{YYYYMM}.csv` (U05-B).
 
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
@@ -742,9 +829,51 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 
 ---
 
+##### 2.10b File: `daily_quota_pattern_{YYYYMM}.csv` (U05-B)
+
+**Mô tả:** Danh sách KH dùng **gói data ngày/tuần (DAILY/WEEKLY)** có pattern hết quota data thường xuyên. Số ngày hết ≥ N_DAYS_THRESHOLD trong M_MONTHS_THRESHOLD tháng liên tiếp; các ngưỡng do CVM cấu hình.
+**Trigger bởi:** OCS → BSS (nightly), export đầu tháng thứ (M+1)
+**Thời điểm push:** 02:00–04:00 ngày 1 của tháng thứ (M+1)
+
+> **Phạm vi áp dụng:** Chỉ KH đang dùng gói có quota data reset hàng ngày (gói ngày, gói tuần chia data/ngày). Không áp dụng cho gói tháng — xem `billing_2month_{YYYYMM}.csv` (U05-A).
+>
+> **Nhánh realtime bổ sung (2026-07-03):** Ngoài file batch pattern nhiều tháng, bổ sung nhánh **NearRealtime**: khi KH hết quota gói ngày/tuần **3 lần liên tiếp** (3 ngày hết gói ngày, hoặc 3 chu kỳ hết gói tuần) thì OCS gọi API CVM đề xuất nâng gói ngay — không đợi tổng hợp cuối tháng. Ngưỡng 3 lần do CVM cấu hình.
+>
+> **⚠️ Vấn đề nguồn dữ liệu (Q21):** Để biết "ngày X KH có hết quota/ngày không", OCS cần event quota/ngày về 0 hoặc BSS tính từ CDR. Nếu OCS không có event này thì compute nặng — cần xác nhận với BSS/Tech.
+
+| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+|---|---|---|---|---|---|
+| `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `current_plan` | string | ✅ | Gói ngày/tuần đang dùng | OCS → BSS nightly batch | `GOI_DATA_NGAY_10K` |
+| `plan_cycle` | string | ✅ | Chu kỳ gói | OCS — định nghĩa gói | `DAILY` hoặc `WEEKLY` |
+| `daily_quota_mb` | integer | ✅ | Hạn mức data/ngày của gói (MB) | OCS — theo định nghĩa gói | `500` |
+| `consecutive_depleted_count` | integer | ✅ | Số lần hết quota liên tiếp (dùng cho nhánh realtime — ngưỡng 3) | OCS (event quota về 0) hoặc BSS từ CDR — cần xác nhận (Q21) | `3` |
+| `month1_depleted_days` | integer | ❌ | Số ngày trong tháng 1 hết quota (dùng cho nhánh batch pattern) | OCS/BSS — cần xác nhận (Q21) | `18` |
+| `month2_depleted_days` | integer | ❌ | Số ngày trong tháng 2 hết quota (dùng cho nhánh batch pattern) | OCS/BSS — cần xác nhận (Q21) | `20` |
+| `month1_total_data_gb` | float | ❌ | Tổng data tháng 1 (GB) | OCS → BSS nightly batch | `14.2` |
+| `month2_total_data_gb` | float | ❌ | Tổng data tháng 2 (GB) | OCS → BSS nightly batch | `15.0` |
+| `suggested_daily_plan` | string | ❌ | Gói ngày lớn hơn đề xuất | OCS hoặc CVM NBO | `GOI_DATA_NGAY_15K` |
+| `suggested_monthly_plan` | string | ❌ | Gói tháng đề xuất nếu upsell | CVM NBO tự tính | `GOI_DATA_70K` |
+
+**Param template:**
+
+> CVM phân nhánh nội dung theo `UPSELL_MODE` (cấu hình nội bộ CVM): `DAILY_UPGRADE` gợi ý gói ngày lớn hơn; `MONTHLY_UPSELL` gợi ý gói tháng; `BOTH` đề xuất cả 2.
+
+| Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
+|---|---|---|---|---|---|---|
+| `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin gợi ý | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH hết quota gói ngày/tuần thường xuyên | Văn bản | CSV `msisdn` | — | `0901234567` |
+| `{{ten_goi_hien_tai}}` | ✅ | Gói ngày/tuần đang dùng — làm ngữ cảnh gợi ý | Văn bản | CSV `current_plan` | — | `GOI_DATA_NGAY_10K` |
+| `{{so_lan_het_lien_tiep}}` | ❌ | Số lần hết quota liên tiếp — bằng chứng cho nhánh realtime | Số | CSV `consecutive_depleted_count` | — | `3 lần` |
+| `{{han_muc_data_ngay_mb}}` | ✅ | Hạn mức data/ngày của gói hiện tại | Số | CSV `daily_quota_mb` | — | `500 MB` |
+| `{{goi_ngay_nang_de_xuat}}` | ❌ | Gói ngày lớn hơn NBO đề xuất | Văn bản | CSV `suggested_daily_plan` hoặc CVM NBO | không hiện | `GOI_DATA_NGAY_15K` |
+| `{{goi_thang_upsell_de_xuat}}` | ❌ | Gói tháng NBO đề xuất thay thế | Văn bản | CSV `suggested_monthly_plan` hoặc CVM NBO | không hiện | `GOI_DATA_70K` |
+
+---
+
 ##### 2.11 File: `plan_change_{YYYYMMDD}.csv` (U06)
 
-**Mô tả:** Danh sách KH chuyển đổi loại gói thành công trong ngày
+**Mô tả:** Danh sách KH chuyển đổi **gói tháng (MONTHLY)** thành công trong ngày
 **Trigger bởi:** OCS → BSS (nightly)
 **Thời điểm push:** 02:00–04:00 hàng ngày
 
@@ -779,15 +908,19 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 
 ##### 2.12 File: `sim_swap_{YYYYMMDD}.csv` (U07)
 
-**Mô tả:** Danh sách KH đổi SIM nội mạng thành công trong ngày
+**Mô tả:** Danh sách KH chuyển đổi SIM/đổi phôi SIM nội mạng thành công trong ngày. Bao gồm **4 tổ hợp chuyển đổi**: vật lý→vật lý, vật lý→eSIM, eSIM→vật lý, eSIM→eSIM. Trường hợp cùng loại (vật lý→vật lý, eSIM→eSIM) chính là **đổi phôi SIM**.
 **Trigger bởi:** BSS (sim_swap event)
 **Thời điểm push:** 02:00–04:00 hàng ngày
+
+> **Phân loại swap (2026-07-03):** `swap_type` xác định rõ tổ hợp: `PHYS_TO_PHYS` và `ESIM_TO_ESIM` là đổi phôi (cùng loại); `PHYS_TO_ESIM` và `ESIM_TO_PHYS` là chuyển đổi loại SIM. CVM phân nhánh nội dung hướng dẫn theo `swap_type`.
 
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
-| `old_sim_type` | string | ✅ | Loại SIM cũ | `resource.sims.sim_type` (bản ghi SIM cũ) | `PHYSICAL` |
-| `new_sim_type` | string | ✅ | Loại SIM mới | `resource.sims.sim_type` (bản ghi SIM mới) | `ESIM` |
+| `old_sim_type` | string | ✅ | Loại SIM cũ | `resource.sims.sim_type` (bản ghi SIM cũ) | `PHYSICAL` hoặc `ESIM` |
+| `new_sim_type` | string | ✅ | Loại SIM mới | `resource.sims.sim_type` (bản ghi SIM mới) | `PHYSICAL` hoặc `ESIM` |
+| `swap_type` | string | ✅ | Tổ hợp chuyển đổi (4 case) | BSS phân loại từ `old_sim_type` + `new_sim_type` | `PHYS_TO_PHYS`, `PHYS_TO_ESIM`, `ESIM_TO_PHYS`, `ESIM_TO_ESIM` |
+| `is_reissue` | boolean | ✅ | Có phải đổi phôi (cùng loại SIM) không | BSS: `true` nếu `old_sim_type = new_sim_type` | `true` |
 | `new_iccid` | string(20) | ✅ | ICCID SIM mới | `resource.sims.iccid` (bản ghi SIM mới) | `8984012345678901235` |
 | `swap_timestamp` | datetime | ✅ | Thời điểm đổi SIM | `resource.sims.activation_date` (SIM mới) | `2026-05-13 11:00:00` |
 | `current_plan` | string | ✅ | Gói cước được giữ nguyên | OCS → BSS nightly batch | `GOI_DATA_120K` |
@@ -800,6 +933,7 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 | `{{so_dien_thoai}}` | ✅ | Số điện thoại KH vừa đổi SIM thành công | Văn bản | CSV `msisdn` | — | `0901234567` |
 | `{{loai_sim_cu}}` | ✅ | Loại SIM cũ để xác nhận đúng giao dịch đổi SIM | Văn bản | CSV `old_sim_type` | — | `PHYSICAL` |
 | `{{loai_sim_moi}}` | ✅ | Loại SIM mới KH vừa chuyển sang | Văn bản | CSV `new_sim_type` | — | `ESIM` |
+| `{{loai_chuyen_doi}}` | ✅ | Tổ hợp chuyển đổi/đổi phôi để CVM phân nhánh nội dung hướng dẫn | Văn bản | CSV `swap_type` | — | `ESIM_TO_ESIM` |
 | `{{ma_iccid_moi}}` | ✅ | Mã ICCID SIM mới để KH lưu làm bằng chứng kích hoạt | Văn bản | CSV `new_iccid` | — | `8984012345678901235` |
 | `{{ten_goi_giu_nguyen}}` | ✅ | Tên gói cước được giữ nguyên sau khi đổi SIM — reassurance KH | Văn bản | CSV `current_plan` | — | `GOI_DATA_120K` |
 | `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin xác nhận đổi SIM | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
@@ -919,15 +1053,20 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 
 #### Kỹ thuật — Batch/CSV
 
-##### 2.2 File: `app_installed_no_open_{YYYYMMDD}.csv` (E04)
+##### 2.2 Event: CHƯA_MỞ_APP_SAU_24H (E04)
 
-**Mô tả:** Danh sách KH đã cài app nhưng chưa mở trong 24h
-**Trigger bởi:** BSS (consume từ Kafka SuperApp events)
-**Thời điểm push:** 02:00–04:00 hàng ngày
+**Mô tả:** KH đã cài app nhưng chưa mở trong 24h
+**Trigger bởi:** SuperApp → BSS gọi API CVM
+**Yêu cầu kỹ thuật:** BSS/SuperApp gọi API CVM ngay khi phát hiện đủ 24h từ lúc cài mà chưa mở app. CVM gửi Push/tin nhắn nhắc mở app.
+**Timing:** Ngay khi đủ 24h tính từ lúc cài app mà chưa mở
 
-| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+> **Cập nhật timing (2026-07-03):** Chuyển từ Batch/CSV `app_installed_no_open` sang **NearRealtime** theo bảng trigger đã chốt.
+
+| Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
+| `event_type` | string | ✅ | Loại sự kiện | SuperApp/BSS — event name cố định | `NO_APP_OPEN_24H` |
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `event_timestamp` | datetime | ✅ | Thời điểm phát hiện đủ 24h chưa mở app | SuperApp/BSS — thời điểm đủ điều kiện | `2026-05-14 10:15:00` |
 | `installed_at` | datetime | ✅ | Thời điểm cài app | `app_install_log.installed_at` (SuperApp → Kafka → BSS) | `2026-05-13 10:15:00` |
 | `device_type` | string | ✅ | Loại thiết bị | `app_install_log.device_type` (SuperApp → Kafka → BSS) | `ANDROID` |
 | `os_version` | string | ❌ | Phiên bản hệ điều hành | `app_install_log.os_version` (SuperApp → Kafka → BSS) | `Android 14` |
@@ -976,30 +1115,39 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 
 ---
 
-##### 2.5 File: `change_pkg_view_{YYYYMMDD}.csv` (E09)
+##### 2.5 Event: HÀNH_TRÌNH_MUA_BỎ_DỞ (E09)
 
-**Mô tả:** Danh sách KH vào màn hình đổi gói nhưng thoát không đăng ký
-**Trigger bởi:** SuperApp → Kafka → BSS
-**Thời điểm push:** 02:00–04:00 hàng ngày
+**Mô tả:** KH bắt đầu hành trình mua nhưng chưa hoàn tất đăng ký, gồm 2 luồng: (1) **xem màn hình đổi gói nhưng chưa đăng ký**; (2) **hành trình mua cả SIM cả gói** — tính từ X phút kể từ lúc bắt đầu hành trình mua SIM/mua gói, với **điều kiện có để lại SĐT**.
+**Trigger bởi:** SuperApp → gọi API CVM
+**Yêu cầu kỹ thuật:** SuperApp gọi API CVM khi phát hiện KH đã qua X phút (X do CVM cấu hình) kể từ lúc bắt đầu hành trình mua mà chưa hoàn tất. Chỉ trigger nếu KH đã để lại SĐT trong hành trình. CVM gửi nhắc hoàn tất mua trong vòng vài phút.
+**Timing:** Ngay khi đủ X phút kể từ lúc bắt đầu hành trình mua mà chưa hoàn tất (điều kiện: có SĐT)
 
-| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+> **Cập nhật timing (2026-07-03):** Chuyển từ Batch/CSV `change_pkg_view` sang **NearRealtime** và mở rộng phạm vi bao gồm hành trình mua SIM + gói bỏ dở, theo bảng trigger đã chốt.
+>
+> **Điều kiện chặn:** Nếu KH chưa để lại SĐT trong hành trình (`msisdn` rỗng) → CVM không trigger (không có kênh liên hệ).
+
+| Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
-| `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
-| `view_timestamp` | datetime | ✅ | Thời điểm vào màn hình | `change_pkg_view_log.view_timestamp` (SuperApp → Kafka → BSS) | `2026-05-13 21:10:00` |
-| `time_on_screen_sec` | integer | ✅ | Thời gian trên màn hình (giây) | `change_pkg_view_log.time_on_screen` (SuperApp → Kafka → BSS) | `47` |
-| `view_count_today` | integer | ✅ | Số lần xem trong ngày | `change_pkg_view_log.view_count` (SuperApp → Kafka → BSS) | `2` |
-| `current_plan` | string | ✅ | Gói đang dùng | OCS → BSS nightly batch | `GOI_DATA_70K` |
-| `total_data_30d_mb` | float | ❌ | Tổng data 30 ngày (MB) — từ OCS | OCS → BSS nightly batch (tổng hợp 30 ngày) | `45000` |
+| `event_type` | string | ✅ | Loại sự kiện | SuperApp — event name cố định | `PURCHASE_JOURNEY_ABANDONED` |
+| `msisdn` | string(15) | ✅ | Số điện thoại KH để lại trong hành trình | SuperApp — SĐT KH nhập | `0901234567` |
+| `event_timestamp` | datetime | ✅ | Thời điểm phát hiện bỏ dở (đủ X phút) | SuperApp — thời điểm đủ điều kiện | `2026-05-13 21:15:00` |
+| `journey_type` | string | ✅ | Loại hành trình bỏ dở | SuperApp — phân loại hành trình | `CHANGE_PLAN` hoặc `BUY_SIM_AND_PLAN` |
+| `journey_start_at` | datetime | ✅ | Thời điểm bắt đầu hành trình mua SIM/mua gói | SuperApp — mốc bắt đầu hành trình | `2026-05-13 21:05:00` |
+| `minutes_since_start` | integer | ✅ | Số phút kể từ lúc bắt đầu hành trình | SuperApp/CVM tính | `10` |
+| `last_step` | string | ❌ | Bước cuối cùng KH dừng lại trong hành trình | SuperApp — bước hành trình | `SELECT_PLAN` hoặc `PAYMENT` |
+| `current_plan` | string | ❌ | Gói đang dùng (nếu là luồng đổi gói của KH hiện hữu) | OCS — tên gói đang active | `GOI_DATA_70K` |
+| `selected_plan` | string | ❌ | Gói KH đang chọn dở trong hành trình | SuperApp — gói đang chọn | `GOI_DATA_120K` |
 
 **Param template:**
 
 | Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
 |---|---|---|---|---|---|---|
-| `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin nhắn nhắc đổi gói | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
-| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH vừa thoát màn hình đổi gói | Văn bản | CSV `msisdn` | — | `0901234567` |
-| `{{ten_goi_hien_tai}}` | ✅ | Tên gói đang dùng để làm ngữ cảnh cho gợi ý đổi gói | Văn bản | CSV `current_plan` | — | `GOI_DATA_70K` |
-| `{{tong_data_30_ngay_gb}}` | ❌ | Tổng data 30 ngày gần nhất — so sánh với hạn mức gói hiện tại | Số | CSV `total_data_30d_mb` → CVM convert sang GB | không hiện so sánh với mức dùng thực | `45.0 GB` |
-| `{{goi_de_xuat}}` | ❌ | Tên gói NBO đề xuất phù hợp với mức dùng data thực tế | Văn bản | CVM NBO — không lấy từ BSS/OCS | không hiện gợi ý | `GOI_DATA_120K` |
+| `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin nhắn nhắc hoàn tất mua | Văn bản | CVM cache từ E01 (nếu là KH hiện hữu) | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH để lại trong hành trình | Văn bản | Payload `msisdn` | — | `0901234567` |
+| `{{loai_hanh_trinh}}` | ✅ | Loại hành trình để CVM phân nhánh nội dung nhắc | Văn bản | Payload `journey_type` | — | `BUY_SIM_AND_PLAN` |
+| `{{ten_goi_hien_tai}}` | ❌ | Tên gói đang dùng (nếu là luồng đổi gói) — ngữ cảnh gợi ý | Văn bản | Payload `current_plan` | không hiện gói hiện tại | `GOI_DATA_70K` |
+| `{{goi_dang_chon}}` | ❌ | Gói KH đang chọn dở — nhắc hoàn tất đúng gói đó | Văn bản | Payload `selected_plan` | không hiện gói đang chọn | `GOI_DATA_120K` |
+| `{{goi_de_xuat}}` | ❌ | Tên gói NBO đề xuất phù hợp với hành vi | Văn bản | CVM NBO — không lấy từ BSS/OCS | không hiện gợi ý | `GOI_DATA_120K` |
 
 ---
 
@@ -1046,9 +1194,7 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 
 > **Ghi chú hợp nhất:** Trigger chuỗi gia hạn `U_RENEWAL_STREAK` đã được gộp vào `U08`. Nhánh GIA HẠN chỉ dùng file `renewal_loyalty_{YYYYMMDD}.csv` để xử lý cả gia hạn đúng hạn và gia hạn sớm theo mốc cấu hình của CVM.
 
-#### Kỹ thuật — NearRealtime
-
-Không có trigger NearRealtime trong phạm vi hiện tại.
+> **Cập nhật timing (2026-07-03):** `U_PRE_EXPIRY` và `U_POST_EXPIRY` chuyển từ Batch/CSV sang **NearRealtime** theo bảng trigger đã chốt. `U08` giữ Batch/CSV.
 
 #### Kỹ thuật — Batch/CSV
 
@@ -1066,6 +1212,8 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 | `full_name` | string(64) | ✅ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
 | `contact_email` | string | ❌ | Email KH | `crm.customers.contact_email` | `nguyenvana@gmail.com` |
 | `consecutive_renewals` | integer | ✅ | Số chu kỳ gia hạn liên tiếp đủ điều kiện, bao gồm đúng hạn và sớm hạn theo rule CVM | BSS tính từ lịch sử `resource.msisdns.expiry_date` + OCS renewal log | `5` |
+| `plan_cycle` | string | ✅ | Chu kỳ gói được gia hạn liên tiếp — dùng làm bộ lọc chuỗi gia hạn theo loại chu kỳ | OCS → BSS nightly batch | `DAILY` hoặc `WEEKLY` hoặc `MONTHLY` |
+| `renewal_count_threshold` | integer | ❌ | Ngưỡng số lần gia hạn (x lần) theo từng chu kỳ để tính đủ điều kiện vinh danh | CVM cấu hình theo `plan_cycle` | `3` |
 | `includes_early_renewal` | boolean | ✅ | Có ít nhất 1 lần gia hạn sớm trong chuỗi không | OCS → BSS nightly batch | `true` |
 | `renewal_pattern` | string | ✅ | Kiểu chuỗi gia hạn để CVM phân nhánh nội dung | BSS phân loại từ lịch sử gia hạn | `ON_TIME_ONLY` hoặc `EARLY_ONLY` hoặc `MIXED` |
 | `last_renewal_date` | date | ✅ | Ngày gia hạn lần cuối | OCS → BSS nightly batch | `2026-05-13` |
@@ -1092,15 +1240,20 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 
 ---
 
-##### 2.20 File: `pre_expiry_{YYYYMMDD}.csv` (U_PRE_EXPIRY)
+##### 2.20 Event: TRƯỚC_KHI_HẾT_HẠN_GÓI (U_PRE_EXPIRY)
 
-**Mô tả:** Danh sách KH còn x ngày trước khi gói hết hạn (x do CVM cấu hình, thường 3 và 7 ngày)
-**Trigger bởi:** BSS (quét hàng ngày từ `resource.msisdns.expiry_date`)
-**Thời điểm push:** 02:00–04:00 hàng ngày
+**Mô tả:** KH còn x ngày trước khi gói hết hạn (x do CVM cấu hình, thường 3 và 7 ngày)
+**Trigger bởi:** BSS gọi API CVM
+**Yêu cầu kỹ thuật:** BSS gọi API CVM ngay khi KH chạm mốc còn x ngày trước hết hạn. CVM gửi nhắc gia hạn.
+**Timing:** Ngay khi KH còn đúng x ngày trước khi gói hết hạn
 
-| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+> **Cập nhật timing (2026-07-03):** Chuyển từ Batch/CSV `pre_expiry` sang **NearRealtime** theo bảng trigger đã chốt.
+
+| Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
+| `event_type` | string | ✅ | Loại sự kiện | BSS — event name cố định | `PRE_EXPIRY` |
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `event_timestamp` | datetime | ✅ | Thời điểm chạm mốc còn x ngày | BSS — thời điểm đủ điều kiện | `2026-06-07 08:00:00` |
 | `current_plan` | string | ✅ | Gói đang dùng | OCS → BSS nightly batch | `GOI_DATA_70K` |
 | `plan_expiry_date` | date | ✅ | Ngày hết hạn gói | `resource.msisdns.expiry_date` (BSS) | `2026-06-10` |
 | `days_to_expiry` | integer | ✅ | Số ngày còn đến khi hết hạn | BSS tính: `expiry_date - ngay_hien_tai` | `3` |
@@ -1123,32 +1276,49 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 
 ---
 
-##### 2.21 File: `post_expiry_{YYYYMMDD}.csv` (U_POST_EXPIRY)
+##### 2.21 Event: SAU_KHI_HẾT_HẠN_GÓI (U_POST_EXPIRY)
 
-**Mô tả:** Danh sách KH đã hết hạn gói x ngày mà chưa gia hạn (x do CVM cấu hình, thường 1, 3, 7 ngày)
-**Trigger bởi:** BSS (quét hàng ngày từ `resource.msisdns.expiry_date`)
-**Thời điểm push:** 02:00–04:00 hàng ngày
+**Mô tả:** KH đã hết hạn gói x ngày mà chưa gia hạn (x do CVM cấu hình, thường 1, 3, 7 ngày)
+**Trigger bởi:** BSS gọi API CVM
+**Yêu cầu kỹ thuật:** BSS gọi API CVM ngay khi KH chạm mốc đã quá hạn x ngày mà chưa gia hạn. CVM gửi thúc gia hạn.
+**Timing:** Ngay khi KH đã quá hạn đúng x ngày mà chưa gia hạn
 
-| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+> **Cập nhật timing (2026-07-03):** Chuyển từ Batch/CSV `post_expiry` sang **NearRealtime** theo bảng trigger đã chốt. Bổ sung trường thông tin KH và kênh/hình thức gia hạn theo cột Mô tả trong bảng trigger.
+
+| Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
+| `event_type` | string | ✅ | Loại sự kiện | BSS — event name cố định | `POST_EXPIRY` |
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `event_timestamp` | datetime | ✅ | Thời điểm chạm mốc quá hạn x ngày | BSS — thời điểm đủ điều kiện | `2026-06-03 08:00:00` |
+| `full_name` | string(64) | ❌ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
+| `gender` | string | ❌ | Giới tính KH | `crm.request_register_info.ekyc_data` → `gender` — chưa xác nhận nguồn | `MALE` |
+| `age_segment` | string | ❌ | Tuổi/phân khúc tuổi KH | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `25-34` |
+| `subscriber_tenure_days` | integer | ❌ | Tuổi thuê bao (số ngày đã dùng mạng) | BSS tính từ `resource.msisdn_status_history` | `365` |
 | `last_plan` | string | ✅ | Tên gói cuối cùng đã hết hạn | OCS → BSS nightly batch | `GOI_DATA_70K` |
+| `last_plan_price` | integer | ❌ | Giá gói vừa hết hạn (đồng) | OCS — bảng giá gói | `70000` |
+| `plan_cycle` | string | ❌ | Chu kỳ gói vừa hết hạn | OCS — định nghĩa gói | `MONTHLY` |
 | `expiry_date` | date | ✅ | Ngày gói đã hết hạn | `resource.msisdns.expiry_date` (BSS) | `2026-05-31` |
-| `days_since_expiry` | integer | ✅ | Số ngày đã qua hạn chưa gia hạn | BSS tính: `ngay_hien_tai - expiry_date` | `3` |
+| `days_since_expiry` | integer | ✅ | Số ngày đã qua hạn chưa gia hạn (tính từ lúc hết hạn) | BSS tính: `ngay_hien_tai - expiry_date` | `3` |
+| `promotion_code` | string | ❌ | Chương trình khuyến mãi áp dụng (nếu có) | OCS/CVM — chương trình KM đang chạy | `KM_GIAHAN_20PCT` |
 | `balance` | integer | ✅ | Số dư tài khoản (đồng) | OCS → BSS nightly batch | `5000` |
 | `subscriber_status` | string | ✅ | Trạng thái thuê bao hiện tại | `crm.subscribers.status` | `ACTIVE` hoặc `GRACE` |
+| `renewal_channel` | string | ❌ | Kênh gia hạn gợi ý cho KH | CVM cấu hình — kênh gia hạn ưu tiên | `APP` hoặc `USSD` hoặc `WEB` |
+| `renewal_method` | string | ❌ | Hình thức gia hạn (thủ công / tự động) | CVM cấu hình theo `auto_renewal_enabled` | `MANUAL` hoặc `AUTO` |
 | `renewal_attempts` | integer | ❌ | Số lần CVM đã nhắc gia hạn trong đợt này | CVM nội bộ — đếm số lần trigger đã fire | `1` |
 
 **Param template:**
 
 | Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
 |---|---|---|---|---|---|---|
-| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH chưa gia hạn sau khi hết hạn | Văn bản | CSV `msisdn` | — | `0901234567` |
-| `{{ten_goi_cu}}` | ✅ | Tên gói vừa hết hạn — để KH nhận ra và cân nhắc gia hạn lại | Văn bản | CSV `last_plan` | — | `GOI_DATA_70K` |
-| `{{ngay_het_han}}` | ✅ | Ngày gói đã hết hạn — xác nhận mốc cần hành động | Ngày (DD/MM/YYYY) | CSV `expiry_date` | — | `31/05/2026` |
-| `{{so_ngay_qua_han}}` | ✅ | Số ngày đã quá hạn — tạo cảm giác cấp bách | Số | CSV `days_since_expiry` | — | `3 ngày` |
-| `{{so_du_tai_khoan}}` | ✅ | Số dư tài khoản — để CVM gợi ý gói phù hợp mức tiền có sẵn | Tiền (VND) | CSV `balance` | — | `5.000 VNĐ` |
-| `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin nhắn thúc gia hạn | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH chưa gia hạn sau khi hết hạn | Văn bản | Payload `msisdn` | — | `0901234567` |
+| `{{ten_goi_cu}}` | ✅ | Tên gói vừa hết hạn — để KH nhận ra và cân nhắc gia hạn lại | Văn bản | Payload `last_plan` | — | `GOI_DATA_70K` |
+| `{{ngay_het_han}}` | ✅ | Ngày gói đã hết hạn — xác nhận mốc cần hành động | Ngày (DD/MM/YYYY) | Payload `expiry_date` | — | `31/05/2026` |
+| `{{so_ngay_qua_han}}` | ✅ | Số ngày đã quá hạn — tạo cảm giác cấp bách | Số | Payload `days_since_expiry` | — | `3 ngày` |
+| `{{so_du_tai_khoan}}` | ✅ | Số dư tài khoản — để CVM gợi ý gói phù hợp mức tiền có sẵn | Tiền (VND) | Payload `balance` | — | `5.000 VNĐ` |
+| `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin nhắn thúc gia hạn | Văn bản | Payload `full_name` hoặc CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{gia_goi_cu}}` | ❌ | Giá gói vừa hết hạn — để KH so sánh khi cân nhắc gia hạn | Tiền (VND) | Payload `last_plan_price` | không hiển thị giá | `70.000 VNĐ` |
+| `{{chuong_trinh_km}}` | ❌ | Chương trình khuyến mãi gia hạn để tăng động lực | Văn bản | Payload `promotion_code` | không hiện KM | `Giảm 20% khi gia hạn` |
+| `{{kenh_gia_han}}` | ❌ | Kênh gia hạn gợi ý để hướng dẫn KH thao tác | Văn bản | Payload `renewal_channel` | dùng kênh mặc định | `APP` |
 | `{{goi_gia_han_de_xuat}}` | ❌ | Tên gói gia hạn NBO đề xuất phù hợp số dư hiện có | Văn bản | CVM NBO dựa trên `balance` và `last_plan` | không hiện gợi ý | `GOI_DATA_50K` |
 
 ---
@@ -1193,58 +1363,71 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 
 ---
 
-#### Kỹ thuật — Batch/CSV
+##### 1.12 Event: KHÓA_1_CHIỀU (E_LOCK_1C)
 
-##### 2.23 File: `lock_1c_{YYYYMMDD}.csv` (E_LOCK_1C)
+**Mô tả:** KH bị khóa 1 chiều — tách 2 kịch bản: (A) hệ thống tác động (admin lock), (B) không sử dụng quá lâu
+**Trigger bởi:** BSS/OCS gọi API CVM
+**Yêu cầu kỹ thuật:** BSS/OCS gọi API CVM ngay khi thuê bao chuyển trạng thái LOCK_1C. CVM gửi USSD/Push hướng dẫn khôi phục.
+**Timing:** Ngay khi tài khoản bị khóa 1 chiều
 
-**Mô tả:** Danh sách KH bị khóa 1 chiều trong ngày — tách 2 kịch bản: (A) hệ thống tác động (admin lock), (B) không sử dụng quá lâu
-**Trigger bởi:** BSS (quét hàng ngày)
-**Thời điểm push:** 02:00–04:00 hàng ngày
+> **Cập nhật timing (2026-07-03):** Chuyển từ Batch/CSV `lock_1c` sang **NearRealtime** theo bảng trigger đã chốt. Bổ sung trường thông tin KH + nguyên nhân khóa + CTKM theo cột Mô tả trong bảng.
 
-| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+| Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
+| `event_type` | string | ✅ | Loại sự kiện | BSS — event name cố định | `LOCK_1C` |
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
-| `lock_1c_date` | date | ✅ | Ngày bị khóa 1 chiều | BSS — ngày chuyển trạng thái LOCK_1C | `2026-06-02` |
-| `lock_scenario` | string | ✅ | Kịch bản khóa | BSS phân loại: `SYSTEM_ACTION` hoặc `INACTIVE` | `INACTIVE` |
+| `event_timestamp` | datetime | ✅ | Thời điểm khóa 1 chiều | BSS — thời điểm chuyển trạng thái LOCK_1C | `2026-06-02 00:00:00` |
+| `full_name` | string(64) | ❌ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
+| `gender` | string | ❌ | Giới tính KH | `ekyc_data` → `gender` — chưa xác nhận nguồn | `MALE` |
+| `age_segment` | string | ❌ | Tuổi/phân khúc tuổi KH | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `25-34` |
+| `subscriber_tenure_days` | integer | ❌ | Tuổi thuê bao (số ngày đã dùng mạng) | BSS tính từ `resource.msisdn_status_history` | `365` |
+| `lock_scenario` | string | ✅ | Kịch bản khóa (nguyên nhân khóa 1 chiều) | BSS phân loại: `SYSTEM_ACTION` hoặc `INACTIVE` | `INACTIVE` |
 | `days_inactive` | integer | ❌ | Số ngày không sử dụng (nếu kịch bản INACTIVE) | BSS tính từ CDR | `90` |
 | `lock_reason_detail` | string | ❌ | Mô tả chi tiết lý do (nếu kịch bản SYSTEM_ACTION) | BSS — lý do admin lock | `FRAUD_SUSPECTED` |
-| `balance` | integer | ✅ | Số dư tài khoản (đồng) | OCS → BSS nightly batch | `0` |
+| `promotion_code` | string | ❌ | Chương trình khuyến mãi mở khóa/quay lại (nếu có) | OCS/CVM — chương trình KM đang chạy | `KM_MOKHOA_10PCT` |
+| `balance` | integer | ✅ | Số dư tài khoản (đồng) | OCS — số dư realtime | `0` |
 | `days_to_lock_2c` | integer | ❌ | Số ngày còn lại trước khi chuyển khóa 2 chiều | BSS tính theo quy định | `30` |
 
 **Param template:**
 
 | Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
 |---|---|---|---|---|---|---|
-| `{{so_dien_thoai}}` | ✅ | Số điện thoại bị khóa 1 chiều | Văn bản | CSV `msisdn` | — | `0901234567` |
-| `{{kich_ban_khoa}}` | ✅ | Kịch bản khóa để CVM phân nhánh nội dung hướng dẫn khôi phục phù hợp | Văn bản | CSV `lock_scenario` | — | `INACTIVE` |
-| `{{so_ngay_con_den_khoa_2c}}` | ❌ | Số ngày còn lại trước khi khóa 2 chiều — tạo urgency | Số | CSV `days_to_lock_2c` | không hiển thị đếm ngược | `30 ngày` |
-| `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin nhắn khóa 1 chiều | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại bị khóa 1 chiều | Văn bản | Payload `msisdn` | — | `0901234567` |
+| `{{nguyen_nhan_khoa}}` | ✅ | Nguyên nhân khóa 1 chiều để CVM phân nhánh nội dung hướng dẫn khôi phục | Văn bản | Payload `lock_scenario` | — | `INACTIVE` |
+| `{{so_ngay_con_den_khoa_2c}}` | ❌ | Số ngày còn lại trước khi khóa 2 chiều — tạo urgency | Số | Payload `days_to_lock_2c` | không hiển thị đếm ngược | `30 ngày` |
+| `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin nhắn khóa 1 chiều | Văn bản | Payload `full_name` hoặc CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{chuong_trinh_km}}` | ❌ | Chương trình khuyến mãi mở khóa để tăng động lực quay lại | Văn bản | Payload `promotion_code` | không hiện KM | `Giảm 10% khi mở khóa` |
 | `{{huong_dan_mo_khoa}}` | ✅ | Hướng dẫn cụ thể để KH tự mở khóa 1 chiều | Văn bản | CVM cấu hình tĩnh theo `lock_scenario` | — | `Sử dụng dịch vụ hoặc liên hệ 1800xxx` |
 
 ---
 
-##### 2.24 File: `pre_lock_2c_{YYYYMMDD}.csv` (E_PRE_LOCK_2C)
+##### 1.13 Event: TRƯỚC_KHI_KHÓA_2_CHIỀU (E_PRE_LOCK_2C)
 
-**Mô tả:** Danh sách KH đang ở trạng thái khóa 1 chiều và còn x ngày trước khi bị khóa 2 chiều (x do CVM cấu hình, thường 7 và 3 ngày)
-**Trigger bởi:** BSS (quét hàng ngày từ trạng thái LOCK_1C + ngày khóa)
-**Thời điểm push:** 02:00–04:00 hàng ngày
+**Mô tả:** KH đang ở trạng thái khóa 1 chiều và còn x ngày trước khi bị khóa 2 chiều (x do CVM cấu hình, thường 7 và 3 ngày)
+**Trigger bởi:** BSS gọi API CVM
+**Yêu cầu kỹ thuật:** BSS gọi API CVM ngay khi KH chạm mốc còn x ngày trước khóa 2 chiều. CVM gửi cảnh báo khẩn.
+**Timing:** Ngay khi KH còn đúng x ngày trước khi khóa 2 chiều
 
-| Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+> **Cập nhật timing (2026-07-03):** Chuyển từ Batch/CSV `pre_lock_2c` sang **NearRealtime** theo bảng trigger đã chốt.
+
+| Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
+| `event_type` | string | ✅ | Loại sự kiện | BSS — event name cố định | `PRE_LOCK_2C` |
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `event_timestamp` | datetime | ✅ | Thời điểm chạm mốc còn x ngày | BSS — thời điểm đủ điều kiện | `2026-06-25 08:00:00` |
 | `lock_1c_date` | date | ✅ | Ngày bắt đầu khóa 1 chiều | BSS — ngày chuyển trạng thái LOCK_1C | `2026-05-03` |
 | `lock_2c_scheduled_date` | date | ✅ | Ngày dự kiến khóa 2 chiều | BSS tính từ quy định (thường lock_1c_date + 30 ngày) | `2026-07-02` |
 | `days_to_lock_2c` | integer | ✅ | Số ngày còn lại trước khóa 2 chiều | BSS tính: `lock_2c_scheduled_date - ngay_hien_tai` | `7` |
 | `lock_scenario` | string | ✅ | Kịch bản khóa 1c ban đầu | BSS — `SYSTEM_ACTION` hoặc `INACTIVE` | `INACTIVE` |
-| `balance` | integer | ✅ | Số dư tài khoản (đồng) | OCS → BSS nightly batch | `0` |
+| `balance` | integer | ✅ | Số dư tài khoản (đồng) | OCS — số dư realtime | `0` |
 
 **Param template:**
 
 | Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
 |---|---|---|---|---|---|---|
-| `{{so_dien_thoai}}` | ✅ | Số điện thoại sắp bị khóa 2 chiều | Văn bản | CSV `msisdn` | — | `0901234567` |
-| `{{so_ngay_con_lai}}` | ✅ | Số ngày còn trước khi khóa 2 chiều — điểm nhấn urgency | Số | CSV `days_to_lock_2c` | — | `7 ngày` |
-| `{{ngay_khoa_2c_du_kien}}` | ✅ | Ngày dự kiến khóa 2 chiều — để KH nắm deadline | Ngày (DD/MM/YYYY) | CSV `lock_2c_scheduled_date` | — | `02/07/2026` |
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại sắp bị khóa 2 chiều | Văn bản | Payload `msisdn` | — | `0901234567` |
+| `{{so_ngay_con_lai}}` | ✅ | Số ngày còn trước khi khóa 2 chiều — điểm nhấn urgency | Số | Payload `days_to_lock_2c` | — | `7 ngày` |
+| `{{ngay_khoa_2c_du_kien}}` | ✅ | Ngày dự kiến khóa 2 chiều — để KH nắm deadline | Ngày (DD/MM/YYYY) | Payload `lock_2c_scheduled_date` | — | `02/07/2026` |
 | `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin nhắn cảnh báo khẩn | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
 | `{{huong_dan_mo_khoa}}` | ✅ | Hướng dẫn cụ thể để mở khóa trước deadline | Văn bản | CVM cấu hình tĩnh theo `lock_scenario` | — | `Đăng ký gói cước tại *101# hoặc ứng dụng` |
 
@@ -1273,3 +1456,12 @@ Không có trigger NearRealtime trong phạm vi hiện tại.
 | Q16 | E_LOCK_1C / E_PRE_LOCK_2C / E_LOCK_2C: BSS có sẵn trường ghi thời gian dự kiến chuyển trạng thái không? Hay CVM phải tự tính từ quy định nghiệp vụ? | E_LOCK_1C, E_PRE_LOCK_2C, E_LOCK_2C | 🟡 Quan trọng |
 | Q17 | Rule chặn E_ZERO_BALANCE vs E06: window 12h có đủ không, hay nên dùng window 24h? Ai owns logic chặn — CVM hay BSS? | E_ZERO_BALANCE, E06 | 🟡 Quan trọng |
 | Q18 | U08: Sau khi gộp `U_RENEWAL_STREAK` vào U08, ngưỡng `consecutive_renewals` theo từng milestone là bao nhiêu và gia hạn sớm được tính như thế nào trong chuỗi đủ điều kiện? | U08 | 🟡 Quan trọng |
+| Q19 | Các trường gửi OB (outbound): VTDĐ vừa gửi danh sách trường thông tin outbound mới — cần đối chiếu với payload/param hiện tại và bổ sung/chỉnh cho khớp. **[Chờ tài liệu VTDĐ]** | Tất cả trigger có gửi OB | 🔴 Cần ngay |
+| Q20 | Gói gợi ý (`goi_de_xuat`, `suggested_plan`...): hiện để "CVM NBO tự tính". VTDĐ có nguyên tắc riêng cho gói gợi ý — cần áp nguyên tắc VTDĐ thay vì để CVM tự quyết. **[Chờ nguyên tắc VTDĐ]** | Tất cả trigger có gói gợi ý | 🔴 Cần ngay |
+| Q21b | Nguyên tắc nâng gói (`recommendation_direction = UPSIZE`, `suggested_plan`): VTDĐ có nguyên tắc riêng xác định khi nào nâng và nâng lên gói nào — cần áp nguyên tắc VTDĐ. **[Chờ nguyên tắc VTDĐ]** | E_USAGE_NEED_ANALYSIS, U05-A, U05-B | 🔴 Cần ngay |
+| Q22 | U05-B: OCS có event/đếm được `consecutive_depleted_count` (số lần hết quota gói ngày/tuần liên tiếp) để phục vụ nhánh realtime 3 lần không? Nếu chỉ có CDR thì compute nặng | U05-B | 🔴 Cần ngay |
+| Q23 | E_CHURN_RISK: tính điểm/tổ hợp tín hiệu nguy cơ rời mạng ở BSS/OCS hay CVM nội bộ? Ngưỡng cụ thể (số ngày không lưu lượng, % suy giảm doanh thu, tỷ lệ on/off sóng) là bao nhiêu và ai owns? Quan hệ với E_SEGMENT_UPDATE thế nào? | E_CHURN_RISK, E_SEGMENT_UPDATE | 🔴 Cần ngay |
+| Q24 | Các trigger vừa chuyển sang NearRealtime (E02, E04, E05, E09, U_PRE_EXPIRY, U_POST_EXPIRY, E_LOCK_1C, E_PRE_LOCK_2C): BSS/OCS/SuperApp có khả năng push realtime theo đúng điều kiện (đủ 24h/72h/x ngày/x phút) không, hay chỉ quét batch được? Cần xác nhận tính khả thi | Các trigger chuyển RT | 🔴 Cần ngay |
+| Q25 | E09: X phút (ngưỡng bỏ dở hành trình mua) và cơ chế SuperApp phát hiện "để lại SĐT" là gì? SuperApp track được `journey_start_at` và phân biệt `journey_type` không? | E09 | 🟡 Quan trọng |
+| Q26 | U07: BSS phân loại được `swap_type` (4 case) và `is_reissue` (đổi phôi cùng loại) trong sự kiện sim_swap không? | U07 | 🟡 Quan trọng |
+| Q27 | E_SEGMENT_UPDATE: phân khúc nghề nghiệp/nhân khẩu (HSSV, tài xế/tự do, CBCNVVP, KOL/KOC, hưu trí) lấy từ nguồn nào — eKYC có đủ để phân loại không? (liên quan Q6) | E_SEGMENT_UPDATE | 🔴 Cần ngay |

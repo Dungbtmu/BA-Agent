@@ -5,6 +5,10 @@
 >
 > Cập nhật: 2026-06-03 — Tái cấu trúc toàn bộ theo 4 nhóm vòng đời (Kích hoạt / Sử dụng / Gia hạn / Khóa); bổ sung 14 trigger mới; chốt E_ZERO_BALANCE giữ lại (ranh giới rõ với E06)
 > Trạng thái: **DRAFT — cần xác nhận với Tech Lead / SA**
+>
+> **⚠️ Cập nhật 2026-07-03 — Bản chuẩn mới nhất là `data-contract-template-lifecycle.md`.**
+> File này được đồng bộ các thay đổi cốt lõi (thêm trigger `E_CHURN_RISK`, rule E08 90%/lần 3). Các thay đổi chi tiết theo bảng trigger đầy đủ — đổi timing sang NearRealtime (E02, E04, E05, E09, U_PRE_EXPIRY, U_POST_EXPIRY, E_LOCK_1C, E_PRE_LOCK_2C), thêm `U05-B` nhánh realtime 3 lần, bổ sung trường KH/kênh/chu kỳ gói (U02 `plan_cycle`, U04/U06 chỉ gói tháng, U07 4 case + đổi phôi, U09 sinh nhật nhà mạng, E_USAGE_NEED_ANALYSIS chốt 2 tháng, E_NO_PLAN_X_DAYS mốc x=10, chuẩn hóa phân khúc HSSV/tài xế/CBCNVVP/hưu trí) — **được đặc tả đầy đủ trong `data-contract-template-lifecycle.md`**. Khi có khác biệt giữa 2 file, lấy bản `-lifecycle.md` làm chuẩn.
+> Nhóm Open Question chờ tài liệu VTDĐ (trường OB, nguyên tắc gói gợi ý, nguyên tắc nâng gói): xem Phần Open Questions của bản `-lifecycle.md`.
 
 **Quy ước chung:**
 - Encoding: UTF-8
@@ -142,6 +146,8 @@
 **Timing:** Ngay khi vượt ngưỡng 80%
 
 > **Lưu ý ngưỡng cảnh báo:** Tỷ lệ 80% (hoặc x%) là ngưỡng do **CVM cấu hình**, không cứng trong OCS. OCS chỉ cần expose API nhận ngưỡng từ CVM và fire event khi vượt ngưỡng đó. Khi CVM muốn thay đổi ngưỡng cảnh báo (ví dụ: từ 80% xuống 70%), chỉ cần cập nhật cấu hình CVM mà không cần BSS/OCS thay đổi logic.
+>
+> **Rule tần suất gửi (2026-07-03):** Đề xuất ngưỡng **90%**. Mỗi ngày CVM chỉ gửi **1 lần** khi KH chạm ngưỡng. Nếu KH lặp lại pattern nhiều ngày, đến **lần thứ 3** (bắt trigger lần 3) mới chuyển sang đề xuất nâng/đổi gói thay vì chỉ nhắc mua thêm data ngày. Ngưỡng % và số lần do CVM cấu hình. Dùng trường `depleted_trigger_count`.
 
 | Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
@@ -363,6 +369,44 @@
 | `{{loai_goi_da_huy}}` | ✅ | Loại gói để phân nhánh nội dung giữ chân phù hợp | Văn bản | Payload `cancelled_plan_type` | — | `DATA` |
 | `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin nhắn giữ chân | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
 | `{{goi_thay_the_de_xuat}}` | ❌ | Tên gói thay thế NBO đề xuất để KH cân nhắc | Văn bản | CVM NBO | không hiện gợi ý | `GOI_DATA_50K` |
+
+---
+
+---
+
+#### Event: THUÊ_BAO_NGUY_CƠ_RỜI_MẠNG (E_CHURN_RISK)
+
+**Trigger bởi:** OCS/BSS gọi API CVM (phân tích tổ hợp tín hiệu nhiều ngày)
+**Yêu cầu kỹ thuật:** BSS/OCS phân tích tổ hợp tín hiệu theo chu kỳ (nightly), khi KH vượt ngưỡng nguy cơ rời mạng thì gọi API CVM để đưa vào luồng giữ chân. Các ngưỡng do CVM cấu hình, BSS/OCS không hardcode.
+**Timing:** Ngay khi phát hiện KH vượt ngưỡng nguy cơ rời mạng (theo chu kỳ phân tích)
+
+> **Mô tả:** KH có dấu hiệu nguy cơ rời mạng, xác định qua tổ hợp tín hiệu: không phát sinh lưu lượng liên tiếp 5–7 ngày, không phát sinh cước trong 30 ngày, doanh thu suy giảm ≥80% so với trung bình 2 tháng gần nhất, tỷ lệ bật/tắt sóng SIM bất thường. Phân biệt với `E_SEGMENT_UPDATE` (CHURN_RISK): E_CHURN_RISK là tín hiệu phát hiện dựa trên tiêu chí cụ thể; E_SEGMENT_UPDATE là kết quả cập nhật phân khúc tổng hợp. Xem thêm bản `data-contract-template-lifecycle.md`.
+
+| Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+|---|---|---|---|---|---|
+| `event_type` | string | ✅ | Loại sự kiện | BSS/OCS — event name cố định | `CHURN_RISK_DETECTED` |
+| `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `event_timestamp` | datetime | ✅ | Thời điểm phát hiện nguy cơ rời mạng | BSS/OCS — thời điểm phân tích đủ điều kiện | `2026-06-03 03:00:00` |
+| `no_usage_days` | integer | ✅ | Số ngày liên tiếp không phát sinh lưu lượng | OCS/BSS tính từ CDR | `6` |
+| `no_charge_days` | integer | ✅ | Số ngày không phát sinh cước | OCS/BSS tính từ CDR/giao dịch | `30` |
+| `revenue_avg_2months` | integer | ❌ | Doanh thu trung bình 2 tháng gần nhất (đồng) | OCS/BSS tổng hợp | `80000` |
+| `revenue_drop_pct` | float | ✅ | % suy giảm doanh thu so với trung bình 2 tháng gần nhất | BSS tính | `87.5` |
+| `sim_on_off_ratio` | float | ❌ | Tỷ lệ bật/tắt sóng của SIM trong kỳ | HLR/BSS | `0.65` |
+| `churn_risk_level` | string | ❌ | Mức độ nguy cơ | BSS/CVM phân loại | `HIGH` hoặc `MEDIUM` |
+| `full_name` | string(64) | ❌ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
+| `gender` | string | ❌ | Giới tính KH | `ekyc_data` → `gender` — chưa xác nhận nguồn | `MALE` |
+| `age_segment` | string | ❌ | Tuổi/phân khúc tuổi KH | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `25-34` |
+| `subscriber_tenure_days` | integer | ❌ | Tuổi thuê bao (số ngày đã dùng mạng) | BSS tính từ `resource.msisdn_status_history` | `540` |
+| `promotion_code` | string | ❌ | Chương trình khuyến mãi giữ chân (nếu có) | OCS/CVM | `KM_GIUCHAN_30PCT` |
+
+**Param template:**
+
+| Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
+|---|---|---|---|---|---|---|
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH có nguy cơ rời mạng | Văn bản | Payload `msisdn` | — | `0901234567` |
+| `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin giữ chân | Văn bản | Payload `full_name` hoặc CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{muc_do_nguy_co}}` | ❌ | Mức độ nguy cơ để CVM chọn cường độ chiến dịch | Văn bản | Payload `churn_risk_level` | mức mặc định | `HIGH` |
+| `{{goi_giu_chan_de_xuat}}` | ❌ | Tên gói/ưu đãi CVM đề xuất để giữ chân | Văn bản | CVM NBO | không hiện gợi ý | `GOI_GIAM_GIA_30PCT` |
 
 ---
 
