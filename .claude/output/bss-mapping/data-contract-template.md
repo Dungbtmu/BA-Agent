@@ -7,7 +7,7 @@
 > Trạng thái: **DRAFT — cần xác nhận với Tech Lead / SA**
 >
 > **⚠️ Cập nhật 2026-07-03 — Bản chuẩn mới nhất là `data-contract-template-lifecycle.md`.**
-> File này được đồng bộ các thay đổi cốt lõi (thêm trigger `E_CHURN_RISK`, rule E08 90%/lần 3). Các thay đổi chi tiết theo bảng trigger đầy đủ — đổi timing sang NearRealtime (E02, E04, E05, E09, U_PRE_EXPIRY, U_POST_EXPIRY, E_LOCK_1C, E_PRE_LOCK_2C), thêm `U05-B` nhánh realtime 3 lần, bổ sung trường KH/kênh/chu kỳ gói (U02 `plan_cycle`, U04/U06 chỉ gói tháng, U07 4 case + đổi phôi, U09 sinh nhật nhà mạng, E_USAGE_NEED_ANALYSIS chốt 2 tháng, E_NO_PLAN_X_DAYS mốc x=10, chuẩn hóa phân khúc HSSV/tài xế/CBCNVVP/hưu trí) — **được đặc tả đầy đủ trong `data-contract-template-lifecycle.md`**. Khi có khác biệt giữa 2 file, lấy bản `-lifecycle.md` làm chuẩn.
+> File này được đồng bộ các thay đổi cốt lõi (thêm trigger `E_CHURN_RISK`, rule E08 90%/lần 3). Các thay đổi chi tiết theo bảng trigger đầy đủ — đổi timing sang NearRealtime (E02, E04, E05, E09, U_PRE_EXPIRY, U_POST_EXPIRY, E_LOCK_1C, E_PRE_LOCK_2C), thêm trigger **`U05-B-RT`** (NearRealtime, riêng biệt với `U05-B` batch — KHÔNG gộp chung schema) khi KH hết quota ngày/tuần 3 lần liên tiếp, bổ sung trường KH/kênh/chu kỳ gói (U02 `plan_cycle`, U04/U06 chỉ gói tháng, U07 4 case + đổi phôi, U09 sinh nhật nhà mạng, E_USAGE_NEED_ANALYSIS chốt 2 tháng, E_NO_PLAN_X_DAYS mốc x=10, chuẩn hóa phân khúc HSSV/tài xế/CBCNVVP/hưu trí) — **được đặc tả đầy đủ trong `data-contract-template-lifecycle.md`**. Khi có khác biệt giữa 2 file, lấy bản `-lifecycle.md` làm chuẩn.
 > Nhóm Open Question chờ tài liệu VTDĐ (trường OB, nguyên tắc gói gợi ý, nguyên tắc nâng gói): xem Phần Open Questions của bản `-lifecycle.md`.
 
 **Quy ước chung:**

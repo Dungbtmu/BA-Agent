@@ -25,7 +25,7 @@ Tài liệu được tổ chức lại theo sơ đồ vòng đời CVM. Mỗi nh
 |---|---|---|---|
 | NHÓM 1 — Kích hoạt | VIỄN THÔNG | E01 | Không có |
 | NHÓM 1 — Kích hoạt | APP | E02 | Không có |
-| NHÓM 2 — Sử dụng | VIỄN THÔNG | U01, U03, E08, E_DATA_100, E_VOICE_100, E06, E_ZERO_BALANCE, E_CANCEL_PLAN, E05, E_CHURN_RISK | U04, E13, E_USAGE_NEED_ANALYSIS, U09, U10, E_SEGMENT_UPDATE, E_NO_PLAN_X_DAYS, E11, U02, U05-A, U05-B, U06, U07 |
+| NHÓM 2 — Sử dụng | VIỄN THÔNG | U01, U03, E08, E_DATA_100, E_VOICE_100, E06, E_ZERO_BALANCE, E_CANCEL_PLAN, E05, E_CHURN_RISK, U05-B-RT | U04, E13, E_USAGE_NEED_ANALYSIS, U09, U10, E_SEGMENT_UPDATE, E_NO_PLAN_X_DAYS, E11, U02, U05-A, U05-B, U06, U07 |
 | NHÓM 2 — Sử dụng | APP | E03, E_CONTENT_FAIL, E_APP_RATING, E04, E09 | E07, E_APP_INACTIVE_X_DAYS |
 | NHÓM 3 — Gia hạn gói/dịch vụ | GIA HẠN | U_PRE_EXPIRY, U_POST_EXPIRY | U08 |
 | NHÓM 4 — Khóa 1c/Khóa 2c | KHÓA 1C/2C | E_LOCK_2C, E_LOCK_1C, E_PRE_LOCK_2C | Không có |
@@ -35,7 +35,7 @@ Tài liệu được tổ chức lại theo sơ đồ vòng đời CVM. Mỗi nh
 > **Cập nhật 2026-07-03 — chốt theo bảng trigger đầy đủ (cột "Loại xử lý"):**
 > - Chuyển sang **NearRealtime**: `E02` (chưa cài app 24h), `E04` (chưa mở app 24h), `E05` (chưa phát sinh cước 72h), `E09` (hành trình mua SIM/gói bỏ dở), `U_PRE_EXPIRY`, `U_POST_EXPIRY`, `E_LOCK_1C`, `E_PRE_LOCK_2C`.
 > - Thêm trigger **`E_CHURN_RISK`** — cảnh báo thuê bao có nguy cơ rời mạng (không lưu lượng 5–7 ngày, không cước 30 ngày, doanh thu giảm ≥80% so với trung bình 2 tháng, tỷ lệ bật/tắt sóng SIM).
-> - Tách **`U05`** thành **`U05-A`** (gói data tháng) và **`U05-B`** (pattern hết quota data ngày) để đồng bộ với `data-contract-template.md`.
+> - Tách **`U05`** thành **`U05-A`** (gói data tháng) và **`U05-B`** (pattern hết quota data ngày, Batch) để đồng bộ với `data-contract-template.md`. Bổ sung thêm **`U05-B-RT`** — trigger NearRealtime riêng biệt khi KH hết quota ngày/tuần 3 lần liên tiếp (không gộp chung schema với U05-B batch).
 
 ---
 
@@ -837,7 +837,7 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 
 > **Phạm vi áp dụng:** Chỉ KH đang dùng gói có quota data reset hàng ngày (gói ngày, gói tuần chia data/ngày). Không áp dụng cho gói tháng — xem `billing_2month_{YYYYMM}.csv` (U05-A).
 >
-> **Nhánh realtime bổ sung (2026-07-03):** Ngoài file batch pattern nhiều tháng, bổ sung nhánh **NearRealtime**: khi KH hết quota gói ngày/tuần **3 lần liên tiếp** (3 ngày hết gói ngày, hoặc 3 chu kỳ hết gói tuần) thì OCS gọi API CVM đề xuất nâng gói ngay — không đợi tổng hợp cuối tháng. Ngưỡng 3 lần do CVM cấu hình.
+> **Phân biệt với U05-B-RT:** File batch này dùng để phân tích **pattern nhiều tháng** (tư vấn nâng/hạ gói định kỳ, không cấp bách). Trường hợp KH hết quota **3 lần liên tiếp trong thời gian ngắn** (cấp bách hơn, cần đề xuất ngay) dùng trigger riêng **`U05-B-RT`** bên dưới — không gộp chung schema.
 >
 > **⚠️ Vấn đề nguồn dữ liệu (Q21):** Để biết "ngày X KH có hết quota/ngày không", OCS cần event quota/ngày về 0 hoặc BSS tính từ CDR. Nếu OCS không có event này thì compute nặng — cần xác nhận với BSS/Tech.
 
@@ -847,9 +847,8 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 | `current_plan` | string | ✅ | Gói ngày/tuần đang dùng | OCS → BSS nightly batch | `GOI_DATA_NGAY_10K` |
 | `plan_cycle` | string | ✅ | Chu kỳ gói | OCS — định nghĩa gói | `DAILY` hoặc `WEEKLY` |
 | `daily_quota_mb` | integer | ✅ | Hạn mức data/ngày của gói (MB) | OCS — theo định nghĩa gói | `500` |
-| `consecutive_depleted_count` | integer | ✅ | Số lần hết quota liên tiếp (dùng cho nhánh realtime — ngưỡng 3) | OCS (event quota về 0) hoặc BSS từ CDR — cần xác nhận (Q21) | `3` |
-| `month1_depleted_days` | integer | ❌ | Số ngày trong tháng 1 hết quota (dùng cho nhánh batch pattern) | OCS/BSS — cần xác nhận (Q21) | `18` |
-| `month2_depleted_days` | integer | ❌ | Số ngày trong tháng 2 hết quota (dùng cho nhánh batch pattern) | OCS/BSS — cần xác nhận (Q21) | `20` |
+| `month1_depleted_days` | integer | ✅ | Số ngày trong tháng 1 hết quota | OCS/BSS — cần xác nhận (Q21) | `18` |
+| `month2_depleted_days` | integer | ✅ | Số ngày trong tháng 2 hết quota | OCS/BSS — cần xác nhận (Q21) | `20` |
 | `month1_total_data_gb` | float | ❌ | Tổng data tháng 1 (GB) | OCS → BSS nightly batch | `14.2` |
 | `month2_total_data_gb` | float | ❌ | Tổng data tháng 2 (GB) | OCS → BSS nightly batch | `15.0` |
 | `suggested_daily_plan` | string | ❌ | Gói ngày lớn hơn đề xuất | OCS hoặc CVM NBO | `GOI_DATA_NGAY_15K` |
@@ -864,10 +863,44 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 | `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin gợi ý | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
 | `{{so_dien_thoai}}` | ✅ | Số điện thoại KH hết quota gói ngày/tuần thường xuyên | Văn bản | CSV `msisdn` | — | `0901234567` |
 | `{{ten_goi_hien_tai}}` | ✅ | Gói ngày/tuần đang dùng — làm ngữ cảnh gợi ý | Văn bản | CSV `current_plan` | — | `GOI_DATA_NGAY_10K` |
-| `{{so_lan_het_lien_tiep}}` | ❌ | Số lần hết quota liên tiếp — bằng chứng cho nhánh realtime | Số | CSV `consecutive_depleted_count` | — | `3 lần` |
 | `{{han_muc_data_ngay_mb}}` | ✅ | Hạn mức data/ngày của gói hiện tại | Số | CSV `daily_quota_mb` | — | `500 MB` |
 | `{{goi_ngay_nang_de_xuat}}` | ❌ | Gói ngày lớn hơn NBO đề xuất | Văn bản | CSV `suggested_daily_plan` hoặc CVM NBO | không hiện | `GOI_DATA_NGAY_15K` |
 | `{{goi_thang_upsell_de_xuat}}` | ❌ | Gói tháng NBO đề xuất thay thế | Văn bản | CSV `suggested_monthly_plan` hoặc CVM NBO | không hiện | `GOI_DATA_70K` |
+
+---
+
+##### Event: HẾT_QUOTA_NGÀY_LIÊN_TIẾP (U05-B-RT)
+
+**Mô tả:** KH hết quota gói ngày/tuần **3 lần liên tiếp** (3 ngày hết gói ngày, hoặc 3 chu kỳ hết gói tuần) — tín hiệu cấp bách hơn pattern nhiều tháng của U05-B, cần đề xuất nâng gói ngay, không đợi tổng hợp cuối tháng.
+**Trigger bởi:** OCS gọi API CVM
+**Yêu cầu kỹ thuật:** OCS đếm số lần liên tiếp KH hết quota gói ngày/tuần; ngay khi chạm ngưỡng (đề xuất 3 lần, do CVM cấu hình) thì gọi API CVM. CVM gửi đề xuất nâng gói trong vòng vài phút.
+**Timing:** Ngay khi đủ N lần hết quota liên tiếp (đề xuất N = 3)
+
+> **Phân biệt với U05-B:** Đây là trigger **NearRealtime riêng biệt**, không phải cùng file/schema với `U05-B` batch. `U05-B` phân tích pattern nhiều tháng để tư vấn định kỳ; `U05-B-RT` phản ứng ngay khi phát hiện chuỗi hết quota liên tiếp trong thời gian ngắn.
+>
+> **⚠️ Vấn đề nguồn dữ liệu (Q21):** Cần OCS có event quota/ngày về 0 theo thời gian thực để đếm được `consecutive_depleted_count` ngay lập tức. Nếu OCS chỉ ghi CDR (không có event realtime) thì không thể làm nhánh này NearRealtime — cần xác nhận với BSS/Tech trước khi implement.
+
+| Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
+|---|---|---|---|---|---|
+| `event_type` | string | ✅ | Loại sự kiện | OCS — event name cố định | `DAILY_QUOTA_DEPLETED_STREAK` |
+| `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
+| `event_timestamp` | datetime | ✅ | Thời điểm chạm đủ N lần liên tiếp | OCS — thời điểm đủ điều kiện | `2026-05-15 23:50:00` |
+| `current_plan` | string | ✅ | Gói ngày/tuần đang dùng | OCS — tên gói đang active | `GOI_DATA_NGAY_10K` |
+| `plan_cycle` | string | ✅ | Chu kỳ gói | OCS — định nghĩa gói | `DAILY` hoặc `WEEKLY` |
+| `daily_quota_mb` | integer | ✅ | Hạn mức data/ngày của gói (MB) | OCS — theo định nghĩa gói | `500` |
+| `consecutive_depleted_count` | integer | ✅ | Số lần hết quota liên tiếp tính đến thời điểm trigger | OCS (event quota về 0) — cần xác nhận (Q21) | `3` |
+| `balance` | integer | ❌ | Số dư tài khoản hiện tại (đồng) | OCS — số dư realtime | `25000` |
+| `suggested_daily_plan` | string | ❌ | Gói ngày lớn hơn đề xuất | OCS hoặc CVM NBO | `GOI_DATA_NGAY_15K` |
+
+**Param template:**
+
+| Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
+|---|---|---|---|---|---|---|
+| `{{so_dien_thoai}}` | ✅ | Số điện thoại KH vừa hết quota liên tiếp N lần | Văn bản | Payload `msisdn` | — | `0901234567` |
+| `{{so_lan_het_lien_tiep}}` | ✅ | Số lần hết quota liên tiếp — bằng chứng cho đề xuất nâng gói ngay | Số | Payload `consecutive_depleted_count` | — | `3 lần` |
+| `{{ten_goi_hien_tai}}` | ✅ | Gói ngày/tuần đang dùng — làm ngữ cảnh đề xuất | Văn bản | Payload `current_plan` | — | `GOI_DATA_NGAY_10K` |
+| `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin đề xuất | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{goi_ngay_nang_de_xuat}}` | ❌ | Gói ngày lớn hơn NBO đề xuất ngay | Văn bản | Payload `suggested_daily_plan` hoặc CVM NBO | không hiện | `GOI_DATA_NGAY_15K` |
 
 ---
 
@@ -1459,7 +1492,7 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 | Q19 | Các trường gửi OB (outbound): VTDĐ vừa gửi danh sách trường thông tin outbound mới — cần đối chiếu với payload/param hiện tại và bổ sung/chỉnh cho khớp. **[Chờ tài liệu VTDĐ]** | Tất cả trigger có gửi OB | 🔴 Cần ngay |
 | Q20 | Gói gợi ý (`goi_de_xuat`, `suggested_plan`...): hiện để "CVM NBO tự tính". VTDĐ có nguyên tắc riêng cho gói gợi ý — cần áp nguyên tắc VTDĐ thay vì để CVM tự quyết. **[Chờ nguyên tắc VTDĐ]** | Tất cả trigger có gói gợi ý | 🔴 Cần ngay |
 | Q21b | Nguyên tắc nâng gói (`recommendation_direction = UPSIZE`, `suggested_plan`): VTDĐ có nguyên tắc riêng xác định khi nào nâng và nâng lên gói nào — cần áp nguyên tắc VTDĐ. **[Chờ nguyên tắc VTDĐ]** | E_USAGE_NEED_ANALYSIS, U05-A, U05-B | 🔴 Cần ngay |
-| Q22 | U05-B: OCS có event/đếm được `consecutive_depleted_count` (số lần hết quota gói ngày/tuần liên tiếp) để phục vụ nhánh realtime 3 lần không? Nếu chỉ có CDR thì compute nặng | U05-B | 🔴 Cần ngay |
+| Q22 | U05-B-RT: OCS có event realtime khi quota/ngày về 0 để đếm `consecutive_depleted_count` ngay lập tức không? Nếu chỉ có CDR (không có event realtime) thì không thể làm trigger này NearRealtime — phải gộp lại thành báo cáo batch | U05-B-RT | 🔴 Cần ngay |
 | Q23 | E_CHURN_RISK: tính điểm/tổ hợp tín hiệu nguy cơ rời mạng ở BSS/OCS hay CVM nội bộ? Ngưỡng cụ thể (số ngày không lưu lượng, % suy giảm doanh thu, tỷ lệ on/off sóng) là bao nhiêu và ai owns? Quan hệ với E_SEGMENT_UPDATE thế nào? | E_CHURN_RISK, E_SEGMENT_UPDATE | 🔴 Cần ngay |
 | Q24 | Các trigger vừa chuyển sang NearRealtime (E02, E04, E05, E09, U_PRE_EXPIRY, U_POST_EXPIRY, E_LOCK_1C, E_PRE_LOCK_2C): BSS/OCS/SuperApp có khả năng push realtime theo đúng điều kiện (đủ 24h/72h/x ngày/x phút) không, hay chỉ quét batch được? Cần xác nhận tính khả thi | Các trigger chuyển RT | 🔴 Cần ngay |
 | Q25 | E09: X phút (ngưỡng bỏ dở hành trình mua) và cơ chế SuperApp phát hiện "để lại SĐT" là gì? SuperApp track được `journey_start_at` và phân biệt `journey_type` không? | E09 | 🟡 Quan trọng |
