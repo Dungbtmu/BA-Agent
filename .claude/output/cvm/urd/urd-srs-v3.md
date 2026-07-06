@@ -119,9 +119,8 @@ Vai trò trong vòng đời dự án: tài liệu này là đầu ra của giai 
 | 15 | Kill Switch | Hành động dừng campaign đang Active ngay lập tức; message đang trong queue sẽ bị hủy |
 | 16 | Delivery Rate | Tỉ lệ % tin nhắn được gửi thành công / tổng tin gửi |
 | 17 | Conversion Rate | Tỉ lệ % khách hàng thực hiện hành động mục tiêu (cài app, mua gói...) / tổng reach |
-| 18 | Spam Risk Score | Điểm đánh giá nguy cơ spam (0–100); cảnh báo khi vượt 60; tính từ opt-out rate, BL trend, avg msg/user, failed delivery |
-| 19 | Customer 360 | Màn hình tổng hợp toàn bộ thông tin một khách hàng: profile, trạng thái kênh, lịch sử nhận tin, throttling |
-| 20 | Throttling | Cơ chế giới hạn số tin nhắn tối đa một khách hàng nhận trong khoảng thời gian nhất định |
+| 18 | Customer 360 | Màn hình tổng hợp toàn bộ thông tin một khách hàng: profile, trạng thái kênh, lịch sử nhận tin, throttling |
+| 19 | Throttling | Cơ chế giới hạn số tin nhắn tối đa một khách hàng nhận trong khoảng thời gian nhất định |
 | 21 | Global Params | Tập hợp tham số động toàn cục — union của payload từ tất cả trigger trong hệ thống; dùng để cá nhân hóa nội dung trong Template Editor; tại runtime hệ thống điền giá trị thực từ payload của trigger kích hoạt; nếu trigger không có param đó → hiển thị chuỗi rỗng |
 
 ### I.3.2. Định nghĩa từ viết tắt
@@ -484,7 +483,7 @@ Hệ thống Quản lý Giá trị Khách hàng (CVM)
 **Khối 3 — Quản lý Sự kiện kích hoạt**
 - Mục đích: Admin khai báo trigger và tham số đầu ra trực tiếp trên UI; QTV tra cứu để lấy cú pháp `{{tham_so}}` khi soạn tin
 - Giá trị nghiệp vụ: QTV cần tra cứu danh sách trigger và thông tin payload để cấu hình campaign
-- Các chức năng con: Xem danh sách (nhóm theo loại: Tức thời / Gần tức thời / Theo lô), Xem chi tiết, Khai báo trigger mới (Admin), Thêm/xóa tham số đầu ra (Admin)
+- Các chức năng con: Xem danh sách (dạng bảng, lọc theo Kiểu chạy: Realtime / Near Realtime / Offline), Xem chi tiết, Khai báo trigger mới (Admin), Thêm/xóa tham số đầu ra (Admin)
 
 **Khối 4 — Quản lý Danh sách chặn (Blacklist Management)**
 - Mục đích: Kiểm soát danh sách số điện thoại bị chặn gửi tin theo từng chiến dịch và kênh cụ thể; đồng bộ 2 chiều với cấu hình Blacklist trong Campaign Builder
@@ -1113,10 +1112,10 @@ CVM query thông tin này từ BSS qua Integration Layer khi tải trang — kh�
 | **Mục tiêu** | Cho phép khôi phục campaign đã dừng mà không cần gửi duyệt lại, miễn là không có thay đổi nội dung |
 | **Tác nhân** | QTV Marketing, Admin Hệ thống |
 | **Trigger** | Click [Bật] trên campaign Paused trong Campaign List hoặc Campaign Detail View |
-| **Tiền điều kiện** | - Campaign ở trạng thái Paused |
+| **Tiền điều kiện** | - Campaign ở trạng thái Paused <br>- Campaign không còn cờ `PARAM_INVALID` |
 | **Hậu điều kiện** | - Campaign chuyển → Active; hệ thống tiếp tục lắng nghe trigger |
-| **Hoạt động** | 1. Người dùng click [Bật] <br>1a. Hệ thống chuyển trạng thái → Active ngay (không cần confirm); toast "Campaign đã kích hoạt lại"; button chuyển từ [Bật] → [Dừng] |
-| **Quy tắc nghiệp vụ** | - Kích hoạt lại không cần duyệt lại, không cần confirm dialog (ngược với Kill Switch) <br>- Muốn sửa nội dung campaign Paused: QTV dùng nút [Sửa] → Campaign Builder → chỉnh sửa → [Lưu nháp] → campaign chuyển về Draft → gửi duyệt lại theo flow bình thường |
+| **Hoạt động** | 1. Người dùng click [Bật] <br>1a. Hệ thống chuyển trạng thái → Active ngay (không cần confirm); toast "Campaign đã kích hoạt lại"; button chuyển từ [Bật] → [Dừng] <br>**[Exception — còn cờ PARAM_INVALID]**: Nút [Bật] disabled; hover → tooltip "Campaign đang có tham số không hợp lệ do trigger đã thay đổi — vui lòng vào [Sửa] để cập nhật nội dung message trước khi gửi duyệt lại"; QTV chỉ còn lựa chọn [Sửa], không có đường tắt bật thẳng |
+| **Quy tắc nghiệp vụ** | - Kích hoạt lại không cần duyệt lại, không cần confirm dialog (ngược với Kill Switch) — áp dụng khi campaign Paused không có cờ lỗi nào <br>- Muốn sửa nội dung campaign Paused: QTV dùng nút [Sửa] → Campaign Builder → chỉnh sửa → [Lưu nháp] → campaign chuyển về Draft → gửi duyệt lại theo flow bình thường (qua Admin duyệt, không kích hoạt thẳng) <br>- Campaign Paused do policy `PARAM_INVALID` (xem Quy tắc nghiệp vụ chung — Khối 3): [Bật] bị khóa vĩnh viễn cho đến khi campaign được sửa qua [Sửa] → Draft → gửi duyệt lại → Admin duyệt → Active; đây là **con đường duy nhất** để resume — không tồn tại việc "sửa nội dung xong rồi bật thẳng" vì [Sửa] luôn đưa campaign về Draft, ra khỏi phạm vi UC-CAM-07 |
 
 ---
 
@@ -1221,13 +1220,13 @@ CVM query thông tin này từ BSS qua Integration Layer khi tải trang — kh�
 | Nội dung | Mô tả |
 |----------|-------|
 | **Tên** | Xem danh sách Sự kiện kích hoạt |
-| **Mục tiêu** | Cho phép người dùng xem toàn bộ danh sách trigger nhóm theo kiểu chạy; tìm kiếm nhanh và điều hướng sang xem chi tiết |
+| **Mục tiêu** | Cho phép người dùng xem toàn bộ danh sách trigger dạng bảng, lọc theo kiểu chạy, tìm kiếm nhanh và điều hướng sang xem chi tiết |
 | **Tác nhân** | Admin Hệ thống, QTV Marketing |
 | **Trigger** | Người dùng click nav "Trigger" → /triggers |
 | **Tiền điều kiện** | - Người dùng đã đăng nhập |
 | **Hậu điều kiện** | - Danh sách trigger hiển thị đúng trạng thái hiện tại; không thay đổi dữ liệu |
-| **Hoạt động** | 1. Hệ thống tải và hiển thị danh sách trigger nhóm thành 3 collapsible groups: Realtime / Near Realtime / Offline <br>1a. Mỗi dòng hiển thị: Trigger code, Tên, Source, Trạng thái, Hành động <br>2. Người dùng tùy chọn click header group → collapse/expand nhóm <br>3. Người dùng tùy chọn nhập từ khóa tìm kiếm (tên hoặc trigger code) <br>3a. Hệ thống lọc realtime, highlight kết quả khớp, tự động expand group chứa kết quả <br>4a. **QTV** click [Xem] → UC-TRG-02 (chỉ đọc) <br>4b. **Admin** click [Xem / Sửa] → UC-TRG-02 với quyền chỉnh sửa tham số; click [+ Thêm trigger] → UC-TRG-03 |
-| **Quy tắc nghiệp vụ** | - Loại trigger quyết định nhóm hiển thị: Realtime / Near Realtime / Offline <br>- Trigger Inactive hiển thị grayed out với label "Không còn sử dụng"; vẫn hiển thị trong danh sách, không bị ẩn — để QTV có thể tra cứu thông tin params <br>- Trigger Inactive không xuất hiện trong dropdown khi QTV tạo campaign mới <br>- QTV: cột Hành động chỉ có [Xem]; Admin: cột Hành động có [Xem / Sửa] và nút [+ Thêm trigger] phía trên bảng |
+| **Hoạt động** | 1. Hệ thống tải và hiển thị danh sách trigger dạng bảng phẳng (mặc định sắp xếp theo Trigger code A-Z) <br>1a. Mỗi dòng hiển thị: Trigger code, Tên, Kiểu chạy (badge), Nguồn sự kiện, Trạng thái, Hành động <br>2. Người dùng tùy chọn click filter chip Kiểu chạy (Realtime / Near Realtime / Offline) <br>2a. Hệ thống lọc bảng theo kiểu chạy đã chọn; filter multi-select, click lại để bỏ; chọn ít nhất 1 chip → hiện link "Xóa bộ lọc" <br>3. Người dùng tùy chọn nhập từ khóa tìm kiếm (tên hoặc trigger code) <br>3a. Hệ thống lọc realtime, highlight kết quả khớp <br>4a. **QTV** click [Xem] → UC-TRG-02 (chỉ đọc) <br>4b. **Admin** click [Xem / Sửa] → UC-TRG-02 với quyền chỉnh sửa tham số; click [+ Thêm trigger] → UC-TRG-03 |
+| **Quy tắc nghiệp vụ** | - Filter chip Kiểu chạy và tìm kiếm có thể kết hợp cùng lúc <br>- Trigger Inactive hiển thị grayed out với label "Không còn sử dụng"; vẫn hiển thị trong danh sách, không bị ẩn — để QTV có thể tra cứu thông tin params <br>- Trigger Inactive không xuất hiện trong dropdown khi QTV tạo campaign mới <br>- QTV: cột Hành động chỉ có [Xem]; Admin: cột Hành động có [Xem / Sửa] và nút [+ Thêm trigger] phía trên bảng |
 
 ---
 
@@ -1282,10 +1281,11 @@ CVM query thông tin này từ BSS qua Integration Layer khi tải trang — kh�
 
 Khi Dev/SA deploy phiên bản mới có thay đổi tham số của một trigger (thêm, đổi tên, hoặc xóa param), hệ thống xử lý như sau:
 
-- **Campaign đang dùng param bị xóa/đổi tên** → tự động chuyển sang trạng thái **Paused** và gắn cờ `PARAM_INVALID`
+- **Campaign đang Active hoặc Pending mà dùng param bị xóa/đổi tên** → tự động chuyển sang trạng thái **Paused** và gắn cờ `PARAM_INVALID` (áp dụng cả Pending vì campaign sắp được duyệt và chạy, cần chặn trước khi phát sinh gửi tin lỗi) <br>- Campaign đang Draft, Paused (đã tạm dừng từ trước) hoặc Ended: chỉ gắn cờ `PARAM_INVALID` để cảnh báo QTV khi mở lại sửa, không tự đổi trạng thái
 - Hệ thống gửi thông báo nội bộ đến QTV sở hữu campaign, liệt kê: tên campaign bị ảnh hưởng + param nào đã thay đổi
-- QTV vào Campaign Builder sửa lại nội dung message (thay thế param cũ bằng param mới hoặc xóa bỏ) → xóa cờ `PARAM_INVALID` → có thể gửi duyệt lại để resume
-- Campaign có cờ `PARAM_INVALID` bị block [Gửi duyệt] cho đến khi QTV xử lý xong
+- Campaign bị chuyển Paused do policy này: nút [Bật] (kích hoạt lại trực tiếp — UC-CAM-07) bị khóa vĩnh viễn, không có đường tắt; QTV bắt buộc dùng [Sửa] → Campaign Builder → thay thế param lỗi trong nội dung message → [Lưu nháp] → campaign chuyển về Draft (cờ `PARAM_INVALID` được xóa) → [Gửi duyệt] lại → Pending → Admin duyệt → Active
+- Campaign đang Draft mà còn cờ `PARAM_INVALID`: bị block [Gửi duyệt] cho đến khi QTV sửa nội dung message và cờ được xóa
+- Campaign Ended không bị tự đổi trạng thái và không cần xử lý cờ để resume (đã kết thúc); cờ chỉ mang tính lưu vết cho tra cứu
 
 **Yêu cầu quy trình với Dev/SA:** Trước khi deploy thay đổi param, Dev/SA phải thông báo cho QTV/BA tối thiểu 1 sprint (≥ 1 tuần) để QTV chuẩn bị cập nhật campaign.
 
@@ -1314,7 +1314,7 @@ Khi Dev/SA deploy phiên bản mới có thay đổi tham số của một trigg
 |----------|-------|
 | **Tên** | Thêm thủ công số điện thoại vào Blacklist |
 | **Mục tiêu** | Cho phép QTV chặn nhanh một hoặc vài số điện thoại cụ thể khỏi một campaign và kênh |
-| **Tác nhân** | QTV Marketing, Admin Hệ thống |
+| **Tác nhân** | QTV Marketing |
 | **Trigger** | Người dùng click [+ Thêm thủ công] từ danh sách Blacklist → mở Modal |
 | **Tiền điều kiện** | - Người dùng đã đăng nhập <br>- Có ít nhất 1 campaign tồn tại trong hệ thống |
 | **Hậu điều kiện** | - Số điện thoại được thêm vào blacklist của campaign và kênh đã chọn; áp dụng ngay cho các event tiếp theo |
@@ -1329,7 +1329,7 @@ Khi Dev/SA deploy phiên bản mới có thay đổi tham số của một trigg
 |----------|-------|
 | **Tên** | Upload danh sách CSV vào Blacklist |
 | **Mục tiêu** | Cho phép QTV thêm hàng loạt số điện thoại vào blacklist của một campaign và kênh qua file CSV |
-| **Tác nhân** | QTV Marketing, Admin Hệ thống |
+| **Tác nhân** | QTV Marketing |
 | **Trigger** | Người dùng click [Upload CSV] từ danh sách Blacklist → mở Modal |
 | **Tiền điều kiện** | - Người dùng đã đăng nhập <br>- Có ít nhất 1 campaign tồn tại trong hệ thống |
 | **Hậu điều kiện** | - Các số hợp lệ trong file được thêm vào blacklist của campaign và kênh đã chọn |
@@ -1535,19 +1535,13 @@ Các chỉ số hiển thị trong tab này:
 | **Blacklist mới** | Số KH bị chặn vào Blacklist mới trong kỳ | Đếm bản ghi Blacklist có `created_at` trong kỳ lọc | CVM `blacklist_log` |
 | **TB tin/người/ngày** | Tần suất gửi trung bình | `Tổng tin đã gửi / Số KH unique nhận tin / Số ngày trong kỳ` | CVM `message_log` |
 | **TB tin/người/tuần** | Tần suất gửi trung bình theo tuần | `Tổng tin đã gửi / Số KH unique nhận tin / Số tuần trong kỳ` | CVM `message_log` |
-| **Spam Risk Score** | Điểm rủi ro spam tổng hợp, thang 0–100 | Xem công thức bên dưới | Tổng hợp từ 3 chỉ số trên |
 
-**Công thức Spam Risk Score:**
+**Ngưỡng cảnh báo rủi ro spam** — áp dụng riêng cho từng chỉ số, không gộp thành điểm tổng hợp:
 
-```
-Spam Risk Score = (opt_out_rate × 0.40) + (new_blacklist_rate × 0.30) + (ctr_drop_rate × 0.30)
-```
-
-- `opt_out_rate`: Opt-out / Delivered × 100, scale tuyến tính 0–100 (opt-out ≥ 5% → 100 điểm; 0% → 0 điểm)
-- `new_blacklist_rate`: Số bị chặn Blacklist mới / Delivered × 100, scale tương tự
-- `ctr_drop_rate`: Mức giảm CTR so với kỳ trước (%; nếu không có kỳ trước → = 0), scale tương tự
-
-Ngưỡng cảnh báo: dưới 60 → bình thường; 60–79 → cảnh báo cam; 80+ → cảnh báo đỏ.
+| Chỉ số | Bình thường | Cảnh báo (cam) | Nguy hiểm (đỏ) |
+|---|---|---|---|
+| Opt-out Rate | < 3% | 3% – 4,9% | ≥ 5% |
+| Blacklist mới (tính theo tỉ lệ / Delivered) | < 3% | 3% – 4,9% | ≥ 5% |
 
 ---
 
@@ -1573,7 +1567,7 @@ File `.xlsx` xuất theo tab đang xem, gồm:
 | **Trigger** | Click nav "Dashboard" → /dashboard; hoặc là màn hình mặc định sau khi đăng nhập |
 | **Tiền điều kiện** | - Người dùng đã đăng nhập |
 | **Hậu điều kiện** | - Người dùng nhận được bức tranh tổng thể về tình trạng hệ thống |
-| **Hoạt động** | 1. Hệ thống hiển thị 7 thẻ KPI (cập nhật mỗi 60 giây): Số campaign đang chạy, Trigger kích hoạt hôm nay, Tin nhắn đã gửi hôm nay, Tỉ lệ đã tới đích, Tin nhắn thất bại, Tỉ lệ chuyển đổi, Bị chặn Blacklist hôm nay; biểu đồ mini 7 ngày; di chuột → tooltip "Ngày X: giá trị Y" <br>2. Hệ thống hiển thị Sức khoẻ hệ thống: biểu đồ đường 24h Lượng trigger/sự kiện; Hàng đợi & Tồn đọng (chờ hết blackout, lên lịch tương lai, chờ lâu nhất) <br>3. Hệ thống hiển thị Campaign Monitoring: bảng Campaign đang chạy nhiều nhất + bảng Trigger kích hoạt nhiều nhất hôm nay + Dòng sự kiện trigger gần đây (luồng thời gian thực) <br>4. Người dùng click [Đang chạy ● / Tạm dừng] → dừng/tiếp tục luồng sự kiện để đọc dữ liệu <br>5. Hệ thống hiển thị Phân tích Trigger (Top Triggers 7 ngày, Phát hiện bất thường, Bản đồ nhiệt giờ × ngày trong tuần) <br>6. Người dùng click bất kỳ campaign/trigger trong bảng → điều hướng đến màn hình chi tiết tương ứng <br>**[Exception — KPI vượt ngưỡng xấu]**: Thẻ viền đỏ + toast cảnh báo; ví dụ: Tỉ lệ đã tới đích < ngưỡng SLA, Tin nhắn thất bại tăng >X% |
+| **Hoạt động** | 1. Hệ thống hiển thị 7 thẻ KPI (cập nhật mỗi 60 giây): Số campaign đang chạy, Trigger kích hoạt hôm nay, Tin nhắn đã gửi hôm nay, Tỉ lệ đã tới đích hôm nay, Tin nhắn thất bại, Tỉ lệ chuyển đổi, Bị chặn Blacklist hôm nay; biểu đồ mini 7 ngày; di chuột → tooltip "Ngày X: giá trị Y" <br>2. Hệ thống hiển thị Sức khoẻ hệ thống: biểu đồ đường 24h Lượng trigger/sự kiện; Hàng đợi & Tồn đọng (chờ hết blackout, lên lịch tương lai, chờ lâu nhất — có ngưỡng cảnh báo) <br>3. Hệ thống hiển thị Campaign Monitoring: bảng Campaign đang chạy nhiều nhất + bảng Trigger kích hoạt nhiều nhất (toggle Hôm nay / 7 ngày) + Dòng sự kiện trigger gần đây (luồng thời gian thực) <br>4. Người dùng click [Đang chạy ● / Tạm dừng] → dừng/tiếp tục luồng sự kiện để đọc dữ liệu <br>5. Hệ thống hiển thị Phân tích Trigger (Phát hiện bất thường) <br>6. Người dùng click bất kỳ campaign/trigger trong bảng → điều hướng đến màn hình chi tiết tương ứng <br>**[Exception — KPI vượt ngưỡng xấu]**: Thẻ viền đỏ + toast cảnh báo; ví dụ: Tỉ lệ đã tới đích < ngưỡng SLA, Tin nhắn thất bại tăng >X% |
 | **Quy tắc nghiệp vụ** | Xem các sub-section bên dưới. |
 
 ---
@@ -1596,13 +1590,13 @@ Mỗi thẻ KPI hiển thị giá trị hiện tại, biểu đồ mini xu hư�
 | 1 | Số campaign đang chạy | Số campaign có trạng thái Active tại thời điểm xem | Đếm campaign `status = Active` | CVM DB | Không có | `/campaigns` đã lọc sẵn `status = Active` |
 | 2 | Trigger kích hoạt hôm nay | Tổng số lần hệ thống nhận sự kiện từ 00:00 đến thời điểm hiện tại, đếm tất cả loại trigger | Đếm trigger events từ 00:00 → now | CVM event log | Không có | `/triggers` |
 | 3 | Tin nhắn đã gửi hôm nay | Tổng tin nhắn CVM đã dispatch sang gateway trong ngày hiện tại | Đếm `message_log` có `sent_at` trong ngày hôm nay | CVM `message_log` | Không có | `/report` tab Gửi tin |
-| 4 | Tỉ lệ đã tới đích | Tỉ lệ tin nhắn được gateway xác nhận giao thành công, tính trong **cửa sổ 24 giờ gần nhất** (không phải "hôm nay" tính từ 00:00) | `Delivered / Sent × 100%` trong `[now − 24h, now]` | Gateway callback | < 85% → viền thẻ chuyển đỏ + icon ⚠ | `/report` tab Gửi tin |
+| 4 | Tỉ lệ đã tới đích hôm nay | Tỉ lệ tin nhắn được gateway xác nhận giao thành công trong ngày hiện tại, tính từ 00:00 — cùng khung thời gian với các thẻ KPI khác | `Delivered / Sent × 100%` trong `[00:00 hôm nay, now]` | Gateway callback | < 85% → viền thẻ chuyển đỏ + icon ⚠ | `/report` tab Gửi tin |
 | 5 | Tin nhắn thất bại | Tổng tin nhắn không giao được trong ngày hiện tại | Đếm `message_log` có `status = failed` trong ngày hôm nay | Gateway callback | Tỉ lệ = `Failed / Sent > 10%` → viền thẻ chuyển đỏ + icon ⚠ (cảnh báo tỉ lệ, không phải số tuyệt đối) | `/report` tab Gửi tin |
 | 6 | Tỉ lệ chuyển đổi | Tỉ lệ KH thực hiện hành động mục tiêu (mua gói, cài app…) trên tổng tin giao thành công, tính trong ngày hôm nay | `Converted / Delivered × 100%` | BSS event join | < 5% → viền thẻ chuyển đỏ + icon ⚠ | `/report` tab Tương tác |
 | 7 | Bị chặn Blacklist hôm nay | Tổng tin bị hệ thống chặn do KH thuộc DNC hoặc Blacklist campaign trong ngày hiện tại | Đếm `message_log` có `status = blocked` trong ngày hôm nay | CVM `message_log` | Không có | `/blacklist` |
 
 Ghi chú áp dụng cho tất cả 7 thẻ:
-- Tooltip trên thẻ thứ 4: ghi rõ "24 giờ gần nhất" để phân biệt với các thẻ "hôm nay" tính từ 00:00.
+- Cả 7 thẻ cùng tính theo khung thời gian "hôm nay" (00:00 → hiện tại) — nhất quán, không có thẻ nào dùng cửa sổ trượt riêng.
 - Biểu đồ mini: hover vào điểm dữ liệu → tooltip "Ngày DD/MM: [giá trị]".
 - Thẻ đang tải: hiệu ứng shimmer animation cùng chiều cao thẻ cho đến khi dữ liệu về.
 - Thẻ lỗi API: hiển thị "–" + icon ⚠ nhỏ + tooltip "Không lấy được dữ liệu" — không crash các thẻ khác.
@@ -1632,7 +1626,7 @@ Ghi chú áp dụng cho tất cả 7 thẻ:
 |--------|------------|-----------------|
 | Pending blackout | Số message bị hoãn do đang trong giờ giới nghiêm; sẽ flush lúc đầu giờ tiếp theo | Không có |
 | Scheduled future | Số message đã lên lịch gửi vào thời điểm tương lai | Không có |
-| Oldest pending | Timestamp của message chờ lâu nhất trong queue | Không có (hiển thị để người dùng tự phán đoán) |
+| Oldest pending | Thời gian message chờ lâu nhất trong queue đã tồn đọng, tính từ lúc đưa vào queue đến hiện tại (không tính message đang trong blackout hoặc lên lịch tương lai — 2 trường hợp này là chờ theo chủ đích) | > 15 phút → cảnh báo cam; > 30 phút → cảnh báo đỏ (tín hiệu queue đang tắc nghẽn bất thường, cần kiểm tra gateway) |
 
 Ghi chú: "Hàng chờ giờ giới nghiêm sẽ được xử lý lúc HH:00" — hiển thị như ghi chú nhỏ dưới chỉ số Pending blackout.
 
@@ -1648,12 +1642,15 @@ Ghi chú: "Hàng chờ giờ giới nghiêm sẽ được xử lý lúc HH:00" �
 - Click vào dòng → điều hướng đến `/campaigns/:id/detail`.
 - [Xem tất cả →] → `/campaigns`.
 
-**Bảng Top Trigger kích hoạt nhiều nhất hôm nay:**
+**Bảng Top Trigger kích hoạt nhiều nhất:**
 
-- Phạm vi: hôm nay (00:00 → hiện tại).
-- Sắp xếp mặc định: số lần kích hoạt giảm dần.
-- Cột hiển thị: Tên trigger / Số lần kích hoạt / Tỉ lệ khớp campaign (thanh ngang).
+- Toggle khung thời gian ở góc phải tiêu đề card: **Hôm nay** (mặc định) / **7 ngày**.
+  - Hôm nay: phạm vi 00:00 → hiện tại, hiển thị tất cả trigger có phát sinh.
+  - 7 ngày: phạm vi T-6 → T-0, hiển thị tối đa 10 trigger có số lần kích hoạt cao nhất; nếu tổng trigger < 10 thì hiển thị bao nhiêu có bấy nhiêu.
+- Sắp xếp mặc định: số lần kích hoạt giảm dần (cả 2 khung thời gian).
+- Cột hiển thị: Tên trigger / Số lần kích hoạt / Tỉ lệ khớp campaign (thanh ngang, tính bằng `count_with_match / total_count × 100%`).
 - Click vào dòng → điều hướng đến `/triggers`.
+- Đổi toggle → dữ liệu bảng cập nhật ngay theo khung thời gian mới chọn, không ảnh hưởng các card khác.
 
 **Dòng sự kiện trigger gần đây (realtime stream):**
 
@@ -1667,12 +1664,6 @@ Ghi chú: "Hàng chờ giờ giới nghiêm sẽ được xử lý lúc HH:00" �
 
 #### Quy tắc nghiệp vụ — Row 4: Phân tích Trigger
 
-**Top 10 Trigger — 7 ngày:**
-
-- Phạm vi: 7 ngày gần nhất (T-6 → T-0).
-- Hiển thị đúng 10 trigger có số lần kích hoạt cao nhất; nếu tổng trigger < 10 thì hiển thị bao nhiêu có bấy nhiêu.
-- Cột: Tên trigger / Số lần kích hoạt / Tỉ lệ khớp campaign (thanh ngang, tính bằng `count_with_match / total_count × 100%`).
-
 **Phát hiện bất thường trigger:**
 
 - Hệ thống tự động so sánh volume từng trigger trong giờ hiện tại với trung bình cùng giờ của 7 ngày trước.
@@ -1682,24 +1673,6 @@ Ghi chú: "Hàng chờ giờ giới nghiêm sẽ được xử lý lúc HH:00" �
 - Nếu có nhiều trigger bất thường cùng lúc → hiển thị tất cả, không giới hạn số item.
 - Nếu không có bất thường → hiển thị "✅ Không phát hiện bất thường".
 - [Xem chi tiết →] → `/report`.
-
-**Bản đồ nhiệt trigger (Heatmap):**
-
-- Phạm vi: 7 ngày gần nhất.
-- Trục X: giờ trong ngày (00 → 23), chia thành 24 cột.
-- Trục Y: thứ trong tuần (Thứ 2 → Chủ nhật), từ trên xuống dưới.
-- Mỗi ô = (thứ, giờ) — giá trị = tổng số lần trigger kích hoạt trong ô đó trong 7 ngày.
-- Thang màu 4 cấp, ngưỡng tính bằng cách chia đều range `[min, max]` thành 4 phần bằng nhau:
-
-| Cấp | Ký hiệu | Phạm vi giá trị |
-|-----|---------|-----------------|
-| 1 (thấp nhất) | ░ (màu nhạt) | `[min, min + (max−min)/4)` |
-| 2 | ▒ | `[min + (max−min)/4, min + 2×(max−min)/4)` |
-| 3 | ▓ | `[min + 2×(max−min)/4, min + 3×(max−min)/4)` |
-| 4 (cao nhất) | █ (màu đậm) | `[min + 3×(max−min)/4, max]` |
-
-- Hover vào ô → tooltip: "Thứ X · Giờ Y:00 – Y+1:00: Z triggers".
-- Trạng thái chưa có dữ liệu (7 ngày): tất cả ô hiển thị màu cấp 1 (░) + ghi chú "Chưa có dữ liệu trong 7 ngày qua".
 
 ---
 
@@ -1739,7 +1712,7 @@ Màn hình monitoring realtime dành cho QTV Marketing và Admin HT theo dõi s�
 | 1.1 | Số campaign đang chạy | Giá trị dạng số nguyên. Nhấn thẻ → `/campaigns?status=Active`. **Loading**: shimmer animation cùng chiều cao thẻ. **Lỗi API**: hiển thị "–" + icon ⚠ nhỏ + tooltip "Không lấy được dữ liệu" — không ảnh hưởng thẻ khác. **Empty**: hiển thị "0". |
 | 1.2 | Trigger kích hoạt hôm nay | Giá trị dạng số nguyên. Nhấn thẻ → `/triggers`. Loading / Lỗi / Empty: giống STT 1.1. |
 | 1.3 | Tin nhắn đã gửi hôm nay | Giá trị dạng số nguyên. Nhấn thẻ → `/report` (tab Hiệu quả gửi tin). Loading / Lỗi / Empty: giống STT 1.1. |
-| 1.4 | Tỉ lệ đã tới đích | Giá trị dạng %, 1 chữ số thập phân (VD: "94.3%"). Tooltip trên thẻ ghi rõ "24 giờ gần nhất" để phân biệt với các thẻ tính từ 00:00. Viền đỏ + icon ⚠ khi < 85%. Nhấn thẻ → `/report` (tab Hiệu quả gửi tin). Loading / Lỗi / Empty: giống STT 1.1. |
+| 1.4 | Tỉ lệ đã tới đích hôm nay | Giá trị dạng %, 1 chữ số thập phân (VD: "94.3%"), tính từ 00:00 hôm nay — cùng khung thời gian với các thẻ khác. Viền đỏ + icon ⚠ khi < 85%. Nhấn thẻ → `/report` (tab Hiệu quả gửi tin). Loading / Lỗi / Empty: giống STT 1.1. |
 | 1.5 | Tin nhắn thất bại | Giá trị dạng số nguyên. Viền đỏ + icon ⚠ khi tỉ lệ `Failed/Sent > 10%` — cảnh báo theo tỉ lệ, không phải số tuyệt đối. Nhấn thẻ → `/report` (tab Hiệu quả gửi tin). Loading / Lỗi / Empty: giống STT 1.1. |
 | 1.6 | Tỉ lệ chuyển đổi | Giá trị dạng %, 1 chữ số thập phân. Viền đỏ + icon ⚠ khi < 5%. Nhấn thẻ → `/report` (tab Tương tác). Loading / Lỗi / Empty: giống STT 1.1. |
 | 1.7 | Bị chặn Blacklist hôm nay | Giá trị dạng số nguyên. Nhấn thẻ → `/blacklist`. Loading / Lỗi / Empty: giống STT 1.1. |
@@ -1758,7 +1731,7 @@ Màn hình monitoring realtime dành cho QTV Marketing và Admin HT theo dõi s�
 | STT | Tên thành phần | Định dạng | Mô tả |
 |-----|----------------|-----------|-------|
 | 2.1 | Biểu đồ lượng trigger/sự kiện 24h | Line chart | 3 đường màu phân biệt: Thời gian thực (xanh dương) · Gần thời gian thực (tím) · Ngoại tuyến (xám). Trục X: giờ 00–23; trục Y: số sự kiện. Hover → tooltip hiển thị giá trị cả 3 nhóm tại giờ đó. Legend phía trên / phía dưới biểu đồ. **Loading**: skeleton overlay toàn card. **Lỗi**: "⚠ Không tải được dữ liệu — [↻ Thử lại]" thay thế vùng biểu đồ. **Empty** (chưa có sự kiện nào trong 24h): 3 đường nằm ở y=0, không ẩn biểu đồ. |
-| 2.2 | Hàng đợi & Tồn đọng | Card (3 chỉ số) | Hiển thị 3 chỉ số dạng label–value theo chiều dọc: Pending blackout / Scheduled future / Oldest pending. Dưới chỉ số Pending blackout có ghi chú nhỏ "Hàng chờ giờ giới nghiêm sẽ được xử lý lúc HH:00" (HH = giờ kết thúc blackout được cấu hình). Nút [Xem queue] → toast "Tính năng đang phát triển". **Loading**: skeleton 3 dòng. **Lỗi**: mỗi chỉ số hiển thị "–" thay vì giá trị. **Empty**: hiển thị "0" cho Pending blackout và Scheduled future; Oldest pending hiển thị "–". |
+| 2.2 | Hàng đợi & Tồn đọng | Card (3 chỉ số) | Hiển thị 3 chỉ số dạng label–value theo chiều dọc: Pending blackout / Scheduled future / Oldest pending. Dưới chỉ số Pending blackout có ghi chú nhỏ "Hàng chờ giờ giới nghiêm sẽ được xử lý lúc HH:00" (HH = giờ kết thúc blackout được cấu hình). Oldest pending hiển thị dạng thời lượng tồn đọng (ví dụ "12 phút"), đổi màu chữ cam khi > 15 phút, đỏ khi > 30 phút. Nút [Xem queue] → toast "Tính năng đang phát triển". **Loading**: skeleton 3 dòng. **Lỗi**: mỗi chỉ số hiển thị "–" thay vì giá trị. **Empty**: hiển thị "0" cho Pending blackout và Scheduled future; Oldest pending hiển thị "–" (queue trống, không có gì tồn đọng). |
 
 ---
 
@@ -1769,20 +1742,18 @@ Màn hình monitoring realtime dành cho QTV Marketing và Admin HT theo dõi s�
 | STT | Tên thành phần | Định dạng | Mô tả |
 |-----|----------------|-----------|-------|
 | 3.1 | Campaign đang chạy nhiều nhất | Bảng | Cột: Tên campaign · Đã gửi · Tỉ lệ gửi thành công · Xu hướng (sparkline mini). Tỉ lệ gửi thành công hiển thị dạng %. Click một dòng → điều hướng `/campaigns/:id/detail`. [Xem tất cả →] ở cuối bảng → `/campaigns`. **Loading**: skeleton rows. **Lỗi**: "⚠ Không tải được dữ liệu — [↻ Thử lại]". **Empty** (hôm nay chưa có campaign nào gửi tin): "Chưa có dữ liệu hôm nay". |
-| 3.2 | Trigger kích hoạt nhiều nhất hôm nay | Bảng | Cột: Tên trigger · Số lần kích hoạt · Tỉ lệ khớp campaign (thanh ngang nội tuyến, đơn vị %). Click một dòng → điều hướng `/triggers`. **Loading**: skeleton rows. **Lỗi**: "⚠ Không tải được dữ liệu — [↻ Thử lại]". **Empty**: "Chưa có trigger nào kích hoạt hôm nay". |
+| 3.2 | Trigger kích hoạt nhiều nhất | Bảng | Toggle khung thời gian góc phải tiêu đề card: **Hôm nay** (mặc định) / **7 ngày** — 7 ngày hiển thị tối đa 10 dòng. Cột: Tên trigger · Số lần kích hoạt · Tỉ lệ khớp campaign (thanh ngang nội tuyến, đơn vị %). Click một dòng → điều hướng `/triggers`. **Loading**: skeleton rows. **Lỗi**: "⚠ Không tải được dữ liệu — [↻ Thử lại]". **Empty**: "Chưa có trigger nào kích hoạt trong khung thời gian đã chọn". |
 | 3.3 | Dòng sự kiện trigger gần đây | List (realtime stream) | Mỗi dòng gồm 4 phần: timestamp (`HH:MM:SS`) · trigger code · số điện thoại (che dạng `0987xxx001`) · kết quả xử lý (ví dụ: "Đã gửi", "Bị chặn DNC"). Giới hạn tối đa 100 dòng (FIFO — dòng cũ nhất bị đẩy ra khi có dòng mới). Toggle ở góc phải tiêu đề card: **[Đang chạy ●]** (stream đang hoạt động) ↔ **[Tạm dừng]** ↔ **[Tiếp tục]** — hành vi chi tiết xem UC-DSH-01. **Empty** (chưa có sự kiện nào): "Chưa có sự kiện nào. Dòng sẽ cập nhật khi có trigger kích hoạt." |
 
 ---
 
 #### ROW 4 — Phân tích Trigger
 
-> Công thức phát hiện bất thường, định nghĩa tỉ lệ khớp, thang màu heatmap → xem **UC-DSH-01 — Row 4**.
+> Công thức phát hiện bất thường, định nghĩa tỉ lệ khớp → xem **UC-DSH-01 — Row 4**.
 
 | STT | Tên thành phần | Định dạng | Mô tả |
 |-----|----------------|-----------|-------|
-| 4.1 | Top 10 Triggers — 7 ngày | Bảng | Cột: Tên trigger · Số lần kích hoạt · Tỉ lệ khớp campaign (thanh ngang nội tuyến, đơn vị %). Hiển thị tối đa 10 dòng; nếu tổng trigger < 10 thì hiển thị bao nhiêu có bấy nhiêu. Click dòng → điều hướng `/triggers`. **Loading**: skeleton rows. **Lỗi**: "⚠ Không tải được dữ liệu — [↻ Thử lại]". **Empty** (7 ngày không có trigger nào): "Chưa có dữ liệu trong 7 ngày qua". |
-| 4.2 | Phát hiện bất thường trigger | Alert card | Hiển thị danh sách trigger bất thường, mỗi dòng: tên trigger + % tăng + so sánh "Hiện tại: X lần / Trung bình 7 ngày: Y lần". Không giới hạn số item khi có nhiều trigger bất thường. Không có bất thường → hiển thị "✅ Không phát hiện bất thường". [Xem chi tiết →] → `/report`. **Loading**: skeleton 1–2 dòng. **Lỗi**: "⚠ Không tải được dữ liệu". |
-| 4.3 | Bản đồ nhiệt trigger (Heatmap) | Heatmap grid | Grid 7 hàng (Thứ 2 → Chủ nhật, trên → dưới) × 24 cột (giờ 00 → 23). Mỗi ô hiển thị màu theo 4 cấp độ (nhạt → đậm), ngưỡng tính bằng cách chia đều `[min, max]` thành 4 phần bằng nhau — ô giá trị 0 không tô màu. Hover ô → tooltip "Thứ X · HH:00 – HH+1:00: Z triggers". **Loading**: skeleton grid. **Lỗi**: "⚠ Không tải được dữ liệu". **Empty** (7 ngày không có trigger nào): tất cả ô cấp 1 (màu nhạt nhất) + ghi chú "Chưa có dữ liệu trong 7 ngày qua". |
+| 4.1 | Phát hiện bất thường trigger | Alert card | Hiển thị danh sách trigger bất thường, mỗi dòng: tên trigger + % tăng + so sánh "Hiện tại: X lần / Trung bình 7 ngày: Y lần". Không giới hạn số item khi có nhiều trigger bất thường. Không có bất thường → hiển thị "✅ Không phát hiện bất thường". [Xem chi tiết →] → `/report`. **Loading**: skeleton 1–2 dòng. **Lỗi**: "⚠ Không tải được dữ liệu". |
 
 ---
 
@@ -1811,7 +1782,7 @@ Màn hình danh sách campaign cho QTV Marketing và Admin HT.
 | 5 | Cột TRIGGER | Chip | – | – | Hiển thị tối đa 2 chip trigger; nếu có hơn 2 → hiển thị "+N ⓘ"; hover/click "+N ⓘ" → popover đầy đủ (tên trigger, nguồn, kiểu chạy) |
 | 6 | Cột HIỆU LỰC | Text | – | – | Định dạng "DD/MM – DD/MM/YYYY" |
 | 7 | Cột TRẠNG THÁI | Status chip | – | – | Active: nền xanh lá nhạt, chữ xanh đậm; Draft: nền xám nhạt, chữ xám vừa; Pending: nền vàng nhạt, chữ vàng đậm; Paused: nền cam nhạt, chữ cam đậm; Ended: nền xám nhạt, chữ xám mờ (nhạt hơn Draft để phân biệt) |
-| 8 | Cột HÀNH ĐỘNG | Button | – | – | Nút thay đổi theo trạng thái: Active → [Xem][Dừng]; Draft → [Xem][Sửa]; Pending → [Xem]; Paused → [Xem][Sửa][Bật]; Ended → [Xem]; **[Dừng]** màu đỏ — bắt buộc confirm dialog "Tin nhắn đang trong hàng chờ sẽ bị hủy. Không thể hoàn tác." [Hủy] / [Xác nhận Dừng]; sau khi xác nhận: nút bị khoá và hiển thị trạng thái đang xử lý, rồi chuyển sang Paused; **[Bật] từ Paused**: nút bị khoá trong lúc xử lý rồi chuyển Active ngay, không cần confirm; **[Sửa] từ Paused**: mở Campaign Builder; nếu QTV thay đổi bất kỳ field nào và nhấn [Lưu Nháp] → campaign về Draft; nếu chỉ vào xem không thay đổi gì → campaign giữ nguyên Paused; **Lưu ý**: [Bật] và [Sửa] chỉ hiển thị khi campaign chưa qua ngày kết thúc |
+| 8 | Cột HÀNH ĐỘNG | Button | – | – | Nút thay đổi theo trạng thái: Active → [Xem][Dừng]; Draft → [Xem][Sửa]; Pending → [Xem]; Paused → [Xem][Sửa][Bật]; Ended → [Xem]; **[Dừng]** màu đỏ — bắt buộc confirm dialog "Tin nhắn đang trong hàng chờ sẽ bị hủy. Không thể hoàn tác." [Hủy] / [Xác nhận Dừng]; sau khi xác nhận: nút bị khoá và hiển thị trạng thái đang xử lý, rồi chuyển sang Paused; **[Bật] từ Paused**: nút bị khoá trong lúc xử lý rồi chuyển Active ngay, không cần confirm; **nếu campaign còn cờ `PARAM_INVALID`**: nút [Bật] disabled, hover → tooltip "Campaign đang có tham số không hợp lệ do trigger đã thay đổi — vui lòng sửa nội dung message trước"; **[Sửa] từ Paused**: mở Campaign Builder; nếu QTV thay đổi bất kỳ field nào và nhấn [Lưu Nháp] → campaign về Draft; nếu chỉ vào xem không thay đổi gì → campaign giữ nguyên Paused; **Lưu ý**: [Bật] và [Sửa] chỉ hiển thị khi campaign chưa qua ngày kết thúc |
 | 9 | Sắp xếp & Phân trang | Pagination | – | 20/trang · Ngày tạo ↓ | Mặc định: campaign tạo mới nhất lên đầu; phân trang "< 1 2 3 >" + dropdown [20/trang ▾]; options: 20, 50, 100 |
 
 ---
@@ -1826,7 +1797,7 @@ Màn hình xem chi tiết campaign chỉ đọc — hiển thị đầy đủ to
 |-----|----------------|-----------|----------|----------|-------|
 | 1 | Header breadcrumb | Link | – | – | "← Campaign" → quay lại danh sách campaign |
 | 2 | Tiêu đề + Status chip | Text + Chip | – | – | Tên campaign (chữ đậm) + mã kịch bản (chữ mờ) + status chip đúng màu trạng thái (giống bảng màu Screen 2 STT 7) |
-| 3 | Nút hành động | Button | – | – | Nút thay đổi theo trạng thái: Draft → [Sửa] + [Đóng]; Active → [Dừng] + [Đóng]; Paused → [Sửa] + [Bật] + [Đóng]; Pending/Ended → chỉ [Đóng]; [Đóng] → quay lại danh sách; **[Dừng]**: hoạt động giống [Dừng] tại Campaign List — bắt buộc confirm dialog "Tin nhắn đang trong hàng chờ sẽ bị hủy. Không thể hoàn tác." → sau khi xác nhận: nút bị khoá trong lúc hệ thống xử lý rồi chuyển Paused; **[Bật]**: chuyển trạng thái → Active ngay, không cần confirm (giống [Bật] tại Campaign List); **[Sửa]**: mở Campaign Builder ở chế độ sửa; **Khi vào trang lần đầu**: toàn bộ nội dung hiển thị trạng thái đang tải; **Khi hệ thống không tải được**: hiển thị "⚠ Không tải được thông tin campaign — [↻ Thử lại]" ở giữa trang |
+| 3 | Nút hành động | Button | – | – | Nút thay đổi theo trạng thái: Draft → [Sửa] + [Đóng]; Active → [Dừng] + [Đóng]; Paused → [Sửa] + [Bật] + [Đóng]; Pending/Ended → chỉ [Đóng]; [Đóng] → quay lại danh sách; **[Dừng]**: hoạt động giống [Dừng] tại Campaign List — bắt buộc confirm dialog "Tin nhắn đang trong hàng chờ sẽ bị hủy. Không thể hoàn tác." → sau khi xác nhận: nút bị khoá trong lúc hệ thống xử lý rồi chuyển Paused; **[Bật]**: chuyển trạng thái → Active ngay, không cần confirm (giống [Bật] tại Campaign List); **nếu campaign còn cờ `PARAM_INVALID`**: nút [Bật] disabled, hover → tooltip "Campaign đang có tham số không hợp lệ do trigger đã thay đổi — vui lòng sửa nội dung message trước"; **[Sửa]**: mở Campaign Builder ở chế độ sửa; **Khi vào trang lần đầu**: toàn bộ nội dung hiển thị trạng thái đang tải; **Khi hệ thống không tải được**: hiển thị "⚠ Không tải được thông tin campaign — [↻ Thử lại]" ở giữa trang |
 | 4 | Section 1 — Thông tin Campaign | Read-only | – | – | Tên, mã kịch bản, mục tiêu, thời gian hiệu lực, độ ưu tiên, người tạo, ngày tạo, ngày gửi duyệt |
 | 5 | Section 2 — Trigger & Logic | Read-only | – | – | Chế độ (Basic/Advanced), logic (OR/AND), danh sách trigger kèm số thứ tự ưu tiên, quy tắc khi khớp nhiều trigger, ước tính số tin |
 | 6 | Section 3 — Audience | Read-only | – | – | Danh sách phân khúc đã chọn, logic phân khúc, điều kiện lọc, số KH ước tính |
@@ -2001,12 +1972,13 @@ Tra cứu danh sách trigger. QTV Marketing chỉ đọc. Admin Hệ thống có
 
 | STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |-----|----------------|-----------|----------|----------|-------|
-| 1 | Ô tìm kiếm | Search | Không | Trống | Tìm theo trigger code hoặc tên; realtime; tự động mở rộng nhóm chứa kết quả; highlight từ khớp |
-| 2 | Filter Trạng thái | Listbox | Không | Tất cả | Options: Tất cả / Active / Inactive; áp dụng đồng thời trên tất cả nhóm |
-| 3 | Header nhóm (Realtime / Near Realtime / Offline) | Collapsible | – | Mở rộng | Click → thu gọn / mở rộng toàn bộ trigger trong nhóm; hiển thị số lượng trigger trong ngoặc |
+| 1 | Ô tìm kiếm | Search | Không | Trống | Tìm theo trigger code hoặc tên; realtime; highlight từ khớp |
+| 2 | Filter chip Kiểu chạy | Chip (multi-select) | Không | Không chọn (hiện tất cả) | Options: Realtime / Near Realtime / Offline; chọn nhiều chip cùng lúc; click lại để bỏ chọn; có ít nhất 1 chip đang chọn → hiện link "Xóa bộ lọc" |
+| 3 | Filter Trạng thái | Listbox | Không | Tất cả | Options: Tất cả / Active / Inactive; kết hợp được với filter chip Kiểu chạy |
 | 4 | Cột Code | Text | – | – | Trigger code hiển thị in hoa, font mono |
 | 5 | Cột Tên | Text | – | – | Tên đầy đủ của trigger |
-| 6 | Cột Source | Text | – | – | BSS / OCS / SuperApp |
+| 5b | Cột Kiểu chạy | Badge | – | – | `Realtime` (chip xanh lá) / `Near Realtime` (chip xanh dương) / `Offline` (chip xám) |
+| 6 | Cột Nguồn sự kiện | Text | – | – | BSS / OCS / SuperApp |
 | 7 | Cột Trạng thái | Status chip | – | – | Active = chip xanh lá; Inactive = chip xám + label "Không còn sử dụng" |
 | 8 | Cột Hành động | Button | – | – | **[Xem]** → mở Modal 5B chi tiết chỉ đọc |
 
@@ -2195,7 +2167,6 @@ Màn hình phân tích đa chiều hiệu quả campaign. Truy cập qua nav "Re
 |-----|----------------|-----------|-------|
 | 4.1 | Bảng hiệu suất phân khúc | Table | Cột: Phân khúc / Tiếp cận / Đã tới đích / Tỉ lệ mở / Chuyển đổi. |
 | 4.2 | Biểu đồ so sánh phân khúc | Bar chart | Mỗi phân khúc có 2 cột: Tỉ lệ mở / Chuyển đổi. |
-| 4.3 | Biểu đồ phân bổ thiết bị | Donut chart | 3 phần: Android / iOS / Khác. Giữa lỗ donut ghi tổng "100% tổng". Legend bên phải kèm tỉ lệ % từng phần. Hover → tooltip: tên nhóm + %. |
 
 ### Tab 5 — Phễu
 
@@ -2208,10 +2179,9 @@ Màn hình phân tích đa chiều hiệu quả campaign. Truy cập qua nav "Re
 
 | STT | Tên thành phần | Định dạng | Mô tả |
 |-----|----------------|-----------|-------|
-| 6.1 | Biểu đồ xu hướng opt-out & Blacklist | Line chart | 2 đường: Opt-out (đỏ) / Blacklist mới (cam), theo ngày. Khi tăng đột biến > 30% so với ngày trước → hiển thị annotation trực tiếp trên biểu đồ: "↑ Spike ngày X: cần điều tra". |
+| 6.1 | Biểu đồ xu hướng opt-out & Blacklist | Line chart | 2 đường: Opt-out (đỏ) / Blacklist mới (cam), theo ngày. Mỗi đường có 2 vạch ngưỡng tham chiếu: 3% (cam) và 5% (đỏ) — xem UC-RPT-01 Tab 6. Khi tăng đột biến > 30% so với ngày trước → hiển thị annotation trực tiếp trên biểu đồ: "↑ Spike ngày X: cần điều tra". Khi Opt-out Rate hoặc tỉ lệ Blacklist mới ≥ 5% → thẻ cảnh báo đỏ phía trên biểu đồ: "⚠ [Chỉ số] đang ở mức nguy hiểm (X%)". |
 | 6.2 | Bảng chỉ số tần suất | Table | 4 chỉ số hàng ngang: TB tin/người/ngày / TB tin/người/tuần / Tối đa tin/người trong kỳ / Tỉ lệ người nhận > 3 tin. |
 | 6.3 | Histogram phân phối số tin/KH | Histogram | Các bucket: 0 / 1 / 2 / 3 / 4 / 5+. Bucket không có dữ liệu vẫn hiển thị bar = 0 (không bỏ qua). |
-| 6.4 | Gauge Spam Risk Score | Gauge chart | Thang điểm 0–100. 3 vùng màu: Xanh (0–59, an toàn) / Cam (60–79, cảnh báo) / Đỏ (80–100, nguy hiểm); mỗi vùng kèm label và thông điệp cảnh báo tương ứng. |
 
 ### Trạng thái chung của màn hình
 
@@ -2244,16 +2214,17 @@ Màn hình dành riêng cho Admin — truy cập qua nav "Admin" → /admin.
 
 | STT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |-----|----------------|-----------|----------|----------|-------|
-| T1 | Ô tìm kiếm | Search | Không | Trống | Tìm theo trigger code hoặc tên; realtime; highlight từ khớp; tự động mở rộng nhóm chứa kết quả |
-| T2 | Filter Trạng thái | Listbox | Không | Tất cả | Options: Tất cả / Active / Inactive |
+| T1 | Ô tìm kiếm | Search | Không | Trống | Tìm theo trigger code hoặc tên; realtime; highlight từ khớp |
+| T2 | Filter chip Kiểu chạy | Chip (multi-select) | Không | Không chọn (hiện tất cả) | Options: Realtime / Near Realtime / Offline; chọn nhiều chip cùng lúc; click lại để bỏ chọn; có ít nhất 1 chip đang chọn → hiện link "Xóa bộ lọc" |
+| T2b | Filter Trạng thái | Listbox | Không | Tất cả | Options: Tất cả / Active / Inactive; kết hợp được với filter chip Kiểu chạy |
 | T3 | Nút [+ Thêm trigger] | Button (primary) | – | – | Mở Modal Tạo trigger mới (xem T-NEW bên dưới) |
-| T4 | Header nhóm (Realtime / Near Realtime / Offline) | Collapsible | – | Mở rộng | Click → thu gọn / mở rộng; hiển thị số lượng trong ngoặc |
 | T5 | Cột Code | Text | – | – | Trigger code in hoa, font mono |
 | T6 | Cột Tên | Text | – | – | Tên đầy đủ của trigger |
-| T7 | Cột Source | Text | – | – | BSS / OCS / SuperApp |
+| T6b | Cột Kiểu chạy | Badge | – | – | `Realtime` (xanh lá) / `Near Realtime` (xanh dương) / `Offline` (xám) |
+| T7 | Cột Nguồn sự kiện | Text | – | – | BSS / OCS / SuperApp |
 | T8 | Cột Trạng thái | Status chip | – | – | Active = chip xanh lá; Inactive = chip xám + "Không còn sử dụng" |
 | T9 | Cột Hành động | Button | – | – | **[Xem / Sửa]** → mở Modal Chi tiết (xem T-DETAIL bên dưới) |
-| T10 | Trạng thái rỗng | Text | – | – | "Không có trigger" per nhóm; "Không tìm thấy trigger nào" khi không có kết quả toàn bộ |
+| T10 | Trạng thái rỗng | Text | – | – | "Không có trigger nào" khi danh sách trống hoặc không có kết quả khớp bộ lọc/tìm kiếm |
 
 ### Tab Trigger — Modal Chi tiết Trigger (Admin) _(T-DETAIL)_
 
