@@ -1450,13 +1450,11 @@ function Customer360Screen({ uid, onBack }) {
           </div>
         </div>
 
-        {/* KPI strip — 6 chỉ số chính */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:10, marginTop:12 }}>
+        {/* KPI strip — chỉ số tổng quan toàn KH (Tỷ lệ phát/hoàn là đặc thù BCCP nên nằm trong sub-tab BCCP) */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10, marginTop:12 }}>
           {[
             { label:'Tổng đơn', value: kh.orders.toLocaleString(), unit:'' },
             { label:'Doanh thu 12 tháng', value: kh.revenue, unit:' ₫', color:'var(--success)' },
-            { label:'Tỷ lệ phát', value: kh.deliveryRate, unit:'%', color: kh.deliveryRate>=90 ? 'var(--success)':'var(--warn)' },
-            { label:'Tỷ lệ hoàn', value: kh.returnRate, unit:'%', color: kh.returnRate>=20 ? 'var(--danger)':'var(--warn)' },
             { label:'Điểm tích lũy', value: kh.loyalty?.points != null ? kh.loyalty.points.toLocaleString() : '—', unit:' pt', color:'var(--purple)' },
             { label:'Độ đầy đủ hồ sơ', value: kh.completeness, unit:'%', color: completenessColor },
           ].map((k,i) => (
