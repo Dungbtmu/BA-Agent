@@ -1388,7 +1388,6 @@ function Customer360Screen({ uid, onBack }) {
     { key:'address',    label:'Địa chỉ' },
     ...(kh.type==='BUSINESS' ? [{ key:'business', label:'Doanh nghiệp' }] : []),
     { key:'pillars',    label:'Hoạt động theo mảng dịch vụ chính' },
-    { key:'transaction',label:'GD & COD' },
     { key:'behavior',   label:'Hành vi số' },
     { key:'cskh',       label:'CSKH' },
     { key:'scores',     label:'Điểm số & Phân khúc' },
@@ -1874,7 +1873,7 @@ function Customer360Screen({ uid, onBack }) {
           // trừ HCC (dịch vụ công) dùng "số hồ sơ đã xử lý" thay cho doanh thu.
           // Dữ liệu mock cho prototype: tất cả mảng đều hiển thị chỉ số để stakeholder hình dung đầy đủ.
           const PILLAR_MOCK = {
-            BCCP:      { fields:[['Doanh thu cước 12 tháng', `${kh.revenue} ₫`],['Tổng đơn gửi/nhận', `${kh.orders.toLocaleString()} đơn`],['Tỷ lệ phát thành công', `${kh.deliveryRate}%`],['Tỷ lệ hoàn', `${kh.returnRate}%`],['Tổng COD đã thu', '312.400.000 ₫'],['Thời gian giao trung bình', '2,4 ngày']], signal: kh.returnRate>=20 ? { text:'Tỷ lệ hoàn cao — cần theo dõi', color:'var(--danger)' } : { text:'Hoạt động ổn định', color:'var(--success)' } },
+            BCCP:      { fields:[['Doanh thu cước 12 tháng', `${kh.revenue} ₫`],['Tổng đơn gửi/nhận', `${kh.orders.toLocaleString()} đơn`],['Trung bình đơn/tháng', kh.avgMonthly || '—'],['Tỷ lệ phát thành công', `${kh.deliveryRate}%`],['Tỷ lệ hoàn', `${kh.returnRate}%`],['Thời gian giao trung bình', '2,4 ngày']], signal: kh.returnRate>=20 ? { text:'Tỷ lệ hoàn cao — cần theo dõi', color:'var(--danger)' } : { text:'Hoạt động ổn định', color:'var(--success)' } },
             TCBC:      { fields:[['Doanh thu phí dịch vụ', '18.500.000 ₫'],['Tổng giá trị giao dịch', '2.340.000.000 ₫'],['Số giao dịch 12 tháng', '412 giao dịch'],['Giá trị giao dịch TB', '5.680.000 ₫'],['Kênh chính', 'Tại quầy'],['Loại giao dịch nhiều nhất', 'Thu hộ COD']], signal:{ text:'Tiềm năng upsell: PayPost thu hộ online', color:'var(--info)' } },
             PPBL:      { fields:[['Doanh thu bán lẻ 12 tháng', '96.700.000 ₫'],['Tổng đơn mua tại quầy', '284 đơn'],['Giá trị đơn trung bình', '340.000 ₫'],['Tần suất mua', '~24 đơn/tháng'],['Nhóm hàng mua nhiều', 'Tem, bao bì, VPP'],['Điểm bán thường dùng', 'BĐ Cầu Giấy']], signal:{ text:'Khách mua đều — có thể mời chương trình khách thân thiết', color:'var(--info)' } },
             HCC:       { fields:[['Số hồ sơ đã xử lý', '17 hồ sơ'],['Hồ sơ trả tại nhà', '12 hồ sơ'],['Thủ tục hay dùng', 'Cấp đổi giấy tờ'],['Tỷ lệ hồ sơ thành công', '94%'],['Thời gian xử lý TB', '3,2 ngày'],['Phí dịch vụ đã thu', '1.360.000 ₫']], signal:{ text:'Sử dụng ổn định dịch vụ hành chính công', color:'var(--success)' } },
@@ -1892,7 +1891,7 @@ function Customer360Screen({ uid, onBack }) {
           return (
             <div>
               <div style={{ fontSize:12, color:'var(--muted)', marginBottom:14, lineHeight:1.6 }}>
-                Chọn từng mảng dịch vụ để xem chỉ số riêng. Xem chi tiết giao dịch và đối soát COD tại tab <strong>GD &amp; COD</strong>.
+                Chọn từng mảng dịch vụ để xem chỉ số riêng. Riêng mảng <strong>BCCP</strong> có thêm chi tiết giao dịch và đối soát COD ở bên dưới.
               </div>
               <div className="tabs-strip" style={{ marginBottom:16 }}>
                 {rows.map(r => (
@@ -1920,97 +1919,66 @@ function Customer360Screen({ uid, onBack }) {
                 ) : (
                   <div style={{ padding:20, textAlign:'center', color:'var(--muted)', fontSize:13, background:'var(--bg)', borderRadius:10, marginBottom:14 }}>Chưa phát sinh dữ liệu cho mảng dịch vụ này</div>
                 )}
+
+                {/* COD — Thu hộ: chỉ riêng mảng BCCP (COD là nghiệp vụ đặc thù của bưu chính chuyển phát) */}
+                {active.id==='BCCP' && active.active && kh.cod && (
+                  <div style={{ marginTop:6, marginBottom:16, paddingTop:16, borderTop:'1px solid var(--line)' }}>
+                    <div className="section-title">COD — Thu hộ</div>
+                    <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:8 }}>
+                      {[
+                        { label:'Tổng COD', value:kh.cod.total+' ₫', bg:'var(--success-soft)', color:'var(--success)' },
+                        { label:'Đã thu',   value:kh.cod.collected+' ₫', bg:'var(--info-soft)', color:'var(--info)' },
+                        { label:'Chưa thu', value:kh.cod.pending+' ₫', bg: parseFloat(kh.cod.pending.replace(/\./g,''))>0 ? 'var(--danger-soft)':'var(--line)', color: parseFloat(kh.cod.pending.replace(/\./g,''))>0 ? 'var(--danger)':'var(--muted)' },
+                        { label:'Đối soát', value: kh.cod.status==='MATCHED'?'Khớp':kh.cod.status==='DISCREPANCY'?'Chênh lệch':'Đang chờ', bg: kh.cod.status==='MATCHED'?'var(--success-soft)':kh.cod.status==='DISCREPANCY'?'var(--danger-soft)':'var(--warn-soft)', color: kh.cod.status==='MATCHED'?'var(--success)':kh.cod.status==='DISCREPANCY'?'var(--danger)':'var(--warn)' },
+                      ].map((k,i) => (
+                        <div key={i} style={{ background:k.bg, borderRadius:10, padding:12 }}>
+                          <div style={{ fontSize:11, color:'var(--muted)', marginBottom:4 }}>{k.label}</div>
+                          <div style={{ fontSize:14, fontWeight:800, color:k.color }} className="tabular-nums">{k.value}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Đóng góp theo nguồn dữ liệu: chỉ riêng BCCP */}
+                {active.id==='BCCP' && active.active && (() => {
+                  const srcRows = (kh.sourcesData||[])
+                    .filter(s => s.giao_dich && (s.giao_dich.tongDon > 0 || s.giao_dich.cod !== '—'))
+                    .map(s => ({ source:s.source, vaiTro:s.giao_dich.vaiTro||'—', tongDon:s.giao_dich.tongDon>0 ? s.giao_dich.tongDon.toLocaleString() : '—', cod:s.giao_dich.cod||'—' }));
+                  if (srcRows.length === 0) return null;
+                  return (
+                    <div style={{ marginBottom:16 }}>
+                      <div className="section-title">Đóng góp theo nguồn dữ liệu</div>
+                      <div style={{ overflow:'auto', borderRadius:10, border:'1px solid var(--border)' }}>
+                        <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+                          <thead>
+                            <tr style={{ background:'var(--bg-2)', borderBottom:'1px solid var(--border)' }}>
+                              {['Nguồn','Vai trò','Số đơn','COD đóng góp'].map(h => (
+                                <th key={h} style={{ padding:'9px 12px', textAlign:'left', fontSize:11, fontWeight:800, color:'var(--muted)' }}>{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {srcRows.map((r,i) => (
+                              <tr key={i} style={{ borderBottom:'1px solid var(--line)' }}>
+                                <td style={{ padding:'9px 12px' }}><span className="badge badge-blue">{r.source}</span></td>
+                                <td style={{ padding:'9px 12px', fontSize:12 }}>{r.vaiTro}</td>
+                                <td style={{ padding:'9px 12px', fontSize:12, fontWeight:600 }} className="tabular-nums">{r.tongDon}</td>
+                                <td style={{ padding:'9px 12px', fontSize:12, fontWeight:600, color: r.cod!=='—'?'var(--success)':'var(--muted)' }} className="tabular-nums">{r.cod !== '—' ? r.cod+' ₫' : '—'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 <div style={{ fontSize:12, fontWeight:600, color:active.signal.color }}>Tín hiệu / Rủi ro: {active.signal.text}</div>
               </div>
             </div>
           );
         })()}
-
-        {/* GIAO DỊCH & COD */}
-        {tab==='transaction' && (
-          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
-            <div style={{ fontSize:12, color:'var(--muted)', lineHeight:1.6 }}>
-              Chi tiết giao dịch và đối soát COD của mảng <strong>BCCP</strong>. Xem tổng hợp đa mảng tại tab <strong>Hoạt động theo mảng dịch vụ chính</strong>.
-            </div>
-
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
-              {/* Tổng hợp giao dịch */}
-              <div>
-                <div className="section-title">Tổng hợp giao dịch</div>
-                {[
-                  ['Tổng đơn', kh.orders.toLocaleString()],
-                  ['Doanh thu 12 tháng', `${kh.revenue} ₫`],
-                  ['Trung bình đơn/tháng', kh.avgMonthly],
-                  ['Dịch vụ chính', kh.service || 'Chưa có dữ liệu'],
-                  ['Tỷ lệ phát thành công', `${kh.deliveryRate}%`],
-                  ['Tỷ lệ hoàn', `${kh.returnRate}%`],
-                ].map(([l,v]) => (
-                  <div key={l} className="info-row">
-                    <span>{l}</span>
-                    <b className="tabular-nums">{v}</b>
-                  </div>
-                ))}
-              </div>
-
-              {/* COD */}
-              <div>
-                <div className="section-title">COD — Thu hộ</div>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:14 }}>
-                  {[
-                    { label:'Tổng COD', value:kh.cod.total+' ₫', bg:'var(--success-soft)', color:'var(--success)' },
-                    { label:'Đã thu',   value:kh.cod.collected+' ₫', bg:'var(--info-soft)', color:'var(--info)' },
-                    { label:'Chưa thu', value:kh.cod.pending+' ₫', bg: parseFloat(kh.cod.pending.replace(/\./g,''))>0 ? 'var(--danger-soft)':'var(--line)', color: parseFloat(kh.cod.pending.replace(/\./g,''))>0 ? 'var(--danger)':'var(--muted)' },
-                    { label:'Đối soát', value: kh.cod.status==='MATCHED'?'Khớp':kh.cod.status==='DISCREPANCY'?'Chênh lệch':'Đang chờ', bg: kh.cod.status==='MATCHED'?'var(--success-soft)':kh.cod.status==='DISCREPANCY'?'var(--danger-soft)':'var(--warn-soft)', color: kh.cod.status==='MATCHED'?'var(--success)':kh.cod.status==='DISCREPANCY'?'var(--danger)':'var(--warn)' },
-                  ].map((k,i) => (
-                    <div key={i} style={{ background:k.bg, borderRadius:10, padding:12 }}>
-                      <div style={{ fontSize:11, color:'var(--muted)', marginBottom:4 }}>{k.label}</div>
-                      <div style={{ fontSize:14, fontWeight:800, color:k.color }} className="tabular-nums">{k.value}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Đóng góp theo nguồn dữ liệu */}
-            {(() => {
-              const srcRows = (kh.sourcesData||[])
-                .filter(s => s.giao_dich && (s.giao_dich.tongDon > 0 || s.giao_dich.cod !== '—'))
-                .map(s => ({
-                  source: s.source,
-                  vaiTro: s.giao_dich.vaiTro || '—',
-                  tongDon: s.giao_dich.tongDon > 0 ? s.giao_dich.tongDon.toLocaleString() : '—',
-                  cod: s.giao_dich.cod || '—',
-                }));
-              if (srcRows.length === 0) return null;
-              return (
-                <div>
-                  <div className="section-title">Đóng góp theo nguồn dữ liệu</div>
-                  <div style={{ overflow:'auto', borderRadius:10, border:'1px solid var(--border)' }}>
-                    <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
-                      <thead>
-                        <tr style={{ background:'var(--bg-2)', borderBottom:'1px solid var(--border)' }}>
-                          {['Nguồn','Vai trò','Số đơn','COD đóng góp'].map(h => (
-                            <th key={h} style={{ padding:'9px 12px', textAlign:'left', fontSize:11, fontWeight:800, color:'var(--muted)' }}>{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {srcRows.map((r,i) => (
-                          <tr key={i} style={{ borderBottom:'1px solid var(--line)' }}>
-                            <td style={{ padding:'9px 12px' }}><span className="badge badge-blue">{r.source}</span></td>
-                            <td style={{ padding:'9px 12px', fontSize:12 }}>{r.vaiTro}</td>
-                            <td style={{ padding:'9px 12px', fontSize:12, fontWeight:600 }} className="tabular-nums">{r.tongDon}</td>
-                            <td style={{ padding:'9px 12px', fontSize:12, fontWeight:600, color: r.cod!=='—'?'var(--success)':'var(--muted)' }} className="tabular-nums">{r.cod !== '—' ? r.cod+' ₫' : '—'}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        )}
 
         {/* HÀNH VI SỐ */}
         {tab==='behavior' && (() => {
