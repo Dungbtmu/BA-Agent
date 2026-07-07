@@ -1418,6 +1418,8 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 **Timing:** Ngay khi tài khoản bị khóa 1 chiều
 
 > **Cập nhật timing (2026-07-03):** Chuyển từ Batch/CSV `lock_1c` sang **NearRealtime** theo bảng trigger đã chốt. Bổ sung trường thông tin KH + nguyên nhân khóa + CTKM theo cột Mô tả trong bảng.
+>
+> **Rà soát bổ sung (2026-07-07):** Đối chiếu đủ 7 trường theo yêu cầu: Họ tên, Giới tính, Tuổi KH (qua `date_of_birth`, CVM tự tính tuổi), SĐT, Tuổi thuê bao, Nguyên nhân khóa 1 chiều, Chương trình KM.
 
 | Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
@@ -1426,7 +1428,7 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 | `event_timestamp` | datetime | ✅ | Thời điểm khóa 1 chiều | BSS — thời điểm chuyển trạng thái LOCK_1C | `2026-06-02 00:00:00` |
 | `full_name` | string(64) | ❌ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
 | `gender` | string | ❌ | Giới tính KH | `ekyc_data` → `gender` — chưa xác nhận nguồn | `MALE` |
-| `age_segment` | string | ❌ | Tuổi/phân khúc tuổi KH | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `25-34` |
+| `date_of_birth` | date | ❌ | Ngày sinh KH — CVM tự tính tuổi cụ thể từ trường này | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `1998-03-15` |
 | `subscriber_tenure_days` | integer | ❌ | Tuổi thuê bao (số ngày đã dùng mạng) | BSS tính từ `resource.msisdn_status_history` | `365` |
 | `lock_scenario` | string | ✅ | Kịch bản khóa (nguyên nhân khóa 1 chiều) | BSS phân loại: `SYSTEM_ACTION` hoặc `INACTIVE` | `INACTIVE` |
 | `days_inactive` | integer | ❌ | Số ngày không sử dụng (nếu kịch bản INACTIVE) | BSS tính từ CDR | `90` |
@@ -1443,6 +1445,7 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 | `{{nguyen_nhan_khoa}}` | ✅ | Nguyên nhân khóa 1 chiều để CVM phân nhánh nội dung hướng dẫn khôi phục | Văn bản | Payload `lock_scenario` | — | `INACTIVE` |
 | `{{so_ngay_con_den_khoa_2c}}` | ❌ | Số ngày còn lại trước khi khóa 2 chiều — tạo urgency | Số | Payload `days_to_lock_2c` | không hiển thị đếm ngược | `30 ngày` |
 | `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin nhắn khóa 1 chiều | Văn bản | Payload `full_name` hoặc CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{tuoi_kh}}` | ❌ | Tuổi KH — CVM tính từ `date_of_birth` để cá nhân hóa nội dung theo độ tuổi | Số | Payload `date_of_birth` → CVM tính tuổi | không cá nhân hóa theo tuổi | `28` |
 | `{{chuong_trinh_km}}` | ❌ | Chương trình khuyến mãi mở khóa để tăng động lực quay lại | Văn bản | Payload `promotion_code` | không hiện KM | `Giảm 10% khi mở khóa` |
 | `{{huong_dan_mo_khoa}}` | ✅ | Hướng dẫn cụ thể để KH tự mở khóa 1 chiều | Văn bản | CVM cấu hình tĩnh theo `lock_scenario` | — | `Sử dụng dịch vụ hoặc liên hệ 1800xxx` |
 

@@ -1258,6 +1258,8 @@
 **Trigger bởi:** BSS (quét hàng ngày)
 **Thời điểm push:** 02:00–04:00 hàng ngày
 
+> **⚠️ Cập nhật 2026-07-07 — bản chuẩn ở `data-contract-template-lifecycle.md`:** đã chuyển sang NearRealtime, bổ sung đủ 7 trường theo rà soát (Họ tên, Giới tính, Tuổi KH qua `date_of_birth`, SĐT, Tuổi thuê bao, Nguyên nhân khóa 1 chiều, Chương trình KM). File này (bản gốc) chưa cập nhật — xem bản `-lifecycle.md` để lấy schema đầy đủ.
+
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
