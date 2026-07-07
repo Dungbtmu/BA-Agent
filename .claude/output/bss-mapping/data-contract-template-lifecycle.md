@@ -700,38 +700,41 @@ Không có file Batch/CSV trong phạm vi hiện tại.
 
 ##### 2.19 File: `no_plan_x_days_{YYYYMMDD}.csv` (E_NO_PLAN_X_DAYS)
 
-**Mô tả:** Danh sách KH trạng thái ACTIVE nhưng không có gói cước nào đang active trong x ngày liên tiếp. Đề xuất các mốc nhắc nhiều tầng: **x, x+7 và x=10 ngày** (x do CVM cấu hình).
+**Mô tả:** Danh sách KH trạng thái ACTIVE nhưng không có gói cước nào đang active trong x ngày liên tiếp. Đề xuất ngưỡng **x = 10 ngày** (do CVM cấu hình).
 **Trigger bởi:** BSS (quét hàng ngày từ `resource.msisdns`)
 **Thời điểm push:** 02:00–04:00 hàng ngày
 
-> **Mốc nhắc nhiều tầng (2026-07-03):** Đề xuất nhắc theo nhiều mốc: mốc đầu (x ngày), mốc x+7, và mốc **10 ngày** — mỗi mốc dùng nội dung khác nhau (nhắc nhẹ → thúc mạnh). Bổ sung trường thông tin KH và kênh/hình thức đăng ký theo cột Mô tả trong bảng trigger.
+> **Chốt ngưỡng (2026-07-07):** Bỏ mốc nhắc nhiều tầng đã đề xuất trước đó, chốt **1 ngưỡng duy nhất x = 10 ngày** không có gói cước liên tiếp thì trigger. Rà soát đủ 10 trường theo yêu cầu: Họ tên, Giới tính, Tuổi KH (qua `date_of_birth`), SĐT, Tuổi thuê bao, Tên gói chính gần nhất, Chương trình KM, Gói gợi ý, Kênh đăng ký, Hình thức đăng ký.
 
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |
-| `days_without_plan` | integer | ✅ | Số ngày không có gói cước | BSS tính từ ngày gói cuối hết hạn | `10` |
-| `reminder_tier` | string | ❌ | Mốc nhắc hiện tại (để CVM phân nhánh nội dung) | CVM cấu hình theo `days_without_plan` | `TIER_X` hoặc `TIER_X7` hoặc `TIER_10` |
+| `days_without_plan` | integer | ✅ | Số ngày không có gói cước (ngưỡng trigger: 10) | BSS tính từ ngày gói cuối hết hạn | `10` |
 | `full_name` | string(64) | ❌ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
 | `gender` | string | ❌ | Giới tính KH | `ekyc_data` → `gender` — chưa xác nhận nguồn | `MALE` |
-| `age_segment` | string | ❌ | Tuổi/phân khúc tuổi KH | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `25-34` |
-| `last_plan_name` | string | ❌ | Tên gói cuối cùng KH từng dùng | OCS → BSS nightly batch | `GOI_DATA_70K` |
+| `date_of_birth` | date | ❌ | Ngày sinh KH — CVM tự tính tuổi cụ thể từ trường này | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `1998-03-15` |
+| `subscriber_tenure_days` | integer | ❌ | Tuổi thuê bao (số ngày KH đã dùng mạng) | BSS tính từ `resource.msisdn_status_history` | `365` |
+| `last_plan_name` | string | ❌ | Tên gói chính gần nhất KH từng dùng | OCS → BSS nightly batch | `GOI_DATA_70K` |
 | `last_plan_expiry_date` | date | ✅ | Ngày hết hạn gói cuối | `resource.msisdns.expiry_date` (BSS) | `2026-05-26` |
 | `promotion_code` | string | ❌ | Chương trình khuyến mãi đăng ký lại (nếu có) | OCS/CVM — chương trình KM | `KM_QUAYLAI_20PCT` |
+| `suggested_plan` | string | ❌ | Gói gợi ý NBO đề xuất phù hợp với số dư hiện có | CVM NBO dựa trên `balance` và `last_plan_name` | `GOI_DATA_30K` |
 | `register_channel` | string | ❌ | Kênh đăng ký gói gợi ý | CVM cấu hình | `APP` hoặc `USSD` |
 | `register_method` | string | ❌ | Hình thức đăng ký | CVM cấu hình | `MANUAL` hoặc `AUTO` |
 | `balance` | integer | ✅ | Số dư tài khoản hiện tại (đồng) | OCS → BSS nightly batch | `15000` |
-| `subscriber_tenure_days` | integer | ❌ | Tuổi thuê bao (số ngày KH đã dùng mạng) | BSS tính từ `resource.msisdn_status_history` | `365` |
 
 **Param template:**
 
 | Param | Bắt buộc | Mô tả | Định dạng | Nguồn dữ liệu | Fallback | Ví dụ |
 |---|---|---|---|---|---|---|
 | `{{so_dien_thoai}}` | ✅ | Số điện thoại KH không có gói cước | Văn bản | CSV `msisdn` | — | `0901234567` |
-| `{{so_ngay_khong_goi}}` | ✅ | Số ngày không có gói — tạo cảm giác cấp bách kích hoạt lại | Số | CSV `days_without_plan` | — | `7 ngày` |
+| `{{so_ngay_khong_goi}}` | ✅ | Số ngày không có gói — tạo cảm giác cấp bách kích hoạt lại | Số | CSV `days_without_plan` | — | `10 ngày` |
 | `{{so_du_tai_khoan}}` | ✅ | Số dư tài khoản — để CVM gợi ý gói phù hợp với mức tiền có sẵn | Tiền (VND) | CSV `balance` | — | `15.000 VNĐ` |
 | `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin nhắn nhắc đăng ký gói | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
-| `{{ten_goi_cu}}` | ❌ | Gói cước cuối KH từng dùng — gợi ý gia hạn lại | Văn bản | CSV `last_plan_name` | không đề cập gói cũ | `GOI_DATA_70K` |
-| `{{goi_phu_hop_de_xuat}}` | ❌ | Tên gói NBO đề xuất phù hợp với số dư hiện có | Văn bản | CVM NBO dựa trên `balance` và `last_plan_name` | không hiện gợi ý | `GOI_DATA_30K` |
+| `{{tuoi_kh}}` | ❌ | Tuổi KH — CVM tính từ `date_of_birth` để cá nhân hóa nội dung theo độ tuổi | Số | CSV `date_of_birth` → CVM tính tuổi | không cá nhân hóa theo tuổi | `28` |
+| `{{ten_goi_cu}}` | ❌ | Gói cước chính gần nhất KH từng dùng — gợi ý gia hạn lại | Văn bản | CSV `last_plan_name` | không đề cập gói cũ | `GOI_DATA_70K` |
+| `{{chuong_trinh_km}}` | ❌ | Chương trình khuyến mãi đăng ký lại để tăng động lực | Văn bản | CSV `promotion_code` | không hiện KM | `Giảm 20% khi đăng ký lại` |
+| `{{kenh_dang_ky}}` | ❌ | Kênh đăng ký gợi ý để hướng dẫn KH thao tác | Văn bản | CSV `register_channel` | dùng kênh mặc định | `APP` |
+| `{{goi_phu_hop_de_xuat}}` | ❌ | Tên gói NBO đề xuất phù hợp với số dư hiện có | Văn bản | CSV `suggested_plan` hoặc CVM NBO dựa trên `balance` và `last_plan_name` | không hiện gợi ý | `GOI_DATA_30K` |
 
 ---
 
