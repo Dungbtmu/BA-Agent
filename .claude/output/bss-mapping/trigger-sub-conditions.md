@@ -67,11 +67,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E02 | app_installed | Đã cài app chưa | boolean | = | FALSE | Bắt buộc | Điều kiện cốt lõi — phải = FALSE | AND | BSS/OCS Batch CSV |
-| E02 | hours_since_activation | Số giờ từ khi kích hoạt SIM | integer | >= | 24 | Bắt buộc | Đã đủ 24h từ mốc NGAY_0 | AND | BSS/OCS Batch CSV |
-| E02 | sim_type | Loại SIM | enum | IN, NOT IN | PHYSICAL, ESIM | Tùy chọn | Lọc riêng cho eSIM vs SIM vật lý | AND | BSS/OCS Batch CSV |
-| E02 | segment_age | Phân khúc tuổi | enum | IN | 15-18, 19-24, 25-34 | Tùy chọn | Nhắm nhóm tuổi trẻ | AND | BSS/OCS Batch CSV |
-| E02 | device_type | Loại thiết bị | enum | IN | ANDROID, IOS, FEATURE | Tùy chọn | Gửi hướng dẫn cài app đúng store | AND | BSS/OCS Batch CSV |
+| E02 | app_installed | Đã cài app chưa | boolean | = | FALSE | Bắt buộc | Điều kiện cốt lõi — phải = FALSE | AND | BSS API Event |
+| E02 | hours_since_activation | Số giờ từ khi kích hoạt SIM | integer | >= | 24 | Bắt buộc | Đã đủ 24h từ mốc NGAY_0 | AND | BSS API Event |
+| E02 | sim_type | Loại SIM | enum | IN, NOT IN | PHYSICAL, ESIM | Tùy chọn | Lọc riêng cho eSIM vs SIM vật lý | AND | BSS API Event |
+| E02 | segment_age | Phân khúc tuổi | enum | IN | 15-18, 19-24, 25-34 | Tùy chọn | Nhắm nhóm tuổi trẻ | AND | BSS API Event |
+| E02 | device_type | Loại thiết bị | enum | IN | ANDROID, IOS, FEATURE | Tùy chọn | Gửi hướng dẫn cài app đúng store | AND | BSS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -130,11 +130,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E04 | firebase_token | Firebase push token | string | IS NOT NULL | — | Bắt buộc | Phải có token mới gửi được Push Notification | AND | SuperApp/Kafka Batch CSV |
-| E04 | hours_since_install | Số giờ từ khi cài app | integer | >= | 24 | Bắt buộc | Đã đủ 24h từ khi cài app | AND | SuperApp/Kafka Batch CSV |
-| E04 | device_type | Loại thiết bị | enum | IN | ANDROID, IOS | Tùy chọn | Hướng dẫn mở app đúng thiết bị | AND | SuperApp/Kafka Batch CSV |
-| E04 | segment_age | Phân khúc tuổi | enum | IN | 15-18, 19-24, 25-34 | Tùy chọn | Nhắm nhóm tuổi trẻ | AND | SuperApp/Kafka Batch CSV |
-| E04 | os_version | Phiên bản hệ điều hành | string | IN, CONTAINS | Android 12+, iOS 15+ | Tùy chọn | Lọc theo phiên bản OS hỗ trợ | AND | SuperApp/Kafka Batch CSV |
+| E04 | firebase_token | Firebase push token | string | IS NOT NULL | — | Bắt buộc | Phải có token mới gửi được Push Notification | AND | SuperApp/BSS API Event |
+| E04 | hours_since_install | Số giờ từ khi cài app | integer | >= | 24 | Bắt buộc | Đã đủ 24h từ khi cài app | AND | SuperApp/BSS API Event |
+| E04 | device_type | Loại thiết bị | enum | IN | ANDROID, IOS | Tùy chọn | Hướng dẫn mở app đúng thiết bị | AND | SuperApp/BSS API Event |
+| E04 | segment_age | Phân khúc tuổi | enum | IN | 15-18, 19-24, 25-34 | Tùy chọn | Nhắm nhóm tuổi trẻ | AND | SuperApp/BSS API Event |
+| E04 | os_version | Phiên bản hệ điều hành | string | IN, CONTAINS | Android 12+, iOS 15+ | Tùy chọn | Lọc theo phiên bản OS hỗ trợ | AND | SuperApp/BSS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -159,11 +159,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E05 | voice_usage_sec | Tổng giây thoại trong 72h | integer | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | BSS/OCS Batch CSV |
-| E05 | data_usage_mb | Tổng data đã dùng (MB) | decimal | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | BSS/OCS Batch CSV |
-| E05 | sms_count | Số SMS đã gửi | integer | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | BSS/OCS Batch CSV |
-| E05 | device_type | Loại thiết bị | enum | IN | ANDROID, IOS, FEATURE_PHONE | Tùy chọn | Hướng dẫn sử dụng đúng loại thiết bị | AND | BSS/OCS Batch CSV |
-| E05 | has_app | Đã cài app chưa | boolean | = | TRUE, FALSE | Tùy chọn | Có app → push; không có → USSD | AND | BSS/OCS Batch CSV |
+| E05 | voice_usage_sec | Tổng giây thoại trong 72h | integer | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | OCS/BSS API Event |
+| E05 | data_usage_mb | Tổng data đã dùng (MB) | decimal | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | OCS/BSS API Event |
+| E05 | sms_count | Số SMS đã gửi | integer | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | OCS/BSS API Event |
+| E05 | device_type | Loại thiết bị | enum | IN | ANDROID, IOS, FEATURE_PHONE | Tùy chọn | Hướng dẫn sử dụng đúng loại thiết bị | AND | OCS/BSS API Event |
+| E05 | has_app | Đã cài app chưa | boolean | = | TRUE, FALSE | Tùy chọn | Có app → push; không có → USSD | AND | OCS/BSS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -279,10 +279,10 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E09 | time_on_screen_sec | Thời gian KH xem màn hình đổi gói (giây) | integer | >=, BETWEEN | 30 | Tùy chọn | Tối thiểu 30 giây mới tính là có intent | AND | SuperApp/Kafka Batch CSV |
-| E09 | view_count_today | Số lần vào màn hình đổi gói trong ngày | integer | >= | 2 | Tùy chọn | Lần thứ 2+ → intent rõ ràng hơn | AND | SuperApp/Kafka Batch CSV |
-| E09 | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Để đề xuất đúng gói nâng cấp | AND | SuperApp/Kafka Batch CSV |
-| E09 | total_data_30d_mb | Tổng data dùng 30 ngày (MB) | float | >=, BETWEEN | 40000 | Tùy chọn | KH dùng nhiều → gợi ý gói lớn hơn | AND | BSS/OCS Batch CSV |
+| E09 | time_on_screen_sec | Thời gian KH xem màn hình đổi gói (giây) | integer | >=, BETWEEN | 30 | Tùy chọn | Tối thiểu 30 giây mới tính là có intent | AND | SuperApp API Event |
+| E09 | view_count_today | Số lần vào màn hình đổi gói trong ngày | integer | >= | 2 | Tùy chọn | Lần thứ 2+ → intent rõ ràng hơn | AND | SuperApp API Event |
+| E09 | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Để đề xuất đúng gói nâng cấp | AND | SuperApp API Event |
+| E09 | total_data_30d_mb | Tổng data dùng 30 ngày (MB) | float | >=, BETWEEN | 40000 | Tùy chọn | KH dùng nhiều → gợi ý gói lớn hơn | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -428,11 +428,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_ZERO_BALANCE | balance | Số dư TKC (đồng) | decimal | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | BSS/OCS Batch CSV |
-| E_ZERO_BALANCE | last_transaction_type | Loại giao dịch cuối làm hết tiền | enum | IN | VOICE_CALL, DATA_USAGE, PLAN_REGISTER, FEE | Tùy chọn | Phân nhánh nội dung phù hợp nguyên nhân | AND | BSS/OCS Batch CSV |
-| E_ZERO_BALANCE | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Để đề xuất nạp đúng mức | AND | BSS/OCS Batch CSV |
-| E_ZERO_BALANCE | plan_expiry_date | Ngày hết hạn gói | date | BEFORE, AFTER | 2026-06-30 | Tùy chọn | Cảnh báo gói sắp hết hạn kèm theo | AND | BSS/OCS Batch CSV |
-| E_ZERO_BALANCE | topup_count_30d | Số lần nạp trong 30 ngày gần nhất | integer | >=, <= | 2 | Tùy chọn | Phân biệt KH nạp thường xuyên vs hiếm | AND | BSS/OCS Batch CSV |
+| E_ZERO_BALANCE | balance | Số dư TKC (đồng) | decimal | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | BSS/OCS API Event |
+| E_ZERO_BALANCE | last_transaction_type | Loại giao dịch cuối làm hết tiền | enum | IN | VOICE_CALL, DATA_USAGE, PLAN_REGISTER, FEE | Tùy chọn | Phân nhánh nội dung phù hợp nguyên nhân | AND | BSS/OCS API Event |
+| E_ZERO_BALANCE | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Để đề xuất nạp đúng mức | AND | BSS/OCS API Event |
+| E_ZERO_BALANCE | plan_expiry_date | Ngày hết hạn gói | date | BEFORE, AFTER | 2026-06-30 | Tùy chọn | Cảnh báo gói sắp hết hạn kèm theo | AND | BSS/OCS API Event |
+| E_ZERO_BALANCE | topup_count_30d | Số lần nạp trong 30 ngày gần nhất | integer | >=, <= | 2 | Tùy chọn | Phân biệt KH nạp thường xuyên vs hiếm | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -1004,10 +1004,10 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U_PRE_EXPIRY | days_to_expiry | Số ngày còn đến khi gói hết hạn | integer | >=, <=, BETWEEN | 3 | Bắt buộc | Bao nhiêu ngày trước hết hạn → gửi nhắc | AND | BSS/OCS Batch CSV |
-| U_PRE_EXPIRY | balance | Số dư TKC (đồng) | decimal | >=, <= | 50000 | Tùy chọn | KH có đủ tiền gia hạn ngay | AND | BSS/OCS Batch CSV |
-| U_PRE_EXPIRY | package_code | Mã gói sắp hết hạn | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Nhắm gói cụ thể cần gia hạn | AND | BSS/OCS Batch CSV |
-| U_PRE_EXPIRY | plan_type | Loại gói | enum | IN | DATA, VOICE, COMBO | Tùy chọn | Phân nhánh nội dung nhắc gia hạn | AND | BSS/OCS Batch CSV |
+| U_PRE_EXPIRY | days_to_expiry | Số ngày còn đến khi gói hết hạn | integer | >=, <=, BETWEEN | 3 | Bắt buộc | Bao nhiêu ngày trước hết hạn → gửi nhắc | AND | BSS API Event |
+| U_PRE_EXPIRY | balance | Số dư TKC (đồng) | decimal | >=, <= | 50000 | Tùy chọn | KH có đủ tiền gia hạn ngay | AND | BSS API Event |
+| U_PRE_EXPIRY | package_code | Mã gói sắp hết hạn | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Nhắm gói cụ thể cần gia hạn | AND | BSS API Event |
+| U_PRE_EXPIRY | plan_type | Loại gói | enum | IN | DATA, VOICE, COMBO | Tùy chọn | Phân nhánh nội dung nhắc gia hạn | AND | BSS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -1032,9 +1032,9 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U_POST_EXPIRY | days_after_expiry | Số ngày sau khi gói hết hạn | integer | >=, <=, BETWEEN | 1 | Bắt buộc | Bao nhiêu ngày sau hết hạn → thúc gia hạn | AND | BSS/OCS Batch CSV |
-| U_POST_EXPIRY | balance | Số dư TKC (đồng) | decimal | >=, <= | 50000 | Tùy chọn | KH có tiền nhưng quên gia hạn | AND | BSS/OCS Batch CSV |
-| U_POST_EXPIRY | package_code | Gói vừa hết hạn | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Gợi ý đăng ký lại đúng gói cũ | AND | BSS/OCS Batch CSV |
+| U_POST_EXPIRY | days_after_expiry | Số ngày sau khi gói hết hạn | integer | >=, <=, BETWEEN | 1 | Bắt buộc | Bao nhiêu ngày sau hết hạn → thúc gia hạn | AND | BSS API Event |
+| U_POST_EXPIRY | balance | Số dư TKC (đồng) | decimal | >=, <= | 50000 | Tùy chọn | KH có tiền nhưng quên gia hạn | AND | BSS API Event |
+| U_POST_EXPIRY | package_code | Gói vừa hết hạn | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Gợi ý đăng ký lại đúng gói cũ | AND | BSS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -1093,10 +1093,10 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_LOCK_1C | lock_reason | Lý do khóa 1 chiều | enum | IN | INACTIVE, ADMIN | Tùy chọn | Phân nhánh theo nguyên nhân khóa | AND | BSS/OCS Batch CSV |
-| E_LOCK_1C | days_in_lock | Số ngày ở trạng thái khóa 1 chiều | integer | >=, <=, BETWEEN | 7 | Tùy chọn | Nhắc theo thời gian đã bị khóa | AND | BSS/OCS Batch CSV |
-| E_LOCK_1C | days_until_lock_2c | Số ngày còn lại đến khi bị khóa 2 chiều | integer | >=, <=, BETWEEN | 15 | Tùy chọn | Cảnh báo deadline trước khi khóa 2 chiều | AND | BSS/OCS Batch CSV |
-| E_LOCK_1C | balance | Số dư TKC (đồng) | decimal | >=, <= | 0 | Tùy chọn | KH hết tiền → hướng dẫn nạp tiền | AND | BSS/OCS Batch CSV |
+| E_LOCK_1C | lock_reason | Lý do khóa 1 chiều | enum | IN | INACTIVE, ADMIN | Tùy chọn | Phân nhánh theo nguyên nhân khóa | AND | BSS/OCS API Event |
+| E_LOCK_1C | days_in_lock | Số ngày ở trạng thái khóa 1 chiều | integer | >=, <=, BETWEEN | 7 | Tùy chọn | Nhắc theo thời gian đã bị khóa | AND | BSS/OCS API Event |
+| E_LOCK_1C | days_until_lock_2c | Số ngày còn lại đến khi bị khóa 2 chiều | integer | >=, <=, BETWEEN | 15 | Tùy chọn | Cảnh báo deadline trước khi khóa 2 chiều | AND | BSS/OCS API Event |
+| E_LOCK_1C | balance | Số dư TKC (đồng) | decimal | >=, <= | 0 | Tùy chọn | KH hết tiền → hướng dẫn nạp tiền | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -1118,9 +1118,9 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_PRE_LOCK_2C | days_in_lock_1c | Số ngày đã ở trạng thái khóa 1 chiều | integer | >=, <=, BETWEEN | 30 | Bắt buộc | Để tính deadline chuyển sang khóa 2 chiều | AND | BSS/OCS Batch CSV |
-| E_PRE_LOCK_2C | scheduled_lock_2c_date | Ngày dự kiến bị khóa 2 chiều | date | BEFORE | 2026-07-15 | Tùy chọn | Gửi trước ngày bị khóa 2 chiều | AND | BSS/OCS Batch CSV |
-| E_PRE_LOCK_2C | balance | Số dư TKC (đồng) | decimal | >=, <= | 50000 | Tùy chọn | KH có tiền → hướng dẫn đóng nợ/nạp tiền | AND | BSS/OCS Batch CSV |
+| E_PRE_LOCK_2C | days_in_lock_1c | Số ngày đã ở trạng thái khóa 1 chiều | integer | >=, <=, BETWEEN | 30 | Bắt buộc | Để tính deadline chuyển sang khóa 2 chiều | AND | BSS API Event |
+| E_PRE_LOCK_2C | scheduled_lock_2c_date | Ngày dự kiến bị khóa 2 chiều | date | BEFORE | 2026-07-15 | Tùy chọn | Gửi trước ngày bị khóa 2 chiều | AND | BSS API Event |
+| E_PRE_LOCK_2C | balance | Số dư TKC (đồng) | decimal | >=, <= | 50000 | Tùy chọn | KH có tiền → hướng dẫn đóng nợ/nạp tiền | AND | BSS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
