@@ -1187,6 +1187,8 @@
 **Trigger bởi:** BSS (quét hàng ngày từ `resource.msisdns.expiry_date`)
 **Thời điểm push:** 02:00–04:00 hàng ngày
 
+> **⚠️ Cập nhật 2026-07-07 — bản chuẩn ở `data-contract-template-lifecycle.md`:** đã chuyển sang NearRealtime, bổ sung đủ 13 trường theo rà soát (Họ tên, Giới tính, Tuổi KH qua `date_of_birth`, SĐT, Tuổi thuê bao, Tên gói, Giá gói, Chu kỳ gói, Ngày hết hạn gói + số ngày tính từ lúc hết hạn, Chương trình KM, Gói gợi ý, Kênh gia hạn, Hình thức gia hạn). File này (bản gốc) chưa cập nhật — xem bản `-lifecycle.md` để lấy schema đầy đủ.
+
 | Cột | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
 | `msisdn` | string(15) | ✅ | Số điện thoại | `crm.subscribers.msisdn` | `0901234567` |

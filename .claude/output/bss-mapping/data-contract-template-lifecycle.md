@@ -1327,6 +1327,8 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 **Timing:** Ngay khi KH đã quá hạn đúng x ngày mà chưa gia hạn
 
 > **Cập nhật timing (2026-07-03):** Chuyển từ Batch/CSV `post_expiry` sang **NearRealtime** theo bảng trigger đã chốt. Bổ sung trường thông tin KH và kênh/hình thức gia hạn theo cột Mô tả trong bảng trigger.
+>
+> **Rà soát bổ sung (2026-07-07):** Đối chiếu đủ 13 trường theo yêu cầu: Họ tên, Giới tính, Tuổi KH (qua `date_of_birth`, CVM tự tính tuổi), SĐT, Tuổi thuê bao, Tên gói, Giá gói, Chu kỳ gói, Ngày hết hạn gói + số ngày tính từ lúc hết hạn, Chương trình KM, Gói gợi ý (bổ sung cột `suggested_plan` — trước đó chỉ có ở param), Kênh gia hạn, Hình thức gia hạn.
 
 | Trường | Kiểu | Bắt buộc | Mô tả | Nguồn tham chiếu | Ví dụ |
 |---|---|---|---|---|---|
@@ -1335,7 +1337,7 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 | `event_timestamp` | datetime | ✅ | Thời điểm chạm mốc quá hạn x ngày | BSS — thời điểm đủ điều kiện | `2026-06-03 08:00:00` |
 | `full_name` | string(64) | ❌ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
 | `gender` | string | ❌ | Giới tính KH | `crm.request_register_info.ekyc_data` → `gender` — chưa xác nhận nguồn | `MALE` |
-| `age_segment` | string | ❌ | Tuổi/phân khúc tuổi KH | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `25-34` |
+| `date_of_birth` | date | ❌ | Ngày sinh KH — CVM tự tính tuổi cụ thể từ trường này | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `1998-03-15` |
 | `subscriber_tenure_days` | integer | ❌ | Tuổi thuê bao (số ngày đã dùng mạng) | BSS tính từ `resource.msisdn_status_history` | `365` |
 | `last_plan` | string | ✅ | Tên gói cuối cùng đã hết hạn | OCS → BSS nightly batch | `GOI_DATA_70K` |
 | `last_plan_price` | integer | ❌ | Giá gói vừa hết hạn (đồng) | OCS — bảng giá gói | `70000` |
@@ -1343,6 +1345,7 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 | `expiry_date` | date | ✅ | Ngày gói đã hết hạn | `resource.msisdns.expiry_date` (BSS) | `2026-05-31` |
 | `days_since_expiry` | integer | ✅ | Số ngày đã qua hạn chưa gia hạn (tính từ lúc hết hạn) | BSS tính: `ngay_hien_tai - expiry_date` | `3` |
 | `promotion_code` | string | ❌ | Chương trình khuyến mãi áp dụng (nếu có) | OCS/CVM — chương trình KM đang chạy | `KM_GIAHAN_20PCT` |
+| `suggested_plan` | string | ❌ | Gói gợi ý NBO đề xuất phù hợp số dư hiện có (nếu có) | CVM NBO dựa trên `balance` và `last_plan` | `GOI_DATA_50K` |
 | `balance` | integer | ✅ | Số dư tài khoản (đồng) | OCS → BSS nightly batch | `5000` |
 | `subscriber_status` | string | ✅ | Trạng thái thuê bao hiện tại | `crm.subscribers.status` | `ACTIVE` hoặc `GRACE` |
 | `renewal_channel` | string | ❌ | Kênh gia hạn gợi ý cho KH | CVM cấu hình — kênh gia hạn ưu tiên | `APP` hoặc `USSD` hoặc `WEB` |
@@ -1359,6 +1362,7 @@ Các schema dưới đây có trong template gốc và được giữ lại theo
 | `{{so_ngay_qua_han}}` | ✅ | Số ngày đã quá hạn — tạo cảm giác cấp bách | Số | Payload `days_since_expiry` | — | `3 ngày` |
 | `{{so_du_tai_khoan}}` | ✅ | Số dư tài khoản — để CVM gợi ý gói phù hợp mức tiền có sẵn | Tiền (VND) | Payload `balance` | — | `5.000 VNĐ` |
 | `{{ten_kh}}` | ❌ | Họ tên KH để cá nhân hóa tin nhắn thúc gia hạn | Văn bản | Payload `full_name` hoặc CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
+| `{{tuoi_kh}}` | ❌ | Tuổi KH — CVM tính từ `date_of_birth` để cá nhân hóa nội dung theo độ tuổi | Số | Payload `date_of_birth` → CVM tính tuổi | không cá nhân hóa theo tuổi | `28` |
 | `{{gia_goi_cu}}` | ❌ | Giá gói vừa hết hạn — để KH so sánh khi cân nhắc gia hạn | Tiền (VND) | Payload `last_plan_price` | không hiển thị giá | `70.000 VNĐ` |
 | `{{chuong_trinh_km}}` | ❌ | Chương trình khuyến mãi gia hạn để tăng động lực | Văn bản | Payload `promotion_code` | không hiện KM | `Giảm 20% khi gia hạn` |
 | `{{kenh_gia_han}}` | ❌ | Kênh gia hạn gợi ý để hướng dẫn KH thao tác | Văn bản | Payload `renewal_channel` | dùng kênh mặc định | `APP` |
