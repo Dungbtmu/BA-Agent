@@ -892,6 +892,7 @@
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
 | U08 | consecutive_renewals | Số lần gia hạn liên tiếp | integer | >=, <=, BETWEEN | 3 | Bắt buộc | Đạt mốc chuỗi gia hạn để vinh danh | AND | BSS/OCS Batch CSV |
+| U08 | plan_cycle | Chu kỳ gói được gia hạn liên tiếp | enum | IN | DAILY, WEEKLY, MONTHLY | Tùy chọn | Lọc chuỗi gia hạn theo loại chu kỳ gói — mốc số lần vinh danh có thể khác nhau giữa gói ngày/tuần/tháng | AND | BSS/OCS Batch CSV |
 | U08 | renewal_pattern | Kiểu chuỗi gia hạn | enum | IN | ON_TIME_ONLY, EARLY_ONLY, MIXED | Tùy chọn | Phân nhánh nội dung: đúng hạn / sớm hạn / hỗn hợp | AND | BSS/OCS Batch CSV |
 | U08 | loyalty_milestone | Mốc trung thành vừa đạt được | enum | IN | M3, M6, M12 | Tùy chọn | Lọc theo mốc để gắn ưu đãi đúng cấp độ | AND | BSS/OCS Batch CSV |
 | U08 | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_120K | Tùy chọn | Nhắm gói cụ thể khi vinh danh | AND | BSS/OCS Batch CSV |
@@ -901,9 +902,15 @@
 #### Logic nghiệp vụ chi tiết
 
 **Điều kiện kích hoạt (AND):**
-- `consecutive_renewals` ≥ x với x là ngưỡng milestone (CVM cấu hình) ❓ (ngưỡng cụ thể cần xác nhận Q18)
+- `consecutive_renewals` ≥ x với x là ngưỡng milestone theo `plan_cycle` (CVM cấu hình) ❓ (ngưỡng cụ thể theo từng chu kỳ cần xác nhận Q18)
 - Chuỗi gia hạn không bị gián đoạn (dịch vụ phải liên tục, không có khoảng trống hết hạn)
 - Tính cả gia hạn đúng hạn và gia hạn sớm trong cùng chuỗi đủ điều kiện
+- Chỉ tính chuỗi gia hạn trong cùng 1 `plan_cycle` — không gộp chung số lần gia hạn giữa gói ngày và gói tháng vào cùng 1 chuỗi
+
+**Ngưỡng đề xuất theo `plan_cycle` (BA đề xuất — CVM xác nhận):**
+- `DAILY` → ngưỡng số lần cao hơn (VD: 30 lần liên tiếp ≈ 1 tháng dùng gói ngày)
+- `WEEKLY` → ngưỡng trung bình (VD: 4 lần liên tiếp ≈ 1 tháng dùng gói tuần)
+- `MONTHLY` → ngưỡng thấp hơn, dùng trực tiếp các mốc M3/M6/M12
 
 **Điều kiện chặn (bất kỳ một điều kiện dưới đây):**
 - Đã tặng thưởng cùng milestone cho `msisdn` này trong chu kỳ gần đây
@@ -1159,7 +1166,7 @@
 | Q14 | Phân khúc CHURN_RISK, GAMING do BSS tính hay CVM tự tính? | E_SEGMENT_UPDATE | 🔴 Cần ngay |
 | Q15 | SuperApp push E_CONTENT_FAIL trực tiếp vào CVM hay qua Kafka → BSS → CSV? | E_CONTENT_FAIL | 🔴 Cần ngay |
 | Q17 | Rule chặn E_ZERO_BALANCE vs E06: window 12h hay 24h? Ai owns logic chặn? | E_ZERO_BALANCE, E06 | 🟡 Quan trọng |
-| Q18 | Ngưỡng `consecutive_renewals` theo từng milestone; gia hạn sớm tính như thế nào? | U08 | 🟡 Quan trọng |
+| Q18 | Ngưỡng `consecutive_renewals` theo từng milestone và theo từng `plan_cycle` (ngày/tuần/tháng) là bao nhiêu; gia hạn sớm tính như thế nào? | U08 | 🟡 Quan trọng |
 | Q19 | OCS có tách quota thoại nội/ngoại mạng riêng không? | E_VOICE_100_ONNET, E_VOICE_100_OFFNET | 🔴 Cần ngay |
 | Q21a | OCS có event riêng khi quota data/ngày về 0 không? | U05-B | 🔴 Cần ngay |
 | Q21b | Ngưỡng N_DAYS_THRESHOLD và M_MONTHS_THRESHOLD cho U05-B? | U05-B | 🟡 Quan trọng |
