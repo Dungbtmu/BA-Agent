@@ -817,6 +817,8 @@
 **Trigger bởi:** OCS → BSS (nightly batch, phân tích mức sử dụng theo chu kỳ)
 **Thời điểm push:** 02:00–04:00 hàng ngày
 
+> **⚠️ Cập nhật 2026-07-07 — bản chuẩn ở `data-contract-template-lifecycle.md`:** đã bổ sung đủ 13 trường theo rà soát (Họ tên, Giới tính, Tuổi KH qua `date_of_birth`, SĐT, Tuổi thuê bao, Tên gói, Giá gói, Chu kỳ gói, **Ngày hết hạn gói + số ngày tính từ lúc hết hạn**, Chương trình KM, Gói gợi ý, Kênh đăng ký, Hình thức đăng ký). File này (bản gốc) chưa cập nhật các trường đó — xem bản `-lifecycle.md` để lấy schema đầy đủ.
+
 > **Rule phân loại nhu cầu:** `usage_need_segment = HIGH_NEED` khi mức sử dụng thực tế cao hơn đáng kể so với hạn mức/giá trị gói hiện tại; CVM tư vấn gói lớn hơn. `usage_need_segment = LOW_NEED` khi mức sử dụng thực tế thấp hơn đáng kể so với gói hiện tại; CVM tư vấn gói nhỏ hơn hoặc gói tiết kiệm hơn. Ngưỡng cụ thể do PO/CVM cấu hình theo từng loại tài nguyên và từng nhóm gói, không hard-code trong contract này.
 >
 > **Điều kiện dữ liệu tối thiểu:** Mỗi bản ghi phải có ít nhất một cặp dữ liệu đủ để tính nhu cầu: `avg_data_usage_mb` + `current_plan_data_quota_mb`, hoặc `avg_voice_usage_min` + `current_plan_voice_quota_min`.

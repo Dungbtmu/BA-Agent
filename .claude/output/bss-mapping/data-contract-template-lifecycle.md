@@ -559,6 +559,8 @@ Không có file Batch/CSV trong phạm vi hiện tại.
 **Thời điểm push:** 02:00–04:00 hàng ngày
 
 > **Chốt cửa sổ phân tích (2026-07-03):** Phân tích tập thuê bao trong **2 tháng liên tiếp** (nhất quán với U05-A). Bổ sung trường thông tin KH và kênh/hình thức đăng ký theo cột Mô tả trong bảng trigger.
+>
+> **Rà soát bổ sung (2026-07-07):** Đối chiếu đủ 13 trường theo yêu cầu: Họ tên, Giới tính, Tuổi KH (qua `date_of_birth`, CVM tự tính tuổi), SĐT, Tuổi thuê bao, Tên gói, Giá gói, Chu kỳ gói, **Ngày hết hạn gói + số ngày tính từ lúc hết hạn** (mới bổ sung — trước đó thiếu), Chương trình KM, Gói gợi ý, Kênh đăng ký, Hình thức đăng ký.
 
 > **Rule phân loại nhu cầu:** `usage_need_segment = HIGH_NEED` khi mức sử dụng thực tế cao hơn đáng kể so với hạn mức/giá trị gói hiện tại; CVM tư vấn gói lớn hơn. `usage_need_segment = LOW_NEED` khi mức sử dụng thực tế thấp hơn đáng kể so với gói hiện tại; CVM tư vấn gói nhỏ hơn hoặc gói tiết kiệm hơn. Ngưỡng cụ thể do PO/CVM cấu hình theo từng loại tài nguyên và từng nhóm gói.
 >
@@ -573,8 +575,10 @@ Không có file Batch/CSV trong phạm vi hiện tại.
 | `analysis_period_cycles` | integer | ✅ | Số chu kỳ gần nhất dùng để phân tích nhu cầu — chốt **2** (2 tháng liên tiếp) | BSS/CVM cấu hình | `2` |
 | `full_name` | string(64) | ❌ | Họ tên KH | `crm.customers.full_name` | `Nguyễn Văn A` |
 | `gender` | string | ❌ | Giới tính KH | `ekyc_data` → `gender` — chưa xác nhận nguồn | `MALE` |
-| `age_segment` | string | ❌ | Tuổi/phân khúc tuổi KH | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `25-34` |
+| `date_of_birth` | date | ❌ | Ngày sinh KH — CVM tự tính tuổi cụ thể từ trường này | `ekyc_data` → `date_of_birth` — chưa xác nhận nguồn | `1998-03-15` |
 | `subscriber_tenure_days` | integer | ❌ | Tuổi thuê bao (số ngày đã dùng mạng) | BSS tính từ `resource.msisdn_status_history` | `365` |
+| `plan_expiry_date` | date | ❌ | Ngày hết hạn gói hiện tại | `resource.msisdns.expiry_date` (BSS) | `2026-07-10` |
+| `days_since_expiry` | integer | ❌ | Số ngày tính từ lúc hết hạn gói (âm nếu gói còn hạn, dương nếu đã hết hạn) | BSS tính: `ngay_hien_tai - plan_expiry_date` | `-5` |
 | `register_channel` | string | ❌ | Kênh đăng ký gói của KH | OCS/BSS — kênh giao dịch đăng ký | `APP` hoặc `USSD` hoặc `AGENCY` |
 | `register_method` | string | ❌ | Hình thức đăng ký | OCS/BSS — hình thức giao dịch | `MANUAL` hoặc `AUTO` |
 | `promotion_code` | string | ❌ | Chương trình khuyến mãi đang áp dụng (nếu có) | OCS/CVM — chương trình KM | `KM_NANGGOI_15PCT` |
@@ -595,6 +599,9 @@ Không có file Batch/CSV trong phạm vi hiện tại.
 | `{{ten_kh}}` | ✅ | Họ tên KH để cá nhân hóa tin nhắn tư vấn gói | Văn bản | CVM cache từ E01 | `"Quý khách"` | `Nguyễn Văn A` |
 | `{{so_dien_thoai}}` | ✅ | Số điện thoại KH được phân tích nhu cầu | Văn bản | CSV `msisdn` | — | `0901234567` |
 | `{{ten_goi_hien_tai}}` | ✅ | Gói đang dùng — cơ sở so sánh khi tư vấn gói phù hợp hơn | Văn bản | CSV `current_plan` | — | `GOI_DATA_70K` |
+| `{{tuoi_kh}}` | ❌ | Tuổi KH — CVM tính từ `date_of_birth` để cá nhân hóa nội dung theo độ tuổi | Số | CSV `date_of_birth` → CVM tính tuổi | không cá nhân hóa theo tuổi | `28` |
+| `{{ngay_het_han_goi}}` | ❌ | Ngày hết hạn gói hiện tại — để KH cân nhắc thời điểm đổi gói | Ngày (DD/MM/YYYY) | CSV `plan_expiry_date` | không hiển thị ngày hết hạn | `10/07/2026` |
+| `{{so_ngay_tinh_tu_het_han}}` | ❌ | Số ngày tính từ lúc hết hạn (âm = còn hạn, dương = đã hết hạn) — làm ngữ cảnh cấp bách khi tư vấn đổi gói | Số | CSV `days_since_expiry` | không hiển thị | `-5 ngày` |
 | `{{phan_khuc_nhu_cau}}` | ✅ | Phân khúc nhu cầu theo mức sử dụng thực tế để CVM phân nhánh nội dung | Văn bản | CSV `usage_need_segment` | — | `HIGH_NEED` |
 | `{{loai_nhu_cau_chinh}}` | ✅ | Loại tài nguyên chính khiến KH cần đổi gói | Văn bản | CSV `primary_usage_resource` | — | `DATA` |
 | `{{ty_le_su_dung_so_voi_goi}}` | ✅ | Tỷ lệ sử dụng so với gói hiện tại — bằng chứng để giải thích vì sao tư vấn đổi gói | Số | CSV `usage_to_quota_pct` | — | `175.0%` |
