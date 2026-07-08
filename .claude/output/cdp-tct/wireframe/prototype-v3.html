@@ -482,6 +482,29 @@ function suspectCount(uid) {
   return suspectFragments(uid).length;
 }
 
+// ============================================================
+// RULE HỢP NHẤT ĐỊNH DANH — bộ quy tắc hệ thống dùng để so khớp và quyết định
+// tự động gộp / gắn cờ nghi trùng. Đây chính là NGUỒN sinh ra cảnh báo ở màn Đối soát
+// định danh (Mục 1). Ngưỡng dùng chung: CONF_AUTO (≥90 → tự gộp), CONF_LOW (60 → ranh giới).
+// Giai đoạn đầu: READ-ONLY, chỉ hiển thị. Sửa rule là giai đoạn sau.
+// ============================================================
+const IDENTITY_RULES = [
+  { id:'R1', key:'CCCD',    field:'Số CCCD/CMND',        weight:'Rất cao', minConf:98, action:'AUTO', note:'Khớp CCCD tuyệt đối — định danh cá nhân duy nhất' },
+  { id:'R2', key:'MST',     field:'Mã số thuế (DN)',      weight:'Rất cao', minConf:96, action:'AUTO', note:'Khớp MST — định danh doanh nghiệp duy nhất' },
+  { id:'R3', key:'POST_ID', field:'PostID',               weight:'Cao',     minConf:95, action:'AUTO', note:'Khớp PostID — mã định danh nội bộ VNPost' },
+  { id:'R4', key:'PHONE_NAME', field:'SĐT + Họ tên khớp', weight:'Trung bình', minConf:85, action:'AUTO', note:'SĐT trùng và họ tên khớp đầy đủ (có dấu)' },
+  { id:'R5', key:'PHONE',   field:'Chỉ SĐT trùng',        weight:'Trung bình', minConf:70, action:'FLAG', note:'Chỉ khớp SĐT — có thể dùng chung số (người thân, shipper) nên cần xác nhận' },
+  { id:'R6', key:'NAME_FUZZY', field:'Tên gần đúng + SĐT', weight:'Thấp',   minConf:62, action:'FLAG', note:'Tên viết khác dấu/viết tắt, SĐT trùng — cần người đối chiếu' },
+  { id:'R7', key:'NAME_ONLY', field:'Chỉ tên gần đúng',   weight:'Rất thấp', minConf:50, action:'LOW', note:'Chỉ khớp tên mờ, không đủ cơ sở — chỉ gợi ý tin cậy thấp' },
+];
+
+// Ánh xạ action → nhãn hiển thị + màu
+const RULE_ACTION = {
+  AUTO: { label:'Tự động gộp',        color:'var(--success)', bg:'var(--success-soft)' },
+  FLAG: { label:'Gắn cờ chờ xác nhận', color:'#8a5a00',        bg:'var(--warn-soft)' },
+  LOW:  { label:'Gợi ý tin cậy thấp',  color:'var(--muted)',   bg:'var(--line)' },
+};
+
 const SEGMENTS = [
   { name:'Khách hàng trung thành',    desc:'Nhóm KH giao dịch thường xuyên, giá trị cao, ít rủi ro — RFM nhóm Champions',              count:'2.180', type:'Động', updated:'29/06/2026', status:'Đang hoạt động' },
   { name:'KHL giá trị cao',           desc:'Khách hàng doanh nghiệp có doanh thu tích lũy trên 1 tỷ đồng',                             count:'1.240', type:'Động', updated:'29/06/2026', status:'Đang hoạt động' },
@@ -587,6 +610,7 @@ function Icon({ name }) {
     plus: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
     trash: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>,
     dashboard: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>,
+    settings: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
   };
   return icons[name] || null;
 }
@@ -599,6 +623,19 @@ function Sidebar({ active, onNav }) {
     { key:'suspects',  label:'Đối soát định danh', icon:'merge', badge: suspectTotal },
     { key:'segments',  label:'Phân khúc',  icon:'segment' },
   ];
+  const configItems = [
+    { key:'ruleconfig', label:'Rule hợp nhất định danh', icon:'settings' },
+  ];
+  const renderItem = (it) => (
+    <button key={it.key} onClick={() => onNav(it.key)}
+      className={`sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-gray-600 cursor-pointer border-0 bg-transparent rounded-lg mb-0.5 ${active===it.key ? 'active':''}`}>
+      <Icon name={it.icon} />
+      <span style={{ flex:1 }}>{it.label}</span>
+      {it.badge > 0 && (
+        <span style={{ background:'var(--warn)', color:'#1A1A1A', fontSize:10, fontWeight:800, borderRadius:10, padding:'1px 7px', minWidth:18, textAlign:'center' }}>{it.badge}</span>
+      )}
+    </button>
+  );
   return (
     <aside style={{ width:228, flexShrink:0, background:'white', borderRight:'1px solid var(--border)', display:'flex', flexDirection:'column', height:'100vh', position:'sticky', top:0 }}>
       {/* Brand */}
@@ -616,16 +653,9 @@ function Sidebar({ active, onNav }) {
       {/* Nav */}
       <nav style={{ flex:1, padding:'10px 8px', overflowY:'auto' }}>
         <div className="sidebar-section-label">Điều hướng chính</div>
-        {mainItems.map(it => (
-          <button key={it.key} onClick={() => onNav(it.key)}
-            className={`sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-gray-600 cursor-pointer border-0 bg-transparent rounded-lg mb-0.5 ${active===it.key ? 'active':''}`}>
-            <Icon name={it.icon} />
-            <span style={{ flex:1 }}>{it.label}</span>
-            {it.badge > 0 && (
-              <span style={{ background:'var(--warn)', color:'#1A1A1A', fontSize:10, fontWeight:800, borderRadius:10, padding:'1px 7px', minWidth:18, textAlign:'center' }}>{it.badge}</span>
-            )}
-          </button>
-        ))}
+        {mainItems.map(renderItem)}
+        <div className="sidebar-section-label" style={{ marginTop:14 }}>Cấu hình</div>
+        {configItems.map(renderItem)}
       </nav>
       {/* Footer */}
       <div style={{ padding:'12px 16px', borderTop:'1px solid var(--border)', fontSize:12, color:'var(--muted)' }}>
@@ -640,6 +670,7 @@ const NAV_META = {
   dashboard: 'Toàn cảnh dữ liệu khách hàng, vận hành và phân khúc',
   customers:  'Tìm kiếm và lọc danh sách khách hàng theo nhiều tiêu chí',
   suspects:   'Danh sách khách hàng có mã định danh nghi trùng chờ xác nhận hợp nhất',
+  ruleconfig: 'Bộ quy tắc hệ thống dùng để so khớp và quyết định hợp nhất định danh',
   segments:   'Xây dựng và quản lý phân khúc động theo điều kiện CDP',
   identity:   'Rà soát, xác nhận và phê duyệt hợp nhất định danh đa nguồn',
   c360:       'Hồ sơ khách hàng 360° — toàn bộ dữ liệu từ mọi hệ thống nguồn',
@@ -2959,6 +2990,97 @@ function MergeReviewScreen({ uid, onBack }) {
 }
 
 // ============================================================
+// MÀN CẤU HÌNH — RULE HỢP NHẤT ĐỊNH DANH (read-only giai đoạn đầu)
+// Hiển thị bộ rule sinh ra cảnh báo ở màn Đối soát định danh + sơ đồ 3 mức ngưỡng.
+// ============================================================
+function IdentityRuleScreen() {
+  const thresholds = [
+    { range:`≥ ${CONF_AUTO}%`, title:'Tự động gộp', desc:'Khóa mạnh (CCCD, MST, PostID). Hệ thống hợp nhất ngay, không cần người xác nhận.', color:'var(--success)', bg:'var(--success-soft)' },
+    { range:`${CONF_LOW}–${CONF_AUTO-1}%`, title:'Gắn cờ chờ xác nhận', desc:'Khóa yếu (chỉ SĐT, tên gần đúng). Gắn cờ ⚠ ở màn Đối soát định danh, chờ người đối chiếu.', color:'#8a5a00', bg:'var(--warn-soft)' },
+    { range:`< ${CONF_LOW}%`, title:'Gợi ý tin cậy thấp', desc:'Khớp rất yếu. Không chủ động đề nghị gộp, chỉ hiện dạng gợi ý tách riêng để cân nhắc.', color:'var(--muted)', bg:'var(--line)' },
+  ];
+
+  return (
+    <div style={{ padding:24, display:'flex', flexDirection:'column', gap:16 }}>
+      {/* Banner read-only */}
+      <div className="panel" style={{ padding:'14px 16px', display:'flex', alignItems:'center', gap:12, flexWrap:'wrap', background:'var(--info-soft)', border:'1px solid #bfdbfe' }}>
+        <span style={{ fontSize:20 }}>🔒</span>
+        <div style={{ fontSize:12, color:'var(--text-2)', lineHeight:1.6, flex:1, minWidth:240 }}>
+          Đây là bộ quy tắc hệ thống đang áp dụng để so khớp và quyết định hợp nhất định danh — cũng là nguồn sinh ra cảnh báo nghi trùng ở màn <b>Đối soát định danh</b>.
+          Giai đoạn đầu <b>chỉ hiển thị</b>; việc thêm/sửa rule và điều chỉnh ngưỡng sẽ mở ở giai đoạn sau.
+        </div>
+      </div>
+
+      {/* Sơ đồ 3 mức ngưỡng */}
+      <div className="panel" style={{ padding:20 }}>
+        <div className="section-title">Ngưỡng độ tin cậy quyết định hành động</div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:12 }}>
+          {thresholds.map((t,i) => (
+            <div key={i} style={{ borderRadius:10, border:`1px solid ${t.color}`, background:t.bg, padding:14 }}>
+              <div style={{ fontSize:18, fontWeight:900, color:t.color }} className="tabular-nums">{t.range}</div>
+              <div style={{ fontSize:13, fontWeight:800, color:'var(--text)', marginTop:4 }}>{t.title}</div>
+              <div style={{ fontSize:12, color:'var(--text-2)', marginTop:4, lineHeight:1.5 }}>{t.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bảng rule */}
+      <div className="panel">
+        <div style={{ padding:'16px 20px 4px', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:8 }}>
+          <div className="section-title" style={{ margin:0 }}>Danh sách rule so khớp định danh</div>
+          <button disabled title="Giai đoạn sau"
+            style={{ fontSize:12, fontWeight:700, border:'1px dashed var(--border)', borderRadius:8, padding:'6px 12px', background:'var(--bg)', color:'var(--muted)', cursor:'not-allowed' }}>
+            + Thêm rule (Giai đoạn sau)
+          </button>
+        </div>
+        <div style={{ overflowX:'auto', padding:'8px 20px 16px' }}>
+          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+            <thead>
+              <tr style={{ borderBottom:'1px solid var(--border)' }}>
+                {['#','Khóa khớp','Trọng số','Ngưỡng tin cậy','Hành động','Diễn giải','Trạng thái',''].map(h => (
+                  <th key={h} style={{ padding:'9px 10px', textAlign:'left', fontSize:11, fontWeight:800, color:'var(--muted)', whiteSpace:'nowrap', background:'var(--bg-2)' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {IDENTITY_RULES.map((r,i) => {
+                const act = RULE_ACTION[r.action];
+                return (
+                  <tr key={r.id} style={{ borderBottom:'1px solid var(--line)' }}>
+                    <td style={{ padding:'10px', color:'var(--muted)', fontFamily:'monospace', fontSize:11 }}>{r.id}</td>
+                    <td style={{ padding:'10px', fontWeight:700, whiteSpace:'nowrap' }}>{r.field}</td>
+                    <td style={{ padding:'10px', whiteSpace:'nowrap' }}><span className="badge badge-gray">{r.weight}</span></td>
+                    <td style={{ padding:'10px', whiteSpace:'nowrap' }} className="tabular-nums">≥ {r.minConf}%</td>
+                    <td style={{ padding:'10px', whiteSpace:'nowrap' }}>
+                      <span className="badge" style={{ background:act.bg, color:act.color }}>{act.label}</span>
+                    </td>
+                    <td style={{ padding:'10px', fontSize:12, color:'var(--text-2)', minWidth:220 }}>{r.note}</td>
+                    <td style={{ padding:'10px', whiteSpace:'nowrap' }}><span className="badge badge-green">Đang áp dụng</span></td>
+                    <td style={{ padding:'10px', whiteSpace:'nowrap' }}>
+                      <button disabled title="Giai đoạn sau" style={{ fontSize:12, border:'none', background:'none', color:'var(--border)', cursor:'not-allowed' }}>Sửa</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div style={{ padding:'10px 20px', borderTop:'1px solid var(--line)', fontSize:12, color:'var(--muted)' }}>
+          {IDENTITY_RULES.length} rule đang áp dụng · Thứ tự ưu tiên từ trên xuống (khóa mạnh xét trước)
+        </div>
+      </div>
+
+      {/* Ghi chú giai đoạn sau */}
+      <div style={{ fontSize:12, color:'var(--muted)', lineHeight:1.7, padding:'0 4px' }}>
+        <b>Sẽ mở ở giai đoạn sau:</b> thêm/sửa/bật-tắt rule, điều chỉnh ngưỡng số cụ thể, đặt thứ tự ưu tiên khi nhiều rule cùng khớp,
+        và <b>rule ưu tiên chọn trường khi gộp</b> (trường nào lấy từ nguồn nào). Mọi thay đổi rule sẽ được ghi nhật ký phục vụ tuân thủ.
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // APP
 // ============================================================
 function App() {
@@ -2971,9 +3093,11 @@ function App() {
     dashboard:'Dashboard tổng quan',
     kafka:'Kafka Integration',
     customers:'Danh sách khách hàng',
+    suspects:'Đối soát định danh',
     identity:'Đối soát & hợp nhất hồ sơ',
     c360:'Customer 360°',
     review:'Đối chiếu hồ sơ nghi trùng',
+    ruleconfig:'Rule hợp nhất định danh',
     segments:'Quản lý phân khúc',
   };
 
@@ -3005,6 +3129,7 @@ function App() {
           {nav==='identity'  && <IdentityScreen onC360={goC360} />}
           {nav==='c360'      && <Customer360Screen uid={c360uid} onBack={c360uid ? () => setNav('customers') : null} />}
           {nav==='review'    && <MergeReviewScreen uid={reviewUid} onBack={() => setNav('suspects')} />}
+          {nav==='ruleconfig' && <IdentityRuleScreen />}
           {nav==='segments'  && <SegmentScreen onViewKH={(seg) => { setSegmentNavFilter(seg); setNav('customers'); }} />}
         </main>
       </div>
