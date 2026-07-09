@@ -2441,13 +2441,14 @@ function SegmentScreen({ onViewKH }) {
       <div className="flex items-center justify-between">
         <div style={{ fontWeight:700, fontSize:16 }}>
           {view==='detail' && selectedSeg!==null
-            ? <span><button onClick={() => setView('list')} style={{ background:'none', border:'none', color:'#6B7280', cursor:'pointer', fontSize:13, padding:0, marginRight:6 }}>← Danh sách</button>{SEGMENTS[selectedSeg]?.name}</span>
-            : 'Quản lý Phân khúc'}
+            ? <span><button onClick={() => setView('list')} style={{ background:'none', border:'none', color:'#6B7280', cursor:'pointer', fontSize:13, padding:0, marginRight:6 }}>← Danh sách phân khúc</button>{SEGMENTS[selectedSeg]?.name}</span>
+            : view==='builder'
+              ? <span><button onClick={() => setView('list')} style={{ background:'none', border:'none', color:'#6B7280', cursor:'pointer', fontSize:13, padding:0, marginRight:6 }}>← Danh sách phân khúc</button>Tạo phân khúc mới</span>
+              : 'Danh sách phân khúc'}
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setView('list')} className={`tab-btn ${view==='list' ? 'active':''}`}>Danh sách</button>
-          <button onClick={() => setView('builder')} className={`tab-btn ${view==='builder' ? 'active':''}`}>+ Tạo phân khúc</button>
-        </div>
+        {view==='list' && (
+          <button onClick={() => setView('builder')} className="btn-primary" style={{ padding:'8px 16px', fontSize:13 }}>+ Tạo phân khúc</button>
+        )}
       </div>
 
       {view === 'list' && (
@@ -2487,7 +2488,6 @@ function SegmentScreen({ onViewKH }) {
       {view === 'builder' && (
         <div style={{ display:'grid', gridTemplateColumns:'1.3fr 1fr', gap:16 }}>
           <div className="panel" style={{ padding:20 }}>
-            <div style={{ fontWeight:700, fontSize:15, marginBottom:16 }}>Tạo phân khúc mới</div>
             <div style={{ marginBottom:14 }}>
               <label className="field-label">Tên phân khúc</label>
               <input value={segName} onChange={e=>setSegName(e.target.value)} placeholder="VD: Khách hàng nguy cơ rời bỏ Q3" style={{ width:'100%', marginTop:4 }} />
@@ -2537,6 +2537,9 @@ function SegmentScreen({ onViewKH }) {
             <RuleGroup node={ruleTree} path={[]} depth={0} onRemove={null} />
 
             <div className="flex gap-3 mt-5">
+              <button onClick={() => setView('list')} className="btn-ghost" style={{ flex:1, padding:'10px', fontSize:13 }}>
+                Hủy
+              </button>
               <button onClick={() => setPreviewCount(8560)} className="btn-ghost" style={{ flex:1, padding:'10px', fontSize:13 }}>
                 Ước tính số KH
               </button>
