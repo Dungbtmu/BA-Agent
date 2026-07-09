@@ -3,9 +3,9 @@
 > Mục đích: đặc tả điều kiện lọc thêm cho Campaign Builder UI và logic nghiệp vụ chi tiết cho từng trigger.
 > Mỗi trigger có 2 phần: **(1) Bảng điều kiện lọc thêm** để Dev render UI filter động + **(2) Logic nghiệp vụ chi tiết** để BA/QA/Dev implement rule engine.
 >
-> Nguồn tổng hợp: `trigger-integration-summary.md`, `data-contract-template.md`
+> Nguồn tổng hợp: `trigger-integration-summary.md`, `data-contract-template-lifecycle.md`
 >
-> Cập nhật: 2026-06-30
+> Cập nhật: 2026-07-08 — bổ sung trigger `E_CHURN_RISK` (nguy cơ rời mạng), đồng bộ cột Nguồn dữ liệu với timing NearRealtime đã chốt
 
 ---
 
@@ -481,6 +481,44 @@
 - Các lý do khác / không có lý do → nội dung giữ chân mặc định ❓ (cần xác nhận Q13: OCS có tách chủ động hủy vs hệ thống tự hủy không)
 
 **SLA:** CVM gửi USSD/Push trong vòng 5 phút
+
+---
+
+### E_CHURN_RISK — Thuê bao có nguy cơ rời mạng (NearRealtime)
+
+#### Bảng điều kiện lọc thêm (Campaign Builder UI)
+
+| Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
+|---|---|---|---|---|---|---|---|---|---|
+| E_CHURN_RISK | no_usage_days | Số ngày liên tiếp không phát sinh lưu lượng | integer | >=, BETWEEN | 5 | Bắt buộc | Điều kiện cốt lõi — không data/thoại/SMS liên tiếp 5–7 ngày | AND | OCS/BSS API Event |
+| E_CHURN_RISK | no_charge_days | Số ngày không phát sinh cước | integer | >=, BETWEEN | 30 | Tùy chọn | Không phát sinh cước trong 30 ngày | AND | OCS/BSS API Event |
+| E_CHURN_RISK | revenue_drop_pct | % suy giảm doanh thu so với TB 2 tháng gần nhất | float | >=, BETWEEN | 80 | Tùy chọn | Ngưỡng đề xuất ≥80% suy giảm | AND | OCS/BSS API Event |
+| E_CHURN_RISK | sim_on_off_ratio | Tỷ lệ bật/tắt sóng của SIM trong kỳ | float | >=, <= | 0.5 | Tùy chọn | Tỷ lệ cao → SIM ít cắm máy, dấu hiệu rời mạng | AND | HLR/BSS |
+| E_CHURN_RISK | churn_risk_level | Mức độ nguy cơ | enum | IN | HIGH, MEDIUM | Tùy chọn | Ưu tiên xử lý theo mức độ | AND | BSS/CVM nội bộ |
+| E_CHURN_RISK | current_plan | Gói đang dùng (nếu còn) | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Nhắm gói cụ thể khi giữ chân | AND | OCS |
+| E_CHURN_RISK | subscriber_tenure_days | Tuổi thuê bao (số ngày đã dùng mạng) | integer | >=, <= | 540 | Tùy chọn | Ưu tiên giữ KH lâu năm với ưu đãi tốt hơn | AND | BSS/CRM |
+
+#### Logic nghiệp vụ chi tiết
+
+**Điều kiện kích hoạt (AND — tổ hợp tín hiệu, không phải 1 điều kiện đơn lẻ):**
+- `no_usage_days` ≥ ngưỡng cấu hình (đề xuất 5–7 ngày) — không phát sinh lưu lượng liên tiếp
+- `no_charge_days` ≥ ngưỡng cấu hình (đề xuất 30 ngày) — không phát sinh cước
+- `revenue_drop_pct` ≥ ngưỡng cấu hình (đề xuất 80%) — so với doanh thu trung bình 2 tháng gần nhất
+- `sim_on_off_ratio` bất thường (SIM tắt sóng nhiều hơn bình thường) — tín hiệu phụ, không bắt buộc phải có đủ dữ liệu này mới trigger
+
+❓ Các ngưỡng cụ thể (số ngày, % suy giảm, tỷ lệ on/off) do CVM cấu hình, cần xác nhận PO/Tech trước khi implement (Q23)
+
+**Điều kiện chặn (bất kỳ một điều kiện dưới đây):**
+- Thuê bao đã ở trạng thái LOCK_1C hoặc LOCK_2C — đã có luồng xử lý riêng (xem nhóm Khóa 1c/2c), không trigger trùng
+- Đã gửi chiến dịch giữ chân cho `msisdn` này trong X ngày gần đây (tránh spam liên tục)
+
+**Nhánh xử lý theo `churn_risk_level`:**
+- `HIGH` → chiến dịch giữ chân mạnh (ưu đãi lớn, đa kênh: USSD + Push + SMS)
+- `MEDIUM` → chiến dịch giữ chân nhẹ (nhắc nhở, ưu đãi nhỏ hơn)
+
+**Quan hệ với E_SEGMENT_UPDATE:** `E_CHURN_RISK` là trigger phát hiện dựa trên tiêu chí hành vi cụ thể ở trên; `E_SEGMENT_UPDATE` là sự kiện cập nhật phân khúc tổng hợp (bao gồm cả CHURN_RISK) sau khi hệ thống đã tính điểm. Có thể dùng `E_CHURN_RISK` làm 1 tín hiệu đầu vào cho `E_SEGMENT_UPDATE`. ❓ Cần xác nhận ai tính điểm churn — BSS/OCS hay CVM nội bộ (Q23)
+
+**SLA:** CVM đưa vào luồng giữ chân (retention) ngay khi nhận event
 
 ---
 
@@ -1172,5 +1210,6 @@
 | Q21b | Ngưỡng N_DAYS_THRESHOLD và M_MONTHS_THRESHOLD cho U05-B? | U05-B | 🟡 Quan trọng |
 | Q21c | UPSELL_MODE mặc định (DAILY_UPGRADE / MONTHLY_UPSELL / BOTH)? | U05-B | 🟡 Quan trọng |
 | Q22 | Ngưỡng HIGH_NEED / LOW_NEED cho E_USAGE_NEED_ANALYSIS? Owner tính phân khúc? | E_USAGE_NEED_ANALYSIS | 🔴 Cần ngay |
+| Q23 | Tính điểm/tổ hợp tín hiệu nguy cơ rời mạng ở BSS/OCS hay CVM nội bộ? Ngưỡng cụ thể (số ngày không lưu lượng, % suy giảm doanh thu, tỷ lệ on/off sóng) là bao nhiêu? Quan hệ với E_SEGMENT_UPDATE thế nào? | E_CHURN_RISK, E_SEGMENT_UPDATE | 🔴 Cần ngay |
 | Q6 | `gender`, `age_segment`, `job_segment` lấy từ đâu trong BSS? | U10 | 🔴 Cần ngay |
 | Q7 | Trường `birthday` trong `crm.customers` có tồn tại không? | U09 | 🟡 Quan trọng |
