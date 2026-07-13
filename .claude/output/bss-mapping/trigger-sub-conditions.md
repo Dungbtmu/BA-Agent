@@ -5,6 +5,7 @@
 >
 > Nguồn tổng hợp: `trigger-integration-summary.md`, `data-contract-template-lifecycle.md`
 >
+> Cập nhật: 2026-07-13 — đồng bộ toàn bộ bảng điều kiện lọc thêm với danh mục ảnh mới nhất (bổ sung đầy đủ các trường còn thiếu ở mọi trigger; thêm 2 trigger `E_DATA_100` và `E_APP_INACTIVE_X_DAYS`; mở rộng bộ toán tử `>`, `<`, `IS NULL`). Tổng 39 trigger.
 > Cập nhật: 2026-07-08 — bổ sung trigger `E_CHURN_RISK` (nguy cơ rời mạng), đồng bộ cột Nguồn dữ liệu với timing NearRealtime đã chốt
 
 ---
@@ -15,7 +16,7 @@
 - **Mức độ: Bắt buộc** — trường phải có giá trị trước khi lưu campaign; không điền → báo lỗi validate
 - **Mức độ: Tùy chọn** — user có thể bỏ qua; không điền = không lọc theo điều kiện này
 - **Logic mặc định: AND** — các điều kiện kết hợp AND; user đổi OR trong UI nếu cần
-- **Toán tử:** `=`, `!=`, `>=`, `<=`, `BETWEEN`, `IN`, `NOT IN`, `CONTAINS`, `AFTER`, `BEFORE`, `IS NOT NULL`
+- **Toán tử:** `=`, `!=`, `>`, `<`, `>=`, `<=`, `BETWEEN`, `IN`, `NOT IN`, `CONTAINS`, `AFTER`, `BEFORE`, `IS NULL`, `IS NOT NULL`
 
 **Logic nghiệp vụ chi tiết:**
 
@@ -37,11 +38,13 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E01 | sim_type | Loại SIM | enum | IN, NOT IN | PHYSICAL, ESIM | Tùy chọn | SIM vật lý hay eSIM | AND | BSS/OCS API Event |
-| E01 | current_plan | Gói cước hiện tại | enum | IN, NOT IN | GOI_DATA_70K, ... | Tùy chọn | Lọc theo gói đang active khi kích hoạt | AND | BSS/OCS API Event |
-| E01 | segment_age | Phân khúc tuổi | enum | IN | 15-18, 19-24, 25-34, 35-49, 50+ | Tùy chọn | Chỉ có khi KH đăng ký qua eKYC | AND | BSS/OCS API Event |
+| E01 | lifecycle_number | Số lần kích hoạt | integer | =, !=, >, >= | 1 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E01 | activation_date | Ngày giờ kích hoạt | datetime | BEFORE, AFTER, BETWEEN | 2026-06-23 08:30:00 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E01 | sim_type | Loại SIM | enum | =, !=, IN, NOT IN | PHYSICAL, ESIM | Tùy chọn | SIM vật lý hay eSIM | AND | BSS/OCS API Event |
+| E01 | package_code | Gói cước hiện tại | string | =, !=, IN, NOT IN, IS NULL | GOI_DATA_70K | Tùy chọn |  | AND | BSS/OCS API Event |
+| E01 | segment_age | Phân khúc tuổi | enum | =, IN, NOT IN | 19-24 | Tùy chọn | Chỉ có khi KH đăng ký qua eKYC | AND | BSS/OCS API Event |
 | E01 | segment_job | Phân khúc nghề nghiệp | enum | IN | STUDENT, WORKER, OFFICE, DRIVER, OTHER | Tùy chọn | Chỉ có khi KH đăng ký qua eKYC | AND | BSS/OCS API Event |
-| E01 | hours_since_activation | Số giờ từ khi kích hoạt | integer | >=, <= | 0 | Bắt buộc | Thời gian từ mốc NGAY_0 | AND | BSS/OCS API Event |
+| E01 | hours_since_activation | Số giờ từ khi kích hoạt | integer | >=, <= | 1899-12-30 00:00:00 | Bắt buộc | Thời gian từ mốc NGAY_0 | AND | BSS/OCS API Event |
 | E01 | activation_source | Nguồn kích hoạt | enum | IN | AGENT, ONLINE, ESIM | Tùy chọn | Kênh KH dùng để kích hoạt SIM | AND | BSS/CRM |
 | E01 | nationality | Quốc tịch | enum | IN, NOT IN | VN, ROW | Tùy chọn | Để gửi nội dung đúng ngôn ngữ | AND | BSS/CRM eKYC |
 
@@ -67,11 +70,13 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E02 | app_installed | Đã cài app chưa | boolean | = | FALSE | Bắt buộc | Điều kiện cốt lõi — phải = FALSE | AND | BSS API Event |
-| E02 | hours_since_activation | Số giờ từ khi kích hoạt SIM | integer | >= | 24 | Bắt buộc | Đã đủ 24h từ mốc NGAY_0 | AND | BSS API Event |
+| E02 | hours_since_activation | Số giờ từ khi kích hoạt | decimal | >, >=, <, BETWEEN | 24 | Bắt buộc | Đã đủ 24h từ mốc NGAY_0 | AND | BSS API Event |
+| E02 | app_installed | Đã cài ứng dụng | boolean | = | FALSE | Bắt buộc | Điều kiện cốt lõi — phải = FALSE | AND | BSS API Event |
+| E02 | app_install_time | Thời điểm cài app | datetime | IS NULL, BEFORE, AFTER | NULL | Khuyến nghị |  | AND | BSS/OCS API Event |
 | E02 | sim_type | Loại SIM | enum | IN, NOT IN | PHYSICAL, ESIM | Tùy chọn | Lọc riêng cho eSIM vs SIM vật lý | AND | BSS API Event |
 | E02 | segment_age | Phân khúc tuổi | enum | IN | 15-18, 19-24, 25-34 | Tùy chọn | Nhắm nhóm tuổi trẻ | AND | BSS API Event |
 | E02 | device_type | Loại thiết bị | enum | IN | ANDROID, IOS, FEATURE | Tùy chọn | Gửi hướng dẫn cài app đúng store | AND | BSS API Event |
+| E02 | sent_count | Số lần đã gửi trigger | integer | integer | 0 | Khuyến nghị |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -100,11 +105,15 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E03 | is_guest | KH là khách vãng lai (chưa đăng nhập) | boolean | = | FALSE | Bắt buộc | Phải = FALSE — KH chưa đăng nhập → CVM không trigger banner | AND | SuperApp/Kafka API Event |
+| E03 | open_count | Số lần mở app | integer | = | 1 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E03 | login_status | Trạng thái đăng nhập | enum | = | SUCCESS | Bắt buộc |  | AND | BSS/OCS API Event |
+| E03 | app_version | Phiên bản ứng dụng | string | =, IN, NOT IN | 2.5.2000 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E03 | device_os | Hệ điều hành | enum | =, IN | ANDROID, IOS | Tùy chọn |  | AND | BSS/OCS API Event |
+| E03 | registration_age_hours | Số giờ từ đăng ký/kích hoạt | integer | <, <=, BETWEEN | 48 | Tùy chọn |  | AND | BSS/OCS API Event |
 | E03 | hours_since_activation | Số giờ từ khi kích hoạt SIM | integer | >=, <=, BETWEEN | 24 | Tùy chọn | Lọc theo mốc thời gian từ kích hoạt | AND | SuperApp/Kafka API Event |
-| E03 | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Gợi ý gói phù hợp ngay khi đăng nhập | AND | BSS/OCS API Event |
+| E03 | package_code | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn |  | AND | BSS/OCS API Event |
 | E03 | balance | Số dư TKC tại thời điểm đăng nhập (đồng) | decimal | >=, <= | 50000 | Tùy chọn | KH có tiền → ưu tiên gợi ý mua gói | AND | BSS/OCS API Event |
-| E03 | device_type | Loại thiết bị | enum | IN | ANDROID, IOS | Tùy chọn | Cá nhân hóa nội dung banner theo thiết bị | AND | SuperApp/Kafka API Event |
+| E03 | devide_type | Loại thiết bị | enum | IN | ANDROID/IOS | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -130,8 +139,12 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
+| E04 | app_installed | Đã cài app | boolean | = | TRUE | Bắt buộc |  | AND | BSS/OCS API Event |
+| E04 | app_open_count | Số lần mở app | integer | =, <=, < | 0 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E04 | hours_since_install | Số giờ từ cài đặt | integer | >, >=, BETWEEN | 24 | Tùy chọn | Đã đủ 24h từ khi cài app | AND | SuperApp/BSS API Event |
+| E04 | push_token_available | Có push token | boolean | = | TRUE | Khuyến nghị |  | AND | BSS/OCS API Event |
+| E04 | sent_count | Số lần đã gửi | integer | = | 0 | Khuyến nghị |  | AND | BSS/OCS API Event |
 | E04 | firebase_token | Firebase push token | string | IS NOT NULL | — | Bắt buộc | Phải có token mới gửi được Push Notification | AND | SuperApp/BSS API Event |
-| E04 | hours_since_install | Số giờ từ khi cài app | integer | >= | 24 | Bắt buộc | Đã đủ 24h từ khi cài app | AND | SuperApp/BSS API Event |
 | E04 | device_type | Loại thiết bị | enum | IN | ANDROID, IOS | Tùy chọn | Hướng dẫn mở app đúng thiết bị | AND | SuperApp/BSS API Event |
 | E04 | segment_age | Phân khúc tuổi | enum | IN | 15-18, 19-24, 25-34 | Tùy chọn | Nhắm nhóm tuổi trẻ | AND | SuperApp/BSS API Event |
 | E04 | os_version | Phiên bản hệ điều hành | string | IN, CONTAINS | Android 12+, iOS 15+ | Tùy chọn | Lọc theo phiên bản OS hỗ trợ | AND | SuperApp/BSS API Event |
@@ -159,9 +172,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E05 | voice_usage_sec | Tổng giây thoại trong 72h | integer | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | OCS/BSS API Event |
-| E05 | data_usage_mb | Tổng data đã dùng (MB) | decimal | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | OCS/BSS API Event |
-| E05 | sms_count | Số SMS đã gửi | integer | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | OCS/BSS API Event |
+| E05 | hours_since_activation | Số giờ từ kích hoạt | integer | >, >=, BETWEEN | 72 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E05 | data_usage_mb | Tổng data đã dùng | decimal | =, <=, < | 0 | Bắt buộc | Phải = 0 để trigger | AND | OCS/BSS API Event |
+| E05 | voice_usage_sec | Tổng giây thoại | integer | =, <=, < | 0 | Bắt buộc | Phải = 0 để trigger | AND | OCS/BSS API Event |
+| E05 | sms_count | Số SMS | integer | =, <=, < | 0 | Bắt buộc | Phải = 0 để trigger | AND | OCS/BSS API Event |
+| E05 | charge_amount | Tổng cước phát sinh | decimal | =, <=, < | 0 | Khuyến nghị |  | AND | BSS/OCS API Event |
 | E05 | device_type | Loại thiết bị | enum | IN | ANDROID, IOS, FEATURE_PHONE | Tùy chọn | Hướng dẫn sử dụng đúng loại thiết bị | AND | OCS/BSS API Event |
 | E05 | has_app | Đã cài app chưa | boolean | = | TRUE, FALSE | Tùy chọn | Có app → push; không có → USSD | AND | OCS/BSS API Event |
 
@@ -188,10 +203,13 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
+| E06 | call_result | Kết quả cuộc gọi | enum | =, IN | FAILED, BUSY, NO_ANSWER | Bắt buộc |  | AND | BSS/OCS API Event |
+| E06 | failure_reason | Mã nguyên nhân lỗi | enum | =, IN, NOT IN | INSUFFICIENT_BALANCE | Tùy chọn |  | AND | BSS/OCS API Event |
+| E06 | call_direction | Chiều cuộc gọi | enum | =, IN | OUTGOING | Khuyến nghị |  | AND | BSS/OCS API Event |
+| E06 | call_type | Loại cuộc gọi | enum | =, IN | ONNET, OFFNET, INTERNATIONAL | Tùy chọn | Để gợi ý đúng gói bổ sung | AND | BSS/OCS API Event |
+| E06 | balance_amount | Số dư tài khoản chính | decimal | <, <=, =, > | 5000 | Tùy chọn |  | AND | BSS/OCS API Event |
 | E06 | fail_reason | Lý do thất bại | enum | IN, NOT IN | INSUFFICIENT_BALANCE, POOR_CONNECTION | Tùy chọn | Phân nhánh nội dung theo lý do | AND | BSS/OCS API Event |
-| E06 | call_type | Loại cuộc gọi | enum | IN | ONNET, OFFNET, INTERNATIONAL | Tùy chọn | Để gợi ý đúng gói bổ sung | AND | BSS/OCS API Event |
-| E06 | balance | Số dư tài khoản chính (đồng) | decimal | >=, <=, BETWEEN | 5000 | Bắt buộc | Lọc theo mức số dư thực tế | AND | BSS/OCS API Event |
-| E06 | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Để đề xuất gói phù hợp | AND | BSS/OCS API Event |
+| E06 | package_code | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -219,10 +237,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E07 | days_since_activation | Số ngày kể từ kích hoạt | integer | >=, <=, BETWEEN | 7 | Bắt buộc | Đúng mốc 7 ngày từ NGAY_0 | AND | SuperApp/Kafka Batch CSV |
-| E07 | trigger_reason | Lý do kích hoạt trigger | enum | IN | DAY_7, TASK_3 | Tùy chọn | DAY_7 = đến mốc ngày 7; TASK_3 = hoàn thành 3 nhiệm vụ sớm hơn | AND | SuperApp/Kafka Batch CSV |
-| E07 | open_count_7d | Số lần mở app trong 7 ngày | integer | >= | 1 | Bắt buộc | Đã dùng app ít nhất 1 lần | AND | SuperApp/Kafka Batch CSV |
-| E07 | survey_completed | Đã hoàn thành khảo sát | boolean | = | FALSE | Tùy chọn | Chưa làm khảo sát → nhắc làm | AND | SuperApp/Kafka Batch CSV |
+| E07 | days_since_activation | Số ngày từ kích hoạt | integer | =, BETWEEN | 7 | Bắt buộc | Đúng mốc 7 ngày từ NGAY_0 | AND | SuperApp/Kafka Batch CSV |
+| E07 | engagement_score | Điểm gắn kết | decimal | <, <=, >, >=, BETWEEN | 50 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E07 | app_open_count_7d | Số lần mở app 7 ngày | integer | <, <=, >, >=, BETWEEN | 3 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E07 | usage_days_7d | Số ngày có sử dụng dịch vụ | integer | <, <=, >, >=, BETWEEN | 4 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E07 | survey_completed | Đã hoàn thành khảo sát | boolean | = | FALSE | Khuyến nghị | Chưa làm khảo sát → nhắc làm | AND | SuperApp/Kafka Batch CSV |
 | E07 | package_code | Mã gói hiện tại | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Gợi ý đúng gói trong khảo sát | AND | BSS/OCS Batch CSV |
 
 #### Logic nghiệp vụ chi tiết
@@ -247,12 +266,15 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E08 | daily_data_pct | % data ngày đã dùng | decimal | >=, <=, BETWEEN | 80 | Bắt buộc | Ngưỡng cảnh báo do CVM cấu hình | AND | BSS/OCS API Event |
-| E08 | remaining_data_mb | Data còn lại (MB) | decimal | >=, <= | 0 | Tùy chọn | Lọc theo lượng data còn lại tuyệt đối | AND | BSS/OCS API Event |
-| E08 | package_code | Mã gói cước | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Nhắm gói cụ thể | AND | BSS/OCS API Event |
-| E08 | quota_type | Loại quota data | enum | IN | DATA, DAILY | Tùy chọn | Gói data ngày hay tháng | AND | BSS/OCS API Event |
+| E08 | quota_type | Loại quota data | enum | =, IN | DAILY_DATA | Bắt buộc | Gói data ngày hay tháng | AND | BSS/OCS API Event |
+| E08 | used_percent | Tỷ lệ data đã sử dụng (%) | decimal | >, >=, =, <, BETWEEN | 80 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E08 | remaining_data_mb | Dung lượng data còn lại (MB) | decimal | <, <=, =, >, BETWEEN | 512 | Tùy chọn | Lọc theo lượng data còn lại tuyệt đối | AND | BSS/OCS API Event |
+| E08 | total_quota_mb | Tổng dung lượng gói (MB) | decimal | >, >=, = | 5120 | Khuyến nghị |  | AND | BSS/OCS API Event |
+| E08 | package_code | Mã gói data | string | =, !=, IN, NOT IN | D5 | Tùy chọn | Nhắm gói cụ thể | AND | BSS/OCS API Event |
+| E08 | threshold_crossed | Ngưỡng vừa bị vượt | boolean | = | TRUE | Khuyến nghị |  | AND | BSS/OCS API Event |
 | E08 | days_remaining | Số ngày còn lại trong chu kỳ | integer | >= | 1 | Tùy chọn | Ưu tiên gửi khi còn nhiều ngày dùng | AND | BSS/OCS API Event |
 | E08 | addon_purchased_today | Đã mua gói bổ sung hôm nay | boolean | = | FALSE | Bắt buộc | Không gửi nếu đã mua thêm rồi | AND | BSS/OCS API Event |
+| E08 | cycle_date | Ngày chu kỳ quota | date | =, BETWEEN | 2026-06-23 | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -273,16 +295,39 @@
 
 ---
 
+
+### E_DATA_100 — Hết 100% data (NearRealtime)
+
+#### Bảng điều kiện lọc thêm (Campaign Builder UI)
+
+| Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
+|---|---|---|---|---|---|---|---|---|---|
+| E_DATA_100 | quota_type | Loại quota | enum | =, IN | DATA | Bắt buộc |  | AND | OCS/BSS API Event |
+| E_DATA_100 | remaining_data_mb | Data còn lại (MB) | decimal | =, <=, < | 0 | Bắt buộc |  | AND | OCS/BSS API Event |
+| E_DATA_100 | used_percent | Tỷ lệ sử dụng (%) | decimal | =, >=, > | 100 | Khuyến nghị |  | AND | OCS/BSS API Event |
+| E_DATA_100 | package_code | Mã gói | string | =, IN, NOT IN | D5 | Tùy chọn |  | AND | OCS/BSS API Event |
+| E_DATA_100 | out_of_package_charge | Cho phép phát sinh cước ngoài gói | boolean | = | TRUE | Tùy chọn |  | AND | OCS/BSS API Event |
+
+#### Logic nghiệp vụ chi tiết
+
+_Chưa đặc tả logic chi tiết — bổ sung từ danh mục ảnh, cần PO/Tech hoàn thiện._
+
+---
+
 ### E09 — Xem màn hình đổi gói nhưng chưa đăng ký (Batch)
 
 #### Bảng điều kiện lọc thêm (Campaign Builder UI)
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
+| E09 | screen_code | Mã màn hình đã xem | string | = | CHANGE_PACKAGE | Bắt buộc |  | AND | BSS/OCS API Event |
 | E09 | time_on_screen_sec | Thời gian KH xem màn hình đổi gói (giây) | integer | >=, BETWEEN | 30 | Tùy chọn | Tối thiểu 30 giây mới tính là có intent | AND | SuperApp API Event |
-| E09 | view_count_today | Số lần vào màn hình đổi gói trong ngày | integer | >= | 2 | Tùy chọn | Lần thứ 2+ → intent rõ ràng hơn | AND | SuperApp API Event |
-| E09 | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Để đề xuất đúng gói nâng cấp | AND | SuperApp API Event |
+| E09 | package_code | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn |  | AND | BSS/OCS API Event |
 | E09 | total_data_30d_mb | Tổng data dùng 30 ngày (MB) | float | >=, BETWEEN | 40000 | Tùy chọn | KH dùng nhiều → gợi ý gói lớn hơn | AND | BSS/OCS API Event |
+| E09 | view_count | Số lần xem màn hình | integer | >, >=, BETWEEN | 1 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E09 | package_register_after_view | Có đăng ký sau khi xem | boolean | = | FALSE | Bắt buộc |  | AND | BSS/OCS API Event |
+| E09 | hours_since_last_view | Số giờ từ lần xem cuối | integer | >, >=, BETWEEN | 1 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E09 | candidate_package_code | Mã gói đã xem | string | =, IN | D10 | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -307,12 +352,13 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E11 | days_since_activation | Số ngày từ kích hoạt | integer | >=, <=, BETWEEN | 30 | Bắt buộc | Đúng mốc 30 ngày từ NGAY_0 | AND | BSS/OCS Batch CSV |
-| E11 | topup_count | Số lần nạp tiền trong 30 ngày | integer | >= | 1 | Tùy chọn | KH đã nạp → gắn kết cao hơn | AND | BSS/OCS Batch CSV |
-| E11 | plan_change_count | Số lần đổi gói trong 30 ngày | integer | >= | 1 | Tùy chọn | KH chủ động tìm gói phù hợp | AND | BSS/OCS Batch CSV |
-| E11 | current_plan | Gói đang dùng tại ngày N30 | string | IN, NOT IN | GOI_DATA_120K | Tùy chọn | Gợi ý upsell đúng gói hiện tại | AND | BSS/OCS Batch CSV |
+| E11 | days_since_activation | Số ngày từ kích hoạt | integer | =, BETWEEN | 30 | Bắt buộc | Đúng mốc 30 ngày từ NGAY_0 | AND | BSS/OCS Batch CSV |
+| E11 | total_revenue_30d | Doanh thu 30 ngày | decimal | <, <=, >, >=, BETWEEN | 100000 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E11 | active_days_30d | Số ngày hoạt động | integer | <, <=, >, >=, BETWEEN | 20 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E11 | engagement_score | Điểm gắn kết | decimal | <, <=, >, >=, BETWEEN | 60 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E11 | topup_after_score | Số lần nạp tiền trong 30 ngày | integer | >= | 1 | Tùy chọn |  | AND | BSS/OCS API Event |
 | E11 | total_data_30d_mb | Tổng data dùng trong 30 ngày (MB) | decimal | >=, BETWEEN | 5120 | Tùy chọn | KH dùng nhiều → upsell gói lớn hơn | AND | BSS/OCS Batch CSV |
-| E11 | app_tasks_completed | Số nhiệm vụ App đã hoàn thành trong 30 ngày | integer | >= | 1 | Tùy chọn | ❓ Cần xác nhận Q20 — BSS có aggregate được không | AND | SuperApp/Kafka Batch CSV |
+| E11 | target_group | Nhóm đích sau đánh giá | enum | =, IN | G4, RETENTION | Khuyến nghị |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -342,11 +388,14 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E13 | spike_ratio | Tỷ lệ tăng đột biến so với mức nền | decimal | >=, BETWEEN | 3 | Bắt buộc | Tối thiểu 3x mức nền mới trigger | AND | BSS/OCS Batch CSV |
+| E13 | metric_type | Loại lưu lượng | enum | =, IN | DATA, VOICE, SMS | Bắt buộc |  | AND | BSS/OCS API Event |
+| E13 | current_usage | Lưu lượng kỳ hiện tại | decimal | >, >=, BETWEEN | 10240 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E13 | baseline_avg_30d | Trung bình 30 ngày | decimal | >, >=, = | 2048 | Bắt buộc |  | AND | BSS/OCS API Event |
 | E13 | traffic_spike_mb | Lưu lượng trong giờ đột biến (MB) | float | >=, BETWEEN | 512 | Bắt buộc | Ngưỡng tuyệt đối tối thiểu | AND | BSS/OCS Batch CSV |
-| E13 | baseline_mb | Mức nền cùng khung giờ 30 ngày (MB) | float | >= | 50 | Tùy chọn | Baseline quá thấp → không có ý nghĩa so sánh | AND | BSS/OCS Batch CSV |
 | E13 | spike_hour | Giờ xảy ra đột biến (0–23) | integer | >=, <=, BETWEEN | 22 | Tùy chọn | Nhắm giờ cao điểm buổi tối | AND | BSS/OCS Batch CSV |
+| E13 | spike_ratio | Tỷ lệ tăng so với baseline | decimal | >, >=, BETWEEN | 3 | Tùy chọn | Tối thiểu 3x mức nền mới trigger | AND | BSS/OCS Batch CSV |
 | E13 | device_type | Loại thiết bị | enum | IN | ANDROID, IOS | Tùy chọn | Gợi ý gói phù hợp loại thiết bị | AND | SuperApp/Kafka Batch CSV |
+| E13 | min_absolute_delta | Mức tăng tuyệt đối tối thiểu | decimal | >, >= | 1024 | Khuyến nghị |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -360,17 +409,37 @@
 
 ---
 
+
+### E_APP_INACTIVE_X_DAYS — X ngày KH không truy cập app (Batch)
+
+#### Bảng điều kiện lọc thêm (Campaign Builder UI)
+
+| Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
+|---|---|---|---|---|---|---|---|---|---|
+| E_APP_INACTIVE_X_DAYS | days_since_last_open | Số ngày từ lần mở app cuối | integer | >, >=, =, BETWEEN | 7 | Bắt buộc |  | AND | SuperApp/Kafka Batch CSV |
+| E_APP_INACTIVE_X_DAYS | last_open_time | Thời điểm mở app gần nhất | datetime | BEFORE, AFTER, BETWEEN | 2026-06-16 | Khuyến nghị |  | AND | SuperApp/Kafka Batch CSV |
+| E_APP_INACTIVE_X_DAYS | app_installed | App còn được cài | boolean | = | TRUE | Tùy chọn |  | AND | SuperApp/Kafka Batch CSV |
+| E_APP_INACTIVE_X_DAYS | push_token_available | Có push token | boolean | = | TRUE | Khuyến nghị |  | AND | SuperApp/Kafka Batch CSV |
+| E_APP_INACTIVE_X_DAYS | inactive_campaign_sent_count | Số lần đã nhắc | integer | <, <= | 2 | Tùy chọn |  | AND | SuperApp/Kafka Batch CSV |
+
+#### Logic nghiệp vụ chi tiết
+
+_Chưa đặc tả logic chi tiết — bổ sung từ danh mục ảnh, cần PO/Tech hoàn thiện._
+
+---
+
 ### E_VOICE_100_ONNET — Hết phút thoại nội mạng (NearRealtime)
 
 #### Bảng điều kiện lọc thêm (Campaign Builder UI)
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_VOICE_100_ONNET | remaining_minutes | Phút thoại nội mạng còn lại | decimal | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | BSS/OCS API Event |
-| E_VOICE_100_ONNET | current_plan | Gói cước đang dùng | string | IN, NOT IN | GOI_THOAI_50K | Tùy chọn | Lọc theo gói thoại cụ thể cần bổ sung | AND | BSS/OCS API Event |
-| E_VOICE_100_ONNET | quota_type | Loại quota thoại | enum | IN | VOICE_ONNET | Bắt buộc | Phân biệt nội/ngoại mạng | AND | BSS/OCS API Event |
+| E_VOICE_100_ONNET | quota_type | Loại quota thoại | enum | = | VOICE_ONNET | Bắt buộc | Phân biệt nội/ngoại mạng | AND | BSS/OCS API Event |
+| E_VOICE_100_ONNET | remaining_minutes | Số phút còn lại | decimal | =, <=, < | 0 | Bắt buộc | Phải = 0 để trigger | AND | BSS/OCS API Event |
+| E_VOICE_100_ONNET | package_code | Mã gói | string | =, IN, NOT IN | V90 | Tùy chọn |  | AND | BSS/OCS API Event |
 | E_VOICE_100_ONNET | days_remaining | Số ngày còn lại trong chu kỳ | integer | >= | 1 | Tùy chọn | Còn nhiều ngày → cấp bách hơn | AND | BSS/OCS API Event |
 | E_VOICE_100_ONNET | balance | Số dư tài khoản (đồng) | decimal | >= | 10000 | Tùy chọn | KH có đủ tiền mua gói bổ sung | AND | BSS/OCS API Event |
+| E_VOICE_100_ONNET | cycle_end_time | Thời điểm kết thúc chu kỳ | datetime | BEFORE, AFTER, BETWEEN | 2026-06-30 23:59:59 | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -396,11 +465,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_VOICE_100_OFFNET | remaining_minutes | Phút thoại ngoại mạng còn lại | decimal | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | BSS/OCS API Event |
-| E_VOICE_100_OFFNET | current_plan | Gói cước đang dùng | string | IN, NOT IN | GOI_THOAI_50K | Tùy chọn | Lọc theo gói thoại cụ thể cần bổ sung | AND | BSS/OCS API Event |
-| E_VOICE_100_OFFNET | quota_type | Loại quota thoại | enum | IN | VOICE_OFFNET | Bắt buộc | Phân biệt nội/ngoại mạng | AND | BSS/OCS API Event |
-| E_VOICE_100_OFFNET | offnet_rate_per_min | Cước ngoại mạng ngoài gói (đồng/phút) | integer | >=, <= | 1500 | Tùy chọn | Hiển thị cảnh báo phí phát sinh | AND | BSS/OCS API Event |
+| E_VOICE_100_OFFNET | quota_type | Loại quota thoại | enum | = | VOICE_OFFNET | Bắt buộc | Phân biệt nội/ngoại mạng | AND | BSS/OCS API Event |
+| E_VOICE_100_OFFNET | remaining_minutes | Số phút còn lại | decimal | =, <=, < | 0 | Bắt buộc | Phải = 0 để trigger | AND | BSS/OCS API Event |
+| E_VOICE_100_OFFNET | package_code | Mã gói | string | =, IN, NOT IN | V90 | Tùy chọn |  | AND | BSS/OCS API Event |
 | E_VOICE_100_OFFNET | balance | Số dư tài khoản (đồng) | decimal | >= | 10000 | Tùy chọn | KH có đủ tiền mua gói bổ sung | AND | BSS/OCS API Event |
+| E_VOICE_100_OFFNET | out_of_package_rate | Đơn giá ngoài gói | decimal | >, >=, BETWEEN | 1000 | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -428,11 +497,13 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_ZERO_BALANCE | balance | Số dư TKC (đồng) | decimal | >=, <= | 0 | Bắt buộc | Phải = 0 để trigger | AND | BSS/OCS API Event |
-| E_ZERO_BALANCE | last_transaction_type | Loại giao dịch cuối làm hết tiền | enum | IN | VOICE_CALL, DATA_USAGE, PLAN_REGISTER, FEE | Tùy chọn | Phân nhánh nội dung phù hợp nguyên nhân | AND | BSS/OCS API Event |
-| E_ZERO_BALANCE | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Để đề xuất nạp đúng mức | AND | BSS/OCS API Event |
+| E_ZERO_BALANCE | account_type | Loại tài khoản | enum | = | MAIN | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_ZERO_BALANCE | balance_before | Số dư trước giao dịch | decimal | >, >= | 0 | Khuyến nghị |  | AND | BSS/OCS API Event |
+| E_ZERO_BALANCE | balance_after | Số dư sau giao dịch | decimal | =, <=, < | 0 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_ZERO_BALANCE | transaction_type | Loại giao dịch làm giảm số dư | enum | =, IN | CALL, DATA, SMS, FEE | Tùy chọn |  | AND | BSS/OCS API Event |
 | E_ZERO_BALANCE | plan_expiry_date | Ngày hết hạn gói | date | BEFORE, AFTER | 2026-06-30 | Tùy chọn | Cảnh báo gói sắp hết hạn kèm theo | AND | BSS/OCS API Event |
 | E_ZERO_BALANCE | topup_count_30d | Số lần nạp trong 30 ngày gần nhất | integer | >=, <= | 2 | Tùy chọn | Phân biệt KH nạp thường xuyên vs hiếm | AND | BSS/OCS API Event |
+| E_ZERO_BALANCE | package_code | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -457,11 +528,14 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_CANCEL_PLAN | cancelled_plan | Gói vừa hủy | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Nhắm gói cụ thể để giữ chân | AND | BSS/OCS API Event |
+| E_CANCEL_PLAN | action_type | Loại hành động gói | enum | = | CANCEL | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_CANCEL_PLAN | package_code | Mã gói bị hủy | string | =, IN, NOT IN | D5 | Bắt buộc |  | AND | BSS/OCS API Event |
 | E_CANCEL_PLAN | cancelled_plan_type | Loại gói vừa hủy | enum | IN | DATA, VOICE, COMBO | Tùy chọn | Phân nhánh nội dung giữ chân | AND | BSS/OCS API Event |
-| E_CANCEL_PLAN | cancel_reason | Lý do hủy | enum | IN | CUSTOMER_REQUEST, SWITCH_TO_OTHER, PRICE | Tùy chọn | Chỉ giữ chân khi KH chủ động hủy | AND | BSS/OCS API Event |
 | E_CANCEL_PLAN | balance | Số dư tài khoản (đồng) | decimal | >=, <= | 50000 | Tùy chọn | KH còn tiền → ưu tiên giữ chân | AND | BSS/OCS API Event |
 | E_CANCEL_PLAN | subscriber_tenure_days | Số ngày KH đã dùng mạng | integer | >=, <= | 180 | Tùy chọn | Ưu tiên giữ KH lâu năm với ưu đãi tốt hơn | AND | BSS/CRM |
+| E_CANCEL_PLAN | cancel_reason | Lý do hủy | enum | =, IN | CUSTOMER_REQUEST | Tùy chọn | Chỉ giữ chân khi KH chủ động hủy | AND | BSS/OCS API Event |
+| E_CANCEL_PLAN | auto_renew | Gói có tự động gia hạn | boolean | = | TRUE | Tùy chọn |  | AND | BSS/OCS API Event |
+| E_CANCEL_PLAN | days_used | Số ngày đã sử dụng gói | integer | <, <=, >, >=, BETWEEN | 5 | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -494,7 +568,7 @@
 | E_CHURN_RISK | no_charge_days | Số ngày không phát sinh cước | integer | >=, BETWEEN | 30 | Tùy chọn | Không phát sinh cước trong 30 ngày | AND | OCS/BSS API Event |
 | E_CHURN_RISK | revenue_drop_pct | % suy giảm doanh thu so với TB 2 tháng gần nhất | float | >=, BETWEEN | 80 | Tùy chọn | Ngưỡng đề xuất ≥80% suy giảm | AND | OCS/BSS API Event |
 | E_CHURN_RISK | sim_on_off_ratio | Tỷ lệ bật/tắt sóng của SIM trong kỳ | float | >=, <= | 0.5 | Tùy chọn | Tỷ lệ cao → SIM ít cắm máy, dấu hiệu rời mạng | AND | HLR/BSS |
-| E_CHURN_RISK | churn_risk_level | Mức độ nguy cơ | enum | IN | HIGH, MEDIUM | Tùy chọn | Ưu tiên xử lý theo mức độ | AND | BSS/CVM nội bộ |
+| E_CHURN_RISK | churn_risk_level | Mức độ nguy cơ | enum | =, IN | HIGH, MEDIUM | Tùy chọn | Ưu tiên xử lý theo mức độ | AND | BSS/CVM nội bộ |
 | E_CHURN_RISK | current_plan | Gói đang dùng (nếu còn) | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Nhắm gói cụ thể khi giữ chân | AND | OCS |
 | E_CHURN_RISK | subscriber_tenure_days | Tuổi thuê bao (số ngày đã dùng mạng) | integer | >=, <= | 540 | Tùy chọn | Ưu tiên giữ KH lâu năm với ưu đãi tốt hơn | AND | BSS/CRM |
 
@@ -528,9 +602,13 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_CONTENT_FAIL | failure_reason | Lý do thất bại | enum | IN | INSUFFICIENT_BALANCE, TIMEOUT, SYSTEM_ERROR | Bắt buộc | Phân nhánh nội dung theo lý do | AND | SuperApp/Kafka API Event |
+| E_CONTENT_FAIL | purchase_status | Trạng thái mua dịch vụ | enum | = | FAILED | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_CONTENT_FAIL | content_code | Mã dịch vụ nội dung | string | =, IN, NOT IN | MUSIC_PREMIUM | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_CONTENT_FAIL | failure_reason | Nguyên nhân thất bại | enum | =, IN | INSUFFICIENT_BALANCE, TIMEOUT | Tùy chọn | Phân nhánh nội dung theo lý do | AND | SuperApp/Kafka API Event |
+| E_CONTENT_FAIL | purchase_amount | Giá trị giao dịch | decimal | >, >=, BETWEEN | 10000 | Tùy chọn |  | AND | BSS/OCS API Event |
 | E_CONTENT_FAIL | balance | Số dư TKC tại thời điểm thất bại (đồng) | decimal | >=, <= | 5000 | Tùy chọn | KH hết tiền → gợi ý nạp thêm | AND | SuperApp/Kafka API Event |
 | E_CONTENT_FAIL | content_type | Loại dịch vụ nội dung | enum | IN | MUSIC, VIDEO, GAME, NEWS | Tùy chọn | Gợi ý gói data phù hợp loại content | AND | SuperApp/Kafka API Event |
+| E_CONTENT_FAIL | retry_count | Số lần thử lại | integer | >, >=, BETWEEN | 2 | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -560,9 +638,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_APP_RATING | rating_main | Điểm đánh giá app | integer | >=, <=, BETWEEN, IN | 4 | Tùy chọn | 4-5 sao → cảm ơn; 1-3 sao → xử lý phản hồi | AND | SuperApp/Kafka API Event |
-| E_APP_RATING | rating_count | Số lần KH đã đánh giá | integer | >= | 1 | Bắt buộc | Ít nhất 1 lần đánh giá | AND | SuperApp/Kafka API Event |
-| E_APP_RATING | review_category | Danh mục phản hồi | string | IN, CONTAINS | QUALITY, PRICE, SPEED | Tùy chọn | Phân loại nội dung phản hồi | AND | SuperApp/Kafka API Event |
+| E_APP_RATING | rating_score | Điểm đánh giá | integer | =, <=, <, >, >=, BETWEEN | 3 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_APP_RATING | has_comment | Có bình luận | boolean | = | TRUE | Tùy chọn |  | AND | BSS/OCS API Event |
+| E_APP_RATING | rating_topic | Chủ đề đánh giá | enum | =, IN | QUALITY, PRICE, UX | Tùy chọn |  | AND | BSS/OCS API Event |
+| E_APP_RATING | app_version | Phiên bản ứng dụng | string | =, IN | 2.5.2000 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E_APP_RATING | rating_count | Số lần đã đánh giá | integer | =, <, > | 1 | Tùy chọn | Ít nhất 1 lần đánh giá | AND | SuperApp/Kafka API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -585,10 +665,14 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_USAGE_NEED_ANALYSIS | avg_monthly_usage_mb | Data bình quân tháng (MB) | decimal | >=, BETWEEN | 20480 | Tùy chọn | KH dùng nhiều → gợi ý gói tháng lớn hơn | AND | BSS/OCS Batch CSV |
+| E_USAGE_NEED_ANALYSIS | analysis_metric | Chỉ tiêu phân tích | enum | =, IN | DATA, VOICE, SMS, ARPU | Bắt buộc |  | AND | BSS/OCS API Event |
 | E_USAGE_NEED_ANALYSIS | depletion_count | Số lần hết data sớm trong 3 tháng | integer | >= | 2 | Tùy chọn | Pattern hết sớm liên tiếp | AND | BSS/OCS Batch CSV |
 | E_USAGE_NEED_ANALYSIS | package_code | Gói hiện tại | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Nhắm gói cần nâng cấp | AND | BSS/OCS Batch CSV |
 | E_USAGE_NEED_ANALYSIS | package_cycle | Chu kỳ gói | enum | IN | MONTHLY, DAILY, WEEKLY | Tùy chọn | Phân tích riêng theo chu kỳ gói | AND | BSS/OCS Batch CSV |
+| E_USAGE_NEED_ANALYSIS | avg_usage_30d | Sử dụng trung bình 30 ngày | decimal | <, <=, >, >=, BETWEEN | 10240 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_USAGE_NEED_ANALYSIS | quota_utilization | Tỷ lệ sử dụng quota | decimal | <, <=, >, >=, BETWEEN | 0.85 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E_USAGE_NEED_ANALYSIS | out_of_package_charge_30d | Cước ngoài gói 30 ngày | decimal | >, >=, BETWEEN | 50000 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E_USAGE_NEED_ANALYSIS | recommended_package_code | Mã gói được đề xuất | string | =, IN | D15 | Khuyến nghị |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -616,10 +700,13 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_NO_PLAN_X_DAYS | subscriber_status | Trạng thái thuê bao | enum | IN | ACTIVE | Bắt buộc | Chỉ trigger khi còn ACTIVE | AND | BSS/OCS Batch CSV |
-| E_NO_PLAN_X_DAYS | days_without_plan | Số ngày không có gói | integer | >=, BETWEEN | 3 | Bắt buộc | Số ngày tối thiểu mới gửi nhắc | AND | BSS/OCS Batch CSV |
+| E_NO_PLAN_X_DAYS | active_package_count | Số gói đang hoạt động | integer | =, <=, < | 0 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_NO_PLAN_X_DAYS | days_without_plan | Số ngày không có gói | integer | >, >=, =, BETWEEN | 7 | Bắt buộc | Số ngày tối thiểu mới gửi nhắc | AND | BSS/OCS Batch CSV |
 | E_NO_PLAN_X_DAYS | last_package_code | Gói đăng ký gần nhất | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Gợi ý đăng ký lại đúng gói cũ | AND | BSS/OCS Batch CSV |
 | E_NO_PLAN_X_DAYS | balance | Số dư tài khoản (đồng) | decimal | >= | 50000 | Tùy chọn | KH có tiền → ưu tiên nhắc đăng ký gói | AND | BSS/OCS Batch CSV |
+| E_NO_PLAN_X_DAYS | last_package_end_date | Ngày gói gần nhất hết hạn | date | BEFORE, AFTER, BETWEEN | 2026-06-16 | Khuyến nghị |  | AND | BSS/OCS API Event |
+| E_NO_PLAN_X_DAYS | subscriber_status | Trạng thái thuê bao | enum | = | ACTIVE | Bắt buộc | Chỉ trigger khi còn ACTIVE | AND | BSS/OCS Batch CSV |
+| E_NO_PLAN_X_DAYS | recent_usage_amount | Mức sử dụng gần đây | decimal | >, >=, BETWEEN | 0 | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -644,9 +731,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_SEGMENT_UPDATE | segment_name | Tên phân khúc mới | string | IN, NOT IN | HEAVY_USER, LIGHT_USER, CHURNER, GAMING | Bắt buộc | Lọc theo phân khúc đích của campaign | AND | BSS/OCS Batch CSV |
-| E_SEGMENT_UPDATE | previous_segment | Phân khúc trước đó | string | IN, NOT IN | MEDIUM_USER | Tùy chọn | Nhắm KH vừa chuyển sang phân khúc mới | AND | BSS/OCS Batch CSV |
-| E_SEGMENT_UPDATE | segment_version | Phiên bản batch phân khúc | string | IN | 2026-06 | Tùy chọn | Đảm bảo dùng kết quả phân khúc mới nhất | AND | BSS/OCS Batch CSV |
+| E_SEGMENT_UPDATE | old_segment | Phân khúc cũ | string | =, IN, NOT IN | MASS | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_SEGMENT_UPDATE | new_segment | Phân khúc mới | string | =, IN, NOT IN | HIGH_VALUE | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_SEGMENT_UPDATE | segment_changed | Có thay đổi phân khúc | boolean | = | TRUE | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_SEGMENT_UPDATE | segment_score | Điểm phân khúc | decimal | >, >=, <, BETWEEN | 80 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E_SEGMENT_UPDATE | effective_date | Ngày hiệu lực phân khúc | date | BEFORE, AFTER, BETWEEN | 2026-06-23 | Khuyến nghị |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -672,11 +761,12 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U01 | topup_count | Tổng số lần nạp tích lũy | integer | >= | 2 | Bắt buộc | Tối thiểu lần thứ 2 mới trigger | AND | BSS/OCS API Event |
-| U01 | topup_amount | Số tiền nạp (đồng) | decimal | >=, <=, BETWEEN | 50000 | Bắt buộc | Lọc theo mức tiền nạp | AND | BSS/OCS API Event |
-| U01 | balance_after | Số dư sau nạp (đồng) | decimal | >=, <= | 103500 | Tùy chọn | KH có số dư đủ để mua gói | AND | BSS/OCS API Event |
-| U01 | topup_channel | Kênh nạp tiền | enum | IN | TOPUP_CARD, MOBILE_BANKING, RETAIL, E-WALLET | Tùy chọn | Gợi ý kênh tiện lợi nhất | AND | BSS/OCS API Event |
-| U01 | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Đề xuất gói phù hợp với số tiền nạp | AND | BSS/OCS API Event |
+| U01 | topup_status | Trạng thái nạp tiền | enum | = | SUCCESS | Bắt buộc |  | AND | BSS/OCS API Event |
+| U01 | topup_count | Số lần nạp thành công | integer | =, >, >= | 2 | Bắt buộc | Tối thiểu lần thứ 2 mới trigger | AND | BSS/OCS API Event |
+| U01 | topup_amount | Số tiền nạp | decimal | >, >=, =, BETWEEN | 50000 | Tùy chọn | Lọc theo mức tiền nạp | AND | BSS/OCS API Event |
+| U01 | topup_channel | Kênh nạp | enum | =, IN, NOT IN | APP, BANK, RETAIL | Tùy chọn | Gợi ý kênh tiện lợi nhất | AND | BSS/OCS API Event |
+| U01 | balance_after | Số dư sau nạp | decimal | >, >=, BETWEEN | 50000 | Tùy chọn | KH có số dư đủ để mua gói | AND | BSS/OCS API Event |
+| U01 | package_code | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -702,11 +792,14 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U02 | plan_register_count | Tổng số lần đăng ký gói | integer | >= | 2 | Bắt buộc | Tối thiểu lần thứ 2 mới trigger | AND | BSS/OCS Batch CSV |
+| U02 | transaction_type | Loại giao dịch gói | enum | =, IN | REGISTER, RENEW | Bắt buộc | Phân biệt nâng cấp hay gia hạn | AND | BSS/OCS Batch CSV |
+| U02 | transaction_status | Trạng thái giao dịch | enum | = | SUCCESS | Bắt buộc |  | AND | BSS/OCS API Event |
+| U02 | success_count | Số lần thành công | integer | =, >, >= | 2 | Bắt buộc |  | AND | BSS/OCS API Event |
+| U02 | package_code | Mã gói | string | =, IN, NOT IN | D5 | Tùy chọn |  | AND | BSS/OCS API Event |
 | U02 | plan_name | Tên gói đã đăng ký | string | IN, NOT IN | GOI_DATA_120K | Tùy chọn | Nhắm gói cụ thể để cross-sell | AND | BSS/OCS Batch CSV |
 | U02 | plan_type | Loại gói đã đăng ký | enum | IN | DATA, VOICE, COMBO | Tùy chọn | Phân nhánh nội dung gợi ý bổ sung | AND | BSS/OCS Batch CSV |
-| U02 | transaction_type | Loại giao dịch gói | enum | IN | UPGRADE, DOWNGRADE, LATERAL, RENEW | Tùy chọn | Phân biệt nâng cấp hay gia hạn | AND | BSS/OCS Batch CSV |
 | U02 | plan_expiry_date | Ngày hết hạn gói | date | AFTER | 2026-06-30 | Tùy chọn | Gợi ý cross-sell trong thời hạn gói | AND | BSS/CRM |
+| U02 | transaction_amount | Giá trị giao dịch | decimal | >, >=, BETWEEN | 50000 | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -735,10 +828,13 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U03 | balance | Số dư TKC (đồng) | decimal | >=, <=, BETWEEN | 10000 | Tùy chọn | KH ít tiền → gợi ý nạp thêm | AND | BSS/OCS API Event |
-| U03 | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Gợi ý gói phù hợp kèm số dư | AND | BSS/OCS API Event |
+| U03 | ussd_code | Mã USSD truy vấn | string | =, IN | *101# | Bắt buộc |  | AND | BSS/OCS API Event |
+| U03 | balance_amount | Số dư hiện tại | decimal | <, <=, >, >=, BETWEEN | 10000 | Tùy chọn |  | AND | BSS/OCS API Event |
+| U03 | query_count_period | Số lần tra cứu trong kỳ | integer | >, >=, BETWEEN | 3 | Tùy chọn |  | AND | BSS/OCS API Event |
+| U03 | package_code | Gói đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn |  | AND | BSS/OCS API Event |
 | U03 | plan_expiry_date | Ngày hết hạn gói | date | BEFORE | 2026-07-05 | Tùy chọn | Nhắc gia hạn khi tra số dư | AND | BSS/OCS API Event |
 | U03 | data_used_pct | % data chu kỳ đã dùng | float | >=, BETWEEN | 60 | Tùy chọn | Cảnh báo data sắp hết kèm gợi ý | AND | BSS/OCS API Event |
+| U03 | response_channel | Kênh phản hồi | enum | =, IN | USSD | Khuyến nghị |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -762,11 +858,14 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
+| U04 | otp_detected | Có phát sinh OTP | boolean | = | TRUE | Bắt buộc |  | AND | BSS/OCS API Event |
 | U04 | otp_count | Số lần nhận OTP trong ngày | integer | >= | 1 | Bắt buộc | Ít nhất 1 OTP trong ngày mới trigger | AND | HLR/SMS log Batch CSV |
 | U04 | app_category | Danh mục ứng dụng gửi OTP | enum | IN | BANKING, ECOMMERCE, TRANSPORT, FINANCE, SOCIAL | Tùy chọn | Gợi ý gói data phù hợp với app đang dùng | AND | HLR/SMS log Batch CSV |
-| U04 | otp_count_period | Số lần OTP trong kỳ (7 ngày) | integer | >= | 2 | Tùy chọn | Pattern sử dụng app thường xuyên | AND | HLR/SMS log Batch CSV |
-| U04 | sender_brandname | Tên đầu số gửi OTP | string | IN, CONTAINS | VPBANK, MOMO, GRAB | Tùy chọn | Nhắm đúng thương hiệu app | AND | HLR/SMS log Batch CSV |
-| U04 | current_plan | Gói data hiện tại | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Gợi ý nâng gói phù hợp với app đang dùng | AND | BSS/OCS |
+| U04 | package_code | Gói data hiện tại | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn |  | AND | BSS/OCS API Event |
+| U04 | sender_brandname | Brandname gửi OTP | string | =, IN, NOT IN, CONTAINS | GRAB, SHOPEE | Tùy chọn | Nhắm đúng thương hiệu app | AND | HLR/SMS log Batch CSV |
+| U04 | otp_count_period | Số OTP trong kỳ | integer | >, >=, BETWEEN | 2 | Tùy chọn | Pattern sử dụng app thường xuyên | AND | HLR/SMS log Batch CSV |
+| U04 | period_days | Số ngày quan sát | integer | =, BETWEEN | 30 | Khuyến nghị |  | AND | BSS/OCS API Event |
+| U04 | app_category | Nhóm ứng dụng | enum | =, IN | ECOMMERCE, TRANSPORT, FINANCE | Tùy chọn | Gợi ý gói data phù hợp với app đang dùng | AND | HLR/SMS log Batch CSV |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -795,13 +894,13 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U05-A | depletion_count | Số tháng liên tiếp hết data sớm | integer | >= | 2 | Bắt buộc | Pattern tối thiểu 2 tháng liên tiếp | AND | BSS/OCS Batch CSV |
+| U05-A | package_cycle | Chu kỳ gói | enum | = | MONTHLY | Bắt buộc |  | AND | BSS/OCS API Event |
+| U05-A | early_depletion_count | Số tháng hết data sớm liên tiếp | integer | >, >=, = | 2 | Bắt buộc |  | AND | BSS/OCS API Event |
+| U05-A | depletion_day | Ngày hết data trong chu kỳ | integer | <, <=, BETWEEN | 20 | Bắt buộc |  | AND | BSS/OCS API Event |
+| U05-A | remaining_cycle_days | Số ngày còn lại khi hết data | integer | >, >=, BETWEEN | 10 | Tùy chọn |  | AND | BSS/OCS API Event |
 | U05-A | quota_type | Loại quota data | enum | IN | MONTHLY | Bắt buộc | Chỉ dành cho gói data tháng | AND | BSS/OCS Batch CSV |
-| U05-A | current_plan | Gói data tháng đang dùng | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Nhắm gói cụ thể cần nâng cấp | AND | BSS/OCS Batch CSV |
-| U05-A | month1_depleted_date | Ngày hết data tháng 1 | date | BEFORE | 2026-05-25 | Tùy chọn | Lọc KH hết data trước ngày cut-off tháng 1 | AND | BSS/OCS Batch CSV |
-| U05-A | month2_depleted_date | Ngày hết data tháng 2 | date | BEFORE | 2026-06-25 | Tùy chọn | Lọc KH hết data trước ngày cut-off tháng 2 | AND | BSS/OCS Batch CSV |
-| U05-A | avg_depletion_day | Ngày bình quân hết data trong tháng | integer | >=, <=, BETWEEN | 25 | Tùy chọn | Ngày bình quân so với ngày N_CUTOFF cấu hình | AND | BSS/OCS Batch CSV |
-| U05-A | avg_monthly_usage_mb | Data bình quân tiêu thụ mỗi tháng (MB) | decimal | >= | 20480 | Tùy chọn | KH dùng nhiều data mới cần nâng gói | AND | BSS/OCS Batch CSV |
+| U05-A | package_code | Mã gói data tháng | string | IN, NOT IN | GOI_DATA_MONTHLY_70K | Tùy chọn |  | AND | BSS/OCS API Event |
+| U05-A | avg_monthly_usage_mb | Data trung bình tháng | decimal | >, >=, BETWEEN | 20480 | Tùy chọn | KH dùng nhiều data mới cần nâng gói | AND | BSS/OCS Batch CSV |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -826,12 +925,14 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U05-B | depletion_count | Số ngày hết data ngày trong tháng | integer | >= | 10 | Bắt buộc | Tối thiểu 10 ngày/tháng bị hết data sớm | AND | BSS/OCS Batch CSV |
-| U05-B | quota_type | Loại quota data | enum | IN | DAILY | Bắt buộc | Chỉ dành cho gói data ngày/quota reset ngày | AND | BSS/OCS Batch CSV |
-| U05-B | current_plan | Gói data ngày đang dùng | string | IN, NOT IN | GOI_DATA_NGAY_10K | Tùy chọn | Nhắm gói ngày cụ thể cần nâng quota | AND | BSS/OCS Batch CSV |
+| U05-B | package_cycle | Chu kỳ quota | enum | = | DAILY | Bắt buộc |  | AND | BSS/OCS API Event |
+| U05-B | depletion_days_count | Số ngày hết quota trong kỳ | integer | >, >=, BETWEEN | 10 | Bắt buộc |  | AND | BSS/OCS API Event |
+| U05-B | observation_days | Số ngày quan sát | integer | = | 30 | Bắt buộc |  | AND | BSS/OCS API Event |
+| U05-B | depletion_ratio | Tỷ lệ ngày hết quota | decimal | >, >=, BETWEEN | 0.33 | Tùy chọn | Ít nhất 1/3 số ngày bị hết data | AND | BSS/OCS Batch CSV |
 | U05-B | daily_quota_mb | Hạn mức data ngày của gói (MB) | integer | >=, <=, BETWEEN | 500 | Tùy chọn | Lọc gói ngày có quota thấp ≤ 500MB | AND | BSS/OCS Batch CSV |
-| U05-B | depletion_ratio | Tỷ lệ ngày hết data so với tổng ngày dùng | decimal | >= | 0.33 | Tùy chọn | Ít nhất 1/3 số ngày bị hết data | AND | BSS/OCS Batch CSV |
-| U05-B | avg_depletion_hour | Giờ trung bình hết data ngày (0–23) | integer | >=, <=, BETWEEN | 14 | Tùy chọn | Hết data trước 14h → pattern rõ ràng | AND | BSS/OCS Batch CSV |
+| U05-B | package_code | Gói data ngày đang dùng | string | IN, NOT IN | GOI_DATA_NGAY_10K | Tùy chọn |  | AND | BSS/OCS API Event |
+| U05-B | quota_type | Loại quota data | enum | IN | DAILY | Bắt buộc | Chỉ dành cho gói data ngày/quota reset ngày | AND | BSS/OCS Batch CSV |
+| U05-B | avg_depletion_hour | Giờ trung bình hết quota | decimal | <, <=, BETWEEN | 18 | Tùy chọn | Hết data trước 14h → pattern rõ ràng | AND | BSS/OCS Batch CSV |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -863,10 +964,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U06 | transaction_type | Loại giao dịch chuyển gói | enum | IN | UPGRADE, DOWNGRADE, LATERAL | Bắt buộc | Loại giao dịch ảnh hưởng nội dung tin nhắn | AND | BSS/OCS Batch CSV |
-| U06 | old_package_code | Gói cũ trước khi chuyển | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Để so sánh lợi ích với gói mới | AND | BSS/OCS Batch CSV |
-| U06 | new_package_code | Gói mới vừa đăng ký | string | IN, NOT IN | GOI_DATA_120K | Tùy chọn | Gợi ý addon phù hợp gói mới | AND | BSS/OCS Batch CSV |
-| U06 | price_delta | Chênh lệch giá giữa gói cũ và mới (đồng) | decimal | >=, <= | 50000 | Tùy chọn | Nâng cấp nhiều → ưu đãi cao hơn | AND | BSS/OCS Batch CSV |
+| U06 | change_status | Trạng thái chuyển gói | enum | = | SUCCESS | Bắt buộc |  | AND | BSS/OCS API Event |
+| U06 | old_package_code | Mã gói cũ | string | =, IN, NOT IN | D5 | Bắt buộc | Để so sánh lợi ích với gói mới | AND | BSS/OCS Batch CSV |
+| U06 | new_package_code | Mã gói mới | string | =, IN, NOT IN | D10 | Bắt buộc | Gợi ý addon phù hợp gói mới | AND | BSS/OCS Batch CSV |
+| U06 | change_type | Loại chuyển đổi | enum | =, IN | UPGRADE, DOWNGRADE, LATERAL | Tùy chọn |  | AND | BSS/OCS API Event |
+| U06 | price_delta | Chênh lệch giá gói | decimal | <, >, =, BETWEEN | 20000 | Tùy chọn | Nâng cấp nhiều → ưu đãi cao hơn | AND | BSS/OCS Batch CSV |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -896,11 +998,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U07 | old_sim_type | Loại SIM cũ trước khi đổi | enum | IN | PHYSICAL, ESIM | Tùy chọn | Lọc hướng đổi: vật lý → eSIM hay ngược lại | AND | BSS/CRM Batch CSV |
-| U07 | new_sim_type | Loại SIM mới | enum | IN | PHYSICAL, ESIM | Tùy chọn | Phân nhánh nội dung eSIM vs SIM vật lý | AND | BSS/CRM Batch CSV |
-| U07 | current_plan | Gói cước được giữ nguyên sau đổi SIM | string | IN, NOT IN | GOI_DATA_120K | Tùy chọn | Gợi ý addon phù hợp gói đang giữ nguyên | AND | BSS/CRM Batch CSV |
-| U07 | sim_change_reason | Lý do đổi SIM | enum | IN | LOST, DAMAGED, ESIM_CONVERSION, UPGRADE | Tùy chọn | Phân nhánh nội dung theo lý do đổi | AND | BSS/CRM Batch CSV |
-| U07 | is_same_msisdn | Giữ nguyên số sau khi đổi SIM | boolean | = | TRUE | Tùy chọn | Giữ số cũ → gợi ý khác so với đổi số | AND | BSS/CRM Batch CSV |
+| U07 | sim_change_status | Trạng thái đổi SIM | enum | = | SUCCESS | Bắt buộc |  | AND | BSS/OCS API Event |
+| U07 | old_sim_type | Loại SIM cũ | enum | =, IN | PHYSICAL, ESIM | Bắt buộc | Lọc hướng đổi: vật lý → eSIM hay ngược lại | AND | BSS/CRM Batch CSV |
+| U07 | new_sim_type | Loại SIM mới | enum | =, IN | PHYSICAL, ESIM | Bắt buộc | Phân nhánh nội dung eSIM vs SIM vật lý | AND | BSS/CRM Batch CSV |
+| U07 | sim_change_reason | Lý do đổi SIM | enum | =, IN | LOST, DAMAGED, ESIM_CONVERSION | Tùy chọn | Phân nhánh nội dung theo lý do đổi | AND | BSS/CRM Batch CSV |
+| U07 | is_same_msisdn | Giữ nguyên số thuê bao | boolean | = | TRUE | Khuyến nghị | Giữ số cũ → gợi ý khác so với đổi số | AND | BSS/CRM Batch CSV |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -929,13 +1031,14 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U08 | consecutive_renewals | Số lần gia hạn liên tiếp | integer | >=, <=, BETWEEN | 3 | Bắt buộc | Đạt mốc chuỗi gia hạn để vinh danh | AND | BSS/OCS Batch CSV |
+| U08 | renewal_status | Trạng thái gia hạn | enum | = | SUCCESS | Bắt buộc |  | AND | BSS/OCS API Event |
+| U08 | consecutive_renewal_count | Số kỳ gia hạn liên tiếp | integer | >, >=, BETWEEN | 3 | Bắt buộc |  | AND | BSS/OCS API Event |
+| U08 | package_code | Mã gói | string | =, IN, NOT IN | D10 | Tùy chọn |  | AND | BSS/OCS API Event |
+| U08 | total_tenure_days | Số ngày gắn bó | integer | >, >=, BETWEEN | 180 | Tùy chọn |  | AND | BSS/OCS API Event |
 | U08 | plan_cycle | Chu kỳ gói được gia hạn liên tiếp | enum | IN | DAILY, WEEKLY, MONTHLY | Tùy chọn | Lọc chuỗi gia hạn theo loại chu kỳ gói — mốc số lần vinh danh có thể khác nhau giữa gói ngày/tuần/tháng | AND | BSS/OCS Batch CSV |
-| U08 | renewal_pattern | Kiểu chuỗi gia hạn | enum | IN | ON_TIME_ONLY, EARLY_ONLY, MIXED | Tùy chọn | Phân nhánh nội dung: đúng hạn / sớm hạn / hỗn hợp | AND | BSS/OCS Batch CSV |
-| U08 | loyalty_milestone | Mốc trung thành vừa đạt được | enum | IN | M3, M6, M12 | Tùy chọn | Lọc theo mốc để gắn ưu đãi đúng cấp độ | AND | BSS/OCS Batch CSV |
-| U08 | current_plan | Gói đang dùng | string | IN, NOT IN | GOI_DATA_120K | Tùy chọn | Nhắm gói cụ thể khi vinh danh | AND | BSS/OCS Batch CSV |
 | U08 | renewal_amount | Tổng tiền gia hạn trong chuỗi (đồng) | decimal | >=, BETWEEN | 210000 | Tùy chọn | Vinh danh theo mức chi tiêu | AND | BSS/OCS Batch CSV |
 | U08 | subscriber_tenure_days | Tổng ngày gắn kết với mạng | integer | >=, BETWEEN | 90 | Tùy chọn | Kết hợp mốc thời gian gắn kết | AND | BSS/CRM |
+| U08 | renewal_channel | Kênh gia hạn | enum | =, IN | AUTO, APP, USSD | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -975,10 +1078,12 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U09 | anniversary_type | Loại kỷ niệm | enum | IN | BIRTHDAY, SIM_ANNIVERSARY | Bắt buộc | Phân nhánh nội dung chúc mừng | AND | BSS/CRM Batch CSV |
-| U09 | customer_tenure_days | Số ngày KH đã gắn kết với mạng | integer | >=, <=, BETWEEN | 365 | Tùy chọn | Vinh danh KH lâu năm với ưu đãi đặc biệt | AND | BSS/CRM Batch CSV |
-| U09 | date_of_birth | Ngày sinh KH | date | BETWEEN | 2026-06-30 | Tùy chọn | Lọc KH có sinh nhật đúng ngày hôm nay | AND | BSS/CRM eKYC |
+| U09 | anniversary_type | Loại ngày kỷ niệm | enum | =, IN | BIRTHDAY, SUBSCRIPTION_ANNIVERSARY | Bắt buộc | Phân nhánh nội dung chúc mừng | AND | BSS/CRM Batch CSV |
+| U09 | days_to_anniversary | Số ngày đến dịp kỷ niệm | integer | =, BETWEEN | 0 | Bắt buộc |  | AND | BSS/OCS API Event |
+| U09 | customer_tenure_days | Số ngày gắn bó | integer | >, >=, BETWEEN | 365 | Tùy chọn | Vinh danh KH lâu năm với ưu đãi đặc biệt | AND | BSS/CRM Batch CSV |
+| U09 | date_of_birth | Ngày sinh | date | =, BETWEEN | 1995-06-23 | Tùy chọn | Lọc KH có sinh nhật đúng ngày hôm nay | AND | BSS/CRM eKYC |
 | U09 | event_date | Ngày diễn ra sự kiện kỷ niệm | date | = | 2026-06-30 | Tùy chọn | Gửi đúng ngày kỷ niệm | AND | BSS/CRM |
+| U09 | activation_date | Ngày kích hoạt | date | =, BETWEEN | 2025-06-23 | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -1006,10 +1111,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U10 | event_date | Ngày diễn ra sự kiện | date | = | 2026-09-02 | Tùy chọn | Ngày lễ cụ thể đã cấu hình trong lịch CVM | AND | BSS/CRM Batch CSV |
-| U10 | days_before_event | Số ngày trước sự kiện | integer | >=, <=, BETWEEN | 2 | Tùy chọn | Gửi sớm trước ngày lễ bao nhiêu ngày | AND | BSS/CRM Batch CSV |
-| U10 | nationality | Quốc tịch KH | enum | IN, NOT IN | VN, ROW | Tùy chọn | Gửi nội dung đúng ngôn ngữ và phong tục | AND | BSS/CRM eKYC |
-| U10 | region_code | Mã khu vực (tỉnh/thành phố) | string | IN, NOT IN | HN, HCM, DN | Tùy chọn | Nhắm sự kiện địa phương nếu có | AND | BSS/CRM |
+| U10 | holiday_code | Mã ngày lễ/sự kiện | string | =, IN | NATIONAL_DAY | Bắt buộc |  | AND | BSS/OCS API Event |
+| U10 | event_date | Ngày diễn ra | date | =, BETWEEN | 2026-09-02 | Bắt buộc | Ngày lễ cụ thể đã cấu hình trong lịch CVM | AND | BSS/CRM Batch CSV |
+| U10 | days_before_event | Số ngày gửi trước | integer | =, BETWEEN | 2 | Tùy chọn | Gửi sớm trước ngày lễ bao nhiêu ngày | AND | BSS/CRM Batch CSV |
+| U10 | nationality | Quốc tịch | enum | =, IN, NOT IN | VN | Tùy chọn | Gửi nội dung đúng ngôn ngữ và phong tục | AND | BSS/CRM eKYC |
+| U10 | region_code | Khu vực | string | =, IN, NOT IN | HN, HCM | Tùy chọn | Nhắm sự kiện địa phương nếu có | AND | BSS/CRM |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -1042,10 +1148,12 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U_PRE_EXPIRY | days_to_expiry | Số ngày còn đến khi gói hết hạn | integer | >=, <=, BETWEEN | 3 | Bắt buộc | Bao nhiêu ngày trước hết hạn → gửi nhắc | AND | BSS API Event |
-| U_PRE_EXPIRY | balance | Số dư TKC (đồng) | decimal | >=, <= | 50000 | Tùy chọn | KH có đủ tiền gia hạn ngay | AND | BSS API Event |
-| U_PRE_EXPIRY | package_code | Mã gói sắp hết hạn | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Nhắm gói cụ thể cần gia hạn | AND | BSS API Event |
+| U_PRE_EXPIRY | days_to_expiry | Số ngày đến hết hạn | integer | =, <, <=, BETWEEN | 3 | Bắt buộc | Bao nhiêu ngày trước hết hạn → gửi nhắc | AND | BSS API Event |
+| U_PRE_EXPIRY | auto_renew | Có tự động gia hạn | boolean | = | TRUE | Tùy chọn |  | AND | BSS/OCS API Event |
+| U_PRE_EXPIRY | main_balance | Số dư tài khoản chính | decimal | <, <=, =, >, BETWEEN | 50000 | Tùy chọn |  | AND | BSS/OCS API Event |
+| U_PRE_EXPIRY | renewal_fee | Phí gia hạn | decimal | >, >=, = | 50000 | Khuyến nghị |  | AND | BSS/OCS API Event |
 | U_PRE_EXPIRY | plan_type | Loại gói | enum | IN | DATA, VOICE, COMBO | Tùy chọn | Phân nhánh nội dung nhắc gia hạn | AND | BSS API Event |
+| U_PRE_EXPIRY | package_code | Mã gói sắp hết hạn | string | =, IN, NOT IN | D10 | Bắt buộc | Nhắm gói cụ thể cần gia hạn | AND | BSS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -1070,9 +1178,11 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| U_POST_EXPIRY | days_after_expiry | Số ngày sau khi gói hết hạn | integer | >=, <=, BETWEEN | 1 | Bắt buộc | Bao nhiêu ngày sau hết hạn → thúc gia hạn | AND | BSS API Event |
-| U_POST_EXPIRY | balance | Số dư TKC (đồng) | decimal | >=, <= | 50000 | Tùy chọn | KH có tiền nhưng quên gia hạn | AND | BSS API Event |
-| U_POST_EXPIRY | package_code | Gói vừa hết hạn | string | IN, NOT IN | GOI_DATA_70K | Tùy chọn | Gợi ý đăng ký lại đúng gói cũ | AND | BSS API Event |
+| U_POST_EXPIRY | days_since_expiry | Số ngày từ khi hết hạn | integer | =, >, >=, BETWEEN | 1 | Bắt buộc |  | AND | BSS/OCS API Event |
+| U_POST_EXPIRY | renewed_after_expiry | Đã gia hạn lại | boolean | = | FALSE | Bắt buộc |  | AND | BSS/OCS API Event |
+| U_POST_EXPIRY | expired_package_code | Mã gói đã hết hạn | string | =, IN | D10 | Bắt buộc |  | AND | BSS/OCS API Event |
+| U_POST_EXPIRY | current_active_package_count | Số gói hiện đang active | integer | =, <=, < | 0 | Tùy chọn |  | AND | BSS/OCS API Event |
+| U_POST_EXPIRY | recent_usage_after_expiry | Sử dụng sau hết hạn | decimal | >, >=, BETWEEN | 0 | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -1100,10 +1210,14 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_LOCK_2C | lock_reason | Lý do khóa 2 chiều | enum | IN, NOT IN | DEBT, CUSTOMER_REQUEST, ADMIN | Bắt buộc | Phân nhánh nội dung theo lý do khóa | AND | BSS/CRM API Event |
+| E_LOCK_2C | old_status | Trạng thái cũ | enum | =, IN | LOCK_1C, ACTIVE | Bắt buộc |  | AND | BSS/OCS API Event |
 | E_LOCK_2C | lock_direction | Chiều khóa | enum | IN | BOTH, INCOMING | Bắt buộc | Xác nhận khóa đúng 2 chiều | AND | BSS/CRM API Event |
 | E_LOCK_2C | days_in_lock | Số ngày ở trạng thái khóa 2 chiều | integer | >=, <=, BETWEEN | 1 | Tùy chọn | Nhắc theo số ngày đã bị khóa | AND | BSS/CRM API Event |
 | E_LOCK_2C | balance | Số dư TKC khi bị khóa (đồng) | decimal | >=, <= | 0 | Tùy chọn | Hướng dẫn nạp tiền để mở khóa | AND | BSS/OCS API Event |
+| E_LOCK_2C | new_status | Trạng thái mới | enum | = | LOCK_2C | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_LOCK_2C | lock_reason | Lý do khóa | enum | =, IN | DEBT, KYC, CUSTOMER_REQUEST | Tùy chọn | Phân nhánh nội dung theo lý do khóa | AND | BSS/CRM API Event |
+| E_LOCK_2C | lock_time | Thời điểm khóa | datetime | BEFORE, AFTER, BETWEEN | 2026-06-23 10:00:00 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_LOCK_2C | recoverable | Có thể tự khôi phục | boolean | = | TRUE | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -1131,10 +1245,13 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_LOCK_1C | lock_reason | Lý do khóa 1 chiều | enum | IN | INACTIVE, ADMIN | Tùy chọn | Phân nhánh theo nguyên nhân khóa | AND | BSS/OCS API Event |
-| E_LOCK_1C | days_in_lock | Số ngày ở trạng thái khóa 1 chiều | integer | >=, <=, BETWEEN | 7 | Tùy chọn | Nhắc theo thời gian đã bị khóa | AND | BSS/OCS API Event |
-| E_LOCK_1C | days_until_lock_2c | Số ngày còn lại đến khi bị khóa 2 chiều | integer | >=, <=, BETWEEN | 15 | Tùy chọn | Cảnh báo deadline trước khi khóa 2 chiều | AND | BSS/OCS API Event |
+| E_LOCK_1C | lock_direction | Chiều khóa | enum | =, IN | OUTGOING, INCOMING | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_LOCK_1C | lock_reason | Lý do khóa | enum | =, IN | DEBT, INACTIVE, ADMIN | Bắt buộc | Phân nhánh theo nguyên nhân khóa | AND | BSS/OCS API Event |
+| E_LOCK_1C | days_in_lock_1c | Số ngày đã khóa 1 chiều | integer | =, >, >=, BETWEEN | 1 | Tùy chọn |  | AND | BSS/OCS API Event |
+| E_LOCK_1C | outstanding_amount | Số tiền còn thiếu/nợ | decimal | >, >=, BETWEEN | 50000 | Tùy chọn |  | AND | BSS/OCS API Event |
 | E_LOCK_1C | balance | Số dư TKC (đồng) | decimal | >=, <= | 0 | Tùy chọn | KH hết tiền → hướng dẫn nạp tiền | AND | BSS/OCS API Event |
+| E_LOCK_1C | days_until_lock_2c | Số ngày còn lại đến khi bị khóa 2 chiều | integer | >=, <=, BETWEEN | 15 | Tùy chọn | Cảnh báo deadline trước khi khóa 2 chiều | AND | BSS/OCS API Event |
+| E_LOCK_1C | scheduled_lock_2c_date | Ngày dự kiến khóa 2 chiều | date | BEFORE, AFTER, BETWEEN | 2026-06-30 | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
@@ -1156,9 +1273,12 @@
 
 | Mã trigger | Tên trường kỹ thuật | Tên điều kiện nghiệp vụ | Kiểu dữ liệu | Toán tử hỗ trợ | Giá trị mẫu / mặc định | Mức độ | Ghi chú nghiệp vụ | Logic mặc định | Nguồn dữ liệu |
 |---|---|---|---|---|---|---|---|---|---|
-| E_PRE_LOCK_2C | days_in_lock_1c | Số ngày đã ở trạng thái khóa 1 chiều | integer | >=, <=, BETWEEN | 30 | Bắt buộc | Để tính deadline chuyển sang khóa 2 chiều | AND | BSS API Event |
-| E_PRE_LOCK_2C | scheduled_lock_2c_date | Ngày dự kiến bị khóa 2 chiều | date | BEFORE | 2026-07-15 | Tùy chọn | Gửi trước ngày bị khóa 2 chiều | AND | BSS API Event |
+| E_PRE_LOCK_2C | current_status | Trạng thái hiện tại | enum | = | LOCK_1C | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_PRE_LOCK_2C | days_to_lock_2c | Số ngày đến khóa 2 chiều | integer | =, <, <=, BETWEEN | 3 | Bắt buộc |  | AND | BSS/OCS API Event |
+| E_PRE_LOCK_2C | scheduled_lock_2c_date | Ngày dự kiến khóa 2 chiều | date | BEFORE, AFTER, BETWEEN | 2026-06-26 | Bắt buộc | Gửi trước ngày bị khóa 2 chiều | AND | BSS API Event |
+| E_PRE_LOCK_2C | lock_reason | Lý do dự kiến khóa | enum | =, IN | DEBT, INACTIVE | Tùy chọn |  | AND | BSS/OCS API Event |
 | E_PRE_LOCK_2C | balance | Số dư TKC (đồng) | decimal | >=, <= | 50000 | Tùy chọn | KH có tiền → hướng dẫn đóng nợ/nạp tiền | AND | BSS API Event |
+| E_PRE_LOCK_2C | required_recovery_amount | Số tiền cần bổ sung/thanh toán | decimal | >, >=, BETWEEN | 50000 | Tùy chọn |  | AND | BSS/OCS API Event |
 
 #### Logic nghiệp vụ chi tiết
 
