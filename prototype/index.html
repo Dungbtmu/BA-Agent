@@ -1803,11 +1803,16 @@ function Customer360Screen({ uid, onBack }) {
                 </div>
               )}
 
-              {/* TẦNG 3 — Timeline */}
-              {sourceTab === 'timeline' && (
+              {/* TẦNG 3 — Timeline: CHỈ nguồn đã gộp (AUTO_MERGED, có mergedAt). Nguồn đang chờ tách riêng. */}
+              {sourceTab === 'timeline' && (() => {
+                const mergedSources = sources.filter(s => s.mergeStatus === 'AUTO_MERGED' && s.mergedAt);
+                const pendingSources = sources.filter(s => s.mergeStatus === 'PENDING');
+                const parseD = (d) => new Date(d.split(' ')[0].split('/').reverse().join('-'));
+                const sorted = [...mergedSources].sort((a,b) => parseD(b.mergedAt) - parseD(a.mergedAt));
+                return (
                 <div style={{ display:'flex', flexDirection:'column', gap:0 }}>
                   <div style={{ fontSize:12, color:'#6B7280', marginBottom:12 }}>
-                    Thứ tự các hệ thống nguồn được CDP nhận diện và gộp vào Hồ sơ chuẩn.
+                    Thứ tự các hệ thống nguồn đã được CDP <b>tự động gộp</b> vào Hồ sơ chuẩn (khóa mạnh ≥{CONF_AUTO}%). Nguồn đang chờ xác nhận chưa nằm trên dòng thời gian này.
                   </div>
                   {/* Hồ sơ chuẩn — điểm cuối */}
                   <div style={{ display:'flex', gap:16, alignItems:'flex-start', paddingBottom:16 }}>
@@ -1818,10 +1823,15 @@ function Customer360Screen({ uid, onBack }) {
                     <div style={{ paddingTop:0 }}>
                       <div style={{ fontWeight:700, fontSize:13, color:'#16A34A' }}>✦ Hồ sơ chuẩn tạo thành</div>
                       <div style={{ fontSize:11, color:'#6B7280', fontFamily:'monospace' }}>{kh.uid}</div>
-                      <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>Tổng hợp từ {sources.length} nguồn · Hoàn chỉnh {kh.completeness}%</div>
+                      <div style={{ fontSize:11, color:'#6B7280', marginTop:2 }}>Đã gộp từ {mergedSources.length} nguồn · Hoàn chỉnh {kh.completeness}%</div>
                     </div>
                   </div>
-                  {[...sources].sort((a,b) => new Date(b.mergedAt.split(' ')[0].split('/').reverse().join('-')) - new Date(a.mergedAt.split(' ')[0].split('/').reverse().join('-'))).map((s, i, arr) => (
+                  {sorted.length === 0 && (
+                    <div style={{ fontSize:12, color:'#6B7280', fontStyle:'italic', paddingLeft:30, paddingBottom:12 }}>
+                      Chưa có nguồn nào được tự động gộp — hồ sơ chuẩn này đang chờ xác nhận thủ công.
+                    </div>
+                  )}
+                  {sorted.map((s, i, arr) => (
                     <div key={i} style={{ display:'flex', gap:16, alignItems:'flex-start', paddingBottom: i < arr.length-1 ? 16 : 0 }}>
                       <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
                         <div style={{ width:12, height:12, borderRadius:50, background:confColor(s.confidence), flexShrink:0 }}></div>
@@ -1840,8 +1850,22 @@ function Customer360Screen({ uid, onBack }) {
                       </div>
                     </div>
                   ))}
+
+                  {/* Nguồn đang chờ xác nhận — KHÔNG nằm trên timeline đã gộp */}
+                  {pendingSources.length > 0 && (
+                    <div style={{ marginTop:20, padding:'12px 14px', background:'var(--warn-soft)', border:'1px dashed #f0c674', borderRadius:10 }}>
+                      <div style={{ fontSize:12, fontWeight:700, color:'#8a5a00', marginBottom:6 }}>⏳ {pendingSources.length} nguồn đang chờ xác nhận — chưa gộp vào hồ sơ chuẩn</div>
+                      <div className="flex gap-2 flex-wrap">
+                        {pendingSources.map(s => (
+                          <span key={s.sourceId} className="badge" style={{ background:'white', border:'1px solid #f0c674', color:'#8a5a00' }} title={s.matchKey}>{s.source} {s.sourceId} ({s.confidence}%)</span>
+                        ))}
+                      </div>
+                      <div style={{ fontSize:11, color:'#8a5a00', marginTop:6 }}>Xác nhận tại màn <b>Đối soát định danh</b> để đưa các nguồn này lên dòng thời gian.</div>
+                    </div>
+                  )}
                 </div>
-              )}
+                );
+              })()}
 
             </div>
           );
