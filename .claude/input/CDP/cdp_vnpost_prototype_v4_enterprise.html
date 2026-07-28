@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CDP VNPost – Enterprise Prototype v4</title>
+<style>
+:root{
+  --brand:#f4b400;
+  --brand-2:#ffd44d;
+  --brand-soft:#fff7dc;
+  --text:#111827;
+  --text-2:#374151;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --line:#edf0f4;
+  --bg:#f5f7fa;
+  --bg-2:#fafbfc;
+  --card:#ffffff;
+  --success:#16a34a;
+  --success-soft:#eaf8ef;
+  --info:#2563eb;
+  --info-soft:#eef4ff;
+  --warning:#d97706;
+  --warning-soft:#fff3df;
+  --danger:#dc2626;
+  --danger-soft:#fff0f0;
+  --purple:#7c3aed;
+  --purple-soft:#f3edff;
+  --shadow-xs:0 4px 10px rgba(17,24,39,.04);
+  --shadow-sm:0 8px 22px rgba(17,24,39,.06);
+  --shadow-md:0 12px 30px rgba(17,24,39,.07);
+  --radius:18px;
+  --radius-md:14px;
+  --radius-sm:10px;
+  --sidebar-w:278px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at top right, rgba(244,180,0,.12), transparent 18%),
+    linear-gradient(180deg,#fafbfc 0%, #f4f6f9 100%);
+}
+a{text-decoration:none;color:inherit}
+.app{display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);
+  background:#fff;border-right:1px solid var(--border);z-index:30;
+  display:flex;flex-direction:column;
+}
+.sidebar:before{
+  content:"";display:block;height:4px;background:linear-gradient(90deg,var(--brand),var(--brand-2));
+}
+.brand{
+  display:flex;align-items:center;gap:14px;padding:20px 22px 18px;border-bottom:1px solid var(--border);
+}
+.logo{
+  width:44px;height:44px;border-radius:14px;background:linear-gradient(180deg,var(--brand),#ffc620);
+  color:#1f2937;display:grid;place-items:center;font-size:20px;font-weight:800;
+  box-shadow:var(--shadow-xs);
+}
+.brand h1{margin:0;font-size:16px;letter-spacing:.01em}
+.brand p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+.side-scroll{padding:14px 12px;overflow:auto}
+.menu-title{
+  padding:12px 12px 8px;font-size:11px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;color:#9ca3af;
+}
+.nav-link{
+  display:flex;align-items:center;gap:12px;padding:11px 12px;margin:3px 0;
+  border-radius:12px;color:var(--text-2);font-size:14px;font-weight:700;transition:.18s ease;
+}
+.nav-link:hover{background:#fafafa}
+.nav-link.active{
+  background:var(--brand-soft);color:#8a5a00;box-shadow:inset 3px 0 0 var(--brand);
+}
+.ico{
+  width:20px;height:20px;display:grid;place-items:center;font-size:15px;color:#6b7280;
+}
+.nav-link.active .ico{color:#8a5a00}
+.sidebar-footer{
+  margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);background:#fff;
+}
+.sidebar-footer strong{display:block;font-size:13px}
+.sidebar-footer span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+
+/* Main shell */
+.main{
+  margin-left:var(--sidebar-w);width:calc(100% - var(--sidebar-w));min-height:100vh;
+}
+.topbar{
+  position:sticky;top:0;z-index:20;height:76px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.topbar h2{margin:0;font-size:22px;letter-spacing:-.02em}
+.top-meta{font-size:12px;color:var(--muted);margin-top:5px}
+.top-actions{display:flex;align-items:center;gap:12px}
+.search{
+  width:380px;background:#fff;border:1px solid var(--border);
+  border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;
+  box-shadow:var(--shadow-xs);
+}
+.search input{width:100%;border:none;outline:none;background:transparent;font-size:14px;color:#374151}
+.header-btn,.header-icon{
+  height:42px;border:1px solid var(--border);background:#fff;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-xs);
+}
+.header-btn{padding:0 14px;font-weight:700;color:#374151}
+.header-icon{width:42px;position:relative}
+.badge{
+  position:absolute;right:-4px;top:-4px;background:var(--brand);color:#1f2937;
+  border-radius:999px;font-size:10px;font-weight:800;padding:3px 6px;border:2px solid #fff;
+}
+.content{padding:28px}
+
+/* Pages */
+.page{display:none}
+.page.active{display:block}
+
+/* Generic components */
+.card{
+  background:var(--card);border:1px solid rgba(17,24,39,.05);
+  border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:18px;
+}
+.section-title{
+  margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#667085;
+}
+.page-toolbar{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;
+}
+.page-toolbar h3{margin:0;font-size:20px}
+.page-toolbar .left p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{
+  height:42px;padding:0 14px;border-radius:12px;border:1px solid var(--border);background:#fff;
+  font-weight:700;color:#374151;display:inline-flex;align-items:center;gap:8px;box-shadow:var(--shadow-xs);cursor:pointer;
+}
+.btn.primary{
+  background:linear-gradient(180deg,var(--brand),#efb000);border-color:#e1ad1f;color:#222;
+}
+.btn.soft{
+  background:var(--brand-soft);border-color:#f0d67b;color:#8a5a00;
+}
+.btn.ghost{
+  background:#fff;border-color:var(--border);
+}
+.pill{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;
+  font-size:12px;font-weight:700;
+}
+.pill.success{background:var(--success-soft);color:var(--success)}
+.pill.info{background:var(--info-soft);color:var(--info)}
+.pill.warn{background:var(--warning-soft);color:var(--warning)}
+.pill.danger{background:var(--danger-soft);color:var(--danger)}
+.pill.brand{background:var(--brand-soft);color:#8a5a00}
+.pill.neutral{background:#f3f4f6;color:#6b7280}
+.muted{color:var(--muted)}
+.small{font-size:12px;color:var(--muted)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.stat{
+  padding:16px;border:1px solid #eef1f4;border-radius:16px;background:linear-gradient(180deg,#fff,#fcfcfd);
+}
+.stat .label{font-size:12px;color:var(--muted)}
+.stat .value{margin-top:8px;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.stat .sub{margin-top:6px;font-size:12px;color:var(--muted)}
+.health{
+  height:8px;background:#edf0f4;border-radius:999px;overflow:hidden;margin-top:10px;
+}
+.health span{display:block;height:100%;background:linear-gradient(90deg,var(--brand),#ffd450)}
+.info-row{
+  display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);
+}
+.info-row:last-child{border-bottom:none}
+.info-row span:first-child{color:var(--muted)}
+.info-row b{text-align:right;font-size:14px}
+.table-wrap{
+  overflow:auto;border:1px solid #edf0f4;border-radius:16px;background:#fff;
+}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{
+  background:#fafbfc;color:#667085;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;
+}
+tbody tr:hover{background:#fffdf6}
+tbody tr:last-child td{border-bottom:none}
+.filters{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;
+}
+.input, .select{
+  min-width:180px;height:40px;padding:0 12px;border:1px solid var(--border);background:#fff;
+  border-radius:12px;color:#374151;display:flex;align-items:center;box-shadow:var(--shadow-xs);
+}
+.input input{border:none;outline:none;width:100%;font-size:14px}
+.tabs{display:flex;gap:8px;overflow:auto;margin:18px 0 14px}
+.tab{
+  border:none;background:#fff;height:42px;padding:0 14px;border-radius:12px;
+  font-weight:700;color:#4b5563;border:1px solid transparent;box-shadow:var(--shadow-xs);cursor:pointer;white-space:nowrap;
+}
+.tab.active{
+  background:linear-gradient(180deg,var(--brand),#efb000);color:#222;
+}
+.panel{display:none}
+.panel.active{display:block}
+.subtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.subtab{
+  height:40px;padding:0 12px;border:1px solid var(--border);background:#fff;border-radius:12px;
+  font-weight:700;color:#4b5563;cursor:pointer;box-shadow:var(--shadow-xs);
+}
+.subtab.active{
+  background:var(--brand-soft);border-color:#f0d67b;color:#8a5a00;
+}
+.subpanel{display:none}
+.subpanel.active{display:block}
+.alert{
+  border:1px solid #f7dda0;background:#fff8e5;color:#7c5700;border-radius:16px;padding:14px 16px;margin-bottom:14px;
+}
+.note{
+  border:1px solid #d9e6ff;background:#f5f9ff;color:#1d4ed8;border-radius:16px;padding:14px 16px;
+}
+.timeline{position:relative;padding-left:24px}
+.timeline:before{
+  content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:#e5e7eb;
+}
+.event{position:relative;padding:0 0 18px 12px}
+.event:before{
+  content:"";position:absolute;left:-18px;top:3px;width:12px;height:12px;border-radius:50%;
+  background:var(--brand);box-shadow:0 0 0 4px #fff4d1;
+}
+.event.success:before{background:var(--success);box-shadow:0 0 0 4px #eaf8ef}
+.event.warn:before{background:var(--warning);box-shadow:0 0 0 4px #fff3df}
+.event.info:before{background:var(--info);box-shadow:0 0 0 4px #eef4ff}
+.event.purple:before{background:var(--purple);box-shadow:0 0 0 4px #f3edff}
+.event small{color:var(--muted)}
+.event b{display:block;margin-top:4px}
+.score{
+  border:1px solid #edf0f4;border-radius:16px;padding:16px;background:#fff;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.score .sub{font-size:12px;color:var(--muted)}
+.score .value{font-size:24px;font-weight:800}
+.hero{
+  display:grid;grid-template-columns:1.35fr .95fr;gap:16px;margin-bottom:16px;
+}
+.banner{
+  padding:22px;border-radius:20px;background:
+    radial-gradient(circle at top right, rgba(255,255,255,.45), transparent 35%),
+    linear-gradient(135deg,#3a3f45 0%, #20252d 100%);
+  color:#fff;box-shadow:var(--shadow-md);position:relative;overflow:hidden;
+}
+.banner:after{
+  content:"";position:absolute;right:-30px;bottom:-30px;width:170px;height:170px;border-radius:50%;
+  background:rgba(244,180,0,.16);
+}
+.banner .eyebrow{
+  display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);padding:7px 10px;border-radius:999px;font-size:12px;font-weight:700;
+}
+.banner h3{margin:16px 0 10px;font-size:28px;line-height:1.15}
+.banner p{margin:0;color:rgba(255,255,255,.84);max-width:88%}
+.banner-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.banner .ghost-dark{
+  background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);
+}
+.banner .gold{
+  background:linear-gradient(180deg,var(--brand),#efb000);color:#222;border:1px solid #e1ad1f;
+}
+.mini-chart{
+  display:flex;gap:8px;align-items:flex-end;height:90px;margin-top:10px
+}
+.bar{flex:1;background:linear-gradient(180deg,#ffd760, #f4b400);border-radius:10px 10px 4px 4px;opacity:.9}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.legend span{font-size:12px;color:var(--muted)}
+.legend i{
+  width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px;vertical-align:middle;
+}
+.profile-card{
+  padding:22px 24px;
+}
+.profile-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.profile-left{display:flex;gap:16px;align-items:flex-start}
+.avatar{
+  width:60px;height:60px;border-radius:18px;background:linear-gradient(180deg,var(--brand),#ffc92d);
+  color:#1f2937;display:grid;place-items:center;font-size:24px;font-weight:800;
+  box-shadow:var(--shadow-xs);
+}
+.profile-title h3{margin:0;font-size:28px;letter-spacing:-.02em}
+.profile-title .uid{margin-top:6px;font-size:12px;color:var(--muted)}
+.tag-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.kpi{
+  padding:14px;border:1px solid #edf0f4;border-radius:16px;background:#fcfcfd;
+}
+.kpi small{display:block;color:var(--muted);font-size:12px;margin-bottom:8px}
+.kpi b{font-size:21px}
+.kpi .good{color:var(--success)}
+.kpi .warn{color:var(--warning)}
+.rule-builder{
+  display:grid;grid-template-columns:1.2fr .8fr;gap:16px;
+}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-field label{display:block;font-size:12px;font-weight:700;color:#667085;margin-bottom:6px}
+.form-field .field{
+  height:42px;border:1px solid var(--border);border-radius:12px;background:#fff;padding:0 12px;
+  display:flex;align-items:center;color:#374151;box-shadow:var(--shadow-xs)
+}
+.rule-box{
+  border:1px dashed #e3d6a2;background:#fffdf4;border-radius:16px;padding:14px
+}
+.rule-item{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 0;border-bottom:1px dashed #eadfaa;
+}
+.rule-item:last-child{border-bottom:none}
+.badge-block{
+  display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;background:#fff;border:1px solid #eee;
+  font-size:13px;font-weight:700;
+}
+.queue-layout{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+.side-panel{
+  border:1px solid #edf0f4;border-radius:16px;background:#fcfcfd;padding:16px
+}
+.chart-card{
+  display:grid;grid-template-columns:1.1fr .9fr;gap:16px
+}
+.donut{
+  width:140px;height:140px;border-radius:50%;
+  background:conic-gradient(var(--brand) 0 235deg, #e9edf3 235deg 360deg);
+  display:grid;place-items:center;margin:auto;
+}
+.donut:after{
+  content:"";width:92px;height:92px;background:#fff;border-radius:50%;box-shadow:inset 0 0 0 1px #eff2f6;
+}
+.donut-wrap{position:relative;width:140px;height:140px;margin:auto}
+.donut-text{
+  position:absolute;inset:0;display:grid;place-items:center;font-size:22px;font-weight:800;
+}
+.footer-note{
+  font-size:12px;color:var(--muted);margin-top:10px
+}
+@media(max-width:1350px){
+  .grid-4,.grid-5,.kpis{grid-template-columns:repeat(3,1fr)}
+  .hero,.chart-card,.rule-builder,.queue-layout{grid-template-columns:1fr}
+}
+@media(max-width:980px){
+  :root{--sidebar-w:88px}
+  .brand h1,.brand p,.menu-title,.nav-link span:not(.ico),.sidebar-footer{display:none}
+  .main{margin-left:var(--sidebar-w);width:calc(100% - var(--sidebar-w))}
+  .grid-2,.grid-3,.grid-4,.grid-5,.kpis,.form-grid{grid-template-columns:1fr}
+  .search{width:220px}
+  .profile-head{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">C</div>
+      <div>
+        <h1>CDP VNPost</h1>
+        <p>Customer Data Platform nội bộ</p>
+      </div>
+    </div>
+
+    <div class="side-scroll">
+      <div class="menu-title">Điều hướng chính</div>
+      <a href="#" class="nav-link active" data-page="dashboardPage"><span class="ico">◫</span><span>Dashboard tổng quan</span></a>
+      <a href="#" class="nav-link" data-page="customerListPage"><span class="ico">☰</span><span>Danh sách khách hàng</span></a>
+      <a href="#" class="nav-link" data-page="customerDetailPage"><span class="ico">👤</span><span>Chi tiết khách hàng 360</span></a>
+      <a href="#" class="nav-link" data-page="segmentBuilderPage"><span class="ico">◎</span><span>Tạo / quản lý phân khúc</span></a>
+      <a href="#" class="nav-link" data-page="identityReviewPage"><span class="ico">⛓</span><span>Rà soát hợp nhất định danh</span></a>
+
+      <div class="menu-title">Module mở rộng</div>
+      <a href="#" class="nav-link"><span class="ico">↗</span><span>Kích hoạt chiến dịch</span></a>
+      <a href="#" class="nav-link"><span class="ico">✓</span><span>Chất lượng dữ liệu</span></a>
+      <a href="#" class="nav-link"><span class="ico">◌</span><span>Consent & quyền riêng tư</span></a>
+      <a href="#" class="nav-link"><span class="ico">⚙</span><span>Quản trị hệ thống</span></a>
+    </div>
+
+    <div class="sidebar-footer">
+      <strong>Admin VNPost</strong>
+      <span>admin@vnpost.vn</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h2 id="pageTitle">Dashboard tổng quan</h2>
+        <div class="top-meta" id="pageMeta">Toàn cảnh dữ liệu khách hàng, vận hành và phân khúc trên hệ thống CDP VNPost</div>
+      </div>
+      <div class="top-actions">
+        <div class="search">⌕ <input placeholder="Tìm theo mã KH / tên / SĐT / MST / vận đơn"/></div>
+        <button class="header-btn">Xuất báo cáo</button>
+        <div class="header-icon">🔔 <span class="badge">5</span></div>
+      </div>
+    </header>
+
+    <section class="content">
+
+      <!-- Dashboard -->
+      <div class="page active" id="dashboardPage">
+        <div class="hero">
+          <div class="banner">
+            <div class="eyebrow">● Trạng thái hệ thống tốt · Realtime ingest đang hoạt động</div>
+            <h3>CDP VNPost – nền tảng hợp nhất dữ liệu, phân tích hành vi và kích hoạt khách hàng đa trụ cột</h3>
+            <p>Thiết kế theo hướng enterprise, hỗ trợ Customer 360, hợp nhất định danh, phân khúc động và theo dõi hành vi cho BCCP, TCBC, HCC, Logistics, MVNO.</p>
+            <div class="banner-actions">
+              <button class="btn gold">Mở khách hàng 360</button>
+              <button class="btn ghost-dark">Xem dashboard dữ liệu</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4 class="section-title">Tăng trưởng khách hàng 6 tháng</h4>
+            <div class="mini-chart">
+              <div class="bar" style="height:44%"></div>
+              <div class="bar" style="height:52%"></div>
+              <div class="bar" style="height:60%"></div>
+              <div class="bar" style="height:67%"></div>
+              <div class="bar" style="height:76%"></div>
+              <div class="bar" style="height:88%"></div>
+            </div>
+            <div class="legend">
+              <span><i style="background:#f4b400"></i>Hồ sơ hợp nhất tăng +11,8%</span>
+              <span><i style="background:#7c3aed"></i>Segment động tăng +7,2%</span>
+            </div>
+            <div class="footer-note">Dữ liệu hiển thị minh họa cho mockup v4.</div>
+          </div>
+        </div>
+
+        <div class="grid-5" style="margin-bottom:16px">
+          <div class="stat"><div class="label">Tổng hồ sơ nguồn</div><div class="value">12,45M</div><div class="sub">14 hệ thống nguồn</div></div>
+          <div class="stat"><div class="label">Hồ sơ hợp nhất</div><div class="value">8,92M</div><div class="sub">Tỷ lệ hợp nhất 71,7%</div></div>
+          <div class="stat"><div class="label">Segment đang chạy</div><div class="value">126</div><div class="sub">76 segment động</div></div>
+          <div class="stat"><div class="label">Campaign kích hoạt</div><div class="value">38</div><div class="sub">SMS · Email · Zalo · CRM</div></div>
+          <div class="stat"><div class="label">Queue rà soát định danh</div><div class="value">32.441</div><div class="sub">Ưu tiên cao: 1.248</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="card">
+            <h4 class="section-title">Toàn cảnh theo trụ cột</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Trụ cột</th><th>Khách hàng hoạt động</th><th>Tín hiệu hành vi nổi bật</th><th>Cơ hội kích hoạt</th><th>Rủi ro cần theo dõi</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><b>BCCP</b></td><td>3,42M</td><td>Gửi đơn thường xuyên, COD cao, tracking nhiều</td><td>Cross-sell Logistics / TCBC</td><td>Tỷ lệ hoàn, churn, COD treo</td></tr>
+                  <tr><td><b>TCBC</b></td><td>0,81M</td><td>Tra cứu thanh toán, chuyển tiền, thu hộ/chi hộ</td><td>Gói tài chính cho shop gửi hàng</td><td>Đối soát chậm, bất thường dòng tiền</td></tr>
+                  <tr><td><b>HCC</b></td><td>0,37M</td><td>Nộp hồ sơ, trả kết quả tại nhà, tra cứu trạng thái</td><td>Nhắc trạng thái & khảo sát hài lòng</td><td>Tuân thủ mục đích xử lý dữ liệu</td></tr>
+                  <tr><td><b>Logistics</b></td><td>0,29M</td><td>Kho bãi, fulfillment, giao đa điểm</td><td>Shop tăng trưởng cần fulfillment</td><td>SLA, tồn kho, khiếu nại</td></tr>
+                  <tr><td><b>MVNO</b></td><td>0,56M</td><td>Dùng data, ARPU, tương tác app</td><td>Bundle với dịch vụ số VNPost</td><td>Rời mạng, ARPU giảm</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4 class="section-title">Chất lượng dữ liệu hợp nhất</h4>
+            <div class="donut-wrap">
+              <div class="donut"></div>
+              <div class="donut-text">65%</div>
+            </div>
+            <div class="small" style="text-align:center;margin-top:8px">Mức độ đầy đủ dữ liệu trung bình toàn hệ thống</div>
+            <div style="margin-top:18px">
+              <div class="info-row"><span>Tự động merge thành công</span><b style="color:var(--success)">87%</b></div>
+              <div class="info-row"><span>Field xung đột cần steward</span><b style="color:var(--warning)">146.220</b></div>
+              <div class="info-row"><span>Dữ liệu có consent hợp lệ</span><b>72%</b></div>
+              <div class="info-row"><span>Nguồn cập nhật theo realtime</span><b>7 / 14</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:16px">
+          <div class="card">
+            <h4 class="section-title">Công việc cần xử lý</h4>
+            <div class="timeline">
+              <div class="event warn"><small>Hôm nay · 08:45</small><b>1.248 hồ sơ định danh ưu tiên cao cần rà soát</b></div>
+              <div class="event success"><small>Hôm nay · 09:10</small><b>Segment “Khách hàng BCCP có tiềm năng TCBC” vừa được cập nhật</b></div>
+              <div class="event info"><small>Hôm nay · 10:00</small><b>Campaign chăm sóc chủ shop churn-risk cần phê duyệt</b></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4 class="section-title">Top segment quan trọng</h4>
+            <div class="info-row"><span>Khách hàng trung thành BCCP</span><b>126.402 KH</b></div>
+            <div class="info-row"><span>Shop tiềm năng Logistics</span><b>12.884 KH</b></div>
+            <div class="info-row"><span>Khách hàng BCCP có tiềm năng TCBC</span><b>21.432 KH</b></div>
+            <div class="info-row"><span>Có nguy cơ rời bỏ</span><b style="color:var(--danger)">18.940 KH</b></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer list -->
+      <div class="page" id="customerListPage">
+        <div class="page-toolbar">
+          <div class="left">
+            <h3>Danh sách khách hàng</h3>
+            <p>Tra cứu, lọc và truy cập hồ sơ Customer 360 theo nhiều tiêu chí nghiệp vụ.</p>
+          </div>
+          <div class="btns">
+            <button class="btn ghost">Xuất Excel</button>
+            <button class="btn soft">Lưu bộ lọc</button>
+            <button class="btn primary">+ Tạo tác vụ chăm sóc</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="filters">
+            <div class="input" style="min-width:300px"><input placeholder="Tìm theo mã KH / tên / SĐT / MST"/></div>
+            <div class="select">Tất cả loại khách hàng</div>
+            <div class="select">Tất cả trụ cột</div>
+            <div class="select">Tất cả phân khúc</div>
+            <div class="select">Tất cả trạng thái</div>
+            <button class="btn soft">Lọc nâng cao</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mã khách hàng</th>
+                  <th>Tên / Công ty</th>
+                  <th>Loại</th>
+                  <th>Trụ cột chính</th>
+                  <th>Doanh thu 12 tháng</th>
+                  <th>Phân khúc</th>
+                  <th>Điểm churn</th>
+                  <th>Độ đầy đủ hồ sơ</th>
+                  <th>Trạng thái</th>
+                  <th>Cập nhật</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>UID-0000123456</td>
+                  <td><b>Nguyễn Thị Hương</b><div class="small">0901***567 · PID-889234</div></td>
+                  <td><span class="pill brand">Cá nhân</span></td>
+                  <td>BCCP + Logistics</td>
+                  <td><b>620.000.000 đ</b></td>
+                  <td><span class="pill success">Khách hàng trung thành</span></td>
+                  <td><span class="pill success">18</span></td>
+                  <td>82%</td>
+                  <td><span class="pill success">Hoạt động</span></td>
+                  <td>30/06/2026</td>
+                </tr>
+                <tr>
+                  <td>UID-0000987654</td>
+                  <td><b>Công ty TNHH TM ABC</b><div class="small">0988***321 · MST</div></td>
+                  <td><span class="pill info">Doanh nghiệp</span></td>
+                  <td>BCCP + TCBC</td>
+                  <td><b>6.820.000.000 đ</b></td>
+                  <td><span class="pill info">KHL giá trị cao</span></td>
+                  <td><span class="pill warn">46</span></td>
+                  <td>91%</td>
+                  <td><span class="pill success">Hoạt động</span></td>
+                  <td>29/06/2026</td>
+                </tr>
+                <tr>
+                  <td>UID-0000456789</td>
+                  <td><b>Phạm Minh Tuấn</b><div class="small">097***222 · Shop online</div></td>
+                  <td><span class="pill brand">Cá nhân</span></td>
+                  <td>BCCP</td>
+                  <td><b>94.000.000 đ</b></td>
+                  <td><span class="pill danger">Có nguy cơ rời bỏ</span></td>
+                  <td><span class="pill danger">74</span></td>
+                  <td>67%</td>
+                  <td><span class="pill warn">Suy giảm</span></td>
+                  <td>28/06/2026</td>
+                </tr>
+                <tr>
+                  <td>UID-0000771122</td>
+                  <td><b>Lê Thị Hằng</b><div class="small">091***766 · Trả kết quả HCC</div></td>
+                  <td><span class="pill brand">Cá nhân</span></td>
+                  <td>HCC</td>
+                  <td><b>—</b></td>
+                  <td><span class="pill info">Người dùng HCC ưu tiên số hóa</span></td>
+                  <td><span class="pill success">12</span></td>
+                  <td>58%</td>
+                  <td><span class="pill success">Hoạt động</span></td>
+                  <td>22/06/2026</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+            <div class="small">Hiển thị 1–4 / 2.408 khách hàng</div>
+            <div class="btns">
+              <button class="btn ghost">← Trước</button>
+              <button class="btn soft">1</button>
+              <button class="btn ghost">2</button>
+              <button class="btn ghost">Tiếp →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer detail -->
+      <div class="page" id="customerDetailPage">
+        <div class="page-toolbar">
+          <div class="left">
+            <h3>Chi tiết khách hàng 360</h3>
+            <p>Hồ sơ hợp nhất, hành vi đa nguồn, phân tích theo trụ cột và kích hoạt nghiệp vụ.</p>
+          </div>
+          <div class="btns">
+            <button class="btn ghost">← Quay lại danh sách</button>
+            <button class="btn soft">Xem nguồn dữ liệu</button>
+            <button class="btn primary">Tạo tác vụ chăm sóc</button>
+          </div>
+        </div>
+
+        <div class="card profile-card">
+          <div class="profile-head">
+            <div class="profile-left">
+              <div class="avatar">N</div>
+              <div class="profile-title">
+                <h3>Nguyễn Thị Hương</h3>
+                <div class="uid">UID-0000123456 · Cập nhật lần cuối 30/06/2026 09:15 · Data steward: NguyenVA</div>
+                <div class="tag-list">
+                  <span class="pill brand">Cá nhân</span>
+                  <span class="pill neutral">Nhóm: SME</span>
+                  <span class="pill success">Hoạt động</span>
+                  <span class="pill info">Đa trụ cột</span>
+                  <span class="pill brand">Customer 360</span>
+                </div>
+              </div>
+            </div>
+            <div class="btns">
+              <button class="btn ghost">Tạo ticket CSKH</button>
+              <button class="btn soft">Kích hoạt chiến dịch</button>
+            </div>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi"><small>Số trụ cột đang sử dụng</small><b>4/5</b></div>
+            <div class="kpi"><small>Giá trị khách hàng 12 tháng</small><b>620.000.000 đ</b></div>
+            <div class="kpi"><small>Lần tương tác gần nhất</small><b>24/06 09:12</b></div>
+            <div class="kpi"><small>Mức độ gắn kết</small><b class="good">88/100</b></div>
+            <div class="kpi"><small>Nguy cơ rời bỏ</small><b class="good">18/100</b></div>
+            <div class="kpi"><small>Độ đầy đủ hồ sơ</small><b>82%</b><div class="health"><span style="width:82%"></span></div></div>
+          </div>
+        </div>
+
+        <div class="tabs" id="detailTabs">
+          <button class="tab" data-tab="d-overview">Tổng quan</button>
+          <button class="tab" data-tab="d-identity">Hồ sơ & định danh</button>
+          <button class="tab active" data-tab="d-multisource">Hồ sơ đa nguồn</button>
+          <button class="tab" data-tab="d-pillars">Hoạt động theo trụ cột</button>
+          <button class="tab" data-tab="d-behavior">Hành vi & tương tác</button>
+          <button class="tab" data-tab="d-score">Điểm số & phân khúc</button>
+          <button class="tab" data-tab="d-consent">Consent</button>
+          <button class="tab" data-tab="d-audit">Nhật ký</button>
+        </div>
+
+        <section class="panel" id="d-overview">
+          <div class="alert">Có 2 trường dữ liệu khác biệt giữa các nguồn, 1 consent Push Notification đang từ chối, và 1 cơ hội cross-sell TCBC ưu tiên cao.</div>
+          <div class="grid-2">
+            <div class="card">
+              <h4 class="section-title">Thông tin định danh chính</h4>
+              <div class="info-row"><span>Giới tính</span><b>Nữ</b></div>
+              <div class="info-row"><span>Ngày sinh</span><b>15/03/1988</b></div>
+              <div class="info-row"><span>SĐT</span><b>0901***567</b></div>
+              <div class="info-row"><span>Email</span><b>huo***@gmail.com</b></div>
+              <div class="info-row"><span>PostID</span><b>PID-889234</b></div>
+              <div class="info-row"><span>Bưu cục quản lý</span><b>BĐ Cầu Giấy</b></div>
+            </div>
+            <div class="card">
+              <h4 class="section-title">Vai trò & phân khúc</h4>
+              <div class="tag-list" style="margin-top:0">
+                <span class="pill danger">Người gửi chính</span>
+                <span class="pill info">Chủ shop</span>
+                <span class="pill neutral">Người nhận</span>
+              </div>
+              <div class="grid-2" style="margin-top:12px">
+                <div class="stat"><div class="label">Số lần là người gửi</div><div class="value">1.240</div></div>
+                <div class="stat"><div class="label">Số lần là người nhận</div><div class="value">35</div></div>
+              </div>
+              <div class="tag-list" style="margin-top:12px">
+                <span class="pill success">Khách hàng trung thành</span>
+                <span class="pill info">Chủ shop hoạt động cao</span>
+                <span class="pill warn">Tiềm năng TCBC</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="d-identity">
+          <div class="grid-2">
+            <div class="card">
+              <h4 class="section-title">Định danh liên kết</h4>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Loại ID</th><th>Giá trị</th><th>Nguồn</th><th>Điểm tin cậy</th><th>Trạng thái</th></tr></thead>
+                  <tbody>
+                    <tr><td>Số điện thoại</td><td>0901234567</td><td>MyVNPost</td><td>90</td><td><span class="pill success">Chính</span></td></tr>
+                    <tr><td>PostID</td><td>PID-889234</td><td>PostID</td><td>95</td><td><span class="pill success">Chính</span></td></tr>
+                    <tr><td>Mã CRM</td><td>CRM-55120</td><td>CRM</td><td>85</td><td><span class="pill info">Phụ</span></td></tr>
+                    <tr><td>ID App</td><td>APP-99213</td><td>MyVNPost</td><td>70</td><td><span class="pill warn">Chờ xác minh</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card">
+              <h4 class="section-title">Tình trạng hợp nhất</h4>
+              <div class="info-row"><span>Hồ sơ nghi trùng</span><b>0</b></div>
+              <div class="info-row"><span>Field xung đột</span><b style="color:var(--warning)">2</b></div>
+              <div class="info-row"><span>Định danh dùng chung</span><b>Không</b></div>
+              <div class="info-row"><span>Lần merge gần nhất</span><b>12/06/2026</b></div>
+              <div class="note" style="margin-top:12px">Số điện thoại được chọn làm dữ liệu chuẩn vì đã xác thực OTP trên MyVNPost và là bản ghi mới nhất.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel active" id="d-multisource">
+          <div class="card">
+            <div class="page-toolbar" style="margin-bottom:12px">
+              <div class="left">
+                <h3 style="font-size:16px;margin:0">Hồ sơ đa nguồn & so sánh field-by-field</h3>
+                <p>Hỗ trợ Data Steward rà soát khác biệt, chọn nguồn chuẩn và xử lý xung đột dữ liệu.</p>
+              </div>
+              <div class="btns">
+                <button class="btn ghost">Chỉ hiện khác biệt</button>
+                <button class="btn ghost">Timeline gộp hồ sơ</button>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Trường dữ liệu</th>
+                    <th>Hồ sơ chuẩn</th>
+                    <th>CAS</th>
+                    <th>CRM</th>
+                    <th>MyVNPost</th>
+                    <th>PostID</th>
+                    <th>PayPost</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><b>Họ tên / Tên DN</b></td><td>Nguyễn Thị Hương</td><td>Nguyễn Thị Hương</td><td>Nguyen Thi Huong</td><td>Nguyễn Thị Hương</td><td>Nguyễn Thị Hương</td><td>Nguyễn Hương</td></tr>
+                  <tr><td><b>Số điện thoại</b></td><td>0901234567</td><td>0901234567</td><td>0901234567</td><td>0901234567</td><td>0901234567</td><td>0901234567</td></tr>
+                  <tr><td><b>Email</b></td><td>huong.nguyen@gmail.com</td><td>Không có</td><td>huong.ng@gmail.com</td><td>huong.nguyen@gmail.com</td><td>Không có</td><td>huong.nguyen@gmail.com</td></tr>
+                  <tr><td><b>CCCD / MST</b></td><td>012*******</td><td>Không có</td><td>Không có</td><td>Không có</td><td>012*******</td><td>Không có</td></tr>
+                  <tr><td><b>Địa chỉ gửi hàng</b></td><td>Số 5 ngõ 12 Trần Thái Tông, Hà Nội</td><td>Số 5 ngõ 12 Trần Thái Tông, Dịch Vọng, Hà Nội</td><td>Số 5 ngõ 12 Trần Thái Tông, Hà Nội</td><td>Hà Nội</td><td>Số 5 ngõ 12 Trần Thái Tông, Dịch Vọng, Hà Nội</td><td>Không có</td></tr>
+                  <tr><td><b>Vai trò chính</b></td><td>Người gửi</td><td>Người gửi</td><td>Chủ shop</td><td>Chủ shop</td><td>Không có</td><td>Không có</td></tr>
+                  <tr><td><b>Tổng đơn BCCP</b></td><td>1.275</td><td>1.240</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                  <tr><td><b>Tổng COD đã thu</b></td><td>1.180.000.000 đ</td><td>1.180.000.000 đ</td><td>Không có</td><td>Không có</td><td>Không có</td><td>70.000.000 đ còn treo</td></tr>
+                  <tr><td><b>Đăng nhập App gần nhất</b></td><td>24/06 09:12</td><td>Không có</td><td>Không có</td><td>24/06 09:12</td><td>Không có</td><td>Không có</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="small" style="margin-top:10px">Gợi ý nghiệp vụ: chọn nguồn chuẩn theo độ tin cậy, độ mới, mức xác thực; hỗ trợ yêu cầu chỉnh sửa nguồn gốc và giữ lịch sử thay đổi.</div>
+          </div>
+        </section>
+
+        <section class="panel" id="d-pillars">
+          <div class="card">
+            <div class="subtabs" id="pillarTabs">
+              <button class="subtab active" data-subtab="p-summary">Tổng hợp</button>
+              <button class="subtab" data-subtab="p-bccp">BCCP</button>
+              <button class="subtab" data-subtab="p-tcbc">TCBC</button>
+              <button class="subtab" data-subtab="p-hcc">HCC</button>
+              <button class="subtab" data-subtab="p-logistics">Logistics</button>
+              <button class="subtab" data-subtab="p-mvno">MVNO</button>
+            </div>
+
+            <div class="subpanel active" id="p-summary">
+              <div class="grid-4">
+                <div class="stat"><div class="label">BCCP</div><div class="value">1.275 đơn</div><div class="sub">COD mạnh · trung thành cao</div></div>
+                <div class="stat"><div class="label">TCBC</div><div class="value">Tiềm năng cao</div><div class="sub">Phù hợp thu hộ / chi hộ</div></div>
+                <div class="stat"><div class="label">HCC</div><div class="value">1 hồ sơ</div><div class="sub">Trả kết quả tại nhà</div></div>
+                <div class="stat"><div class="label">Logistics</div><div class="value">86 đơn</div><div class="sub">Fulfillment tăng theo mùa</div></div>
+              </div>
+            </div>
+
+            <div class="subpanel" id="p-bccp">
+              <div class="grid-4" style="margin-bottom:16px">
+                <div class="stat"><div class="label">Tổng đơn 12 tháng</div><div class="value">1.275</div><div class="sub">+12% so với kỳ trước</div></div>
+                <div class="stat"><div class="label">Doanh thu</div><div class="value">458,2M</div><div class="sub">Dịch vụ chủ đạo: EMS</div></div>
+                <div class="stat"><div class="label">Tỷ lệ phát thành công</div><div class="value" style="color:var(--success)">94%</div><div class="sub">Tuyến mạnh HN→HCM</div></div>
+                <div class="stat"><div class="label">Tỷ lệ hoàn</div><div class="value" style="color:var(--warning)">8%</div><div class="sub">Cần theo dõi COD risk</div></div>
+              </div>
+
+              <div class="grid-2">
+                <div class="card">
+                  <h4 class="section-title">1. Hành vi tìm kiếm và lựa chọn</h4>
+                  <div class="info-row"><span>Tìm kiếm dịch vụ</span><b>Xem bảng giá EMS, TMĐT đồng giá, tra cứu thời gian phát</b></div>
+                  <div class="info-row"><span>So sánh lựa chọn</span><b>Ưu tiên dịch vụ có tracking rõ, COD tiện, lấy hàng tận nơi</b></div>
+                  <div class="info-row"><span>Kênh tìm hiểu</span><b>App MyVNPost, website, bưu cục, CSKH</b></div>
+                  <div class="info-row"><span>Tín hiệu intent</span><b>Tra cứu giá nhiều lần, xem điểm phục vụ, xem SLA tuyến</b></div>
+                </div>
+
+                <div class="card">
+                  <h4 class="section-title">2. Hành vi mua sắm và sử dụng dịch vụ</h4>
+                  <div class="info-row"><span>Tần suất tạo đơn</span><b>106 đơn/tháng</b></div>
+                  <div class="info-row"><span>Dịch vụ sử dụng</span><b>EMS, chuyển phát TMĐT, có lấy hàng tận nơi</b></div>
+                  <div class="info-row"><span>Chu kỳ sử dụng</span><b>Tăng mạnh đầu tuần và trước các đợt sale</b></div>
+                  <div class="info-row"><span>Vai trò giao dịch</span><b>Người gửi chính / chủ shop</b></div>
+                </div>
+
+                <div class="card">
+                  <h4 class="section-title">3. Hành vi thanh toán và xử lý đơn</h4>
+                  <div class="info-row"><span>Phương thức thanh toán</span><b>Ưu tiên COD và đối soát sau giao hàng</b></div>
+                  <div class="info-row"><span>Hoạt động xử lý đơn</span><b>Tạo đơn, sửa địa chỉ, hủy đơn, đổi người nhận</b></div>
+                  <div class="info-row"><span>Theo dõi vận đơn</span><b>Tracking 2–3 lần/đơn với các đơn giá trị cao</b></div>
+                  <div class="info-row"><span>Điểm kiểm soát</span><b>COD treo, đơn hoàn, khiếu nại giao chậm</b></div>
+                </div>
+
+                <div class="card">
+                  <h4 class="section-title">4. Hành vi sau khi giao hàng</h4>
+                  <div class="info-row"><span>Sau phát thành công</span><b>Kiểm tra COD, đối soát, đánh giá dịch vụ</b></div>
+                  <div class="info-row"><span>Nếu phát thất bại</span><b>Liên hệ CSKH, yêu cầu phát lại / hoàn hàng</b></div>
+                  <div class="info-row"><span>Tỷ lệ khiếu nại</span><b>Thấp, chủ yếu giao chậm ở cao điểm</b></div>
+                  <div class="info-row"><span>Cơ hội cải thiện</span><b>Push trạng thái tự động, cảnh báo chậm trễ</b></div>
+                </div>
+
+                <div class="card">
+                  <h4 class="section-title">5. Hành vi trung thành và rời bỏ</h4>
+                  <div class="info-row"><span>Tín hiệu trung thành</span><b>RFM Champions, tạo đơn đều 3 tháng liên tiếp</b></div>
+                  <div class="info-row"><span>Tín hiệu rời bỏ</span><b>Sản lượng giảm >30%/30 ngày, tăng hủy đơn, giảm tracking</b></div>
+                  <div class="info-row"><span>Khả năng upsell</span><b>Logistics, TCBC, bao phát, lấy hàng tận nơi</b></div>
+                  <div class="info-row"><span>Dữ liệu nguồn</span><b>MPITS, BCCP, TMS, PayPost, CRM</b></div>
+                </div>
+
+                <div class="card">
+                  <h4 class="section-title">Ứng dụng CDP cho BCCP</h4>
+                  <div class="info-row"><span>Segment gợi ý</span><b>Chủ shop hoạt động cao / Tỷ lệ hoàn cao / Churn-risk</b></div>
+                  <div class="info-row"><span>Next best action</span><b>Ưu đãi cước, chăm sóc theo tuyến, nhắc bổ sung địa chỉ</b></div>
+                  <div class="info-row"><span>Risk score</span><b>COD risk · hoàn hàng · gian lận</b></div>
+                  <div class="info-row"><span>Kích hoạt</span><b>SMS / Zalo / CRM task / App push theo consent</b></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="subpanel" id="p-tcbc">
+              <div class="grid-2">
+                <div class="card">
+                  <h4 class="section-title">Hành vi TCBC</h4>
+                  <div class="info-row"><span>Khởi tạo nhu cầu</span><b>Tra cứu thanh toán, quan tâm thu hộ/chi hộ, chuyển tiền</b></div>
+                  <div class="info-row"><span>Hành vi giao dịch</span><b>COD được đối soát định kỳ, ưu tiên quy trình rõ ràng</b></div>
+                  <div class="info-row"><span>Hành vi sau giao dịch</span><b>Kiểm tra trạng thái thanh toán, yêu cầu biên lai/đối soát</b></div>
+                  <div class="info-row"><span>Tín hiệu trung thành</span><b>Dòng tiền ổn định, tái sử dụng cùng điểm giao dịch</b></div>
+                  <div class="info-row"><span>Tín hiệu rời bỏ</span><b>Giảm đối soát, tăng thời gian treo COD, không quay lại điểm giao dịch</b></div>
+                </div>
+                <div class="card">
+                  <h4 class="section-title">Ứng dụng CDP cho TCBC</h4>
+                  <div class="info-row"><span>Segment</span><b>Khách hàng BCCP có tiềm năng TCBC</b></div>
+                  <div class="info-row"><span>Trigger</span><b>COD cao + đều 3 tháng + có tra cứu thanh toán</b></div>
+                  <div class="info-row"><span>Risk</span><b>COD treo > 7 ngày, bất thường dòng tiền</b></div>
+                  <div class="info-row"><span>Next best action</span><b>Mời dùng thu hộ/chi hộ, chuyển tiền, thanh toán tại bưu cục</b></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="subpanel" id="p-hcc">
+              <div class="grid-2">
+                <div class="card">
+                  <h4 class="section-title">Hành vi HCC</h4>
+                  <div class="info-row"><span>Trước giao dịch</span><b>Tra cứu thủ tục, thời hạn, điểm tiếp nhận</b></div>
+                  <div class="info-row"><span>Trong giao dịch</span><b>Nộp hồ sơ, theo dõi trạng thái, chọn trả kết quả tại nhà</b></div>
+                  <div class="info-row"><span>Sau giao dịch</span><b>Khảo sát hài lòng, tra cứu lại hồ sơ, hỗ trợ bổ sung giấy tờ</b></div>
+                  <div class="info-row"><span>Tín hiệu trung thành</span><b>Ưa dùng kênh số, lặp lại nhiều thủ tục qua VNPost</b></div>
+                  <div class="info-row"><span>Lưu ý tuân thủ</span><b>Chỉ dùng dữ liệu đúng mục đích, không tái sử dụng trái phép</b></div>
+                </div>
+                <div class="card">
+                  <h4 class="section-title">Ứng dụng CDP cho HCC</h4>
+                  <div class="info-row"><span>Segment</span><b>Người dùng HCC ưu tiên số hóa</b></div>
+                  <div class="info-row"><span>Trigger</span><b>Nộp hồ sơ mới / trả kết quả / khảo sát hài lòng</b></div>
+                  <div class="info-row"><span>Next best action</span><b>Nhắc trạng thái hồ sơ, hướng dẫn bổ sung, khảo sát sau xử lý</b></div>
+                  <div class="info-row"><span>Dữ liệu nguồn</span><b>HCC Portal, Một cửa, Call Center</b></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="subpanel" id="p-logistics">
+              <div class="grid-2">
+                <div class="card">
+                  <h4 class="section-title">Hành vi Logistics</h4>
+                  <div class="info-row"><span>Khởi tạo nhu cầu</span><b>Cần kho bãi, fulfillment, giao đa điểm, quản lý tồn</b></div>
+                  <div class="info-row"><span>Hành vi sử dụng</span><b>Tăng dùng trước mùa sale, phụ thuộc sản lượng BCCP</b></div>
+                  <div class="info-row"><span>Sau sử dụng</span><b>Quan tâm SLA, tồn kho, khiếu nại, báo cáo vận hành</b></div>
+                  <div class="info-row"><span>Tín hiệu trung thành</span><b>Giao nhiều đợt, dùng kho cố định, yêu cầu dashboard định kỳ</b></div>
+                  <div class="info-row"><span>Tín hiệu rời bỏ</span><b>Giảm đơn fulfillment, tăng lỗi tồn kho, tăng khiếu nại</b></div>
+                </div>
+                <div class="card">
+                  <h4 class="section-title">Ứng dụng CDP cho Logistics</h4>
+                  <div class="info-row"><span>Segment</span><b>Shop tăng trưởng cần logistics</b></div>
+                  <div class="info-row"><span>Trigger</span><b>BCCP > X đơn/tháng + đa điểm giao + nhu cầu kho</b></div>
+                  <div class="info-row"><span>Risk</span><b>SLA giảm, tồn kho bất thường, chi phí tăng</b></div>
+                  <div class="info-row"><span>Next best action</span><b>Mời dùng fulfillment, kho bãi, báo cáo tùy chỉnh</b></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="subpanel" id="p-mvno">
+              <div class="grid-2">
+                <div class="card">
+                  <h4 class="section-title">Hành vi MVNO</h4>
+                  <div class="info-row"><span>Khởi tạo</span><b>Đăng ký gói, tra cứu data, nạp cước</b></div>
+                  <div class="info-row"><span>Sử dụng</span><b>Data cao, tương tác app thường xuyên</b></div>
+                  <div class="info-row"><span>Sau sử dụng</span><b>Gia hạn gói, kiểm tra cước, CSKH kỹ thuật</b></div>
+                  <div class="info-row"><span>Tín hiệu churn</span><b>ARPU giảm, không gia hạn, giảm data usage</b></div>
+                </div>
+                <div class="card">
+                  <h4 class="section-title">Ứng dụng CDP cho MVNO</h4>
+                  <div class="info-row"><span>Segment</span><b>Thuê bao có nguy cơ rời mạng / data-heavy</b></div>
+                  <div class="info-row"><span>Next best action</span><b>Gia hạn gói, bundle với dịch vụ số VNPost</b></div>
+                  <div class="info-row"><span>Dữ liệu nguồn</span><b>CRM MVNO, App, Billing</b></div>
+                  <div class="info-row"><span>Risk</span><b>Rời mạng, ARPU giảm</b></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="d-behavior">
+          <div class="grid-2">
+            <div class="card">
+              <h4 class="section-title">Tương tác số & thiết bị</h4>
+              <div class="info-row"><span>Lần đăng nhập cuối</span><b>24/06/2026 09:12</b></div>
+              <div class="info-row"><span>Thiết bị chính</span><b>Android</b></div>
+              <div class="info-row"><span>Phiên / 30 ngày</span><b>47</b></div>
+              <div class="info-row"><span>Điểm tương tác</span><b style="color:var(--success)">88/100</b></div>
+            </div>
+            <div class="card">
+              <h4 class="section-title">Timeline đa kênh</h4>
+              <div class="timeline">
+                <div class="event info"><small>24/06 09:12 · App</small><b>Đăng nhập MyVNPost</b></div>
+                <div class="event success"><small>23/06 14:30 · App</small><b>Tạo đơn EMS HN → HCM</b></div>
+                <div class="event warn"><small>20/06 10:00 · Call Center</small><b>Khiếu nại đơn giao chậm</b></div>
+                <div class="event purple"><small>10/06 16:00 · Email</small><b>Phản hồi chiến dịch SALE06</b></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="d-score">
+          <div class="grid-2">
+            <div class="card">
+              <h4 class="section-title">Điểm số hiện tại</h4>
+              <div class="grid-2">
+                <div class="score"><div><b>Nguy cơ rời bỏ</b><div class="sub">Thấp</div></div><div class="value" style="color:var(--success)">18/100</div></div>
+                <div class="score"><div><b>Mức độ tương tác</b><div class="sub">Cao</div></div><div class="value" style="color:var(--success)">88/100</div></div>
+                <div class="score"><div><b>Rủi ro COD</b><div class="sub">Thấp</div></div><div class="value" style="color:var(--success)">22/100</div></div>
+                <div class="score"><div><b>Rủi ro gian lận</b><div class="sub">Rất thấp</div></div><div class="value" style="color:var(--success)">9/100</div></div>
+              </div>
+            </div>
+            <div class="card">
+              <h4 class="section-title">RFM & phân khúc</h4>
+              <div class="info-row"><span>Nhóm RFM</span><b>Champions</b></div>
+              <div class="info-row"><span>Recency</span><b>5/5</b></div>
+              <div class="info-row"><span>Frequency</span><b>5/5</b></div>
+              <div class="info-row"><span>Monetary</span><b>4/5</b></div>
+              <div class="info-row"><span>CLV dự kiến</span><b>620.000.000 đ</b></div>
+              <div class="note" style="margin-top:12px">Khuyến nghị: duy trì chăm sóc ưu tiên, đồng thời cross-sell dịch vụ TCBC và logistics.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="d-consent">
+          <div class="card">
+            <h4 class="section-title">Ma trận consent theo mục đích & kênh</h4>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Mục đích</th><th>SMS</th><th>Email</th><th>Zalo OA</th><th>Push</th></tr></thead>
+                <tbody>
+                  <tr><td>Thông báo vận hành</td><td><span class="pill success">Cho phép</span></td><td><span class="pill success">Cho phép</span></td><td><span class="pill success">Cho phép</span></td><td><span class="pill success">Cho phép</span></td></tr>
+                  <tr><td>Chăm sóc khách hàng</td><td><span class="pill success">Cho phép</span></td><td><span class="pill success">Cho phép</span></td><td><span class="pill success">Cho phép</span></td><td><span class="pill danger">Từ chối</span></td></tr>
+                  <tr><td>Marketing</td><td><span class="pill danger">Từ chối</span></td><td><span class="pill success">Cho phép</span></td><td><span class="pill success">Cho phép</span></td><td><span class="pill danger">Từ chối</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="small" style="margin-top:10px">Nguồn consent: MyVNPost · 18/06/2026 10:05 · Phiên bản điều khoản: 2.1</div>
+          </div>
+        </section>
+
+        <section class="panel" id="d-audit">
+          <div class="grid-2">
+            <div class="card">
+              <h4 class="section-title">Nguồn dữ liệu đóng góp</h4>
+              <div class="tag-list" style="margin-top:0">
+                <span class="pill info">CAS</span>
+                <span class="pill info">CRM</span>
+                <span class="pill info">MyVNPost</span>
+                <span class="pill info">PayPost</span>
+                <span class="pill info">PostID</span>
+                <span class="pill info">PNS / DingDong</span>
+              </div>
+              <div class="info-row"><span>Ngày tạo hồ sơ</span><b>10/01/2023</b></div>
+              <div class="info-row"><span>Lần cập nhật cuối</span><b>30/06/2026 09:15</b></div>
+              <div class="info-row"><span>Phiên bản hồ sơ</span><b>v15</b></div>
+            </div>
+            <div class="card">
+              <h4 class="section-title">Nhật ký thay đổi gần nhất</h4>
+              <div class="timeline">
+                <div class="event success"><small>30/06 09:15 · System</small><b>Cập nhật doanh thu 12 tháng từ MPITS</b></div>
+                <div class="event info"><small>29/06 16:42 · Data Steward</small><b>Xác nhận số điện thoại chính</b></div>
+                <div class="event warn"><small>18/06 10:05 · MyVNPost</small><b>Cập nhật consent marketing qua Email</b></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Segment builder -->
+      <div class="page" id="segmentBuilderPage">
+        <div class="page-toolbar">
+          <div class="left">
+            <h3>Tạo / quản lý phân khúc</h3>
+            <p>Xây dựng phân khúc động theo hồ sơ hợp nhất, hành vi, sự kiện và điểm số.</p>
+          </div>
+          <div class="btns">
+            <button class="btn ghost">Danh sách phân khúc</button>
+            <button class="btn primary">Lưu & kích hoạt</button>
+          </div>
+        </div>
+
+        <div class="rule-builder">
+          <div class="card">
+            <h4 class="section-title">Thông tin phân khúc</h4>
+            <div class="form-grid">
+              <div class="form-field"><label>Tên phân khúc</label><div class="field">Khách hàng BCCP có tiềm năng TCBC</div></div>
+              <div class="form-field"><label>Loại phân khúc</label><div class="field">Phân khúc động</div></div>
+              <div class="form-field"><label>Trụ cột trọng tâm</label><div class="field">BCCP + TCBC</div></div>
+              <div class="form-field"><label>Tần suất cập nhật</label><div class="field">Hàng ngày lúc 02:00</div></div>
+            </div>
+
+            <h4 class="section-title" style="margin-top:18px">Rule builder</h4>
+            <div class="rule-box">
+              <div class="rule-item">
+                <span class="badge-block">Điều kiện 1</span>
+                <span class="badge-block">Tổng COD đã thu</span>
+                <span class="badge-block">≥</span>
+                <span class="badge-block">100.000.000 đ / 3 tháng</span>
+              </div>
+              <div class="rule-item">
+                <span class="badge-block">AND</span>
+                <span class="badge-block">Tần suất gửi đơn</span>
+                <span class="badge-block">≥</span>
+                <span class="badge-block">50 đơn / tháng</span>
+              </div>
+              <div class="rule-item">
+                <span class="badge-block">AND</span>
+                <span class="badge-block">Sự kiện</span>
+                <span class="badge-block">Tra cứu / quan tâm thanh toán</span>
+                <span class="badge-block">≥ 3 lần / 30 ngày</span>
+              </div>
+              <div class="rule-item">
+                <span class="badge-block">AND</span>
+                <span class="badge-block">Consent</span>
+                <span class="badge-block">Cho phép SMS hoặc Zalo</span>
+              </div>
+            </div>
+
+            <div class="btns" style="margin-top:14px">
+              <button class="btn soft">+ Thêm điều kiện</button>
+              <button class="btn ghost">Kiểm tra logic</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4 class="section-title">Preview kết quả</h4>
+            <div class="stat"><div class="label">Quy mô dự kiến</div><div class="value">21.432 KH</div><div class="sub">Tăng trưởng +6,2% trong 30 ngày gần nhất</div></div>
+            <div class="stat" style="margin-top:12px"><div class="label">Kênh kích hoạt phù hợp</div><div class="value" style="font-size:18px">SMS · Zalo OA · CRM task</div><div class="sub">Đã lọc theo consent</div></div>
+            <div class="stat" style="margin-top:12px"><div class="label">Top hành vi chung</div><div class="value" style="font-size:18px">COD cao · shop online · gửi đơn đều</div></div>
+            <div class="note" style="margin-top:14px">Khuyến nghị: triển khai chiến dịch tư vấn thu hộ/chi hộ, hỗ trợ đối soát COD và ưu đãi giao dịch tại bưu cục.</div>
+
+            <h4 class="section-title" style="margin-top:18px">Danh sách phân khúc đang hoạt động</h4>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Tên phân khúc</th><th>Loại</th><th>Quy mô</th><th>Trạng thái</th></tr></thead>
+                <tbody>
+                  <tr><td>Khách hàng trung thành BCCP</td><td>Động</td><td>126.402</td><td><span class="pill success">Đang chạy</span></td></tr>
+                  <tr><td>Shop tiềm năng Logistics</td><td>Động</td><td>12.884</td><td><span class="pill success">Đang chạy</span></td></tr>
+                  <tr><td>Có nguy cơ rời bỏ</td><td>Động</td><td>18.940</td><td><span class="pill warn">Theo dõi</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Identity review -->
+      <div class="page" id="identityReviewPage">
+        <div class="page-toolbar">
+          <div class="left">
+            <h3>Rà soát hợp nhất định danh</h3>
+            <p>Hỗ trợ xác minh hồ sơ nghi trùng, kiểm soát ngưỡng merge và quản lý golden profile.</p>
+          </div>
+          <div class="btns">
+            <button class="btn ghost">Bộ quy tắc matching</button>
+            <button class="btn soft">Xuất queue</button>
+            <button class="btn primary">Merge thủ công</button>
+          </div>
+        </div>
+
+        <div class="grid-4" style="margin-bottom:16px">
+          <div class="stat"><div class="label">Hồ sơ nghi trùng</div><div class="value">32.441</div><div class="sub">Ưu tiên cao 1.248</div></div>
+          <div class="stat"><div class="label">Auto-merge success</div><div class="value">87%</div><div class="sub">Deterministic & probabilistic</div></div>
+          <div class="stat"><div class="label">Field conflict</div><div class="value">146.220</div><div class="sub">Cần stewardship</div></div>
+          <div class="stat"><div class="label">Golden profile coverage</div><div class="value">71,7%</div><div class="sub">Toàn hệ thống</div></div>
+        </div>
+
+        <div class="queue-layout">
+          <div class="card">
+            <h4 class="section-title">Queue candidate cần xử lý</h4>
+            <div class="filters">
+              <div class="select">Mức ưu tiên: Tất cả</div>
+              <div class="select">Nguồn: Tất cả</div>
+              <div class="select">Trạng thái: Chờ xử lý</div>
+              <button class="btn soft">Áp dụng</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Candidate</th><th>Tín hiệu trùng</th><th>Điểm match</th><th>Khuyến nghị</th><th>Trạng thái</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>UID-100234 / UID-928134</b><div class="small">CAS / CRM / App</div></td>
+                    <td>Tên gần giống + địa chỉ + tuyến gửi trùng</td>
+                    <td>78</td>
+                    <td>Rà soát thủ công</td>
+                    <td><span class="pill warn">Chờ xử lý</span></td>
+                  </tr>
+                  <tr>
+                    <td><b>UID-551004 / UID-551229</b><div class="small">PostID / App</div></td>
+                    <td>Trùng SĐT xác thực và PostID</td>
+                    <td>98</td>
+                    <td>Tự động gộp</td>
+                    <td><span class="pill success">Đã gộp</span></td>
+                  </tr>
+                  <tr>
+                    <td><b>UID-221104 / UID-220987</b><div class="small">CRM / PayPost</div></td>
+                    <td>Email chung doanh nghiệp</td>
+                    <td>54</td>
+                    <td>Không tự gộp</td>
+                    <td><span class="pill danger">Loại trừ</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4 class="section-title">Chi tiết candidate đang chọn</h4>
+            <div class="side-panel">
+              <div class="info-row"><span>Candidate</span><b>UID-100234 / UID-928134</b></div>
+              <div class="info-row"><span>Deterministic</span><b>Không đủ điều kiện</b></div>
+              <div class="info-row"><span>Probabilistic</span><b>78/100</b></div>
+              <div class="info-row"><span>Tín hiệu match</span><b>Tên, địa chỉ, tuyến gửi, hành vi tạo đơn</b></div>
+              <div class="info-row"><span>Field xung đột</span><b>SĐT, email</b></div>
+              <div class="info-row"><span>Khuyến nghị</span><b>Rà soát thủ công trước khi merge</b></div>
+            </div>
+
+            <h4 class="section-title" style="margin-top:16px">Quy tắc nghiệp vụ cốt lõi</h4>
+            <div class="info-row"><span>Deterministic matching</span><b>PostID, SĐT OTP verified, MST/CCCD, mã KH nội bộ</b></div>
+            <div class="info-row"><span>Probabilistic matching</span><b>Tên, địa chỉ, thiết bị, IP, hành vi gửi/nhận, tuyến vận chuyển</b></div>
+            <div class="info-row"><span>Golden profile</span><b>Ưu tiên nguồn mới nhất + xác thực + độ tin cậy cao</b></div>
+            <div class="info-row"><span>Audit log</span><b>Lưu lịch sử merge / unmerge / steward action</b></div>
+
+            <div class="btns" style="margin-top:16px">
+              <button class="btn primary">Merge hồ sơ</button>
+              <button class="btn ghost">Không merge</button>
+              <button class="btn soft">Yêu cầu xác minh bổ sung</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<script>
+const pageConfig = {
+  dashboardPage: {
+    title: "Dashboard tổng quan",
+    meta: "Toàn cảnh dữ liệu khách hàng, vận hành và phân khúc trên hệ thống CDP VNPost"
+  },
+  customerListPage: {
+    title: "Danh sách khách hàng",
+    meta: "Tra cứu khách hàng, bộ lọc nghiệp vụ và truy cập Customer 360"
+  },
+  customerDetailPage: {
+    title: "Chi tiết khách hàng 360",
+    meta: "Hồ sơ hợp nhất, hồ sơ đa nguồn, hành vi và phân tích theo trụ cột"
+  },
+  segmentBuilderPage: {
+    title: "Tạo / quản lý phân khúc",
+    meta: "Rule builder cho phân khúc động, preview quy mô và kích hoạt"
+  },
+  identityReviewPage: {
+    title: "Rà soát hợp nhất định danh",
+    meta: "Queue candidate nghi trùng, quy tắc matching và golden profile"
+  }
+};
+
+document.querySelectorAll('.nav-link[data-page]').forEach(link=>{
+  link.addEventListener('click', e=>{
+    e.preventDefault();
+    document.querySelectorAll('.nav-link[data-page]').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+    link.classList.add('active');
+    const page = link.dataset.page;
+    document.getElementById(page).classList.add('active');
+    document.getElementById('pageTitle').textContent = pageConfig[page].title;
+    document.getElementById('pageMeta').textContent = pageConfig[page].meta;
+  });
+});
+
+document.querySelectorAll('#detailTabs .tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('#detailTabs .tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('#customerDetailPage .panel').forEach(x=>x.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+
+document.querySelectorAll('#pillarTabs .subtab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('#pillarTabs .subtab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('#d-pillars .subpanel').forEach(x=>x.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.subtab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

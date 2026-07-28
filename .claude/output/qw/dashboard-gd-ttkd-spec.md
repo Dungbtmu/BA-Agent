@@ -1,13 +1,13 @@
-# Đặc tả chỉ số — Dashboard GĐ TTKD · Phần "Hiệu quả kênh bán"
+# Đặc tả chỉ số — Dashboard GĐ TTKD (Hiệu quả kênh bán + Cảnh báo tự động)
 
-> Dự án: **QW** · Màn: Kênh bán (GĐ Trung tâm Kinh doanh)
-> Nguồn đối chiếu: giao diện mẫu `dashboard_gd_ttkd (16).html` + bảng data inventory (mục C · Kênh bán) + bảng đặc tả tổng của team
-> Phạm vi bảng này: toàn bộ chỉ số phần **Hiệu quả kênh bán** (STT 17–23)
+> Dự án: **QW** · Màn: Dashboard GĐ Trung tâm Kinh doanh
+> Nguồn đối chiếu: giao diện mẫu `dashboard_gd_ttkd (16).html` + bảng data inventory + bảng đặc tả tổng của team
+> Phạm vi tài liệu: phần **Hiệu quả kênh bán** (STT 17–23) và **Cảnh báo tự động** (STT 24–29)
 > Style: đồng bộ với bảng đặc tả tổng — 10 cột, gom mỗi khối UI 1 dòng, KPI/chart con liệt kê trong ô Công thức.
 
 ---
 
-## Bảng đặc tả chỉ số
+## Bảng đặc tả chỉ số — Phần "Hiệu quả kênh bán"
 
 | STT | Màn | Tên chỉ số | Loại biểu đồ | Công thức tính / Cách xác định / Mô tả | Lưu ý khi hiển thị | Đơn vị tính | Dữ liệu nguồn | Tần suất lấy | Ghi chú |
 |---|---|---|---|---|---|---|---|---|---|
@@ -22,6 +22,22 @@
 
 ---
 
+## Bảng đặc tả chỉ số — Phần "Cảnh báo tự động"
+
+> Phạm vi: mục **Cảnh báo tự động** trên Dashboard GĐ TTKD. STT nối tiếp phần Kênh bán.
+> Đối chiếu prototype: mục Cảnh báo gồm 6 khối UI theo thứ tự — cụm KPI đầu mục → danh sách cảnh báo → bảng biến động điểm bán → bảng KH giảm theo KAM → cụm KPI SLA → bảng KH có vấn đề.
+
+| STT | Màn | Tên chỉ số | Loại biểu đồ | Công thức tính / Cách xác định / Mô tả | Lưu ý khi hiển thị | Đơn vị tính | Dữ liệu nguồn | Tần suất lấy | Ghi chú |
+|---|---|---|---|---|---|---|---|---|---|
+| 24 | Cảnh báo tự động | Chỉ tiêu cảnh báo (cụm KPI Card) | KPI Card | Cụm 4 KPI Card đầu mục Cảnh báo:<br>**1. Tổng cảnh báo hôm nay** = Tổng số cảnh báo hệ thống sinh ra trong ngày; delta tách theo mức độ: `X mức cao · Y mức trung bình`<br>**2. Điểm bán sụt giảm DT** = Số điểm bán có doanh thu sụt giảm so bình quân chung kỳ trước<br>**3. Điểm bán tăng đột biến** = Số điểm bán có doanh thu tăng đột biến (cần xác minh nguồn phát sinh)<br>**4. KH giảm theo KAM** = Số khách hàng giảm doanh thu do KAM phụ trách; delta: `X KAM liên quan` | - KPI 1 màu trung tính (không đánh giá tốt/xấu, chỉ đếm)<br>- KPI 2 (sụt giảm) và KPI 4 (KH giảm): mũi tên xuống, màu đỏ (chiều xấu)<br>- KPI 3 (tăng đột biến): mũi tên lên nhưng kèm cảnh báo xác minh — tăng bất thường không hẳn là tốt<br>**<span style="color:red">Căn cứ công thức và các ngưỡng màu tương ứng — cần Ban chốt.</span>** | Cảnh báo · Điểm bán · Khách hàng | Cas-report + CRM (tổng hợp cảnh báo hệ thống) | Hàng ngày (cập nhật trong ngày) | Cảnh báo sinh tự động theo ngưỡng cấu hình |
+| 25 | Cảnh báo tự động | Danh sách cảnh báo | Table / List | Danh sách các cảnh báo hệ thống sinh ra, mỗi dòng gồm:<br>+ **Nội dung cảnh báo** (mô tả + số liệu ngưỡng vi phạm), ví dụ: "Doanh thu chung đạt X% tiến độ — dưới ngưỡng 80% kế hoạch tháng"; "X BĐX chưa phát sinh doanh thu tính đến 15:00 hôm nay"; "X khách hàng lớn giảm doanh thu > 30% so bình quân 3 tháng"<br>+ **Mức độ** = Cao / Trung bình<br>+ **Người phụ trách** (owner) = GĐ TTKD / P. KD / Đội KAM / Trưởng địa bàn...<br>+ **Trạng thái xử lý** = Chưa xử lý / Đang xử lý / Đã đóng | - Mỗi dòng có chấm màu theo mức độ: mức cao (đỏ), mức trung bình (cam)<br>- Trạng thái hiển thị dạng nhãn (pill): Chưa xử lý / Đang xử lý / Đã đóng<br>- Ngưỡng sinh cảnh báo (vd 80% kế hoạch, giảm >30% so 3 tháng, mốc 15:00) lấy từ prototype<br>**<span style="color:red">Căn cứ ngưỡng sinh cảnh báo — cần Ban chốt.</span>** | Cảnh báo | Cas-report + CRM (theo ngưỡng cấu hình) | Hàng ngày (cập nhật trong ngày) | Danh sách cảnh báo theo vòng đời: mở → đang xử lý → đã đóng |
+| 26 | Cảnh báo tự động | Điểm bán biến động doanh thu | Table | Bảng các điểm bán có biến động doanh thu bất thường so kỳ trước, mỗi dòng gồm:<br>+ **Điểm bán** = tên điểm bán<br>+ **DT tháng** = doanh thu thực hiện tháng của điểm bán<br>+ **Biến động** = % thay đổi doanh thu so bình quân chung kỳ trước; phân 2 chiều:<br>&nbsp;&nbsp;· Tăng đột biến: `▲ Tăng đột biến +X%`<br>&nbsp;&nbsp;· Sụt giảm: `▼ Sụt giảm X%` | - Dòng có chiều sụt giảm được tô nền cảnh báo (risk)<br>- Cột Biến động dùng màu: tăng (xanh/▲), giảm (đỏ/▼)<br>- Nhấn dòng ("Xem →") → xem chi tiết điểm bán ("Cảnh báo → Biến động điểm bán")<br>**<span style="color:red">Căn cứ ngưỡng "đột biến"/"sụt giảm" — cần Ban chốt.</span>** | VNĐ (Triệu đồng) · % | Cas-report (so bình quân chung kỳ trước) | Hàng ngày | So sánh doanh thu điểm bán với kỳ trước |
+| 27 | Cảnh báo tự động | Khách hàng giảm theo KAM | Table | Bảng khách hàng giảm doanh thu, nhóm theo KAM phụ trách, mỗi dòng gồm:<br>+ **KAM** = tên nhân sự KAM phụ trách<br>+ **KH giảm** = số khách hàng giảm doanh thu thuộc KAM đó<br>+ **DT giảm** = % doanh thu giảm | - Dòng có số KH giảm ≥ 2 được tô nền cảnh báo (risk)<br>- Nhấn dòng ("Xem →") → xem chi tiết ("Cảnh báo → KH giảm theo KAM")<br>**<span style="color:red">Căn cứ ngưỡng KH giảm — cần Ban chốt.</span>** | Khách hàng · % | CRM (theo KAM phụ trách) | Hàng ngày | KAM = Key Account Manager, nhân sự phụ trách khách hàng trọng điểm |
+| 28 | Cảnh báo tự động | SLA phát & chăm sóc khách hàng | KPI Card | Cụm 6 KPI theo dõi SLA phát và chăm sóc khách hàng:<br>**1. SLA phát lần đầu** = Tỷ lệ phát thành công ngay lần 1 / Tổng đơn phát<br>**2. SLA toàn trình — đạt time** = Tỷ lệ đơn đạt thời gian toàn trình cam kết / Tổng đơn<br>**3. SLA toàn trình — chậm time** = Tỷ lệ đơn chậm thời gian toàn trình (= 100% − SLA đạt time)<br>**4. Ticket CSKH đã xử lý** = Tỷ lệ ticket đã xử lý / Tổng ticket lập trong kỳ; delta: `X ticket lập trong kỳ`<br>**5. Khiếu nại đang treo** = Số vụ khiếu nại chưa xử lý xong; delta: `Trên tổng X khiếu nại`<br>**6. Khiếu nại đã xử lý/tổng** = Tỷ lệ khiếu nại đã xử lý (đã xác minh kết quả cuối cùng) / Tổng khiếu nại | Logic màu theo ngưỡng (lấy từ prototype):<br>- SLA phát lần đầu / toàn trình đạt time / Ticket: ≥85% xanh; 70–<85% cam; <70% đỏ<br>- SLA chậm time: chiều xấu — luôn mũi tên xuống/đỏ<br>- Khiếu nại đang treo: chiều xấu — mũi tên xuống/đỏ<br>- Khiếu nại đã xử lý/tổng: ≥80% xanh; 60–<80% cam; <60% đỏ<br>**<span style="color:red">Căn cứ ngưỡng SLA — cần Ban chốt.</span>** | % (khiếu nại đang treo: vụ) | Hệ thống phát/vận chuyển + CSKH (ticket, khiếu nại) | Hàng ngày | Toàn trình = từ lúc nhận đến lúc phát thành công |
+| 29 | Cảnh báo tự động | Danh sách khách hàng có vấn đề | Table | Bảng khách hàng đang có vấn đề cần xử lý, theo dõi **kết quả xử lý cuối cùng** (không chỉ trạng thái đóng), mỗi dòng gồm:<br>+ **Khách hàng** = tên khách hàng/doanh nghiệp<br>+ **Loại vấn đề** = SLA phát lần đầu / SLA toàn trình / Ticket CSKH / Khiếu nại<br>+ **Chi tiết** = mô tả cụ thể vấn đề (vd "Phát lần đầu thất bại 3/5 đơn trong tuần")<br>+ **Kết quả xử lý cuối cùng** = trạng thái thực chất: Đã đóng nhưng chưa đạt SLA / Đang xử lý lại / Chưa xử lý / Đang treo — cần xử lý gấp / Đã đóng — cần xem xét lại | - Dòng mức nghiêm trọng (bad) được tô nền cảnh báo (risk)<br>- Cột kết quả dùng nhãn màu (pill) theo trạng thái<br>- **Điểm nghiệp vụ quan trọng**: theo dõi kết quả xử lý CUỐI CÙNG, không dừng ở trạng thái "đã đóng" — 1 ticket đã đóng nhưng khách chưa hài lòng vẫn phải hiển thị để xem xét lại<br>- Nhấn dòng ("Xem →") → xem chi tiết ("Cảnh báo → Khách hàng có vấn đề") | Khách hàng | CSKH (ticket, khiếu nại, khảo sát hài lòng) | Hàng ngày | Phản ánh chất lượng xử lý thực chất, không chỉ đóng ticket cho đủ số |
+
+---
+
 ## Thuật ngữ
 
 - **KH giao** = **Kế Hoạch giao** — chỉ tiêu doanh thu được giao xuống cho điểm bán/người bán/đơn vị. KHÔNG viết tắt cho "khách hàng".
@@ -32,6 +48,10 @@
 - **KHHH** = Khách Hàng Hiện Hữu · **KHM** = Khách Hàng Mới · **KHVL** = Khách Hàng Vãng Lai.
 - **LLBH** = Lực Lượng Bán Hàng · **BĐVHX** = Bưu Điện Văn Hoá Xã · **BĐX** = Bưu Điện Xã.
 - **Xem chi tiết theo cấp** (drill-down) = bấm vào 1 mục để đi sâu xuống cấp thấp hơn: Tổng công ty → Tỉnh → BĐX → điểm bán/người bán.
+- **KAM** = Key Account Manager — nhân sự phụ trách khách hàng trọng điểm.
+- **SLA** = Service Level Agreement — cam kết mức chất lượng dịch vụ (vd thời gian phát, thời gian xử lý).
+- **Toàn trình** = toàn bộ hành trình đơn hàng từ lúc nhận đến lúc phát thành công.
+- **BCCP · PPTT · HCC · TCBC** = 4 nhóm dịch vụ doanh thu (xuất hiện trong cảnh báo tiến độ ở STT 25). Tên đầy đủ thuộc phần Cơ cấu doanh thu — *cần Ban xác nhận tên đầy đủ từng nhóm.*
 
 ## Ghi chú & Assumptions
 
@@ -53,9 +73,16 @@
 ## Điểm cần xác nhận (Open Questions)
 
 - [ ] OQ-1: Ngưỡng màu KPI phần Kênh bán — dùng chung ngưỡng doanh thu (`<50% đỏ · 50–<65% cam · >65% xanh`) hay ngưỡng riêng? (liên quan [A3])
-- [ ] OQ-2: "Khách mới qua kênh bán" (KPI 4, STT 17) — kỳ tính là tháng hay khoảng thời gian theo bộ lọc? Mũi tên so kỳ trước tính theo tháng trước hay cùng kỳ năm trước?
+- [ ] OQ-2: "Khách mới qua kênh bán" (KPI 4, STT 19) — kỳ tính là tháng hay khoảng thời gian theo bộ lọc? Mũi tên so kỳ trước tính theo tháng trước hay cùng kỳ năm trước?
 - [ ] OQ-3: Tổng điểm bán (STT 17) và Tổng LLBH (STT 18) — hiển thị thành KPI card độc lập trên dashboard, hay chỉ là con số nền dùng làm mẫu số? (Bảng data inventory liệt kê là chỉ số nghiệp vụ độc lập)
 - [ ] OQ-4: KPI dạng tỷ lệ đạt (Điểm bán PSDT, Người bán PSDT...) — mũi tên đánh giá theo **ngưỡng đạt** hay **biến động so kỳ trước** như chỉ số doanh thu?
 - [ ] OQ-5: Combo Chart khi xem chi tiết xuống 1 BĐX (STT 20–21) — có phải hành vi Ban mong muốn, hay chỉ hiển thị Bar Chart thuần theo doanh thu như Top/Bottom?
 - [ ] OQ-6: "Doanh thu chốt thắng" trong Funnel (STT 22, dòng 20 data inventory = Tổng DT kỳ vọng chốt thắng) — hiển thị như tầng thứ 5 của phễu, hay chỉ là số liệu kèm tooltip?
 - [ ] OQ-7: **Các chỉ số bình quân (%KH giao bình quân, % Chuyển đổi bình quân — STT 23)** — **chốt tạm cách có trọng số**: %KH giao BQ = `Σ(DT thực hiện)/Σ(Kế hoạch giao)`, % Chuyển đổi BQ = `Σ(Cơ hội PSDT)/Σ(Hoạt động bán)`. Cần Ban xác nhận chính thức. Phương án còn lại: bình quân đơn giản `Σ(% từng người)/số người` (prototype đang dùng) — dễ lệch khi chỉ tiêu/khối lượng giữa người bán chênh lệch lớn nên không chọn. Lưu ý: áp dụng nhất quán cho "%KH giao toàn kênh" (STT 19) và mọi chỉ số bình quân khác trong dashboard.
+
+**Phần Cảnh báo tự động (STT 24–29):**
+
+- [ ] OQ-8: Ngưỡng sinh cảnh báo tự động (STT 24–25) — chốt cụ thể các ngưỡng: doanh thu dưới bao nhiêu % kế hoạch thì cảnh báo, giảm bao nhiêu % so mấy tháng thì tính "khách hàng lớn giảm", mốc giờ cắt "chưa phát sinh DT" (prototype dùng 15:00)? Ai cấu hình ngưỡng?
+- [ ] OQ-9: "Điểm bán biến động doanh thu" (STT 26) — ngưỡng % để phân loại "tăng đột biến" và "sụt giảm" là bao nhiêu? So với "bình quân chung kỳ trước" — kỳ trước là tháng trước hay bình quân mấy kỳ?
+- [ ] OQ-10: SLA (STT 28) — các ngưỡng 85/70, 80/60 lấy từ prototype; Ban có SLA cam kết chính thức khác không? "Toàn trình" định nghĩa nghiệp vụ cụ thể (từ mốc nào đến mốc nào)?
+- [ ] OQ-11: "Danh sách khách hàng có vấn đề" (STT 29) — tiêu chí đưa 1 khách hàng vào danh sách (loại vấn đề nào, mức nghiêm trọng nào)? Điều kiện để đưa ra khỏi danh sách (đã xử lý xong và khách hài lòng)?
