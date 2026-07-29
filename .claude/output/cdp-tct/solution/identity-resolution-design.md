@@ -1,9 +1,29 @@
 # Identity Resolution Design — CDP VNPost/TCT
 
 **Ngày tạo:** 2026-06-26
-**Cập nhật:** 2026-07-29 — đồng bộ với prototype v3 (bản giao diện đã chốt ngày 24/07): thay mô hình một ngưỡng chung bằng bộ 7 rule đang chạy thật, ghi nhận D-01/D-02 đã được thay thế, chuyển luồng tách hồ sơ ra ngoài phạm vi giai đoạn này.
-**Phiên bản:** v2.0
+**Cập nhật:** 2026-07-29 (v2.1) — đối chiếu với tài liệu gốc `CDP.md` (Chương 6 + mục 7.4): áp dụng bảng ngưỡng tin cậy 4 vùng theo mục 6.6.2, bổ sung bộ luật đối sánh đầy đủ theo mục 6.6.1, gắn truy vết tới mã FR-IDR, ghi nhận các điểm bản đang chạy còn lệch.
+**Nguồn chuẩn:** `.claude/input/CDP/CDP.md` — Chương 6 (Mô hình dữ liệu và Hợp nhất định danh), mục 7.4 (Phân hệ 3: Hợp nhất định danh), mục 8.9/8.14/8.15 (audit, rủi ro, báo cáo).
 **Phụ thuộc vào:** clarification.md, cdp-system-design-brief.md, prototype v3
+
+> Khi nội dung tài liệu này khác với `CDP.md`, tài liệu gốc là chuẩn.
+
+---
+
+## Truy vết tới tài liệu gốc
+
+| Nội dung trong tài liệu này | Mã yêu cầu | Mục trong CDP.md |
+|---|---|---|
+| Luật đối sánh tuyệt đối | FR-IDR-01 | 6.6.1 |
+| Luật đối sánh xác suất | FR-IDR-02 | 6.6.2 |
+| Điểm tin cậy và phân loại kết quả | FR-IDR-11 | 6.6.2 |
+| Gộp hồ sơ | FR-IDR-06 | 6.8.1 |
+| Tách hồ sơ | FR-IDR-07 | 6.8.3 |
+| Định danh dùng chung | FR-IDR-08 | 6.8.2, 6.9 case 2/4 |
+| Phân biệt vai trò người gửi/người nhận | FR-IDR-09 | 6.8.2, 6.9 case 7/8 |
+| Danh sách rà soát thủ công | FR-IDR-12 | 6.6.2 |
+| Xử lý xung đột dữ liệu | FR-IDR-13 | 6.9 case 19, 6.10 |
+| Nhật ký hợp nhất định danh | FR-IDR-14, FR-GOV-03 | 8.9 nhóm sự kiện 8 |
+| Báo cáo gộp/tách hồ sơ | — | 8.15 báo cáo 6 |
 
 ---
 
@@ -11,93 +31,107 @@
 
 | Mã | Nội dung | Hiệu lực |
 |---|---|---|
-| D-01 | Identity Resolution do BE xử lý tự động theo confidence score — càng ít thủ công càng tốt | **Đã thay thế 24/07/2026** — xem mô hình hiện hành bên dưới |
-| D-02 | Màn "Đối soát hồ sơ" giữ trong sidebar nhưng read-only — đã xóa nút Merge/Dismiss | **Đã thay thế 24/07/2026** |
-| D-03 | Tab "Hồ sơ liên kết" thêm vào Customer 360 — hiển thị alias IDs, nguồn, ngày merge, confidence score | Còn hiệu lực |
+| D-01 | Identity Resolution do BE xử lý tự động theo confidence score — càng ít thủ công càng tốt | Đã thay thế 24/07/2026 |
+| D-02 | Màn "Đối soát hồ sơ" giữ trong sidebar nhưng read-only — đã xóa nút Merge/Dismiss | Đã thay thế 24/07/2026 |
+| D-03 | Tab "Hồ sơ liên kết" thêm vào Customer 360 | Còn hiệu lực |
 | D-04 | Kafka ẩn tạm khỏi sidebar | Còn hiệu lực |
+| D-05 | Ngưỡng tin cậy và luật đối sánh **áp dụng theo tài liệu gốc** (mục 6.6.1 và 6.6.2), không dùng ngưỡng tự đặt | Chốt 29/07/2026 |
+| D-06 | Luồng tách hồ sơ **hoãn sang giai đoạn sau** | Chốt 29/07/2026 |
 
 ### Mô hình hiện hành (thay cho D-01 và D-02)
 
-Hệ thống **tự động gộp** các mã nguồn khớp bằng khóa mạnh — CCCD, mã số thuế, PostID. Các mã còn lại không tự gộp mà đưa vào danh sách nghi trùng để **người dùng xác nhận từng mã một**: tick chọn mã nào thuộc về cùng khách hàng, xem trước hồ sơ chuẩn dự kiến sau khi gộp, rồi mới bấm hợp nhất.
+Hệ thống tự động gộp các mã nguồn khớp bằng khóa mạnh. Các mã còn lại không tự gộp mà đưa vào danh sách chờ duyệt để người dùng xác nhận từng mã một: tick chọn mã nào thuộc về cùng khách hàng, xem trước hồ sơ chuẩn dự kiến sau khi gộp, rồi mới bấm hợp nhất.
 
-**Lý do thay đổi:** giữ nguyên D-01/D-02 nghĩa là người dùng chỉ được nhìn mà không quyết định được gì ở vùng tin cậy trung bình — trong khi đó chính là vùng cần con người nhất. Dữ liệu VNPost có chất lượng không đồng đều (tên có dấu/không dấu, viết tắt, sai chính tả, số điện thoại dùng chung), nên vùng giữa cần người đối chiếu chứ không thể để hệ thống tự quyết. Mô hình mới vẫn giữ tinh thần "ít thủ công nhất có thể" ở chỗ: khóa mạnh vẫn tự gộp hoàn toàn, người dùng chỉ chạm vào phần hệ thống không đủ cơ sở kết luận.
+**Lý do thay đổi:** giữ nguyên D-01/D-02 nghĩa là người dùng chỉ được nhìn mà không quyết định được gì ở vùng tin cậy trung bình — trong khi đó chính là vùng cần con người nhất. Mô hình mới cũng khớp với mục 6.6.2 và 6.8.1 trường hợp 5 của tài liệu gốc, vốn đã quy định vùng giữa phải qua hàng đợi phê duyệt của Data Steward.
 
 ---
 
 ## Solution Overview
 
-**Bài toán cần giải:** ba lỗ hổng khiến Dev không biết code gì (BL-01), hệ thống không giải trình được khi bị kiểm tra (BL-02), và không có cơ chế phục hồi khi gộp nhầm (BL-03).
-
-**Trạng thái xử lý:**
-
 | Mã | Nội dung | Trạng thái |
 |---|---|---|
-| BL-01 | Luật hợp nhất định danh — định nghĩa hành vi cho từng vùng tin cậy | Đã giải — bộ 7 rule đang chạy trên prototype v3 |
+| BL-01 | Luật hợp nhất định danh — định nghĩa hành vi cho từng vùng tin cậy | Đã giải theo tài liệu gốc |
 | BL-02 | Nhật ký gộp hồ sơ phục vụ giải trình | Yêu cầu giữ nguyên — màn hiển thị đã dựng nhưng chưa gắn vào điều hướng |
-| BL-03 | Luồng tách hồ sơ khi gộp nhầm | **Ngoài phạm vi giai đoạn này** — xem mục riêng |
+| BL-03 | Luồng tách hồ sơ khi gộp nhầm | Hoãn sang giai đoạn sau — xem mục riêng |
 
 ---
 
 ## BL-01 — Luật hợp nhất định danh
 
-### Bộ 7 rule đang áp dụng
+### Bốn vùng tin cậy (theo mục 6.6.2)
 
-| Mã | Trường so khớp | Mức mạnh | Ngưỡng tin cậy | Hành động | Ghi chú |
-|---|---|---|---|---|---|
-| R1 | Số CCCD/CMND | Rất cao | 98% | Tự gộp | Khớp CCCD tuyệt đối — định danh cá nhân duy nhất |
-| R2 | Mã số thuế (doanh nghiệp) | Rất cao | 96% | Tự gộp | Khớp MST — định danh doanh nghiệp duy nhất |
-| R3 | PostID | Cao | 95% | Tự gộp | Mã định danh nội bộ VNPost |
-| R4 | Số điện thoại + họ tên khớp | Trung bình | 85% | Tự gộp | **Điểm chưa nhất quán — xem bên dưới** |
-| R5 | Chỉ số điện thoại trùng | Trung bình | 70% | Chờ xác nhận | Có thể dùng chung số (người thân, shipper) |
-| R6 | Tên gần đúng + số điện thoại | Thấp | 62% | Chờ xác nhận | Tên viết khác dấu/viết tắt — cần người đối chiếu |
-| R7 | Chỉ tên gần đúng | Rất thấp | 50% | Gợi ý tin cậy thấp | Không đủ cơ sở, chỉ hiển thị làm mờ |
-
-### Ba vùng hành vi
-
-| Vùng tin cậy | Hành vi hệ thống | Hiển thị |
+| Điểm tin cậy | Ý nghĩa | Hành vi hệ thống |
 |---|---|---|
-| **Từ 90% trở lên** | Tự động gộp vào hồ sơ chuẩn, không cần ai duyệt | Ghi nhận trong tab "Hồ sơ đa nguồn" của Customer 360 |
-| **60% đến 89%** | Không tự gộp — đưa vào danh sách nghi trùng, tick sẵn để người dùng xác nhận | Màn "Đối soát định danh" và màn đối chiếu |
-| **Dưới 60%** | Không tự gộp, không tick sẵn — làm mờ kèm nhãn "tin cậy thấp" | Chỉ hiện khi người dùng chủ động xem, phải tự tick nếu chắc chắn |
+| **Từ 95% trở lên** | Gần như chắc chắn cùng khách hàng | Tự động gộp, với điều kiện không có xung đột dữ liệu và không vi phạm consent |
+| **85% đến dưới 95%** | Khả năng cao là cùng khách hàng | Đưa vào danh sách chờ duyệt để Data Steward/Admin xác nhận |
+| **70% đến dưới 85%** | Có liên quan nhưng chưa đủ chắc chắn | Lưu quan hệ nghi vấn trong Identity Graph, **không gộp**, không đưa vào hàng đợi duyệt |
+| **Dưới 70%** | Không đủ căn cứ | Không gộp; chỉ dùng làm tín hiệu phân tích nếu phù hợp |
 
-### Điểm chưa nhất quán cần chốt — R4
+### Luật đối sánh tuyệt đối (theo mục 6.6.1)
 
-Rule R4 đặt hành động **tự gộp ở mức 85%**, trong khi ba màn hình khác đều tuyên bố với người dùng là hệ thống chỉ tự gộp từ 90% trở lên và vùng 60–89% cần người xác nhận. Sáu rule còn lại đều nhất quán với ba vùng ở trên; chỉ R4 lệch, nên nhiều khả năng đây là sót khi tinh chỉnh rule chứ không phải thiết kế có chủ đích.
+| # | Điều kiện khớp | Mức ưu tiên | Hành động | Đã có trong bản đang chạy |
+|---|---|---|---|---|
+| 1 | Trùng CCCD hợp lệ | Rất cao | Gộp hồ sơ cá nhân, áp dụng masking/mã hóa | Có |
+| 2 | Trùng mã số thuế hợp lệ | Rất cao | Gộp vào hồ sơ doanh nghiệp/KHL | Có |
+| 3 | Trùng mã số thuế + tên doanh nghiệp gần giống | Rất cao | Gộp, lưu tên chuẩn và tên thay thế | **Chưa** |
+| 4 | Trùng số điện thoại + email | Rất cao | Tự động gộp nếu không xung đột vai trò | **Chưa** |
+| 5 | Trùng PostID | Cao | Gộp tài khoản số vào hồ sơ khách hàng | Có |
+| 6 | Trùng email hợp lệ, không phải email dùng chung | Cao | Gộp hoặc đề xuất gộp | **Chưa** |
+| 7 | Trùng mã khách hàng CRM | Cao | Gộp vào hồ sơ tương ứng | **Chưa** |
+| 8 | Trùng mã KHL | Cao | Gộp vào hồ sơ doanh nghiệp/KHL | **Chưa** |
+| 9 | Trùng User ID App đã xác thực qua số điện thoại/PostID | Cao | Gộp hành vi app vào hồ sơ | **Chưa** |
+| 10 | Trùng số điện thoại đã chuẩn hóa, không thuộc danh sách dùng chung | Cao | Gợi ý gộp; chỉ tự động gộp khi có thêm tín hiệu hỗ trợ và đạt ngưỡng | Có |
 
-Hai hướng xử lý:
+### Trường hợp cấm gộp tự động (theo mục 6.8.2)
 
-| Hướng | Nội dung | Đánh giá |
-|---|---|---|
-| **A — Hạ R4 xuống "chờ xác nhận"** | Giữ ngưỡng 85%, đổi hành động thành chờ người xác nhận | **Khuyến nghị.** Số điện thoại tại Việt Nam bị thu hồi và cấp lại sau 3 tháng không dùng; tên tiếng Việt trùng nhau rất nhiều. "Nguyễn Văn A + 09xx" khớp 85% vẫn có thể là hai người khác nhau, và gộp nhầm kéo theo sai điểm rủi ro COD — là quyết định tài chính trực tiếp |
-| B — Nâng ngưỡng R4 lên 90% | Giữ tự gộp, chỉ siết ngưỡng cho khớp tuyên bố | Nhất quán về mặt con số nhưng vẫn để số điện thoại + tên làm khóa tự gộp, chưa xử lý được rủi ro số tái sử dụng |
+Không được gộp tự động khi chỉ trùng: mã vận đơn · địa chỉ · địa chỉ IP · Device ID. Cũng không gộp tự động khi số điện thoại là hotline/tổng đài/số doanh nghiệp, khi người gửi và người nhận chỉ trùng một thông tin phụ, hoặc khi thiếu consent cho mục đích kích hoạt.
 
-Chưa chốt — xem mục Câu hỏi mở.
+Riêng tên: **không dùng tên làm khóa gộp độc lập** trong mọi trường hợp (mục 6.9 case 11); tên chỉ là tín hiệu hỗ trợ đi kèm định danh khác.
+
+### Đối sánh xác suất (FR-IDR-02 — chưa triển khai)
+
+Tài liệu gốc quy định 10 tín hiệu dùng cho đối sánh xác suất: IP mạng bưu cục · thiết bị/Device ID · Cookie ID · khung giờ gửi hàng · địa chỉ gửi thường dùng · tuyến gửi thường xuyên · loại hàng và trọng lượng thường gặp · tên gần giống · lịch sử chăm sóc tương đồng · hành vi app/web.
+
+Không tín hiệu nào trong nhóm này được dùng làm khóa gộp độc lập — chỉ cộng điểm vào confidence score. Hạng mục này có độ ưu tiên Medium và **chưa được triển khai** trong bản đang chạy.
 
 ### Trạng thái hồ sơ
 
 | Trạng thái | Ai tạo | Hành vi hiển thị |
 |---|---|---|
-| Đã hợp nhất | Hệ thống (khóa mạnh) hoặc người dùng xác nhận | Hiện trong tab "Hồ sơ đa nguồn" của Customer 360 |
-| Chờ xác nhận | Hệ thống (vùng 60–89%) | Hiện trong danh sách nghi trùng, có nhãn số lượng mã chờ xử lý trên thanh điều hướng |
-| Không phải cùng người | Người dùng xác nhận | Gỡ cờ nghi trùng của khách hàng đó, không hiện lại trong danh sách |
-| Gợi ý tin cậy thấp | Hệ thống (dưới 60%) | Làm mờ trong màn đối chiếu, không tick sẵn |
+| Đã hợp nhất | Hệ thống (từ 95%) hoặc người dùng xác nhận (85–94%) | Hiện trong tab "Hồ sơ đa nguồn" của Customer 360 |
+| Chờ duyệt | Hệ thống (85–94%) | Hiện trong danh sách đối soát, có nhãn số lượng chờ xử lý |
+| Quan hệ nghi vấn | Hệ thống (70–84%) | Chỉ lưu trong Identity Graph, không đưa vào hàng đợi duyệt |
+| Không phải cùng người | Người dùng xác nhận | Gỡ cờ nghi trùng, không hiện lại trong danh sách |
 
-### Luồng xác nhận thực tế
+### Luồng xác nhận
 
-Người dùng xử lý danh sách nghi trùng theo trình tự sau:
-
-1. Vào **Đối soát định danh** — danh sách khách hàng đang có mã định danh nghi trùng, kèm số lượng mã mạnh và mã yếu của từng người.
+1. Vào **Đối soát định danh** — danh sách khách hàng có mã định danh chờ duyệt.
 2. Chọn một khách hàng để mở màn **Đối chiếu hồ sơ nghi trùng**.
-3. Màn này hiển thị hồ sơ chuẩn hiện tại và các mã nguồn đã được hệ thống tự gộp (khóa mạnh), sau đó là bảng đối chiếu toàn bộ mã nghi trùng — mỗi mã một cột, so sánh từng trường cạnh nhau.
-4. Mã trong vùng 60–89% được tick sẵn; mã dưới 60% làm mờ, mặc định không tick. Người dùng bỏ tick hoặc tick thêm theo đánh giá của mình.
-5. Bấm xem trước — hệ thống dựng **hồ sơ chuẩn dự kiến sau khi gộp**: từng trường lấy giá trị từ nguồn nào, và các chỉ số giao dịch, tài chính được cộng dồn ra sao.
-6. Xác nhận hợp nhất, hoặc chọn "Không phải cùng người" nếu kết luận đây là các khách hàng khác nhau.
+3. Màn hiển thị hồ sơ chuẩn hiện tại, các mã nguồn hệ thống đã tự gộp, rồi tới bảng đối chiếu các mã chờ duyệt — mỗi mã một cột, so sánh từng trường cạnh nhau.
+4. Người dùng tick chọn các mã xác nhận là cùng một khách hàng.
+5. Bấm xem trước — hệ thống dựng **hồ sơ chuẩn dự kiến sau khi gộp**: từng trường lấy giá trị từ nguồn nào, các chỉ số giao dịch và tài chính cộng dồn ra sao.
+6. Xác nhận hợp nhất, hoặc chọn "Không phải cùng người".
 
 **Trường hợp cần lưu ý:**
 
-- Danh sách nghi trùng rỗng — hiển thị trạng thái không còn hồ sơ chờ xử lý.
-- Cặp hồ sơ có dấu hiệu rủi ro (một bên là người gửi, một bên là người nhận; hoặc số điện thoại dùng chung) — phải hiển thị cảnh báo nổi bật trước khi người dùng quyết định.
+- Danh sách chờ duyệt rỗng — hiển thị trạng thái không còn hồ sơ cần xử lý.
+- Cặp hồ sơ có dấu hiệu rủi ro (một bên người gửi, một bên người nhận; hoặc số điện thoại dùng chung) — phải hiển thị cảnh báo nổi bật trước khi người dùng quyết định.
 - Người dùng không có quyền — màn đối soát không hiện trên thanh điều hướng.
+
+### Bản đang chạy còn lệch so với tài liệu gốc
+
+| Điểm lệch | Bản đang chạy (prototype v3) | Tài liệu gốc |
+|---|---|---|
+| Ngưỡng tự động gộp | 90% | **95%** |
+| Ngưỡng chờ duyệt | 60–89% | **85–94%** |
+| Vùng "quan hệ nghi vấn, chưa gộp" | Không có | **70–84%** |
+| Ngưỡng loại bỏ | Dưới 60% | **Dưới 70%** |
+| Luật số điện thoại + họ tên, ngưỡng 85% | Tự động gộp | **Chờ duyệt** (thuộc vùng 85–94%) |
+| Luật "chỉ tên gần đúng" | Tồn tại như một luật riêng | Tên **không được** làm khóa gộp độc lập |
+| 6 luật đối sánh còn thiếu | Chưa có | Xem bảng luật đối sánh, cột cuối |
+| Đối sánh xác suất | Chưa có | FR-IDR-02, ưu tiên Medium |
+
+Toàn bộ các điểm trên cần được đưa vào phạm vi điều chỉnh trước khi bàn giao Dev.
 
 ---
 
@@ -105,9 +139,11 @@ Người dùng xử lý danh sách nghi trùng theo trình tự sau:
 
 ### Vì sao bắt buộc
 
-Việc gộp hồ sơ ảnh hưởng trực tiếp đến điểm rủi ro COD — một quyết định tài chính. Khi khách hàng khiếu nại hoặc cơ quan quản lý kiểm tra, VNPost phải trả lời được: hồ sơ này được gộp từ những mã nào, dựa trên căn cứ gì, ai quyết định, vào lúc nào.
+Việc gộp hồ sơ ảnh hưởng trực tiếp đến điểm rủi ro COD — một quyết định tài chính. Khi khách hàng khiếu nại hoặc cơ quan quản lý kiểm tra, VNPost phải trả lời được: hồ sơ này được gộp từ những mã nào, dựa trên căn cứ gì, ai quyết định, vào lúc nào. Đây là yêu cầu bắt buộc theo FR-IDR-14 và FR-GOV-03 (ghi nhật ký **không thể xóa** đối với thao tác merge/unmerge).
 
 ### Thông tin phải ghi cho mọi lần gộp
+
+Mục 8.9 nhóm sự kiện 8 quy định tối thiểu: Customer ID trước và sau, lý do, người thực hiện, kết quả xử lý. Chi tiết hóa cho CDP VNPost:
 
 | Trường | Mô tả |
 |---|---|
@@ -116,8 +152,8 @@ Việc gộp hồ sơ ảnh hưởng trực tiếp đến điểm rủi ro COD �
 | Thời điểm | Ngày giờ xảy ra |
 | Mã hồ sơ chuẩn | Mã định danh CDP được giữ lại |
 | Danh sách mã nguồn được gộp | Toàn bộ mã nguồn hợp nhất vào hồ sơ chuẩn trong lần này |
-| Độ tin cậy tại thời điểm quyết định | Ghi riêng cho từng mã nguồn |
-| Rule kích hoạt | Mã rule (R1–R7) và trường so khớp tương ứng |
+| Điểm tin cậy tại thời điểm quyết định | Ghi riêng cho từng mã nguồn |
+| Luật kích hoạt | Điều kiện khớp và trường so khớp tương ứng |
 | Hệ thống nguồn | Nguồn phát hiện ra mã trùng |
 | Người quyết định | Hệ thống tự động, hoặc tên người dùng xác nhận |
 | Lý do | Ghi chú tùy chọn khi người dùng xác nhận |
@@ -126,7 +162,7 @@ Việc gộp hồ sơ ảnh hưởng trực tiếp đến điểm rủi ro COD �
 
 ### Quy tắc
 
-- Nhật ký **bất biến** — không được sửa hoặc xóa sau khi ghi. Mọi thay đổi về sau chỉ được ghi thêm bản ghi mới.
+- Nhật ký **bất biến** — không sửa, không xóa sau khi ghi. Thay đổi về sau chỉ được ghi thêm bản ghi mới.
 - Ghi **đồng bộ** với hành động gộp, không ghi sau hoặc ghi theo lô.
 - Thời hạn lưu trữ: đang giả định tối thiểu 5 năm — cần xác nhận theo quy định nội bộ VNPost và Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15.
 
@@ -138,37 +174,60 @@ Việc gộp hồ sơ ảnh hưởng trực tiếp đến điểm rủi ro COD �
 | CSKH đầy đủ | Chỉ xem tóm tắt các lần gộp liên quan đến khách hàng đang mở |
 | CSKH cơ bản, Marketing | Không xem |
 
+### Báo cáo gộp/tách hồ sơ
+
+Ngoài nhật ký chi tiết, mục 8.15 báo cáo 6 yêu cầu một **báo cáo tổng hợp**: số hồ sơ đã gộp/tách, số trường hợp đang chờ duyệt, số trường hợp gộp sai, lý do xử lý. Đối tượng sử dụng là Data Steward và bộ phận quản trị dữ liệu. Hạng mục này **chưa có** trong bản đang chạy.
+
 ### Hiện trạng hiển thị
 
-Màn danh sách nhật ký gộp đã được dựng trong prototype v3 (tab "Lịch sử merge" thuộc màn Đối soát & hợp nhất hồ sơ) nhưng **màn này chưa được gắn vào thanh điều hướng**, nên hiện tại chưa có lối vào từ giao diện. Theo quyết định ngày 29/07, tạm giữ nguyên hiện trạng.
-
-Trong Customer 360, tab **Nhật ký** hiện chỉ hiển thị nguồn dữ liệu đóng góp và thông tin hồ sơ — chưa phải nhật ký gộp theo yêu cầu ở trên. Khi mở lại hạng mục này, cần xác định nơi đặt: tab thứ hai trong màn Đối soát định danh, hoặc bổ sung nội dung vào tab Nhật ký của Customer 360.
+Màn danh sách nhật ký gộp đã được dựng trong prototype v3 nhưng **chưa gắn vào thanh điều hướng**, nên hiện chưa có lối vào từ giao diện. Theo quyết định ngày 29/07, tạm giữ nguyên hiện trạng. Trong Customer 360, tab "Nhật ký" hiện chỉ hiển thị nguồn dữ liệu đóng góp và thông tin hồ sơ — chưa phải nhật ký gộp theo yêu cầu ở trên.
 
 ---
 
-## BL-03 — Tách hồ sơ khi gộp nhầm (ngoài phạm vi giai đoạn này)
+## BL-03 — Tách hồ sơ khi gộp nhầm (hoãn sang giai đoạn sau)
 
-### Quyết định
+### Quyết định và mức độ lệch so với tài liệu gốc
 
-Giai đoạn này **không xây luồng tách hồ sơ**. Nội dung thiết kế bên dưới được giữ lại nguyên vẹn để dùng khi mở lại hạng mục.
+Giai đoạn này **không xây luồng tách hồ sơ**.
+
+Cần ghi nhận rõ: đây là **hoãn một yêu cầu bắt buộc**, không phải hạng mục ngoài phạm vi. Tài liệu gốc quy định tách hồ sơ ở 12 vị trí, trong đó:
+
+- **FR-IDR-07 — Tách hồ sơ khách hàng, độ ưu tiên High**
+- Mục 6.8: "Merge và Unmerge là **chức năng bắt buộc** để duy trì tính chính xác của Customer 360"
+- Mục 6.8.3: bảng 6 trường hợp tách hồ sơ kèm yêu cầu kiểm soát
+- Mục 6.9 case 8: người gửi và người nhận bị gộp nhầm thì áp dụng tách hồ sơ
+- Mục 8.14 rủi ro 4: "Gộp nhầm hồ sơ khách hàng" ở mức Cao, biện pháp kiểm soát bao gồm tách hồ sơ
+
+Nghĩa là bỏ luồng này đi thì rủi ro gộp nhầm mất một lớp phòng vệ mà tài liệu gốc đã chỉ định. Xem thêm ghi chú ở mục Rủi ro.
 
 ### Cách làm hiện tại
 
-Trong tab "Hồ sơ liên kết" của Customer 360 vẫn giữ nút **Báo cáo** kèm dòng gợi ý cho trường hợp nghi ngờ hồ sơ bị gộp nhầm. Khi người dùng bấm, báo cáo được gửi về hệ thống để kiểm tra; **chưa có luồng xử lý tách hồ sơ đi kèm** trong giai đoạn này.
+Trong tab "Hồ sơ liên kết" của Customer 360 vẫn giữ nút **Báo cáo** cho trường hợp nghi ngờ hồ sơ bị gộp nhầm. Khi người dùng bấm, báo cáo được gửi về hệ thống để kiểm tra; chưa có luồng xử lý tách hồ sơ đi kèm.
 
-**Điểm cần lưu ý khi bàn giao:** hiện chưa có màn hình nào để người tiếp nhận xem và xử lý các báo cáo này. Cần thống nhất với vận hành nơi tiếp nhận và cách xử lý ngoài hệ thống, tránh tình trạng báo cáo được ghi nhận nhưng không ai theo dõi.
+Chưa có màn hình nào để người tiếp nhận xem và xử lý các báo cáo này — cần thống nhất với vận hành nơi tiếp nhận và cách xử lý ngoài hệ thống.
 
 ### Thiết kế giữ lại cho giai đoạn sau
 
-Nguyên tắc: không cấp quyền hoàn tác gộp trực tiếp vì quá nguy hiểm — có thể làm mất dữ liệu đã hợp nhất hợp lệ. Thay vào đó dùng luồng ba bước **Báo cáo → Phê duyệt → Tách có kiểm soát**.
+Nguyên tắc: không cấp quyền hoàn tác gộp trực tiếp vì có thể làm mất dữ liệu đã hợp nhất hợp lệ. Dùng luồng ba bước **Báo cáo → Phê duyệt → Tách có kiểm soát**.
 
 **Bước 1 — Người phát hiện báo cáo:** từ tab Hồ sơ liên kết, chọn dòng nghi ngờ sai, điền lý do bắt buộc kèm bằng chứng tùy chọn, gửi đi. Hệ thống tạo yêu cầu và thông báo cho người có thẩm quyền.
 
-**Bước 2 — Người có thẩm quyền xem xét:** mở yêu cầu, đối chiếu hồ sơ tại thời điểm gộp, nhật ký gộp gốc, lý do báo cáo và tác động hiện tại lên các điểm số. Chọn phê duyệt tách hoặc từ chối, đều phải ghi lý do.
+**Bước 2 — Người có thẩm quyền xem xét:** đối chiếu hồ sơ tại thời điểm gộp, nhật ký gộp gốc, lý do báo cáo và tác động hiện tại lên các điểm số. Chọn phê duyệt hoặc từ chối, đều phải ghi lý do.
 
-**Bước 3 — Hệ thống thực hiện tách:** tách hồ sơ chuẩn thành các hồ sơ riêng, phân chia lại dữ liệu giao dịch, địa chỉ và điểm số về đúng hồ sơ gốc, tính lại toàn bộ điểm số cho các hồ sơ mới, ghi nhật ký tách và thông báo kết quả.
+**Bước 3 — Hệ thống thực hiện tách:** tách hồ sơ chuẩn thành các hồ sơ riêng, **trả lại mã nguồn tương ứng**, phân chia lại dữ liệu giao dịch, địa chỉ và điểm số về đúng hồ sơ gốc, tính lại toàn bộ điểm số, ghi nhật ký tách và thông báo kết quả. Không được làm mất lịch sử vận đơn.
 
-**Các trường hợp cần xử lý riêng khi mở lại:**
+**Sáu trường hợp tách hồ sơ theo mục 6.8.3:**
+
+| # | Trường hợp | Cách xử lý |
+|---|---|---|
+| 1 | Gộp nhầm hai khách hàng cá nhân | Tách thành hai mã khách hàng riêng, trả lại mã nguồn tương ứng |
+| 2 | Gộp nhầm cá nhân với doanh nghiệp | Tách hai hồ sơ, cập nhật lại luật đối sánh theo mã số thuế/mã KHL |
+| 3 | Gộp nhầm người gửi và người nhận | Tách vai trò và lịch sử giao dịch, không làm mất lịch sử vận đơn |
+| 4 | Số điện thoại dùng chung cho nhiều người | Tách hồ sơ, đánh dấu số điện thoại là dùng chung, không dùng để gộp tự động nữa |
+| 5 | Email dùng chung | Tách hồ sơ, đánh dấu email chỉ dùng làm kênh liên hệ |
+| 6 | Khách hàng yêu cầu chỉnh sửa/xóa dữ liệu | Tách, xóa hoặc ẩn danh theo quy trình quyền chủ thể dữ liệu |
+
+**Tình huống cần xử lý riêng khi mở lại:**
 
 | Tình huống | Hướng xử lý |
 |---|---|
@@ -181,10 +240,11 @@ Nguyên tắc: không cấp quyền hoàn tác gộp trực tiếp vì quá nguy
 
 ## Phụ thuộc
 
-- Bộ 7 rule và ba vùng hành vi phải được thống nhất giữa cấu hình rule và thông điệp hiển thị cho người dùng trước khi bàn giao — hiện R4 đang lệch.
+- Bản đang chạy phải được điều chỉnh theo bảng ngưỡng 4 vùng và bộ luật đối sánh của tài liệu gốc trước khi bàn giao Dev.
 - Cấu trúc nhật ký gộp cần được xác nhận trước khi thiết kế chi tiết màn hiển thị.
 - Bảng phân quyền xem nhật ký cần được xác nhận với PO/client.
-- Quy tắc chọn giá trị khi nhiều nguồn cùng cung cấp một trường (hồ sơ chuẩn lấy giá trị từ nguồn nào) hiện được mô tả là "lấy từ nguồn tin cậy cao nhất" nhưng chưa có bộ rule cụ thể — màn cấu hình rule ghi nhận đây là hạng mục mở ở giai đoạn sau.
+- Quy tắc chọn giá trị khi nhiều nguồn cùng cung cấp một trường: tài liệu gốc đã có bảng nguồn ưu tiên ở mục 6.10 cho 12 nhóm dữ liệu. Cần đối chiếu bảng này với cách bản đang chạy đang chọn giá trị ("lấy từ nguồn tin cậy cao nhất").
+- Ba yêu cầu ưu tiên High liên quan chưa có trong bản đang chạy: đánh dấu định danh dùng chung (FR-IDR-08), xử lý xung đột dữ liệu định danh (FR-IDR-13), phân quyền theo đơn vị/tỉnh/thành (FR-GOV-14).
 
 ---
 
@@ -192,9 +252,9 @@ Nguyên tắc: không cấp quyền hoàn tác gộp trực tiếp vì quá nguy
 
 | Hướng | Ưu điểm | Nhược điểm |
 |---|---|---|
-| **Đang áp dụng: tự gộp khóa mạnh, người xác nhận vùng giữa theo từng mã nguồn** | Giảm rủi ro gộp nhầm ở vùng không chắc chắn; người dùng thấy rõ từng mã nguồn trước khi quyết; có bước xem trước hồ sơ chuẩn | Tăng khối lượng công việc thủ công; phụ thuộc năng lực và thời gian của người đối soát |
-| Tự gộp toàn bộ từ 60% trở lên | Ít thủ công nhất | Gộp nhầm xảy ra trước khi có ai kiểm tra — và giai đoạn này không có luồng tách để sửa |
-| Chỉ tự gộp từ 85%, bỏ qua vùng 60–84% | Giảm khối lượng đối soát | Bỏ sót nhiều cặp trùng thật, hồ sơ tiếp tục phân mảnh |
+| **Áp dụng: tự gộp từ 95%, người xác nhận vùng 85–94%, lưu nghi vấn 70–84%** | Bám đúng tài liệu gốc; giảm mạnh rủi ro gộp nhầm; vùng nghi vấn vẫn được lưu để phân tích về sau | Số cặp được gộp tự động ít hơn; hồ sơ phân mảnh lâu hơn ở giai đoạn đầu |
+| Ngưỡng cũ đang chạy (tự gộp từ 90%, xác nhận từ 60%) | Hàng đợi duyệt phủ rộng hơn, gộp được nhiều hơn | Lệch tài liệu gốc; vùng 60–84% đưa vào duyệt trong khi tài liệu gốc coi là chưa đủ căn cứ |
+| Tự gộp toàn bộ từ 60% | Ít thủ công nhất | Gộp nhầm xảy ra trước khi có ai kiểm tra, và giai đoạn này không có luồng tách để sửa |
 
 ---
 
@@ -202,19 +262,20 @@ Nguyên tắc: không cấp quyền hoàn tác gộp trực tiếp vì quá nguy
 
 | Mã | Giả định | Nếu sai — cần điều chỉnh |
 |---|---|---|
-| A1 | Số lượng mã chờ xác nhận mỗi ngày ở mức người đối soát xử lý được (dưới 50 trong giai đoạn đầu) | Cần bổ sung chức năng duyệt hàng loạt cho nhóm tin cậy cao, hoặc nâng ngưỡng |
+| A1 | Số lượng mã chờ duyệt mỗi ngày ở mức người đối soát xử lý được | Cần bổ sung chức năng duyệt hàng loạt, hoặc xem lại ngưỡng |
 | A2 | Nhật ký gộp lưu tối thiểu 5 năm | Điều chỉnh yêu cầu lưu trữ và chính sách xóa dữ liệu |
-| A3 | Người đối soát là vai trò riêng biệt, không phải CSKH cấp cao kiêm nhiệm | Cần đơn giản hóa luồng nếu không có vai trò chuyên trách |
+| A3 | Data Steward là vai trò riêng biệt, không phải CSKH cấp cao kiêm nhiệm | Cần đơn giản hóa luồng nếu không có vai trò chuyên trách |
 
 ---
 
 ## Câu hỏi mở
 
-- [ ] **OQ-01**: Rule R4 (số điện thoại + họ tên, ngưỡng 85%) chốt theo hướng nào — hạ xuống "chờ xác nhận" hay nâng ngưỡng lên 90%? Đang khuyến nghị hướng hạ xuống chờ xác nhận.
-- [ ] **OQ-02**: Thời hạn lưu giữ nhật ký gộp là bao nhiêu năm theo quy định nội bộ VNPost và Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15? (Đang giả định 5 năm)
-- [ ] **OQ-03**: Nhật ký gộp đặt ở đâu khi mở lại — tab riêng trong màn Đối soát định danh, hay bổ sung vào tab Nhật ký của Customer 360?
-- [ ] **OQ-04**: Báo cáo nghi ngờ gộp nhầm được gửi về đâu và ai theo dõi, khi giai đoạn này chưa có luồng tách hồ sơ?
-- [ ] **OQ-05**: Khi nhiều hệ thống nguồn cung cấp giá trị khác nhau cho cùng một trường (ví dụ CRM ghi đang hoạt động, CAS ghi ngừng hoạt động; CRM phân loại cá nhân, Portal KHL phân loại doanh nghiệp), CDP dùng rule ưu tiên nguồn nào để quyết định giá trị hiển thị trên hồ sơ chuẩn? Cần chốt cho các trường: loại khách hàng, nhóm khách hàng, trạng thái, hạng khách hàng thân thiết.
+- [ ] **OQ-01**: Thời hạn lưu giữ nhật ký gộp là bao nhiêu năm theo quy định nội bộ VNPost và Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15? (Đang giả định 5 năm)
+- [ ] **OQ-02**: Nhật ký gộp và báo cáo gộp/tách đặt ở đâu khi mở lại — tab riêng trong màn Đối soát định danh, hay bổ sung vào tab Nhật ký của Customer 360?
+- [ ] **OQ-03**: Báo cáo nghi ngờ gộp nhầm được gửi về đâu và ai theo dõi, khi giai đoạn này chưa có luồng tách hồ sơ?
+- [ ] **OQ-04**: Vùng 70–84% ("quan hệ nghi vấn, chưa gộp") được lưu trong Identity Graph — người dùng nghiệp vụ có cần nhìn thấy nhóm này ở đâu không, hay chỉ phục vụ phân tích nội bộ?
+- [ ] **OQ-05**: Bảng nguồn ưu tiên ở mục 6.10 của tài liệu gốc đã đủ để quyết định giá trị hiển thị trên hồ sơ chuẩn chưa, hay cần bổ sung rule cho các trường: loại khách hàng, nhóm khách hàng, trạng thái, hạng khách hàng thân thiết?
+- [ ] **OQ-06**: Thời điểm nào mở lại luồng tách hồ sơ (FR-IDR-07, ưu tiên High)?
 
 ---
 
@@ -222,12 +283,12 @@ Nguyên tắc: không cấp quyền hoàn tác gộp trực tiếp vì quá nguy
 
 | Mã | Rủi ro | Mức ảnh hưởng | Khả năng xảy ra | Cách giảm thiểu |
 |---|---|---|---|---|
-| R1 | Số lượng mã chờ xác nhận lớn, người đối soát không xử lý kịp, hàng chờ tồn đọng | Cao | Trung bình | Theo dõi thời gian xử lý trung bình từ ngày đầu vận hành; đặt cam kết xử lý trong 2 ngày làm việc |
+| R1 | Số lượng mã chờ duyệt lớn, người đối soát không xử lý kịp, hàng chờ tồn đọng | Cao | Trung bình | Theo dõi thời gian xử lý trung bình từ ngày đầu vận hành; đặt cam kết xử lý trong 2 ngày làm việc |
 | R2 | **Xác nhận nhầm hai người khác nhau thành một** | Cao | Trung bình | Bắt buộc hiển thị cảnh báo với cặp có dấu hiệu rủi ro; bắt buộc xem trước hồ sơ chuẩn trước khi hợp nhất |
 | R3 | Nhật ký gộp bị thay đổi hoặc mất, không giải trình được trước cơ quan quản lý | Cao | Thấp | Lưu trên vùng riêng chỉ cho phép ghi thêm; kiểm tra tính toàn vẹn định kỳ (thuộc phạm vi SA/Dev) |
-| R4 | Rule R4 giữ nguyên tự gộp ở 85%, hệ thống tự gộp cả những cặp chỉ khớp số điện thoại và tên | Cao | Trung bình | Chốt OQ-01 trước khi bàn giao Dev |
+| R4 | Bản đang chạy giữ ngưỡng cũ và bộ luật thiếu, dẫn tới hành vi gộp khác với đặc tả khi bàn giao Dev | Cao | Cao | Điều chỉnh theo bảng ngưỡng và bộ luật ở mục BL-01 trước khi bàn giao |
 
-**Lưu ý về R2:** ở phiên bản trước, rủi ro này được giảm nhẹ bằng khả năng báo cáo và tách hồ sơ ngay sau khi gộp nhầm. Giai đoạn này **không còn cơ chế sửa sai đó** — một lần xác nhận nhầm sẽ tồn tại cho đến khi có luồng tách hồ sơ. Vì vậy cảnh báo trước khi hợp nhất và bước xem trước hồ sơ chuẩn không còn là tính năng hỗ trợ mà là hàng rào duy nhất.
+**Lưu ý về R2:** tài liệu gốc chỉ định tách hồ sơ là biện pháp kiểm soát cho rủi ro gộp nhầm (mục 8.14 rủi ro 4). Giai đoạn này hoãn luồng tách, nên một lần xác nhận nhầm sẽ tồn tại cho đến khi mở lại hạng mục. Vì vậy cảnh báo trước khi hợp nhất và bước xem trước hồ sơ chuẩn không còn là tính năng hỗ trợ mà là hàng rào duy nhất — bắt buộc phải có khi bàn giao Dev.
 
 ---
 
@@ -235,10 +296,12 @@ Nguyên tắc: không cấp quyền hoàn tác gộp trực tiếp vì quá nguy
 
 | Màn | Trạng thái |
 |---|---|
-| Đối soát định danh — danh sách khách hàng có mã nghi trùng | Đang chạy, có trên thanh điều hướng, hiển thị số lượng chờ xử lý |
-| Đối chiếu hồ sơ nghi trùng — bảng so sánh, tick chọn, xem trước, hợp nhất | Đang chạy |
-| Rule hợp nhất định danh — bảng 7 rule, chỉ xem | Đang chạy, nằm trong nhóm Cấu hình |
-| Customer 360 — tab Hồ sơ liên kết (alias + nút Báo cáo) | Đang chạy |
+| Đối soát định danh — danh sách khách hàng có mã nghi trùng | Đang chạy, cần cập nhật theo ngưỡng mới |
+| Đối chiếu hồ sơ nghi trùng — bảng so sánh, tick chọn, xem trước, hợp nhất | Đang chạy, cần cập nhật theo ngưỡng mới |
+| Rule hợp nhất định danh — bảng luật, chỉ xem | Đang chạy, thiếu 6 luật và sai hành động ở luật số điện thoại + họ tên |
+| Customer 360 — tab Hồ sơ liên kết (định danh thay thế + nút Báo cáo) | Đang chạy |
 | Customer 360 — tab Hồ sơ đa nguồn (so sánh từng trường theo nguồn) | Đang chạy |
 | Nhật ký gộp hồ sơ | Đã dựng nhưng chưa có lối vào |
-| Luồng tách hồ sơ | Ngoài phạm vi giai đoạn này |
+| Báo cáo gộp/tách hồ sơ | Chưa có |
+| Đối sánh xác suất | Chưa có |
+| Luồng tách hồ sơ | Hoãn sang giai đoạn sau |
