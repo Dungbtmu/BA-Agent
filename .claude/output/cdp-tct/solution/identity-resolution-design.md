@@ -36,7 +36,8 @@
 | D-03 | Tab "Hồ sơ liên kết" thêm vào Customer 360 | Còn hiệu lực |
 | D-04 | Kafka ẩn tạm khỏi sidebar | Còn hiệu lực |
 | D-05 | Ngưỡng tin cậy và luật đối sánh **áp dụng theo tài liệu gốc** (mục 6.6.1 và 6.6.2), không dùng ngưỡng tự đặt | Chốt 29/07/2026 |
-| D-06 | Luồng tách hồ sơ **hoãn sang giai đoạn sau** | Chốt 29/07/2026 |
+| D-06 | ~~Luồng tách hồ sơ hoãn sang giai đoạn sau~~ | Đã thay thế 30/07/2026 |
+| D-07 | Luồng tách hồ sơ **làm trong giai đoạn này, theo đúng tài liệu gốc**: người phụ trách dữ liệu tự tách trực tiếp, bắt buộc điền lý do, hệ thống ghi nhật ký. Không có bước báo cáo và phê duyệt riêng | Chốt 30/07/2026 |
 
 ### Mô hình hiện hành (thay cho D-01 và D-02)
 
@@ -52,7 +53,7 @@ Hệ thống tự động gộp các mã nguồn khớp bằng khóa mạnh. Cá
 |---|---|---|
 | BL-01 | Luật hợp nhất định danh — định nghĩa hành vi cho từng vùng tin cậy | Đã giải theo tài liệu gốc |
 | BL-02 | Nhật ký gộp hồ sơ phục vụ giải trình | Yêu cầu giữ nguyên — màn hiển thị đã dựng nhưng chưa gắn vào điều hướng |
-| BL-03 | Luồng tách hồ sơ khi gộp nhầm | Hoãn sang giai đoạn sau — xem mục riêng |
+| BL-03 | Luồng tách hồ sơ khi gộp nhầm | Đã giải theo tài liệu gốc — người phụ trách dữ liệu tách trực tiếp |
 
 ---
 
@@ -102,6 +103,7 @@ Không tín hiệu nào trong nhóm này được dùng làm khóa gộp độc 
 | Chờ duyệt | Hệ thống (85–94%) | Hiện trong danh sách đối soát, có nhãn số lượng chờ xử lý |
 | Quan hệ nghi vấn | Hệ thống (70–84%) | Chỉ lưu trong Identity Graph, không đưa vào hàng đợi duyệt |
 | Không phải cùng người | Người dùng xác nhận | Gỡ cờ nghi trùng, không hiện lại trong danh sách |
+| Đã tách | Người phụ trách dữ liệu tách hồ sơ gộp nhầm | Các mã nguồn được trả về hồ sơ riêng; ghi nhật ký tách; hiện dấu hiệu đã tách trong tab hồ sơ liên kết |
 
 ### Luồng xác nhận
 
@@ -184,57 +186,79 @@ Màn danh sách nhật ký gộp đã được dựng trong prototype v3 nhưng 
 
 ---
 
-## BL-03 — Tách hồ sơ khi gộp nhầm (hoãn sang giai đoạn sau)
+## BL-03 — Tách hồ sơ khi gộp nhầm
 
-### Quyết định và mức độ lệch so với tài liệu gốc
+### Căn cứ
 
-Giai đoạn này **không xây luồng tách hồ sơ**.
+Tách hồ sơ là **chức năng bắt buộc** theo tài liệu gốc, xuất hiện ở 12 vị trí:
 
-Cần ghi nhận rõ: đây là **hoãn một yêu cầu bắt buộc**, không phải hạng mục ngoài phạm vi. Tài liệu gốc quy định tách hồ sơ ở 12 vị trí, trong đó:
-
-- **FR-IDR-07 — Tách hồ sơ khách hàng, độ ưu tiên High**
-- Mục 6.8: "Merge và Unmerge là **chức năng bắt buộc** để duy trì tính chính xác của Customer 360"
+- **FR-IDR-07 — Tách hồ sơ khách hàng, độ ưu tiên High**, tác nhân là **người phụ trách dữ liệu / hệ thống**
+- Mục 6.8: "Merge và Unmerge là chức năng bắt buộc để duy trì tính chính xác của Customer 360"
 - Mục 6.8.3: bảng 6 trường hợp tách hồ sơ kèm yêu cầu kiểm soát
 - Mục 6.9 case 8: người gửi và người nhận bị gộp nhầm thì áp dụng tách hồ sơ
-- Mục 8.14 rủi ro 4: "Gộp nhầm hồ sơ khách hàng" ở mức Cao, biện pháp kiểm soát bao gồm tách hồ sơ
+- Mục 8.7: mọi thao tác gộp và tách phải có nhật ký kèm lý do
+- Mục 8.9 nhóm sự kiện 8: nhật ký ghi mã khách hàng trước và sau, lý do, người thực hiện, kết quả
+- Mục 8.14 rủi ro 4: "Gộp nhầm hồ sơ khách hàng" ở mức Cao, biện pháp kiểm soát gồm tách hồ sơ
+- Mục 8.15 báo cáo 6: báo cáo tổng hợp số hồ sơ đã gộp và đã tách
 
-Nghĩa là bỏ luồng này đi thì rủi ro gộp nhầm mất một lớp phòng vệ mà tài liệu gốc đã chỉ định. Xem thêm ghi chú ở mục Rủi ro.
+Tài liệu gốc **không quy định** bước báo cáo hay cấp phê duyệt riêng — người phụ trách dữ liệu là tác nhân thực hiện, điều kiện duy nhất là ghi nhật ký kèm lý do.
 
-### Cách làm hiện tại
+### Luồng tách hồ sơ (áp dụng giai đoạn này)
 
-Trong tab "Hồ sơ liên kết" của Customer 360 vẫn giữ nút **Báo cáo** cho trường hợp nghi ngờ hồ sơ bị gộp nhầm. Khi người dùng bấm, báo cáo được gửi về hệ thống để kiểm tra; chưa có luồng xử lý tách hồ sơ đi kèm.
-
-Chưa có màn hình nào để người tiếp nhận xem và xử lý các báo cáo này — cần thống nhất với vận hành nơi tiếp nhận và cách xử lý ngoài hệ thống.
-
-### Thiết kế giữ lại cho giai đoạn sau
-
-Nguyên tắc: không cấp quyền hoàn tác gộp trực tiếp vì có thể làm mất dữ liệu đã hợp nhất hợp lệ. Dùng luồng ba bước **Báo cáo → Phê duyệt → Tách có kiểm soát**.
-
-**Bước 1 — Người phát hiện báo cáo:** từ tab Hồ sơ liên kết, chọn dòng nghi ngờ sai, điền lý do bắt buộc kèm bằng chứng tùy chọn, gửi đi. Hệ thống tạo yêu cầu và thông báo cho người có thẩm quyền.
-
-**Bước 2 — Người có thẩm quyền xem xét:** đối chiếu hồ sơ tại thời điểm gộp, nhật ký gộp gốc, lý do báo cáo và tác động hiện tại lên các điểm số. Chọn phê duyệt hoặc từ chối, đều phải ghi lý do.
-
-**Bước 3 — Hệ thống thực hiện tách:** tách hồ sơ chuẩn thành các hồ sơ riêng, **trả lại mã nguồn tương ứng**, phân chia lại dữ liệu giao dịch, địa chỉ và điểm số về đúng hồ sơ gốc, tính lại toàn bộ điểm số, ghi nhật ký tách và thông báo kết quả. Không được làm mất lịch sử vận đơn.
+1. Người phụ trách dữ liệu mở hồ sơ khách hàng, vào tab hồ sơ liên kết, xem danh sách mã nguồn đã được gộp vào hồ sơ chuẩn.
+2. Chọn mã nguồn cần tách ra. Có thể chọn nhiều mã trong một lần tách.
+3. Hệ thống hiển thị **xem trước kết quả tách**: hồ sơ chuẩn còn lại những gì, hồ sơ mới nhận những gì, điểm số dự kiến sau khi tính lại.
+4. Người phụ trách dữ liệu **điền lý do — bắt buộc**, chọn trường hợp tách theo bảng dưới.
+5. Xác nhận. Hệ thống tách hồ sơ, **trả lại mã nguồn tương ứng**, phân chia lại dữ liệu giao dịch, địa chỉ và điểm số về đúng hồ sơ gốc, **không làm mất lịch sử vận đơn**.
+6. Hệ thống tính lại toàn bộ điểm số cho các hồ sơ sau khi tách.
+7. Hệ thống ghi nhật ký tách và cập nhật dấu hiệu đã tách trong tab hồ sơ liên kết của cả hai hồ sơ.
 
 **Sáu trường hợp tách hồ sơ theo mục 6.8.3:**
 
-| # | Trường hợp | Cách xử lý |
-|---|---|---|
-| 1 | Gộp nhầm hai khách hàng cá nhân | Tách thành hai mã khách hàng riêng, trả lại mã nguồn tương ứng |
-| 2 | Gộp nhầm cá nhân với doanh nghiệp | Tách hai hồ sơ, cập nhật lại luật đối sánh theo mã số thuế/mã KHL |
-| 3 | Gộp nhầm người gửi và người nhận | Tách vai trò và lịch sử giao dịch, không làm mất lịch sử vận đơn |
-| 4 | Số điện thoại dùng chung cho nhiều người | Tách hồ sơ, đánh dấu số điện thoại là dùng chung, không dùng để gộp tự động nữa |
-| 5 | Email dùng chung | Tách hồ sơ, đánh dấu email chỉ dùng làm kênh liên hệ |
-| 6 | Khách hàng yêu cầu chỉnh sửa/xóa dữ liệu | Tách, xóa hoặc ẩn danh theo quy trình quyền chủ thể dữ liệu |
+| # | Trường hợp | Cách xử lý | Yêu cầu kiểm soát |
+|---|---|---|---|
+| 1 | Gộp nhầm hai khách hàng cá nhân | Tách thành hai mã khách hàng riêng, trả lại mã nguồn tương ứng | Lưu nhật ký và lý do tách |
+| 2 | Gộp nhầm cá nhân với doanh nghiệp | Tách hồ sơ cá nhân và hồ sơ doanh nghiệp | Cập nhật lại luật đối sánh theo mã số thuế và mã khách hàng lớn |
+| 3 | Gộp nhầm người gửi và người nhận | Tách vai trò và lịch sử giao dịch tương ứng | Không làm mất lịch sử vận đơn |
+| 4 | Số điện thoại dùng chung cho nhiều người | Tách hồ sơ, đánh dấu số điện thoại là dùng chung | Không dùng số này để gộp tự động nữa |
+| 5 | Email dùng chung | Tách hồ sơ, đánh dấu email là dùng chung | Chỉ dùng email làm kênh liên hệ, không làm khóa gộp mạnh |
+| 6 | Khách hàng yêu cầu chỉnh sửa hoặc xóa dữ liệu | Tách, xóa hoặc ẩn danh theo quy trình quyền chủ thể dữ liệu | Bảo đảm tuân thủ và lưu vết xử lý |
 
-**Tình huống cần xử lý riêng khi mở lại:**
+### Nhật ký tách hồ sơ
 
-| Tình huống | Hướng xử lý |
+| Trường | Mô tả |
 |---|---|
-| Báo cáo sai một lần gộp vốn đúng | Từ chối yêu cầu, ghi lý do, không tách |
-| Hồ sơ đã gộp thêm mã khác sau lần gộp bị nghi ngờ | Cảnh báo chuỗi gộp phức tạp, không tự động tách, cần quy trình riêng |
-| Báo cáo trùng cho cùng một lần gộp | Chỉ tạo một yêu cầu, báo cho người gửi sau là đã có yêu cầu đang xử lý |
-| Giao dịch dùng chung không phân tách được rõ | Ghi vào cả hai hồ sơ kèm dấu hiệu nhận biết để xử lý thủ công sau |
+| Mã sự kiện | Định danh duy nhất của lần tách |
+| Thời điểm | Ngày giờ thực hiện |
+| Mã hồ sơ trước khi tách | Hồ sơ chuẩn đang chứa các mã nguồn |
+| Mã hồ sơ sau khi tách | Danh sách các hồ sơ hình thành sau khi tách |
+| Mã nguồn được trả lại | Từng mã nguồn về hồ sơ nào |
+| Liên kết tới lần gộp gốc | Trỏ về bản ghi nhật ký gộp tương ứng |
+| Trường hợp tách | Một trong sáu trường hợp ở bảng trên |
+| Lý do | Bắt buộc, do người thực hiện điền |
+| Người thực hiện | Tên người phụ trách dữ liệu |
+| Điểm số đã tính lại | Ghi nhận có tính lại hay không, và giá trị sau khi tính |
+
+Nhật ký tách là **bất biến** như nhật ký gộp — chỉ ghi thêm, không sửa, không xóa. Bản ghi nhật ký gộp gốc **không bị xóa** khi tách; chuỗi sự kiện gộp rồi tách được giữ nguyên để truy vết.
+
+### Vai trò nút Báo cáo trong hồ sơ khách hàng
+
+| Vai trò | Hành vi |
+|---|---|
+| Người phụ trách dữ liệu, quản trị | Tách trực tiếp, không cần qua nút Báo cáo |
+| Chăm sóc khách hàng, kinh doanh, vận hành | Bấm **Báo cáo** kèm lý do — hệ thống ghi nhận và chuyển cho người phụ trách dữ liệu xem xét |
+| Tiếp thị | Không thấy nút này |
+
+Báo cáo không tự tạo ra thao tác tách. Người phụ trách dữ liệu xem báo cáo, tự đánh giá và quyết định tách hay không.
+
+### Trường hợp để giai đoạn sau
+
+| Tình huống | Cách xử lý giai đoạn này |
+|---|---|
+| Hồ sơ đã qua nhiều lần gộp, cần tách một mã nằm giữa chuỗi | Hệ thống **cảnh báo chuỗi gộp phức tạp** và không cho tách trực tiếp; ghi vào danh sách chờ xử lý riêng |
+| Giao dịch dùng chung không phân tách được rõ | Ghi vào cả hai hồ sơ kèm dấu hiệu nhận biết, để người phụ trách dữ liệu xử lý tay sau |
+
+Luồng ba bước có phê duyệt — người phát hiện báo cáo, người có thẩm quyền duyệt, hệ thống thực hiện — được ghi nhận là **phương án chặt hơn**, để dành nếu sau này thấy quyền tách trực tiếp bị dùng sai hoặc số lần tách tăng bất thường.
 
 ---
 
@@ -254,7 +278,15 @@ Nguyên tắc: không cấp quyền hoàn tác gộp trực tiếp vì có thể
 |---|---|---|
 | **Áp dụng: tự gộp từ 95%, người xác nhận vùng 85–94%, lưu nghi vấn 70–84%** | Bám đúng tài liệu gốc; giảm mạnh rủi ro gộp nhầm; vùng nghi vấn vẫn được lưu để phân tích về sau | Số cặp được gộp tự động ít hơn; hồ sơ phân mảnh lâu hơn ở giai đoạn đầu |
 | Ngưỡng cũ đang chạy (tự gộp từ 90%, xác nhận từ 60%) | Hàng đợi duyệt phủ rộng hơn, gộp được nhiều hơn | Lệch tài liệu gốc; vùng 60–84% đưa vào duyệt trong khi tài liệu gốc coi là chưa đủ căn cứ |
-| Tự gộp toàn bộ từ 60% | Ít thủ công nhất | Gộp nhầm xảy ra trước khi có ai kiểm tra, và giai đoạn này không có luồng tách để sửa |
+| Tự gộp toàn bộ từ 60% | Ít thủ công nhất | Gộp nhầm xảy ra trước khi có ai kiểm tra |
+
+Về luồng tách hồ sơ:
+
+| Hướng | Ưu điểm | Nhược điểm |
+|---|---|---|
+| **Áp dụng: người phụ trách dữ liệu tách trực tiếp, bắt buộc lý do và nhật ký** | Đúng tài liệu gốc; khối lượng nhỏ; vá lại lớp phòng vệ cho rủi ro gộp nhầm ngay giai đoạn này | Quyền tách nằm ở một vai trò, phụ thuộc vào sự cẩn thận của người thực hiện |
+| Luồng ba bước có phê duyệt | Kiểm soát chặt hơn, khó dùng sai quyền | Tài liệu gốc không yêu cầu; khối lượng lớn hơn nhiều, từng là lý do khiến hạng mục bị hoãn |
+| Không làm luồng tách | Tiết kiệm nhất ở giai đoạn đầu | Lệch một yêu cầu ưu tiên cao; rủi ro gộp nhầm mất lớp phòng vệ mà tài liệu gốc chỉ định |
 
 ---
 
@@ -271,11 +303,12 @@ Nguyên tắc: không cấp quyền hoàn tác gộp trực tiếp vì có thể
 ## Câu hỏi mở
 
 - [ ] **OQ-01**: Thời hạn lưu giữ nhật ký gộp là bao nhiêu năm theo quy định nội bộ VNPost và Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15? (Đang giả định 5 năm)
-- [ ] **OQ-02**: Nhật ký gộp và báo cáo gộp/tách đặt ở đâu khi mở lại — tab riêng trong màn Đối soát định danh, hay bổ sung vào tab Nhật ký của Customer 360?
-- [ ] **OQ-03**: Báo cáo nghi ngờ gộp nhầm được gửi về đâu và ai theo dõi, khi giai đoạn này chưa có luồng tách hồ sơ?
-- [ ] **OQ-04**: Vùng 70–84% ("quan hệ nghi vấn, chưa gộp") được lưu trong Identity Graph — người dùng nghiệp vụ có cần nhìn thấy nhóm này ở đâu không, hay chỉ phục vụ phân tích nội bộ?
-- [ ] **OQ-05**: Bảng nguồn ưu tiên ở mục 6.10 của tài liệu gốc đã đủ để quyết định giá trị hiển thị trên hồ sơ chuẩn chưa, hay cần bổ sung rule cho các trường: loại khách hàng, nhóm khách hàng, trạng thái, hạng khách hàng thân thiết?
-- [ ] **OQ-06**: Thời điểm nào mở lại luồng tách hồ sơ (FR-IDR-07, ưu tiên High)?
+- [ ] **OQ-02**: Nhật ký gộp và tách, cùng báo cáo tổng hợp gộp/tách, đặt ở đâu — tab riêng trong màn Đối soát định danh, hay bổ sung vào tab Nhật ký của Customer 360?
+- [ ] **OQ-03**: Vùng 70–84% ("quan hệ nghi vấn, chưa gộp") được lưu trong Identity Graph — người dùng nghiệp vụ có cần nhìn thấy nhóm này ở đâu không, hay chỉ phục vụ phân tích nội bộ?
+- [ ] **OQ-04**: Bảng nguồn ưu tiên ở mục 6.10 của tài liệu gốc đã đủ để quyết định giá trị hiển thị trên hồ sơ chuẩn chưa, hay cần bổ sung rule cho các trường: loại khách hàng, nhóm khách hàng, trạng thái, hạng khách hàng thân thiết?
+- [ ] **OQ-05**: Quyền tách hồ sơ có cần giới hạn theo cấp không — mọi người phụ trách dữ liệu đều tách được, hay chỉ người được chỉ định riêng? Tài liệu gốc chỉ ghi tác nhân là người phụ trách dữ liệu, không phân cấp.
+- [ ] **OQ-06**: Khi hồ sơ đã qua nhiều lần gộp và cần tách một mã nằm giữa chuỗi thì tách đến đâu — chỉ lần gộp gần nhất, hay tách được mã bất kỳ trong chuỗi? Giai đoạn này đang cảnh báo và không cho tách trực tiếp.
+- [ ] **OQ-07**: Có cần ngưỡng cảnh báo khi số lần tách tăng bất thường không? Đây là dấu hiệu luật đối sánh đang gộp sai quá nhiều.
 
 ---
 
@@ -287,8 +320,9 @@ Nguyên tắc: không cấp quyền hoàn tác gộp trực tiếp vì có thể
 | R2 | **Xác nhận nhầm hai người khác nhau thành một** | Cao | Trung bình | Bắt buộc hiển thị cảnh báo với cặp có dấu hiệu rủi ro; bắt buộc xem trước hồ sơ chuẩn trước khi hợp nhất |
 | R3 | Nhật ký gộp bị thay đổi hoặc mất, không giải trình được trước cơ quan quản lý | Cao | Thấp | Lưu trên vùng riêng chỉ cho phép ghi thêm; kiểm tra tính toàn vẹn định kỳ (thuộc phạm vi SA/Dev) |
 | R4 | Bản đang chạy giữ ngưỡng cũ và bộ luật thiếu, dẫn tới hành vi gộp khác với đặc tả khi bàn giao Dev | Cao | Cao | Điều chỉnh theo bảng ngưỡng và bộ luật ở mục BL-01 trước khi bàn giao |
+| R5 | Quyền tách hồ sơ bị dùng sai, hoặc tách nhầm một lần gộp vốn đúng | Trung bình | Trung bình | Bắt buộc điền lý do và chọn trường hợp tách; ghi nhật ký bất biến; có báo cáo tổng hợp số lần gộp và tách để phát hiện bất thường; giữ nguyên nhật ký gộp gốc để đối chiếu |
 
-**Lưu ý về R2:** tài liệu gốc chỉ định tách hồ sơ là biện pháp kiểm soát cho rủi ro gộp nhầm (mục 8.14 rủi ro 4). Giai đoạn này hoãn luồng tách, nên một lần xác nhận nhầm sẽ tồn tại cho đến khi mở lại hạng mục. Vì vậy cảnh báo trước khi hợp nhất và bước xem trước hồ sơ chuẩn không còn là tính năng hỗ trợ mà là hàng rào duy nhất — bắt buộc phải có khi bàn giao Dev.
+**Lưu ý về R2:** tài liệu gốc chỉ định tách hồ sơ là biện pháp kiểm soát cho rủi ro gộp nhầm (mục 8.14 rủi ro 4). Giai đoạn này **đã có luồng tách**, nên một lần xác nhận nhầm vẫn sửa được. Tuy vậy cảnh báo trước khi hợp nhất và bước xem trước hồ sơ chuẩn vẫn là hàng rào đầu tiên và bắt buộc phải có — sửa sau khi gộp nhầm luôn tốn hơn ngăn từ đầu, vì điểm rủi ro thu hộ có thể đã được dùng để ra quyết định nghiệp vụ trong khoảng thời gian hồ sơ còn sai.
 
 ---
 
@@ -304,4 +338,5 @@ Nguyên tắc: không cấp quyền hoàn tác gộp trực tiếp vì có thể
 | Nhật ký gộp hồ sơ | Đã dựng nhưng chưa có lối vào |
 | Báo cáo gộp/tách hồ sơ | Chưa có |
 | Đối sánh xác suất | Chưa có |
-| Luồng tách hồ sơ | Hoãn sang giai đoạn sau |
+| Luồng tách hồ sơ | **Chưa có — cần bổ sung:** chọn mã nguồn để tách, xem trước kết quả, chọn trường hợp tách, điền lý do bắt buộc |
+| Tách hồ sơ trong chuỗi gộp nhiều lần | Để giai đoạn sau — giai đoạn này chỉ cảnh báo và không cho tách trực tiếp |

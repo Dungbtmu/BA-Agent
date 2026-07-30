@@ -100,7 +100,7 @@ Sáu cấp phạm vi theo mục 8.13: theo đơn vị và tỉnh thành · theo 
 | Khách hàng cuối | **Không truy cập CDP.** Không có màn hình nào dành cho khách hàng VNPost |
 | Trạng thái đồng ý dữ liệu | CDP **chỉ nhận** từ nguồn: ứng dụng MyVNPost, website, quầy giao dịch, hệ thống quan hệ khách hàng. CDP không tự thu đồng ý |
 | Yêu cầu xem hoặc xóa dữ liệu của khách hàng | Đến qua **chăm sóc khách hàng tiếp nhận** rồi nhập vào CDP. Không có kênh tự phục vụ |
-| Thiết bị truy cập | Trang web độc lập mở trên trình duyệt. Truy cập được bằng điện thoại qua đường dẫn |
+| Thiết bị truy cập | Trang web độc lập mở trên trình duyệt. Mở được bằng điện thoại qua đường dẫn, nhưng **tối ưu hiển thị cho điện thoại chưa phải ưu tiên giai đoạn này** — làm cho máy tính trước |
 
 ---
 
@@ -143,6 +143,10 @@ Phân tích theo mô hình gần đây, tần suất, giá trị · giá trị v
 6. Các trường hợp cấm gộp tự động dù điểm cao: chỉ trùng mã vận đơn, chỉ trùng địa chỉ, chỉ trùng địa chỉ mạng, chỉ trùng thiết bị, số điện thoại là số dùng chung hoặc tổng đài, người gửi và người nhận chỉ trùng một thông tin phụ, hoặc thiếu đồng ý cho mục đích kích hoạt.
 7. Người phụ trách dữ liệu mở hồ sơ trong hàng đợi, xem bảng so sánh từng cột giữa các mã nguồn, tick chọn mã thuộc cùng khách hàng, xem trước hồ sơ chuẩn dự kiến, rồi xác nhận hợp nhất hoặc đánh dấu là các khách hàng khác nhau.
 8. Hệ thống sinh mã định danh CDP, giữ lại toàn bộ mã nguồn cũ dưới dạng mã thay thế, tính lại điểm số, và ghi nhật ký gộp.
+9. **Khi phát hiện gộp nhầm:** người phụ trách dữ liệu mở hồ sơ, chọn mã nguồn cần tách ra, xem trước kết quả tách, chọn trường hợp tách theo sáu trường hợp của mục 6.8.3, điền lý do bắt buộc rồi xác nhận. Không cần qua bước báo cáo hay phê duyệt riêng.
+10. Hệ thống tách hồ sơ, trả lại mã nguồn tương ứng, phân chia lại dữ liệu và điểm số về đúng hồ sơ gốc, không làm mất lịch sử vận đơn, rồi ghi nhật ký tách. Nhật ký gộp gốc được giữ nguyên để truy vết chuỗi sự kiện.
+11. Vai trò không có quyền tách — chăm sóc khách hàng, kinh doanh, vận hành — bấm nút Báo cáo kèm lý do; người phụ trách dữ liệu xem và tự quyết định có tách hay không.
+12. Hồ sơ đã qua nhiều lần gộp mà cần tách một mã nằm giữa chuỗi: hệ thống cảnh báo và không cho tách trực tiếp, ghi vào danh sách chờ xử lý riêng (để giai đoạn sau).
 
 **Hình luồng — từ tiếp nhận đến hồ sơ chuẩn**
 
@@ -352,8 +356,10 @@ Sáu vai trò còn lại (chủ sở hữu dữ liệu, kỹ sư dữ liệu, ph
 |---|---|---|---|---|
 | Hồ sơ khách hàng | Đang hoạt động | Ngừng hoạt động | Không phát sinh giao dịch quá thời hạn quy định | Có, khi phát sinh giao dịch mới |
 | Hồ sơ khách hàng | Đang hoạt động | Bị khóa | Quản trị khóa theo yêu cầu nghiệp vụ hoặc rủi ro | Có, cần quyền quản trị |
-| Hồ sơ khách hàng | Đang hoạt động | Đã hợp nhất | Hồ sơ được gộp vào hồ sơ chuẩn khác | Chỉ khi mở lại luồng tách hồ sơ |
-| Quan hệ định danh | Chờ duyệt | Đã gộp | Người đối soát xác nhận, hoặc hệ thống tự gộp từ 95% | Chỉ khi mở lại luồng tách hồ sơ |
+| Hồ sơ khách hàng | Đang hoạt động | Đã hợp nhất | Hồ sơ được gộp vào hồ sơ chuẩn khác | Có, qua luồng tách hồ sơ |
+| Hồ sơ khách hàng | Đã hợp nhất | Đã tách | Người phụ trách dữ liệu tách hồ sơ gộp nhầm | Có, nếu gộp lại |
+| Quan hệ định danh | Chờ duyệt | Đã gộp | Người đối soát xác nhận, hoặc hệ thống tự gộp từ 95% | Có, qua luồng tách hồ sơ |
+| Quan hệ định danh | Đã gộp | Đã tách | Người phụ trách dữ liệu tách, kèm lý do bắt buộc | Có, nếu gộp lại |
 | Quan hệ định danh | Chờ duyệt | Bị từ chối | Người đối soát kết luận khác khách hàng | Không |
 | Quan hệ định danh | Hoạt động | Hết hạn | Quan hệ không được xác nhận lại trong thời gian quy định | Có, khi phát sinh tín hiệu mới |
 | Đồng ý dữ liệu | Chưa rõ | Đồng ý / Từ chối | Nguồn ghi nhận lựa chọn của khách hàng | Có |
@@ -610,6 +616,7 @@ Bộ chỉ tiêu dưới đây lấy từ `clarification.md`, **chưa được V
 | GD-06 | Chỉ tiêu chất lượng dữ liệu theo hai mốc 6 và 12 tháng | Cách đo và ngưỡng cảnh báo chất lượng dữ liệu |
 | GD-07 | Tiêu chí thành công giữ theo bộ đang giả định | Toàn bộ phần mục tiêu và cách đo hiệu quả |
 | GD-08 | CDP nhận danh tính từ cổng đăng nhập chung, không tự quản lý tài khoản | Phải bổ sung phân hệ quản lý tài khoản và xác thực |
+| GD-09 | Giai đoạn này chỉ tối ưu hiển thị cho máy tính; điện thoại mở được nhưng chưa tối ưu | Phải bổ sung yêu cầu hiển thị thích ứng cho từng màn, và xác định màn nào bắt buộc dùng được trên điện thoại |
 
 ---
 
@@ -624,18 +631,22 @@ Bộ chỉ tiêu dưới đây lấy từ `clarification.md`, **chưa được V
 | OQ-05 | VNPost đã chuẩn bị đến đâu về tuân thủ bảo vệ dữ liệu cá nhân? Ai chịu trách nhiệm pháp lý? | Pháp chế / Tuân thủ |
 | OQ-06 | Trong 600.000 hồ sơ hiện có, bao nhiêu phần trăm có bằng chứng đồng ý lưu vết được, và đồng ý đó có nêu rõ mục đích tiếp thị và phân tích không? | Pháp chế / Công nghệ thông tin |
 | OQ-07 | Quy mô người dùng nội bộ thực tế — số tài khoản và số người dùng đồng thời? | VNPost |
-| OQ-08 | Màn nào thực sự cần dùng được trên điện thoại? Màn tra cứu hồ sơ thì hợp lý, còn màn tạo phân khúc và bảng đối chiếu nhiều cột rất khó dùng trên màn hình nhỏ | Chủ sản phẩm |
-| OQ-09 | Thời hạn lưu nhật ký 5 năm có đúng quy định nội bộ và quy định pháp luật không? | Pháp chế |
-| OQ-10 | Bản giao diện đang chạy dùng ngưỡng 90% và 60%, tài liệu gốc quy định 95%, 85% và 70%. Sửa bản đang chạy theo tài liệu gốc, hay cập nhật tài liệu gốc theo bản đang chạy? | Chủ sản phẩm / VNPost |
-| OQ-11 | Khi nào mở lại luồng tách hồ sơ? Đây là yêu cầu ưu tiên cao trong tài liệu gốc, hiện đang hoãn | Chủ sản phẩm |
-| OQ-12 | VNPost đã có chính sách tần suất gửi tin cho khách hàng chưa? Nếu có thì lấy theo chính sách đó thay cho con số đề xuất | Tiếp thị VNPost |
+| OQ-08 | Thời hạn lưu nhật ký 5 năm có đúng quy định nội bộ và quy định pháp luật không? | Pháp chế |
+| OQ-09 | VNPost đã có chính sách tần suất gửi tin cho khách hàng chưa? Nếu có thì lấy theo chính sách đó thay cho con số đề xuất | Tiếp thị VNPost |
 
-**Đã chốt trong buổi này:** phạm vi tài liệu · người đọc · cách xử lý điểm chưa có câu trả lời · bộ vai trò · ranh giới đăng nhập · ranh giới với khách hàng cuối · cách xử lý khi hai người cùng thao tác · phạm vi hiệu lực của việc rút đồng ý · cách xử lý khi sửa phân khúc đang chạy chiến dịch · toàn bộ con số giới hạn · hai mốc thời hạn xử lý yêu cầu khách hàng · bộ câu chữ thông báo · ba rủi ro nặng nhất.
+**Đã chốt trong buổi này:** phạm vi tài liệu · người đọc · cách xử lý điểm chưa có câu trả lời · bộ vai trò · ranh giới đăng nhập · ranh giới với khách hàng cuối · cách xử lý khi hai người cùng thao tác · phạm vi hiệu lực của việc rút đồng ý · cách xử lý khi sửa phân khúc đang chạy chiến dịch · toàn bộ con số giới hạn · hai mốc thời hạn xử lý yêu cầu khách hàng · bộ câu chữ thông báo · ba rủi ro nặng nhất · mức ưu tiên cho hiển thị trên điện thoại · ngưỡng hợp nhất theo tài liệu gốc · luồng tách hồ sơ làm ngay giai đoạn này.
+
+Ba điểm chốt thêm ngày 30/07:
+
+| Nội dung | Quyết định |
+|---|---|
+| Hiển thị trên điện thoại | Toàn bộ trang web mở được trên điện thoại, nhưng tối ưu hiển thị **chưa phải ưu tiên** giai đoạn này — làm cho máy tính trước |
+| Ngưỡng hợp nhất định danh | **Đi theo tài liệu gốc**: từ 95% tự gộp, 85–94% chờ duyệt, 70–84% lưu quan hệ nghi vấn, dưới 70% không gộp. Bản giao diện đang chạy chỉ là dữ liệu mẫu nên cập nhật hay không đều được |
+| Luồng tách hồ sơ | **Làm ngay giai đoạn này**, theo đúng tài liệu gốc: người phụ trách dữ liệu tự tách trực tiếp, bắt buộc điền lý do, hệ thống ghi nhật ký. Không có bước báo cáo và phê duyệt riêng |
 
 ---
 
 ## 13. Bước tiếp theo
 
 1. Trả lời OQ-01 đến OQ-05 với khách hàng — năm câu này ảnh hưởng phạm vi và kiến trúc, càng chậm càng rủi ro
-2. Chốt OQ-10 trước khi viết phần hợp nhất định danh trong URD, vì con số ngưỡng đi thẳng vào quy tắc nghiệp vụ và ca kiểm thử
-3. Chạy `/urd cdp` theo lô từng phân hệ, thứ tự đề xuất: hợp nhất định danh và hồ sơ khách hàng 360 trước (đã có giao diện và đã làm rõ nhất), rồi tiếp nhận và chuẩn hóa, sau đó phân khúc và phân tích, kích hoạt, cuối cùng là quản trị
+2. Chạy `/urd cdp` theo lô từng phân hệ, thứ tự đề xuất: hợp nhất định danh và hồ sơ khách hàng 360 trước (đã có giao diện và đã làm rõ nhất), rồi tiếp nhận và chuẩn hóa, sau đó phân khúc và phân tích, kích hoạt, cuối cùng là quản trị
