@@ -174,6 +174,19 @@
 - **Toàn trình** = toàn bộ hành trình đơn hàng từ lúc nhận đến lúc phát thành công.
 - **BCCP · PPTT · HCC · TCBC** = 4 nhóm dịch vụ doanh thu (xuất hiện trong cảnh báo tiến độ ở STT 25). Tên đầy đủ thuộc phần Cơ cấu doanh thu — *cần Ban xác nhận tên đầy đủ từng nhóm.*
 
+### Định nghĩa làm rõ theo Ghi chú sau họp (đã chốt)
+
+- **Điểm bán** — phân thành 2 loại kênh:
+  - **BC** = Bưu cục (gồm 3 cấp: **GD1, GD2, GD3**).
+  - **VHX** = điểm Văn hóa xã (Bưu điện Văn hóa xã).
+- **Tổng điểm bán** = toàn bộ điểm bán trong phạm vi (BC + VHX). Là con số quy mô nền.
+- **Điểm bán hoạt động** = tập con của tổng điểm bán, chỉ gồm điểm **đang hoạt động** — dùng làm **mẫu số Y** của chỉ số "Điểm bán PSDT" (STT 19 KPI 1). *(Tiêu chí "hoạt động" cần Ban định nghĩa rõ — OQ-3.)*
+- **Điểm bán PSDT** = điểm bán hoạt động **có phát sinh doanh thu** trong kỳ. Chỉ số hiển thị `X/Y` = điểm bán hoạt động có PSDT / điểm bán hoạt động; ngưỡng màu **< 85% đỏ · ≥ 85% xanh**, không mũi tên, số nguyên.
+- **DT giao trên kênh** = tổng kế hoạch (KH) giao cho từng điểm bán, **cộng cả 2 kênh BC + VHX**. Là mẫu số của "%KH giao toàn kênh" (STT 19 KPI 2).
+- **Doanh thu chốt thắng** (nguồn CRM) = doanh thu từ cơ hội bán hàng đã chốt thành công (có phát sinh DT thực). Lấy tại **CRM: Báo cáo cơ hội → Báo cáo chi tiết hiệu suất → cột "Doanh thu chốt thắng"** — là căn cứ xác định **người bán phát sinh doanh thu** (STT 19 KPI 3, STT 23).
+- **MBC 6 số** = Mã Bưu Cục 6 số — dùng làm **mã điểm bán**, khóa liên kết giữa người bán (CRM) và điểm bán. Quy tắc: mã bưu cục ⇒ mã điểm bán của người bán đó.
+- **Người bán PSDT** = người bán có phát sinh doanh thu trong kỳ, xác định qua **DT chốt thắng trên CRM** theo user người bán / mã HRM, liên kết điểm bán qua MBC 6 số.
+
 ## Ghi chú & Assumptions
 
 **[A1]** Bảng gồm **7 dòng STT 17–23**, phủ toàn bộ mục C · Kênh bán của bảng data inventory:
