@@ -15,6 +15,8 @@ TỔNG CÔNG TY BƯU ĐIỆN VIỆT NAM (VNPost/TCT)
 |---|---|---|---|
 | v1 | 08/2026 | Khởi tạo khung tổng thể: Mục I (Giới thiệu) và Mục II (Yêu cầu tổng thể) cho cả 7 phân hệ. Chưa bao gồm Mục III (Use Case), Mục IV (Giao diện), Mục C (Phi chức năng) — sẽ viết theo lô ở các vòng sau | BA |
 | v1.1 | 08/2026 | Patch theo QA review — sửa 2 CRITICAL + 4 MAJOR: (CR-01) chốt MVP chỉ người gửi, người nhận Out of scope MVP theo A2, OQ-02 chuyển Out of scope P1; (CR-02) bổ sung "email dùng chung" vào danh sách cấm gộp tự động DP-05; (MA-01) tách bạch quyền Xem báo cáo gộp/tách và quyền Đề xuất tách (REQUEST_UNMERGE); (MA-02) bỏ quyền tách hồ sơ của Quản trị hệ thống; (MA-03) chú thích FR-GOV-03 là góc quản trị của cùng nhật ký FR-IDR-14; (MA-05) làm rõ 10 mã FR-IDR có tên trên 14 vị trí. 5 MINOR (MI-01→05) ghi nhận xử lý ở lô Hợp nhất định danh | BA |
+| v1.2 | 08/2026 | **Lô 1** — bổ sung Mục III (Đặc tả Use Case) và Mục IV (Giao diện chức năng) cho Phân hệ 3 (Hợp nhất định danh) và Phân hệ 4 (Customer 360): 11 Use Case (UC-IDR-01→07, UC-C360-01→04), 16 Business Rule (BR-IDR-01→12, BR-C360-01→04), 7 màn giao diện (SCR-IDR-01→05, SCR-C360-01→02) bám prototype v3. Đối chiếu thẳng tài liệu gốc CDP.md 6.6–6.10, 7.4, 7.5, 8.8, 8.9: xác nhận đủ tên **14 mã FR-IDR-01→14** và **15 mã FR-C360-01→15**. Áp ngưỡng 4 vùng 95/85/70 theo gốc; đánh dấu điểm lệch prototype (ngưỡng 90/60, mô hình phê duyệt tách cũ). Đặc tả bảng che dữ liệu theo vai trò (masking) theo 6.2 + 8.8. Bổ sung màn Tách hồ sơ (SCR-IDR-05 — prototype chưa có). Thêm OQ Lô 1 vào Phụ lục | BA |
+| v1.3 | 08/2026 | Patch theo QA review Lô 1 — sửa 1 CRITICAL + 5 MAJOR: (CR-01) đồng bộ mã FR giữa Mục I/II và III — cập nhật cây chức năng II.2 với đủ 14 tên FR-IDR (thêm 03/04/05/10) và 15 tên FR-C360, gỡ toàn bộ chú thích "chưa đặt tên"/`[Cần xác nhận: mã]` ở I.2.1, II.2 và diễn giải Phân hệ 3; (MA-01) sửa ghi chú UC-IDR-07 trỏ nhầm III.C360 → bảng luật gốc CDP.md 6.6.1; (MA-02) thống nhất "10 nhóm dữ liệu / 11 tab, tab Doanh nghiệp là tab điều kiện" ở UC-C360-02 và SCR-C360-02; (MA-03) thêm dòng masking "Hồ sơ liên kết/alias" vào bảng III.C360 (kèm OQ-IDR-09); (MA-04) làm rõ 3 điều kiện empty-state SCR-C360-01 để testable, đồng bộ UC-C360-01; (MA-05) thêm cột Trạng thái (đã gộp/đã tách) vào bảng định danh liên kết SCR-C360-02. Thêm OQ-IDR-09→11; ghi nhận 5 MINOR QA Lô 1 (MI-L1-01→05, gom lô sau) | BA |
 
 ---
 
@@ -78,7 +80,7 @@ Tài liệu bao phủ **toàn bộ 7 phân hệ** của CDP, khoảng **99 mã y
 | 6 | Kích hoạt dữ liệu | FR-ACT | Kiểm tra đồng ý; kiểm tra tần suất và khung giờ; phê duyệt theo ngưỡng; đẩy sang kênh; nhận phản hồi |
 | 7 | Quản trị, bảo mật và quyền riêng tư | FR-GOV | Quản lý tài khoản, vai trò, phạm vi; nhật ký bất biến; quản lý đồng ý; xử lý yêu cầu chủ thể dữ liệu; báo cáo tuân thủ |
 
-> **[Cần xác nhận: mã yêu cầu chi tiết cho 6 phân hệ ngoài Hợp nhất định danh]** — Nguồn hiện tại chỉ liệt kê tên cụ thể cho nhóm mã FR-IDR: **10 mã đã có tên** (FR-IDR-01, 02, 06, 07, 08, 09, 11, 12, 13, 14) trên tổng **14 vị trí** trong dải FR-IDR-01→14; 4 mã còn lại (03, 04, 05, 10) chưa được đặt tên trong nguồn (xem Mục II.2). Các phân hệ còn lại được dựng cây theo nhóm chức năng nghiệp vụ đã xác định; tên và số hiệu chi tiết của từng mã yêu cầu (FR-INGEST-xx, FR-STD-xx, …) sẽ được bổ sung khi làm chi tiết theo lô, hoặc khi có bảng mã yêu cầu gốc từ tài liệu `CDP.md`.
+> **Về mã yêu cầu chi tiết:** Hai phân hệ của Lô 1 đã có **đủ tên mã theo tài liệu gốc `CDP.md`**: **14 mã FR-IDR-01→14** (mục 7.4) và **15 mã FR-C360-01→15** (mục 7.5) — xem cây chức năng đầy đủ ở Mục II.2 và danh mục ánh xạ ở Mục III.0. Năm phân hệ còn lại (Tiếp nhận FR-ING, Chuẩn hóa FR-DPS, Phân tích FR-ANA, Kích hoạt, Quản trị) cũng có bảng mã gốc trong `CDP.md` (mục 7.2, 7.3, 7.6…); tên và số hiệu chi tiết của từng mã sẽ được đưa vào cây chức năng khi làm chi tiết theo lô tương ứng.
 
 ### I.2.2. Ranh giới hệ thống
 
@@ -622,19 +624,30 @@ CDP — Nền tảng Dữ liệu Khách hàng VNPost
 │   ├── Danh sách rà soát thủ công / hàng đợi đối soát (FR-IDR-12)
 │   ├── Xử lý xung đột dữ liệu định danh (FR-IDR-13)
 │   ├── Nhật ký hợp nhất định danh (FR-IDR-14, đồng thời là FR-GOV-03 ở góc quản trị — một chức năng, hai mã truy vết)
-│   ├── Quản lý sơ đồ liên kết định danh (Identity Graph)
+│   ├── Cơ sở dữ liệu đồ thị định danh / Identity Graph (FR-IDR-03)
+│   ├── Sinh mã khách hàng hợp nhất / Unified Customer ID (FR-IDR-04)
+│   ├── Quản lý mã định danh gốc và mã thay thế / Alias ID (FR-IDR-05)
+│   ├── Liên kết hồ sơ ẩn danh với hồ sơ đã định danh (FR-IDR-10)
 │   └── Báo cáo tổng hợp gộp/tách hồ sơ
-│       └── [Cần xác nhận: các mã FR-IDR-03, 04, 05, 10 chưa được đặt tên trong nguồn]
+│       └── (Đủ 14 mã FR-IDR-01→14 có tên theo CDP.md mục 7.4 — xem III.0)
 │
 ├── Phân hệ 4: Quản lý hồ sơ khách hàng 360 (FR-C360)
-│   ├── Tìm kiếm khách hàng (đa tiêu chí định danh)
-│   ├── Xem hồ sơ 360 (10 nhóm dữ liệu)
-│   ├── Hiển thị theo phân quyền (che/ẩn theo vai trò)
-│   ├── So sánh giá trị giữa các nguồn (hồ sơ đa nguồn)
-│   ├── Xem hồ sơ liên kết (mã thay thế)
-│   ├── Ghi chú và gắn nhãn khách hàng
-│   └── Xuất danh sách khách hàng
-│       └── [Cần xác nhận: mã yêu cầu chi tiết phân hệ 4 — FR-C360-xx]
+│   ├── Bảng thông tin hồ sơ khách hàng hợp nhất (FR-C360-01)
+│   ├── Khung thông tin định danh khách hàng (FR-C360-02)
+│   ├── Lịch sử giao dịch khách hàng (FR-C360-03)
+│   ├── Dòng thời gian hành trình bưu gửi (FR-C360-04)
+│   ├── Lịch sử COD và thanh toán (FR-C360-05)
+│   ├── Dòng thời gian tương tác đa kênh (FR-C360-06)
+│   ├── Lịch sử khiếu nại và yêu cầu hỗ trợ (FR-C360-07)
+│   ├── Thông tin khách hàng thân thiết / loyalty (FR-C360-08)
+│   ├── Hiển thị phân khúc và điểm số khách hàng (FR-C360-09)
+│   ├── Hiển thị trạng thái đồng ý sử dụng dữ liệu (FR-C360-10)
+│   ├── Che giấu dữ liệu theo vai trò / masking (FR-C360-11)
+│   ├── Tìm kiếm khách hàng (FR-C360-12)
+│   ├── Truy vết nguồn dữ liệu trong hồ sơ (FR-C360-13)
+│   ├── Ghi chú và gắn nhãn khách hàng (FR-C360-14)
+│   └── Tính toán thuộc tính phái sinh (FR-C360-15)
+│       └── (Đủ 15 mã FR-C360-01→15 có tên theo CDP.md mục 7.5 — xem III.0)
 │
 ├── Phân hệ 5: Phân khúc, phân tích và trí tuệ nhân tạo (FR-SEG / FR-ANALYTICS)
 │   ├── Xem danh sách phân khúc
@@ -690,7 +703,7 @@ CDP — Nền tảng Dữ liệu Khách hàng VNPost
 **Phân hệ 3 — Hợp nhất định danh (FR-IDR)**
 - **Mục đích:** Nhận diện cùng một khách hàng đang có nhiều mã ở nhiều hệ thống, hợp nhất thành một hồ sơ chuẩn; tách khi gộp nhầm.
 - **Giá trị nghiệp vụ:** Đây là lõi giá trị của CDP — không hợp nhất định danh thì không có Customer 360. Cũng là hạng mục rủi ro nhất (gộp nhầm là quyết định tài chính khi liên quan điểm rủi ro COD).
-- **Chức năng con:** 10 mã FR-IDR đã có tên (FR-IDR-01, 02, 06, 07, 08, 09, 11, 12, 13, 14) trong dải 14 vị trí FR-IDR-01→14 (4 mã 03/04/05/10 chưa đặt tên), quản lý Identity Graph, báo cáo gộp/tách.
+- **Chức năng con:** đủ **14 mã FR-IDR-01→14** đã có tên theo CDP.md mục 7.4 (gồm FR-IDR-03 Identity Graph, FR-IDR-04 Sinh mã CDP, FR-IDR-05 Alias ID, FR-IDR-10 liên kết ẩn danh — 4 mã trước đây solution chưa nêu tên), cùng báo cáo tổng hợp gộp/tách.
 
 **Phân hệ 4 — Quản lý hồ sơ khách hàng 360 (FR-C360)**
 - **Mục đích:** Cung cấp bức tranh 360 độ về một khách hàng, hiển thị đúng theo quyền của người xem.
@@ -1018,6 +1031,735 @@ sequenceDiagram
 
 ---
 
+# III. ĐẶC TẢ TÌNH HUỐNG SỬ DỤNG (USE CASE SPECIFICATION)
+
+> **Phạm vi Mục III (phiên bản này):** chỉ **Lô 1 — Hợp nhất định danh (Phân hệ 3, FR-IDR) và Hồ sơ khách hàng 360 (Phân hệ 4, FR-C360)**. Các phân hệ còn lại (Tiếp nhận, Chuẩn hóa, Phân khúc/Phân tích, Kích hoạt, Quản trị) sẽ được đặc tả ở các lô sau.
+>
+> **Ranh giới MVP nhắc lại:** CDP chỉ xây hồ sơ **người gửi** (theo A2). Người nhận là thuộc tính trên giao dịch, **không có hồ sơ khách hàng độc lập** — mọi use case dưới đây viết theo đúng ranh giới này (OQ-02 Out of scope MVP, xem xét lại ở P1).
+>
+> **Ngưỡng tin cậy áp dụng xuyên suốt Mục III và IV** theo tài liệu gốc `CDP.md` mục 6.6.2: **≥95% tự động gộp · 85–94% chờ người xác nhận · 70–84% lưu quan hệ nghi vấn không gộp · <70% không gộp**. Không dùng ngưỡng 90/75/60 của prototype v3 (prototype lệch — xem ghi chú tại Mục IV).
+
+## III.0. Danh mục Use Case và Business Rule của Lô 1
+
+**Danh mục Use Case (11 UC):**
+
+| Mã UC | Tên Use Case | Actor chính | Chức năng (Function Tree II.2) | FR gốc liên quan |
+|---|---|---|---|---|
+| UC-IDR-01 | Tự động gộp hồ sơ (vùng ≥95%) | Hệ thống | Gộp hồ sơ · Tính điểm tin cậy | FR-IDR-04, 05, 06, 11 |
+| UC-IDR-02 | Đối soát và xác nhận gộp thủ công (vùng 85–94%) | Người phụ trách dữ liệu | Danh sách rà soát · Gộp hồ sơ | FR-IDR-06, 11, 12 |
+| UC-IDR-03 | Đối chiếu hồ sơ nghi trùng (so sánh cột, xem trước, hợp nhất) | Người phụ trách dữ liệu | Danh sách rà soát · Gộp hồ sơ · Xử lý xung đột | FR-IDR-06, 12, 13 |
+| UC-IDR-04 | Tách hồ sơ khi gộp nhầm | Người phụ trách dữ liệu | Tách hồ sơ | FR-IDR-07, 08, 09, 14 |
+| UC-IDR-05 | Đề xuất tách qua nút Báo cáo | CSKH · Kinh doanh · Vận hành | Tách hồ sơ (đề xuất) | FR-IDR-07 (đầu vào) |
+| UC-IDR-06 | Xem nhật ký gộp/tách hồ sơ | Người phụ trách dữ liệu · Quản trị hệ thống | Nhật ký hợp nhất định danh | FR-IDR-14 (= FR-GOV-03) |
+| UC-IDR-07 | Xem bảng luật hợp nhất định danh (read-only) | Người phụ trách dữ liệu · Quản trị hệ thống | Luật đối sánh tuyệt đối/xác suất | FR-IDR-01, 02, 11 |
+| UC-C360-01 | Tìm kiếm khách hàng (7 loại khóa) | CSKH · Tiếp thị · Kinh doanh · Vận hành · Người phụ trách dữ liệu | Tìm kiếm khách hàng | FR-C360-12 |
+| UC-C360-02 | Xem hồ sơ 360 với che dữ liệu theo vai trò | CSKH · Tiếp thị · Kinh doanh · Vận hành · Người phụ trách dữ liệu · Quản trị | Xem hồ sơ 360 · Hiển thị theo phân quyền | FR-C360-01→11 |
+| UC-C360-03 | Ghi chú và gắn nhãn khách hàng | CSKH · Tiếp thị · Kinh doanh · Vận hành · Người phụ trách dữ liệu | Ghi chú và gắn nhãn | FR-C360-14 |
+| UC-C360-04 | Xem hồ sơ liên kết và hồ sơ đa nguồn | CSKH · Kinh doanh · Vận hành · Người phụ trách dữ liệu · Quản trị | So sánh giá trị giữa nguồn · Xem hồ sơ liên kết | FR-C360-02, 05, 13 |
+
+> **Ghi chú đối chiếu tài liệu gốc:** đọc thẳng `CDP.md` mục 7.4 và 7.5 cho thấy **cả 14 mã FR-IDR-01→14 và 15 mã FR-C360-01→15 đều đã có tên và độ ưu tiên đầy đủ**. Bốn mã FR-IDR mà solution trước đây chưa nêu tên thực chất là: **FR-IDR-03** Cơ sở dữ liệu đồ thị định danh (Identity Graph) · **FR-IDR-04** Sinh mã khách hàng hợp nhất (Unified Customer ID) · **FR-IDR-05** Quản lý mã định danh gốc và mã thay thế (Alias ID) · **FR-IDR-10** Liên kết hồ sơ ẩn danh với hồ sơ đã định danh. Từ phiên bản v1.3, Mục I.2.1 và cây chức năng II.2 đã được cập nhật khớp với danh sách gốc này; Mục III/IV dùng đúng tên gốc CDP.md.
+
+**Danh mục Business Rule của Lô 1 (BR-IDR, BR-C360):**
+
+| Mã BR | Nội dung | Nguồn |
+|---|---|---|
+| BR-IDR-01 | **Bốn vùng tin cậy quyết định hành vi gộp:** ≥95% tự gộp (nếu không xung đột dữ liệu và không vướng đồng ý) · 85–94% đưa vào hàng đợi đối soát chờ người xác nhận · 70–84% lưu quan hệ nghi vấn trong Identity Graph, **không gộp, không vào hàng đợi** · <70% không gộp | CDP.md 6.6.2 |
+| BR-IDR-02 | **Trường hợp cấm gộp tự động dù điểm cao** (đưa vào hàng đợi đối soát): chỉ trùng mã vận đơn · chỉ trùng địa chỉ · chỉ trùng địa chỉ mạng (IP) · chỉ trùng thiết bị (Device ID) · số điện thoại là hotline/tổng đài/số dùng chung · email dùng chung/email doanh nghiệp · người gửi và người nhận chỉ trùng một thông tin phụ · thiếu đồng ý cho mục đích kích hoạt | CDP.md 6.8.2 |
+| BR-IDR-03 | **Tên khách hàng không bao giờ được dùng làm khóa gộp độc lập** — chỉ là tín hiệu hỗ trợ đi kèm định danh mạnh khác | CDP.md 6.9 case 11 |
+| BR-IDR-04 | **Mã nguồn không bao giờ bị xóa sau khi gộp** — giữ lại làm mã thay thế (alias) để truy vết và đồng bộ ngược | CDP.md 6.7, 6.8.1 case 6 |
+| BR-IDR-05 | **Bắt buộc xem trước hồ sơ chuẩn dự kiến trước khi hợp nhất thủ công** — thể hiện từng trường lấy giá trị từ nguồn nào, số liệu giao dịch/tài chính cộng dồn ra sao | CDP.md 6.8.1, thiết kế solution BL-01 |
+| BR-IDR-06 | **Cặp có dấu hiệu rủi ro phải hiển thị cảnh báo nổi bật trước khi quyết định gộp** — gồm: một bên người gửi/một bên người nhận, số điện thoại dùng chung, xung đột loại khách hàng cá nhân/doanh nghiệp | CDP.md 6.8.2, solution R2 |
+| BR-IDR-07 | **Tách hồ sơ bắt buộc điền lý do và chọn 1 trong 6 trường hợp tách** (mục 6.8.3); ghi nhật ký tách bất biến; **nhật ký gộp gốc được giữ nguyên**, không bị xóa | CDP.md 6.8.3, 8.9 nhóm 8 |
+| BR-IDR-08 | **Không làm mất lịch sử vận đơn khi tách** — mã nguồn được trả về đúng hồ sơ, dữ liệu giao dịch và điểm số tính lại về đúng hồ sơ gốc | CDP.md 6.8.3 case 3 |
+| BR-IDR-09 | **Tách một mã nằm giữa chuỗi gộp nhiều lần:** hệ thống cảnh báo chuỗi gộp phức tạp, **không cho tách trực tiếp** ở giai đoạn này, ghi vào danh sách chờ xử lý riêng | Solution BL-03, baseline 6.4 |
+| BR-IDR-10 | **Không khóa hồ sơ khi hai người cùng xử lý** — ai bấm xác nhận trước người đó thắng; người sau nhận thông báo ngay, danh sách được làm mới | Baseline 6.4 |
+| BR-IDR-11 | **Nút Báo cáo không tự tạo thao tác tách** — chỉ ghi nhận đề xuất và chuyển Người phụ trách dữ liệu; người này tự đánh giá và quyết định tách hay không | Solution BL-03 |
+| BR-IDR-12 | **Quy tắc chọn giá trị master khi xung đột** — lấy theo bảng nguồn ưu tiên 12 nhóm dữ liệu (mục 6.10). Ví dụ: số điện thoại ưu tiên nguồn đã xác thực (PostID/MyVNPost); trạng thái COD ưu tiên PayPost; địa chỉ ưu tiên bản đã chuẩn hóa VPostCode/Vmap | CDP.md 6.10 |
+| BR-C360-01 | **Che dữ liệu theo vai trò** áp dụng trên từng trường trong cùng một màn hình (không chỉ ẩn/hiện cả khối). Bộ quy tắc che theo mục 6.2 baseline và 8.8 gốc — chi tiết ở bảng III.C360 và Mục IV.SCR-C360-02 | CDP.md 8.8, baseline 6.2 |
+| BR-C360-02 | **Không hiển thị ô rỗng gây hiểu nhầm** — nhóm dữ liệu vai trò không được xem thì che hoặc ẩn hẳn kèm thông báo quyền, không để trống như thể khách hàng không có dữ liệu | Baseline 6.4, 7.3 |
+| BR-C360-03 | **Điểm rủi ro thu hộ (COD Risk) và điểm gian lận (Fraud) ẩn hoàn toàn với CSKH và Tiếp thị** — chỉ Kinh doanh/KHL, Vận hành/thu hộ, Người phụ trách dữ liệu và Quản trị được xem | CDP.md 6.11 mục 7, baseline 6.2 |
+| BR-C360-04 | **Mọi thao tác trên Customer 360 được ghi nhật ký:** tìm kiếm, xem hồ sơ, xem dữ liệu nhạy cảm, ghi chú/gắn nhãn — theo 12 nhóm sự kiện của mục 8.9 | CDP.md 8.9 |
+
+---
+
+## III.1. Phân hệ 3 — Hợp nhất định danh (UC-IDR)
+
+### UC-IDR-01 — Tự động gộp hồ sơ (vùng tin cậy ≥95%)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-IDR-01 |
+| **Tên** | Tự động gộp hồ sơ khi điểm tin cậy đạt vùng ≥95% |
+| **Actor chính** | Hệ thống (tự động, không có người vận hành) |
+| **Actor phụ** | Không |
+| **Mô tả** | Sau khi bản ghi đạt chuẩn, hệ thống tính điểm tin cậy cho từng cặp nghi trùng. Cặp đạt ≥95% và không thuộc trường hợp cấm gộp tự động được hợp nhất ngay, không cần người xác nhận. |
+| **Tiền điều kiện** | Bản ghi đã qua tiếp nhận và chuẩn hóa (Quy trình 1). Bộ luật đối sánh (UC-IDR-07) đang áp dụng. |
+| **Kích hoạt** | Có cặp bản ghi nghi trùng mới phát sinh hoặc dữ liệu định danh thay đổi. |
+
+**Luồng chính:**
+
+1. Hệ thống lấy cặp bản ghi nghi trùng, tính điểm tin cậy theo luật đối sánh tuyệt đối (FR-IDR-01) và tín hiệu hỗ trợ.
+2. Hệ thống kiểm tra cặp có thuộc **trường hợp cấm gộp tự động** không (BR-IDR-02). Nếu có → chuyển UC-IDR-02 (hàng đợi đối soát), kết thúc luồng này.
+3. Hệ thống kiểm tra điểm thuộc vùng nào (BR-IDR-01). Nếu **≥95%** → tiếp tục; các vùng khác xử lý theo BR-IDR-01, kết thúc luồng này.
+4. Hệ thống kiểm tra không có xung đột dữ liệu nghiêm trọng và không vướng ràng buộc đồng ý.
+5. Hệ thống sinh **mã khách hàng hợp nhất (mã định danh CDP)** nếu chưa có (FR-IDR-04), gộp các mã nguồn về hồ sơ chuẩn.
+6. Hệ thống giữ toàn bộ mã nguồn cũ làm **mã thay thế (alias)** (FR-IDR-05, BR-IDR-04).
+7. Hệ thống tính lại điểm số của hồ sơ chuẩn (CLV, điểm rủi ro thu hộ, gian lận…).
+8. Hệ thống **ghi nhật ký gộp bất biến** với loại sự kiện "Tự động gộp" (FR-IDR-14, BR-IDR-07).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Thuộc trường hợp cấm gộp tự động (BR-IDR-02) dù điểm ≥95% | Đưa vào hàng đợi đối soát (UC-IDR-02), không tự gộp |
+| E2 | Có xung đột dữ liệu nghiêm trọng (khác loại khách hàng cá nhân/doanh nghiệp) | Không tự gộp, chuyển hàng đợi đối soát kèm cờ cảnh báo xung đột (FR-IDR-13) |
+| E3 | Thiếu đồng ý cho mục đích kích hoạt | Vẫn được gộp để phục vụ vận hành/hồ sơ 360, nhưng đánh dấu giới hạn mục đích; không đưa vào tệp kích hoạt (không thuộc phạm vi UC này) |
+| E4 | Điểm 85–94% | Chuyển UC-IDR-02 (chờ người xác nhận) |
+| E5 | Điểm 70–84% | Lưu quan hệ nghi vấn trong Identity Graph, không gộp, không vào hàng đợi |
+| E6 | Điểm <70% | Không gộp |
+
+**Hậu điều kiện:** Hồ sơ chuẩn mang một mã định danh CDP; mã nguồn được giữ làm alias; điểm số cập nhật; có bản ghi nhật ký gộp bất biến. Hồ sơ xuất hiện đầy đủ trong Customer 360 (tab Hồ sơ đa nguồn).
+
+**Business Rule liên quan:** BR-IDR-01, BR-IDR-02, BR-IDR-04, BR-IDR-12.
+**FR gốc:** FR-IDR-04, FR-IDR-05, FR-IDR-06, FR-IDR-11, FR-IDR-14.
+
+---
+
+### UC-IDR-02 — Đối soát và xác nhận gộp thủ công (vùng 85–94%)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-IDR-02 |
+| **Tên** | Đối soát hàng đợi và xác nhận gộp thủ công hồ sơ nghi trùng |
+| **Actor chính** | Người phụ trách dữ liệu (DATA-STEWARD) |
+| **Mô tả** | Người phụ trách dữ liệu mở danh sách hồ sơ có mã định danh nghi trùng (vùng 85–94% hoặc bị đưa vào hàng đợi do cấm gộp tự động), đối chiếu và quyết định hợp nhất hay đánh dấu khác người. |
+| **Tiền điều kiện** | Người dùng có quyền "Đối soát hàng đợi" và "Xác nhận gộp" (II.3). Có ít nhất một hồ sơ trong hàng đợi đối soát. |
+| **Kích hoạt** | Người dùng mở màn **Đối soát định danh** (SCR-IDR-01) hoặc màn **Đối soát & hợp nhất hồ sơ — tab Chờ xem xét** (SCR-IDR-03). |
+
+**Luồng chính:**
+
+1. Người dùng mở màn Đối soát định danh; hệ thống hiển thị danh sách hồ sơ gốc đang có mã nghi trùng, sắp theo điểm tin cậy giảm dần, 25 dòng/trang.
+2. Người dùng chọn một hồ sơ để mở màn **Đối chiếu hồ sơ nghi trùng** (chuyển sang UC-IDR-03).
+3. Sau khi đối chiếu và ra quyết định ở UC-IDR-03, quay lại danh sách; hồ sơ vừa xử lý được gỡ khỏi hàng đợi.
+4. Người dùng lặp lại cho các hồ sơ còn lại.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Danh sách hàng đợi rỗng | Hiển thị: "Chưa có dữ liệu để hiển thị." kèm trạng thái không còn hồ sơ cần xử lý |
+| A2 | Người dùng không có quyền đối soát | Màn Đối soát không hiện trên thanh điều hướng; nếu truy cập trực tiếp: "Bạn không có quyền truy cập chức năng này." |
+| E1 | Hồ sơ vừa được người khác xử lý trước (BR-IDR-10) | Ở danh sách hiển thị: "Hồ sơ này vừa được {tên người} xử lý lúc {giờ}. Danh sách đã được cập nhật." và làm mới danh sách |
+| E2 | Hàng đợi tồn đọng quá 200 hồ sơ hoặc có hồ sơ chờ quá 5 ngày | Hệ thống phát cảnh báo tồn đọng cho người phụ trách và quản lý |
+
+**Hậu điều kiện:** Mỗi hồ sơ đã xử lý được ra quyết định (hợp nhất hoặc đánh dấu khác người) và gỡ khỏi hàng đợi; có bản ghi nhật ký tương ứng.
+
+**Business Rule liên quan:** BR-IDR-01, BR-IDR-10.
+**FR gốc:** FR-IDR-06, FR-IDR-11, FR-IDR-12.
+
+---
+
+### UC-IDR-03 — Đối chiếu hồ sơ nghi trùng và hợp nhất
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-IDR-03 |
+| **Tên** | Đối chiếu từng cột, chọn mã, xem trước hồ sơ chuẩn và hợp nhất |
+| **Actor chính** | Người phụ trách dữ liệu (DATA-STEWARD) |
+| **Mô tả** | Trong màn đối chiếu, người dùng so sánh từng trường giữa các mã nguồn nghi trùng, tick chọn mã thuộc cùng khách hàng, xem trước hồ sơ chuẩn dự kiến, rồi xác nhận hợp nhất hoặc đánh dấu khác người. |
+| **Tiền điều kiện** | Đã mở một hồ sơ từ hàng đợi (UC-IDR-02). |
+| **Kích hoạt** | Người dùng bấm "Xử lý" trên một hồ sơ nghi trùng. |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị: hồ sơ gốc (mã nguồn neo), các mã đã **tự động gộp từ khóa mạnh (≥95%)** (chỉ hiển thị, không hỏi lại), và bảng đối chiếu các mã chờ duyệt — mỗi mã một cột, mỗi trường một hàng.
+2. Hệ thống tick sẵn các mã vùng 85–94%; **không** tick sẵn mã <85% (nếu có hiển thị dạng gợi ý tin cậy thấp, làm mờ).
+3. Với cặp có dấu hiệu rủi ro (BR-IDR-06), hệ thống hiển thị **cảnh báo nổi bật** trên đầu bảng trước khi người dùng quyết định.
+4. Người dùng bỏ tick mã không phải cùng người, hoặc tick thêm mã tin cậy thấp nếu chắc chắn.
+5. Người dùng bấm **Xem trước hồ sơ chuẩn** — hệ thống dựng hồ sơ chuẩn dự kiến (BR-IDR-05): từng trường định danh/địa chỉ lấy giá trị từ nguồn tin cậy cao nhất (theo nguồn ưu tiên BR-IDR-12); số liệu giao dịch/tài chính cộng dồn; trường xung đột được đánh dấu.
+6. Người dùng xác nhận **Hợp nhất** — hệ thống gộp các mã đã chọn, sinh/cập nhật mã định danh CDP, giữ mã nguồn làm alias, tính lại điểm, ghi nhật ký gộp thủ công.
+7. Hệ thống hiển thị: "Đã hợp nhất {N} mã định danh vào hồ sơ {mã}. Lịch sử giao dịch và điểm số đã được tính lại."
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Người dùng kết luận **không phải cùng người** | Bấm "Không phải cùng người" → gỡ cờ nghi trùng; hiển thị: "Đã ghi nhận đây là các khách hàng khác nhau. Hệ thống sẽ không đề xuất hợp nhất các mã này nữa." (FR-IDR-12, DP-06) |
+| A2 | Người dùng chọn "Để sau" | Hồ sơ vẫn ở trạng thái chờ duyệt, xuất hiện lại trong danh sách |
+| E1 | Hồ sơ vừa được người khác hợp nhất trong lúc đang mở (BR-IDR-10) | Hiển thị: "Hồ sơ này vừa được {tên người} hợp nhất. Bạn không thể thao tác tiếp trên bản cũ." Khóa nút xác nhận |
+| E2 | Người dùng mất kết nối khi đang đối soát (baseline 6.4) | Thao tác chưa xác nhận **không được lưu**; hồ sơ vẫn ở trạng thái chờ duyệt, xuất hiện lại trong danh sách |
+| E3 | Có trường xung đột giữa các nguồn ở bước xem trước | Hệ thống ưu tiên nguồn tin cậy cao nhất (BR-IDR-12), đánh dấu "Xung đột", cho xem giá trị nguồn khác; lựa chọn thủ công từng trường để giai đoạn sau |
+| E4 | Không chọn mã nào (0 mã tick) | Nút "Xem trước hồ sơ chuẩn" bị vô hiệu hóa |
+
+**Hậu điều kiện:** Các mã đã chọn được hợp nhất thành một hồ sơ chuẩn; hoặc nhóm được đánh dấu khác người và gỡ cờ. Có bản ghi nhật ký gộp/đánh dấu tương ứng.
+
+**Business Rule liên quan:** BR-IDR-01, BR-IDR-03, BR-IDR-04, BR-IDR-05, BR-IDR-06, BR-IDR-10, BR-IDR-12.
+**FR gốc:** FR-IDR-06, FR-IDR-11, FR-IDR-12, FR-IDR-13.
+
+---
+
+### UC-IDR-04 — Tách hồ sơ khi gộp nhầm
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-IDR-04 |
+| **Tên** | Tách một hoặc nhiều mã nguồn ra khỏi hồ sơ chuẩn khi phát hiện gộp nhầm |
+| **Actor chính** | Người phụ trách dữ liệu (DATA-STEWARD) |
+| **Mô tả** | Người phụ trách dữ liệu chọn mã nguồn cần tách, xem trước kết quả, chọn 1 trong 6 trường hợp tách, điền lý do bắt buộc, xác nhận. Hệ thống tách hồ sơ, trả lại mã nguồn, tính lại điểm và ghi nhật ký tách. |
+| **Tiền điều kiện** | Người dùng có quyền "Tách hồ sơ" (UNMERGE — chỉ DATA-STEWARD, II.4). Hồ sơ chuẩn đang chứa từ 2 mã nguồn trở lên. |
+| **Kích hoạt** | Người dùng mở hồ sơ, vào tab Hồ sơ liên kết, chọn "Tách mã nguồn"; hoặc xử lý từ một đề xuất tách (UC-IDR-05). |
+
+**Luồng chính:**
+
+1. Người dùng mở hồ sơ khách hàng, vào tab **Hồ sơ liên kết** — xem danh sách mã nguồn đã gộp vào hồ sơ chuẩn.
+2. Người dùng chọn mã nguồn cần tách (có thể chọn nhiều mã trong một lần).
+3. Hệ thống hiển thị **xem trước kết quả tách**: hồ sơ chuẩn còn lại gì, hồ sơ mới nhận gì, điểm số dự kiến sau khi tính lại.
+4. Người dùng chọn **1 trong 6 trường hợp tách** (mục 6.8.3): (1) gộp nhầm hai cá nhân · (2) gộp nhầm cá nhân với doanh nghiệp · (3) gộp nhầm người gửi và người nhận · (4) số điện thoại dùng chung · (5) email dùng chung · (6) theo yêu cầu chủ thể dữ liệu.
+5. Người dùng **điền lý do — bắt buộc** (không được để trống).
+6. Người dùng xác nhận. Hệ thống tách hồ sơ, **trả lại mã nguồn tương ứng**, phân chia lại dữ liệu giao dịch/địa chỉ/điểm số về đúng hồ sơ gốc, **không làm mất lịch sử vận đơn** (BR-IDR-08).
+7. Với trường hợp 4 (số điện thoại dùng chung) và 5 (email dùng chung): hệ thống đánh dấu định danh là **dùng chung** (FR-IDR-08), không dùng làm khóa gộp tự động nữa.
+8. Hệ thống tính lại toàn bộ điểm số cho các hồ sơ sau khi tách.
+9. Hệ thống **ghi nhật ký tách bất biến**, giữ nguyên nhật ký gộp gốc và liên kết tới lần gộp gốc (BR-IDR-07); cập nhật dấu hiệu "đã tách" trong tab Hồ sơ liên kết của cả hai hồ sơ.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Mã cần tách nằm giữa một chuỗi gộp nhiều lần (BR-IDR-09) | Hệ thống cảnh báo "chuỗi gộp phức tạp", **không cho tách trực tiếp**; ghi vào danh sách chờ xử lý riêng (giai đoạn sau) |
+| E2 | Lý do để trống | Chặn xác nhận, yêu cầu điền lý do trước khi tách |
+| E3 | Giao dịch dùng chung không phân tách rõ được | Ghi vào cả hai hồ sơ kèm dấu hiệu nhận biết, để người phụ trách dữ liệu xử lý tay sau |
+| E4 | Người dùng không có quyền tách (CSKH/Kinh doanh/Vận hành/Tiếp thị) | Không thấy nút Tách; các vai trò CSKH/Kinh doanh/Vận hành dùng nút Báo cáo (UC-IDR-05); Tiếp thị không thấy nút nào |
+
+**Hậu điều kiện:** Các mã nguồn được tách được trả về hồ sơ riêng; điểm số các hồ sơ tính lại; có bản ghi nhật ký tách bất biến liên kết tới lần gộp gốc; nhật ký gộp gốc còn nguyên.
+
+**Business Rule liên quan:** BR-IDR-04, BR-IDR-07, BR-IDR-08, BR-IDR-09.
+**FR gốc:** FR-IDR-07, FR-IDR-08, FR-IDR-09, FR-IDR-14.
+
+> **[Cần xác nhận: phân cấp quyền tách]** (OQ-05 solution) — Tài liệu gốc chỉ ghi tác nhân là "Người phụ trách dữ liệu", không phân cấp. Đang giả định **mọi Người phụ trách dữ liệu đều tách được**. Nếu VNPost muốn giới hạn cho người được chỉ định riêng, cần bổ sung một cấp quyền con.
+> **[Cần xác nhận: phạm vi tách trong chuỗi gộp]** (OQ-06 solution) — Giai đoạn này chỉ cảnh báo và không cho tách mã giữa chuỗi. Cần chốt sau: tách được lần gộp gần nhất, hay tách được mã bất kỳ trong chuỗi.
+
+---
+
+### UC-IDR-05 — Đề xuất tách qua nút Báo cáo
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-IDR-05 |
+| **Tên** | Đề xuất tách hồ sơ nghi gộp nhầm qua nút Báo cáo |
+| **Actor chính** | CSKH và tổng đài (CSKH) · Kinh doanh và KHL (SALES-KHL) · Vận hành và thu hộ (OPS-COD) |
+| **Mô tả** | Vai trò không có quyền tách trực tiếp, khi phát hiện hồ sơ có dấu hiệu gộp nhầm, bấm nút Báo cáo kèm lý do. Hệ thống ghi nhận và chuyển Người phụ trách dữ liệu xem xét. |
+| **Tiền điều kiện** | Người dùng có quyền REQUEST_UNMERGE (II.4); đang mở hồ sơ khách hàng, tab Hồ sơ liên kết. |
+| **Kích hoạt** | Người dùng bấm nút **Báo cáo** ("Nghi ngờ gộp sai?") trên tab Hồ sơ liên kết. |
+
+**Luồng chính:**
+
+1. Người dùng phát hiện hồ sơ có dấu hiệu gộp nhầm trong tab Hồ sơ liên kết.
+2. Người dùng bấm nút **Báo cáo**, nhập lý do nghi ngờ.
+3. Hệ thống ghi nhận đề xuất tách (mã hồ sơ liên quan, người báo cáo, thời gian, lý do), trạng thái "Chờ xử lý".
+4. Hệ thống hiển thị xác nhận: "Yêu cầu báo cáo đã được ghi nhận. Người phụ trách dữ liệu sẽ xem xét trong 1–2 ngày làm việc."
+5. Người phụ trách dữ liệu thấy đề xuất trong danh sách, tự đánh giá và quyết định tách (UC-IDR-04) hoặc bỏ qua (BR-IDR-11).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Người dùng là Tiếp thị (MARKETING) | Không thấy nút Báo cáo |
+| E2 | Lý do để trống | Chặn gửi, yêu cầu nhập lý do |
+
+**Hậu điều kiện:** Có một bản ghi đề xuất tách trạng thái "Chờ xử lý" chờ Người phụ trách dữ liệu xem. Nút Báo cáo **không** tạo bất kỳ thao tác tách nào (BR-IDR-11).
+
+**Business Rule liên quan:** BR-IDR-11.
+**FR gốc:** FR-IDR-07 (đầu vào đề xuất).
+
+> **Ghi chú điểm lệch prototype (quan trọng):** Prototype v3 hiển thị đề xuất tách ở tab "Yêu cầu tách hồ sơ" **có nút Phê duyệt/Từ chối và ghi chú "Chỉ Admin mới có thể phê duyệt"** — đây là **mô hình phê duyệt cũ**. Theo quyết định solution D-07 (chốt 30/07), giai đoạn này **không có bước phê duyệt riêng**: Người phụ trách dữ liệu xem đề xuất và **tự tách trực tiếp** (UC-IDR-04). Đặc tả trên theo solution; bước phê duyệt/Admin trong prototype cần bỏ khi triển khai — xem Mục IV.SCR-IDR-03.
+
+---
+
+### UC-IDR-06 — Xem nhật ký gộp/tách hồ sơ
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-IDR-06 |
+| **Tên** | Xem nhật ký hợp nhất định danh (gộp và tách) |
+| **Actor chính** | Người phụ trách dữ liệu (DATA-STEWARD) · Quản trị hệ thống (SYS-ADMIN) — xem đầy đủ |
+| **Actor phụ** | CSKH — chỉ xem tóm tắt các lần gộp liên quan đến khách hàng đang mở |
+| **Mô tả** | Người dùng có quyền xem lịch sử các lần gộp và tách hồ sơ để giải trình: hồ sơ được gộp/tách từ mã nào, căn cứ gì, ai quyết định, lúc nào. |
+| **Tiền điều kiện** | Người dùng có quyền "Xem nhật ký gộp/tách" (II.3). |
+| **Kích hoạt** | Người dùng mở màn Đối soát & hợp nhất hồ sơ — tab Lịch sử gộp (SCR-IDR-03), hoặc tab Nhật ký trong Customer 360 (với CSKH: tóm tắt của khách hàng đang mở). |
+
+**Luồng chính:**
+
+1. Người dùng mở tab Lịch sử gộp; hệ thống hiển thị bảng các sự kiện gộp/tách: mã sự kiện, loại (tự động/thủ công/tách), mã hồ sơ chuẩn, mã gộp vào/tách ra, điểm tin cậy, khóa trùng, người quyết định, thời điểm.
+2. Người dùng chọn một sự kiện để xem chi tiết: danh sách mã nguồn, luật kích hoạt, điểm số trước/sau khi gộp, trường nào lấy từ nguồn nào, lý do (nếu là thao tác thủ công/tách).
+3. Với sự kiện tách: hiển thị liên kết tới lần gộp gốc và trường hợp tách đã chọn.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Actor là CSKH | Chỉ hiển thị **tóm tắt** các lần gộp liên quan đến khách hàng đang mở (không xem toàn bộ nhật ký hệ thống) |
+| A2 | Actor là Tiếp thị, Kinh doanh, Vận hành | Không xem nhật ký gộp/tách: "Bạn không có quyền xem thông tin này. Liên hệ quản trị hệ thống nếu công việc của bạn cần dùng đến." |
+| E1 | Chưa có sự kiện gộp/tách nào | "Chưa có dữ liệu để hiển thị." |
+
+**Hậu điều kiện:** Người dùng xem được lịch sử giải trình; **nhật ký là bất biến — chỉ đọc, không sửa, không xóa** (BR-IDR-07). Việc xem được ghi vào nhật ký truy cập (mục 8.9).
+
+**Business Rule liên quan:** BR-IDR-07.
+**FR gốc:** FR-IDR-14 (đồng thời là FR-GOV-03 ở góc quản trị).
+
+> **[Cần xác nhận: vị trí đặt nhật ký]** (OQ-02 solution) — Đặt nhật ký gộp/tách ở tab riêng trong màn Đối soát định danh, hay bổ sung vào tab Nhật ký của Customer 360. Hiện đặc tả cả hai lối vào theo quyền; cần VNPost chốt.
+> **[Cần xác nhận: thời hạn lưu nhật ký]** (OQ-01/OQ-08 solution, GD-04) — Đang giả định **5 năm** cho nhật ký gộp/tách. Cần đối chiếu quy định nội bộ VNPost và Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15.
+
+---
+
+### UC-IDR-07 — Xem bảng luật hợp nhất định danh (read-only)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-IDR-07 |
+| **Tên** | Xem bộ luật đối sánh và ngưỡng tin cậy đang áp dụng |
+| **Actor chính** | Người phụ trách dữ liệu (DATA-STEWARD) · Quản trị hệ thống (SYS-ADMIN) |
+| **Mô tả** | Người dùng xem bộ luật so khớp định danh và ba/bốn mức ngưỡng tin cậy hệ thống đang áp dụng — đây cũng là nguồn sinh ra cảnh báo nghi trùng. Giai đoạn đầu chỉ xem, không sửa. |
+| **Tiền điều kiện** | Người dùng có quyền truy cập màn Rule hợp nhất định danh. |
+| **Kích hoạt** | Người dùng mở màn **Rule hợp nhất định danh** (SCR-IDR-04). |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị banner read-only ("giai đoạn đầu chỉ hiển thị; thêm/sửa rule mở ở giai đoạn sau").
+2. Hệ thống hiển thị sơ đồ **bốn vùng ngưỡng tin cậy** (≥95% tự gộp · 85–94% chờ xác nhận · 70–84% lưu quan hệ nghi vấn · <70% không gộp) — theo BR-IDR-01.
+3. Hệ thống hiển thị bảng danh sách luật so khớp: khóa khớp, trọng số, ngưỡng tin cậy, hành động, diễn giải, trạng thái áp dụng.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Người dùng bấm "Thêm rule" / "Sửa" | Nút bị vô hiệu hóa, chú thích "Giai đoạn sau" |
+
+**Hậu điều kiện:** Người dùng nắm được logic hệ thống đang dùng; không có thay đổi dữ liệu.
+
+**Business Rule liên quan:** BR-IDR-01, BR-IDR-02, BR-IDR-03.
+**FR gốc:** FR-IDR-01, FR-IDR-02, FR-IDR-11.
+
+> **Ghi chú điểm lệch prototype (quan trọng):** Prototype v3 (màn Rule) đang hiển thị **3 mức ngưỡng 90/60** (≥90% tự gộp · 60–89% chờ xác nhận · <60% gợi ý thấp) và **thiếu vùng 70–84% "quan hệ nghi vấn"**. Đây là dữ liệu mẫu lệch tài liệu gốc. Bản triển khai phải hiển thị **bốn vùng 95/85/70** theo BR-IDR-01. Ngoài ra prototype thiếu 6 luật đối sánh và sai hành động ở luật "SĐT + tên gần đúng" (tài liệu gốc: tên không được làm khóa gộp độc lập — BR-IDR-03). Bảng luật đối sánh đầy đủ (10 luật tuyệt đối) theo CDP.md mục 6.6.1; giai đoạn đầu màn SCR-IDR-04 chỉ hiển thị read-only.
+
+> **[Cần xác nhận: vùng 70–84% có hiển thị cho người dùng không]** (OQ-03 solution) — Quan hệ nghi vấn 70–84% được lưu trong Identity Graph. Cần chốt người dùng nghiệp vụ có cần nhìn thấy nhóm này ở đâu không, hay chỉ phục vụ phân tích nội bộ.
+
+---
+
+## III.2. Phân hệ 4 — Hồ sơ khách hàng 360 (UC-C360)
+
+### Bảng che dữ liệu theo vai trò (III.C360) — áp dụng cho UC-C360-01, 02, 04
+
+Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất mục 6.2 baseline và ví dụ masking 8.8 gốc. "Che một phần" hiển thị theo mẫu: SĐT `0912***678` · email `kha***@email.com` · CCCD `001***999` · tài khoản COD `1234***9012`.
+
+| Nhóm dữ liệu | CSKH | Tiếp thị | Kinh doanh | Vận hành/Thu hộ | Phụ trách dữ liệu | Quản trị |
+|---|---|---|---|---|---|---|
+| Họ tên, mã định danh CDP | Đầy đủ | Đầy đủ | Đầy đủ | Đầy đủ | Đầy đủ | Đầy đủ |
+| Số điện thoại, email | Che một phần | Che một phần | Đầy đủ | Che một phần | Đầy đủ | Đầy đủ |
+| Số định danh cá nhân (CCCD) | Che | Không xem | Không xem | Không xem | Che | Đầy đủ (quyền đặc biệt) |
+| Địa chỉ chi tiết | Đến phường/quận/tỉnh | Đến phường/quận/tỉnh | Đầy đủ | Đầy đủ | Đầy đủ | Đầy đủ |
+| Lịch sử giao dịch | Đầy đủ | Tổng hợp | Đầy đủ | Đầy đủ | Đầy đủ | Đầy đủ |
+| Thu hộ (COD) và tài khoản nhận tiền | Tổng hợp, tài khoản che | Không xem | Tổng hợp | Đầy đủ | Che | Đầy đủ (quyền đặc biệt) |
+| Hành vi số | Đầy đủ | Đầy đủ | Tổng hợp | Không xem | Đầy đủ | Đầy đủ |
+| Điểm gần đây/tần suất/giá trị (RFM), CLV, nguy cơ rời bỏ | Xem | Xem | Xem | Không xem | Xem | Xem |
+| **Điểm rủi ro thu hộ (COD Risk), điểm gian lận (Fraud)** | **Không xem** | **Không xem** | Xem | Xem | Xem | Xem |
+| Trạng thái đồng ý | Xem | Xem | Xem | Không xem | Xem | Xem |
+| Hồ sơ liên kết / định danh liên kết (alias) | Xem | Không xem | Xem | Xem | Xem | Xem |
+| Nhật ký gộp hồ sơ | Tóm tắt KH đang mở | Không xem | Không xem | Không xem | Đầy đủ | Đầy đủ |
+
+> **[Cần xác nhận: mức che nhóm "Hồ sơ liên kết / định danh liên kết"]** (OQ-IDR-09) — Dòng này **suy ra từ logic nghiệp vụ**, không có dòng tương đương tường minh trong CDP.md 8.8 / baseline 6.2. Căn cứ: Tiếp thị không có quyền xem hồ sơ liên kết (nên nút Báo cáo ẩn với Tiếp thị — UC-C360-04 A1, item 17 SCR-C360-02); các vai trò còn lại được xem để tra cứu/đề xuất tách. Cần VNPost xác nhận, đặc biệt việc Tiếp thị bị chặn hoàn toàn.
+> **[Cần xác nhận: che dữ liệu cho 6 vai trò chưa có giao diện]** — Chủ sở hữu dữ liệu, Kỹ sư dữ liệu, Chuyên viên phân tích, An toàn thông tin, Pháp chế, Lãnh đạo đơn vị chưa có dòng che chi tiết; bổ sung khi làm phân hệ Quản trị/Phân tích.
+
+---
+
+### UC-C360-01 — Tìm kiếm khách hàng
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-C360-01 |
+| **Tên** | Tìm kiếm khách hàng theo 7 loại khóa định danh |
+| **Actor chính** | CSKH · Tiếp thị · Kinh doanh · Vận hành · Người phụ trách dữ liệu (tất cả vai trò có giao diện) |
+| **Mô tả** | Người dùng tìm khách hàng theo một trong bảy khóa: số điện thoại, email, mã khách hàng, mã KHL, PostID, mã vận đơn, mã số thuế. Kết quả che dữ liệu nhạy cảm theo vai trò người tìm. |
+| **Tiền điều kiện** | Người dùng đã đăng nhập (qua cổng chung), có quyền "Tìm kiếm khách hàng" (mọi vai trò có giao diện đều có — II.3). |
+| **Kích hoạt** | Người dùng mở màn **Tìm kiếm & danh sách khách hàng** (SCR-C360-01) và nhập từ khóa/chọn bộ lọc. |
+
+**Luồng chính:**
+
+1. Người dùng nhập từ khóa (mã KH / tên / SĐT) hoặc chọn bộ lọc (loại, nhóm, mảng dịch vụ, trạng thái, phân khúc).
+2. Hệ thống trả danh sách kết quả khớp; số điện thoại và dữ liệu nhạy cảm được **che theo vai trò người tìm** (bảng III.C360).
+3. Người dùng chọn một khách hàng để mở hồ sơ đầy đủ (chuyển UC-C360-02).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Không có kết quả khớp | "Không tìm thấy khách hàng nào khớp điều kiện lọc." |
+| A2 | Khóa tìm là mã vận đơn | Trả về hồ sơ **người gửi** gắn với vận đơn đó (người nhận không có hồ sơ riêng — A2); nếu vận đơn chỉ có dữ liệu người nhận, hiển thị chỉ dẫn không có hồ sơ người gửi tương ứng |
+| E1 | Từ khóa rỗng và không chọn bộ lọc | **Không phải empty** — hiển thị toàn bộ danh sách theo phạm vi dữ liệu được phân quyền của người dùng |
+| E2 | Phạm vi phân quyền của người dùng không có khách hàng nào (không do lọc) | "Chưa có dữ liệu để hiển thị." |
+
+**Hậu điều kiện:** Danh sách kết quả hiển thị đã che theo vai trò. Lần tìm kiếm được ghi nhật ký (mục 8.9 nhóm 2: người tìm, tiêu chí, số kết quả).
+
+**Business Rule liên quan:** BR-C360-01, BR-C360-04.
+**FR gốc:** FR-C360-12.
+
+> **[Cần xác nhận: khóa gộp/tìm khi PostID chưa phủ đủ]** (OQ-03 baseline, A3) — Nếu PostID chưa phủ toàn bộ khách hàng, số điện thoại (đã chuẩn hóa, không dùng chung) là khóa tìm/ghép chính. Cần VNPost xác nhận độ phủ PostID.
+
+---
+
+### UC-C360-02 — Xem hồ sơ 360 với che dữ liệu theo vai trò
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-C360-02 |
+| **Tên** | Xem hồ sơ khách hàng 360 (10 nhóm dữ liệu) theo phân quyền |
+| **Actor chính** | CSKH · Tiếp thị · Kinh doanh · Vận hành · Người phụ trách dữ liệu · Quản trị |
+| **Mô tả** | Người dùng mở hồ sơ đầy đủ của một khách hàng gồm **10 nhóm dữ liệu nghiệp vụ, trình bày trên 11 tab** (tab Doanh nghiệp là tab điều kiện chỉ hiện với khách hàng doanh nghiệp — khách hàng cá nhân thấy 10 tab); mỗi nhóm hiển thị đúng theo quyền vai trò — che, ẩn hoặc tổng hợp theo bảng III.C360. |
+| **Tiền điều kiện** | Đã chọn một khách hàng từ danh sách (UC-C360-01) hoặc từ hồ sơ liên kết. |
+| **Kích hoạt** | Người dùng mở màn **Hồ sơ 360** (SCR-C360-02). |
+
+**Luồng chính:**
+
+1. Hệ thống tải hồ sơ chuẩn của khách hàng, hiển thị header (tên, mã định danh CDP, loại, nhóm, trạng thái, các mảng dịch vụ, độ đầy đủ hồ sơ) và các tab của 10 nhóm dữ liệu (trình bày trên 11 tab; tab Doanh nghiệp chỉ hiện với khách hàng doanh nghiệp).
+2. Với mỗi nhóm/tab, hệ thống kiểm tra quyền vai trò (DP-07, bảng III.C360): được xem đầy đủ → hiện đầy đủ; che một phần → hiện theo mẫu che; không được xem → ẩn/che kèm thông báo quyền (BR-C360-02).
+3. Người dùng chuyển giữa các tab: Tổng quan · Hồ sơ liên kết · Hồ sơ đa nguồn · Địa chỉ · (Doanh nghiệp nếu là DN) · Hoạt động theo mảng dịch vụ · Hành vi số · CSKH · Điểm số & Phân khúc · Đồng ý dữ liệu · Nhật ký.
+4. Điểm rủi ro thu hộ và điểm gian lận **chỉ hiện với** Kinh doanh, Vận hành, Người phụ trách dữ liệu, Quản trị (BR-C360-03).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Vai trò không được xem một nhóm dữ liệu | Ẩn/che nhóm kèm: "Bạn không có quyền xem thông tin này. Liên hệ quản trị hệ thống nếu công việc của bạn cần dùng đến." Không hiện ô rỗng gây hiểu nhầm (BR-C360-02) |
+| A2 | Nhóm dữ liệu chưa có dữ liệu (nhưng vai trò được xem) | Hiển thị trong ô: "Chưa có dữ liệu"; cả tab trống: "Chưa có dữ liệu để hiển thị." |
+| A3 | Khách hàng là cá nhân | Ẩn tab Doanh nghiệp |
+| E1 | Người dùng cần xem CCCD/tài khoản COD đầy đủ (chỉ Quản trị, quyền đặc biệt) | Yêu cầu quyền đặc biệt kèm lý do; việc xem dữ liệu nhạy cảm ghi nhật ký (mục 8.9 nhóm 4) |
+
+**Hậu điều kiện:** Hồ sơ hiển thị đúng mức che theo vai trò. Lần xem hồ sơ (và xem dữ liệu nhạy cảm nếu có) được ghi nhật ký (mục 8.9 nhóm 3, 4).
+
+**Business Rule liên quan:** BR-C360-01, BR-C360-02, BR-C360-03, BR-C360-04.
+**FR gốc:** FR-C360-01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11.
+
+---
+
+### UC-C360-03 — Ghi chú và gắn nhãn khách hàng
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-C360-03 |
+| **Tên** | Ghi chú và gắn nhãn khách hàng cần chăm sóc đặc biệt |
+| **Actor chính** | CSKH · Tiếp thị · Kinh doanh · Vận hành · Người phụ trách dữ liệu (đều có quyền CREATE ghi chú/nhãn — II.4) |
+| **Mô tả** | Người dùng thêm ghi chú hoặc gắn nhãn cho khách hàng để đánh dấu cần chăm sóc đặc biệt. |
+| **Tiền điều kiện** | Đang mở hồ sơ khách hàng; có quyền "Ghi chú / gắn nhãn" (II.3). |
+| **Kích hoạt** | Người dùng bấm thêm ghi chú/nhãn trên hồ sơ 360. |
+
+**Luồng chính:**
+
+1. Người dùng mở khu vực ghi chú/nhãn trên hồ sơ.
+2. Người dùng nhập nội dung ghi chú hoặc chọn nhãn.
+3. Hệ thống lưu ghi chú/nhãn kèm người tạo và thời điểm; hiển thị lại trên hồ sơ.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Nội dung ghi chú rỗng | Chặn lưu, yêu cầu nhập nội dung |
+| A1 | Vai trò không có quyền ghi chú | Không hiện thao tác thêm ghi chú (mọi vai trò có giao diện đều có quyền — trường hợp này chỉ áp dụng khi mở rộng vai trò sau) |
+
+**Hậu điều kiện:** Ghi chú/nhãn được lưu và hiển thị trên hồ sơ; thao tác ghi vào nhật ký.
+
+**Business Rule liên quan:** BR-C360-04.
+**FR gốc:** FR-C360-14.
+
+---
+
+### UC-C360-04 — Xem hồ sơ liên kết và hồ sơ đa nguồn
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-C360-04 |
+| **Tên** | Xem mã định danh liên kết và so sánh giá trị giữa các nguồn |
+| **Actor chính** | CSKH · Kinh doanh · Vận hành · Người phụ trách dữ liệu · Quản trị (theo quyền xem hồ sơ liên kết — II.3) |
+| **Mô tả** | Người dùng xem danh sách mã định danh liên kết (alias) của hồ sơ chuẩn và bảng so sánh từng trường giữa các hệ thống nguồn, cùng dòng thời gian gộp. |
+| **Tiền điều kiện** | Đang mở hồ sơ 360; có quyền xem hồ sơ liên kết. |
+| **Kích hoạt** | Người dùng mở tab **Hồ sơ liên kết** hoặc **Hồ sơ đa nguồn** trong hồ sơ 360. |
+
+**Luồng chính:**
+
+1. Tab **Hồ sơ liên kết:** hệ thống hiển thị bảng các mã định danh liên kết (loại ID, giá trị, nguồn, độ tin cậy, cờ mã chính) và nút Báo cáo/Tách tùy vai trò.
+2. Tab **Hồ sơ đa nguồn:** hệ thống hiển thị bảng so sánh từng trường theo từng hệ thống nguồn — cột hồ sơ chuẩn (golden) và các cột nguồn, đánh dấu trường xung đột; kèm chế độ xem dòng thời gian gộp.
+3. Người dùng đối chiếu giá trị giữa các nguồn; trường xung đột hiển thị giá trị nào lấy từ nguồn nào (BR-IDR-12).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Vai trò không có quyền xem hồ sơ liên kết (Tiếp thị) | Ẩn tab hoặc thông báo quyền |
+| A2 | Chưa có dữ liệu nguồn | "Chưa có dữ liệu nguồn" |
+| A3 | Người dùng có quyền tách phát hiện gộp nhầm | Đi tiếp UC-IDR-04 (tách); vai trò không có quyền tách dùng nút Báo cáo (UC-IDR-05) |
+
+**Hậu điều kiện:** Người dùng xem được cấu trúc liên kết và nguồn gốc dữ liệu; có thể khởi tạo tách hoặc đề xuất tách.
+
+**Business Rule liên quan:** BR-IDR-04, BR-IDR-11, BR-IDR-12, BR-C360-01.
+**FR gốc:** FR-C360-02, FR-C360-05, FR-C360-13.
+
+---
+
+# IV. GIAO DIỆN CHỨC NĂNG (PROTOTYPE CHÍNH)
+
+> **Nguồn giao diện chuẩn:** prototype v3 (`wireframe/prototype-v3.html`, bản chốt 24/07/2026). Bảy màn dưới đây thuộc Lô 1. Khi prototype khác tài liệu gốc CDP.md/solution về **nghiệp vụ** (ngưỡng, mô hình phê duyệt), tài liệu gốc/solution là chuẩn — điểm lệch được ghi rõ ngay tại màn liên quan.
+>
+> **Quy ước cột "Bắt buộc" và "Mặc định":** ghi `N/A` cho thành phần chỉ hiển thị (Label, nút thao tác, badge, bảng đọc). Cột "Quyền hiển thị" mô tả che/ẩn theo vai trò (masking).
+
+**Danh mục màn hình Lô 1:**
+
+| Mã màn | Tên màn | Component prototype | Ánh xạ Use Case | Trạng thái prototype |
+|---|---|---|---|---|
+| SCR-IDR-01 | Đối soát định danh — danh sách hồ sơ nghi trùng | `SuspectListScreen` | UC-IDR-02 | Đang chạy (cần cập nhật ngưỡng) |
+| SCR-IDR-02 | Đối chiếu hồ sơ nghi trùng | `MergeReviewScreen` + `CompareTable` | UC-IDR-03 | Đang chạy (cần cập nhật ngưỡng) |
+| SCR-IDR-03 | Đối soát & hợp nhất hồ sơ (3 tab) | `IdentityScreen` | UC-IDR-02, 05, 06 | Đang chạy (cần bỏ bước phê duyệt tách) |
+| SCR-IDR-04 | Rule hợp nhất định danh (read-only) | `IdentityRuleScreen` | UC-IDR-07 | Đang chạy (sai ngưỡng, thiếu luật) |
+| SCR-IDR-05 | Tách hồ sơ | **Chưa có — CẦN BỔ SUNG** | UC-IDR-04 | Chưa có trong prototype |
+| SCR-C360-01 | Tìm kiếm & danh sách khách hàng | `CustomerListScreen` | UC-C360-01 | Đang chạy |
+| SCR-C360-02 | Hồ sơ 360 (10 nhóm dữ liệu / 11 tab) | `Customer360Screen` | UC-C360-02, 03, 04 | Đang chạy |
+
+---
+
+## IV.1. SCR-C360-01 — Tìm kiếm & danh sách khách hàng
+
+**Mục tiêu:** Cho phép người dùng tìm và duyệt danh sách khách hàng theo nhiều tiêu chí; là điểm vào của UC-C360-01, dẫn tới hồ sơ 360.
+**Ánh xạ Use Case:** UC-C360-01.
+**Layout (theo prototype v3):** Thanh công cụ tìm/lọc trên cùng (ô tìm kiếm + 5 bộ lọc); bên dưới là bảng danh sách khách hàng có thanh cuộn ngang; chân bảng hiển thị số lượng kết quả.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Ô tìm kiếm | Ô nhập text | Không | Rỗng | Tìm theo mã KH, tên, SĐT; kết quả cập nhật sau khi dừng gõ. Placeholder "Tìm mã KH, tên, SĐT..." |
+| 2 | Bộ lọc Loại | Danh sách chọn | Không | Tất cả loại | Cá nhân / Doanh nghiệp |
+| 3 | Bộ lọc Nhóm | Danh sách chọn | Không | Tất cả nhóm | Nhóm khách hàng |
+| 4 | Bộ lọc Mảng dịch vụ | Danh sách chọn | Không | Tất cả mảng dịch vụ | Mảng dịch vụ chính |
+| 5 | Bộ lọc Trạng thái | Danh sách chọn | Không | Tất cả trạng thái | Đang hoạt động / Không hoạt động |
+| 6 | Bộ lọc Phân khúc | Danh sách chọn | Không | Tất cả phân khúc | Phân khúc động |
+| 7 | Cột Mã khách hàng | Cột bảng (chữ mono) | N/A | N/A | Mã định danh CDP |
+| 8 | Cột Tên / Công ty | Cột bảng (liên kết) | N/A | N/A | Bấm mở hồ sơ 360 |
+| 9 | Cột Loại | Nhãn màu | N/A | N/A | Cá nhân / Doanh nghiệp |
+| 10 | Cột Nhóm | Nhãn màu | N/A | N/A | Nhóm khách hàng |
+| 11 | Cột Mảng dịch vụ chính | Cột bảng | N/A | N/A | Mảng dịch vụ |
+| 12 | Cột SĐT | Cột bảng | N/A | N/A | **Che theo vai trò**: CSKH/Tiếp thị/Vận hành thấy `0912***678`; Kinh doanh/Phụ trách dữ liệu/Quản trị thấy đầy đủ (BR-C360-01) |
+| 13 | Cột Tổng đơn | Cột bảng (số) | N/A | N/A | Số đơn |
+| 14 | Cột Doanh thu 12 tháng | Cột bảng (số) | N/A | N/A | Doanh thu; với Tiếp thị hiển thị dạng tổng hợp |
+| 15 | Cột Phân khúc | Nhãn màu | N/A | N/A | Phân khúc hiện tại |
+| 16 | Cột Trạng thái | Nhãn màu | N/A | N/A | Đang/không hoạt động |
+| 17 | Cột Cập nhật | Cột bảng (ngày) | N/A | N/A | Lần cập nhật gần nhất |
+| 18 | Dòng đếm kết quả | Nhãn | N/A | N/A | "Hiển thị {N} / {tổng} khách hàng" |
+
+**Trạng thái đặc biệt (điều kiện kích hoạt rõ để testable — đồng bộ UC-C360-01 E1/A1):**
+- **(a) Từ khóa rỗng và không chọn bộ lọc** → **KHÔNG phải empty**: hiển thị toàn bộ danh sách khách hàng trong phạm vi phân quyền của người dùng.
+- **(b) Có từ khóa hoặc có bộ lọc nhưng 0 kết quả khớp** → "Không tìm thấy khách hàng nào khớp điều kiện lọc."
+- **(c) Phạm vi phân quyền của người dùng không có khách hàng nào** (không do lọc) → "Chưa có dữ liệu để hiển thị."
+- **Không đủ quyền chức năng:** "Bạn không có quyền truy cập chức năng này."
+
+---
+
+## IV.2. SCR-C360-02 — Hồ sơ 360
+
+**Mục tiêu:** Hiển thị hồ sơ hợp nhất đầy đủ của một khách hàng theo **10 nhóm dữ liệu nghiệp vụ, trình bày trên 11 tab** (tab Doanh nghiệp là tab điều kiện chỉ hiện với khách hàng doanh nghiệp — khách hàng cá nhân thấy 10 tab), che theo vai trò; là màn cốt lõi của UC-C360-02/03/04.
+**Ánh xạ Use Case:** UC-C360-02 (xem hồ sơ + masking), UC-C360-03 (ghi chú/nhãn), UC-C360-04 (hồ sơ liên kết + đa nguồn).
+**Layout (theo prototype v3):** (1) Nút quay lại; (2) Header card: avatar, tên, mã định danh CDP, nhãn loại/nhóm/trạng thái, dải thông tin phụ (mảng dịch vụ, hệ thống nguồn, tương tác gần nhất), dải 4 chỉ số (tổng đơn, doanh thu, điểm tích lũy, độ đầy đủ hồ sơ); (3) Thanh 11 tab; (4) Vùng nội dung tab.
+
+**Bảng thành phần — Header và điều hướng:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Nút Quay lại danh sách | Nút | N/A | N/A | Về màn danh sách khách hàng |
+| 2 | Avatar + Tên khách hàng | Hiển thị | N/A | N/A | Chữ cái đầu + tên đầy đủ (mọi vai trò xem) |
+| 3 | Mã định danh CDP | Nhãn (chữ mono) | N/A | N/A | Mã hồ sơ chuẩn |
+| 4 | Nhãn Loại / Nhóm / Trạng thái | Nhãn màu | N/A | N/A | Cá nhân/DN, nhóm KH, trạng thái |
+| 5 | Dải mảng dịch vụ | Nhãn màu | N/A | N/A | Các mảng dịch vụ đang hoạt động; rỗng hiển thị "—" |
+| 6 | Dải hệ thống nguồn | Nhãn màu | N/A | N/A | Hệ thống có dữ liệu đóng góp |
+| 7 | Tương tác gần nhất | Hiển thị | N/A | N/A | Ngày tương tác gần nhất; rỗng "Chưa có dữ liệu" |
+| 8 | Chỉ số Tổng đơn | Ô số | N/A | N/A | Tổng số đơn |
+| 9 | Chỉ số Doanh thu 12 tháng | Ô số | N/A | N/A | Doanh thu; Tiếp thị xem tổng hợp |
+| 10 | Chỉ số Điểm tích lũy | Ô số | N/A | N/A | Điểm loyalty; rỗng "—" |
+| 11 | Chỉ số Độ đầy đủ hồ sơ | Ô số + thanh | N/A | N/A | Phần trăm đầy đủ dữ liệu, có thanh tiến độ |
+| 12 | Thanh tab (10 nhóm / 11 tab) | Thanh tab | N/A | Tab Tổng quan | Tổng quan · Hồ sơ liên kết · Hồ sơ đa nguồn · Địa chỉ · Doanh nghiệp (tab điều kiện — chỉ khi KH doanh nghiệp) · Hoạt động theo mảng dịch vụ · Hành vi số · CSKH · Điểm số & Phân khúc · Đồng ý dữ liệu · Nhật ký. KH cá nhân thấy 10 tab (ẩn tab Doanh nghiệp) |
+
+> **Điểm lệch prototype (ghi nhận):** Prototype có ô chọn Vai trò (Role) ngay trên header để mô phỏng masking (CSKH/Marketing/Kinh doanh/Vận hành/Data Steward/Admin). Ở bản thật, **vai trò lấy từ tài khoản đăng nhập, không phải ô chọn** — ô này chỉ phục vụ demo, bỏ khi triển khai.
+
+**Bảng thành phần — Nội dung tab (theo nhóm dữ liệu và masking):**
+
+| TT | Tab / Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị (masking theo III.C360) |
+|---|---|---|---|---|---|
+| 13 | Tab Tổng quan — Thông tin định danh | Danh sách trường | N/A | N/A | Giới tính, ngày sinh, SĐT, email, CCCD, PostID, bưu cục. **SĐT/email che một phần với CSKH/Tiếp thị/Vận hành; CCCD che với CSKH/Phụ trách dữ liệu, chỉ Quản trị xem đầy đủ theo quyền đặc biệt**; trường rỗng "Chưa có dữ liệu" |
+| 14 | Tab Tổng quan — Vai trò giao dịch | Nhãn + ô số | N/A | N/A | Số lần là Người gửi / Người nhận; nhãn vai trò chính. Người nhận **không có hồ sơ riêng** (A2) |
+| 15 | Tab Tổng quan — Phân khúc hiện tại | Nhãn màu | N/A | N/A | Các phân khúc khách hàng thuộc về |
+| 16 | Tab Hồ sơ liên kết — Bảng định danh liên kết | Bảng | N/A | N/A | Cột: Loại ID · Giá trị · Nguồn · Độ tin cậy · Cờ mã chính · **Trạng thái** (giá trị: *đã gộp* / *đã tách*) (UC-C360-04). Cột Trạng thái cập nhật thành "đã tách" sau khi tách hồ sơ — khớp hậu điều kiện UC-IDR-04 và SCR-IDR-05. Ẩn tab với Tiếp thị (bảng III.C360 dòng Hồ sơ liên kết) |
+| 17 | Tab Hồ sơ liên kết — Khối "Nghi ngờ gộp sai" + nút Báo cáo | Khối cảnh báo + nút | N/A | N/A | Nút **Báo cáo** hiện với CSKH/Kinh doanh/Vận hành (UC-IDR-05); **ẩn với Tiếp thị**; Người phụ trách dữ liệu thấy thêm nút Tách (UC-IDR-04). Xác nhận: "Yêu cầu báo cáo đã được ghi nhận. Người phụ trách dữ liệu sẽ xem xét trong 1–2 ngày làm việc." |
+| 18 | Tab Hồ sơ đa nguồn — Bảng so sánh field theo nguồn | Bảng (cuộn ngang) | N/A | N/A | Cột hồ sơ chuẩn (golden) + các cột nguồn; đánh dấu ⚠ trường xung đột; giá trị lấy theo nguồn ưu tiên (BR-IDR-12). Empty: "Chưa có dữ liệu nguồn" |
+| 19 | Tab Hồ sơ đa nguồn — Chế độ Dòng thời gian gộp | Nút chuyển + timeline | N/A | Chế độ So sánh | Timeline các lần gộp hồ sơ |
+| 20 | Tab Địa chỉ | Danh sách/bảng | N/A | N/A | **CSKH/Tiếp thị: đến phường/quận/tỉnh; Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị: đầy đủ** |
+| 21 | Tab Doanh nghiệp (chỉ KH doanh nghiệp) | Danh sách trường | N/A | N/A | MST, hợp đồng, công nợ; ẩn tab nếu là cá nhân |
+| 22 | Tab Hoạt động theo mảng dịch vụ | Bảng/khối theo mảng | N/A | N/A | Lịch sử giao dịch theo mảng; **Tiếp thị xem tổng hợp** |
+| 23 | Tab Hành vi số | Khối/bảng | N/A | N/A | **Vận hành: không xem; Kinh doanh: tổng hợp; còn lại: đầy đủ** |
+| 24 | Tab CSKH | Bảng lịch sử | N/A | N/A | Lịch sử khiếu nại, chăm sóc |
+| 25 | Tab Điểm số & Phân khúc | Khối điểm số | N/A | N/A | RFM/CLV/rời bỏ: Vận hành không xem, còn lại xem. **Điểm rủi ro thu hộ (COD Risk) và gian lận (Fraud): ẩn với CSKH và Tiếp thị**, chỉ Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị xem (BR-C360-03) |
+| 26 | Tab Đồng ý dữ liệu | Bảng trạng thái đồng ý | N/A | N/A | Opt-in/opt-out theo mục đích + kênh; **Vận hành không xem** |
+| 27 | Tab Nhật ký | Bảng | N/A | N/A | Nguồn dữ liệu đóng góp + **tóm tắt nhật ký gộp của KH đang mở với CSKH**; Phụ trách dữ liệu/Quản trị xem đầy đủ (UC-IDR-06). Tiếp thị/Kinh doanh/Vận hành: không xem nhật ký gộp |
+| 28 | Khu vực Ghi chú / Gắn nhãn | Ô nhập + nút | Có (khi thêm) | Rỗng | Thêm ghi chú/nhãn (UC-C360-03); nội dung rỗng chặn lưu |
+
+**Trạng thái đặc biệt:**
+- **Không đủ quyền xem một nhóm:** "Bạn không có quyền xem thông tin này. Liên hệ quản trị hệ thống nếu công việc của bạn cần dùng đến."
+- **Ô rỗng có quyền xem:** "Chưa có dữ liệu"; cả tab: "Chưa có dữ liệu để hiển thị."
+- **Loading:** hiển thị trạng thái đang tải hồ sơ trước khi dữ liệu về.
+
+---
+
+## IV.3. SCR-IDR-01 — Đối soát định danh (danh sách hồ sơ nghi trùng)
+
+**Mục tiêu:** Liệt kê các hồ sơ gốc đang có mã định danh nghi trùng chờ xử lý; điểm vào của UC-IDR-02.
+**Ánh xạ Use Case:** UC-IDR-02 (→ SCR-IDR-02 khi bấm "Xử lý").
+**Layout (theo prototype v3):** Khối giải thích ngắn + ô tìm kiếm trên cùng; bảng danh sách hồ sơ nghi trùng (cuộn ngang); chân bảng đếm số lượng.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Khối giải thích ngưỡng | Nhãn mô tả | N/A | N/A | Nêu 4 vùng tin cậy (≥95% tự gộp · 85–94% chờ xác nhận · 70–84% quan hệ nghi vấn · <70% không gộp) — **theo BR-IDR-01** |
+| 2 | Ô tìm kiếm | Ô nhập text | Không | Rỗng | Tìm mã hồ sơ gốc, tên, SĐT |
+| 3 | Cột Hồ sơ gốc (mã nguồn) | Cột bảng (mono) | N/A | N/A | Mã nguồn neo + tên nguồn; nhắc "mã định danh CDP chỉ sinh sau khi gộp" |
+| 4 | Cột Tên / Công ty | Cột bảng (liên kết) | N/A | N/A | Tên khách hàng |
+| 5 | Cột Loại | Nhãn màu | N/A | N/A | Cá nhân / Doanh nghiệp |
+| 6 | Cột Số mã chờ | Nhãn đếm | N/A | N/A | Số mã chờ xác nhận + số mã tin cậy thấp |
+| 7 | Cột Tin cậy cao nhất | Nhãn phần trăm | N/A | N/A | Điểm tin cậy cao nhất trong nhóm |
+| 8 | Cột Khóa khớp nổi bật | Cột bảng | N/A | N/A | Các khóa khớp chính (MST, SĐT…) |
+| 9 | Nút Xử lý | Nút | N/A | N/A | Mở màn Đối chiếu hồ sơ nghi trùng (SCR-IDR-02) |
+| 10 | Dòng đếm | Nhãn | N/A | N/A | "{N} khách hàng đang có mã định danh nghi trùng" |
+
+**Trạng thái đặc biệt:**
+- **Empty:** "Không có khách hàng nào đang nghi trùng." / khi hết hàng đợi: "Chưa có dữ liệu để hiển thị."
+- **Bị người khác xử lý trước (BR-IDR-10):** "Hồ sơ này vừa được {tên người} xử lý lúc {giờ}. Danh sách đã được cập nhật."
+- **Không đủ quyền:** màn không hiện trên điều hướng; truy cập trực tiếp → "Bạn không có quyền truy cập chức năng này."
+
+> **Điểm lệch prototype:** khối giải thích trong prototype ghi ngưỡng "60–89%" và "≥90%". Bản thật phải sửa theo 4 vùng 95/85/70 (BR-IDR-01). Danh sách sắp theo điểm giảm dần, 25 dòng/trang (baseline 7.2).
+
+---
+
+## IV.4. SCR-IDR-02 — Đối chiếu hồ sơ nghi trùng
+
+**Mục tiêu:** So sánh từng trường giữa các mã nguồn nghi trùng, chọn mã, xem trước hồ sơ chuẩn và hợp nhất; màn thực thi UC-IDR-03.
+**Ánh xạ Use Case:** UC-IDR-03.
+**Layout (theo prototype v3):** (1) Nút quay lại; (2) Panel hồ sơ chuẩn + danh sách mã đã tự gộp từ khóa mạnh; (3) Bảng đối chiếu cột (`CompareTable`) — mỗi mã một cột, có checkbox chọn gộp, mã tin cậy thấp làm mờ; (4) Thanh hành động dính đáy (đếm số mã chọn, nút Không phải cùng người, nút Xem trước hồ sơ chuẩn); (5) Modal xem trước hồ sơ chuẩn dự kiến.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Nút Quay lại đối soát định danh | Nút | N/A | N/A | Về SCR-IDR-01 |
+| 2 | Panel hồ sơ chuẩn (neo) | Khối | N/A | N/A | Tên KH, mã hồ sơ gốc + nguồn; hướng dẫn đối chiếu |
+| 3 | Khối "Đã tự động gộp từ khóa mạnh ≥95%" | Nhãn danh sách | N/A | N/A | Các mã đã tự gộp (chỉ hiển thị, không hỏi lại) |
+| 4 | Cảnh báo cặp rủi ro | Khối cảnh báo | N/A | N/A | Hiển thị nổi bật với cặp người gửi/người nhận, SĐT dùng chung, xung đột loại KH (BR-IDR-06) |
+| 5 | Checkbox "Gộp mã này?" mỗi cột | Ô chọn | Không | Tick sẵn mã 85–94%; **không** tick mã <85% | Chọn mã thuộc cùng khách hàng |
+| 6 | Hàng dữ liệu so sánh | Bảng cột | N/A | N/A | Độ tin cậy, nguồn, mã KH nguồn, tên, SĐT, email, CCCD/MST, khóa khớp, đóng góp thêm |
+| 7 | Nhãn "tin cậy thấp" + làm mờ | Nhãn | N/A | N/A | Mã <85% làm mờ, gắn nhãn cảnh báo |
+| 8 | Đếm số mã đã chọn | Nhãn | N/A | N/A | "Đã chọn {N} / {tổng} mã để hợp nhất" |
+| 9 | Nút Không phải cùng người | Nút | N/A | N/A | Gỡ cờ nghi trùng (A1). Thông báo: "Đã ghi nhận đây là các khách hàng khác nhau..." |
+| 10 | Nút Xem trước hồ sơ chuẩn | Nút | N/A | N/A | Mở modal xem trước; vô hiệu khi 0 mã chọn (E4) |
+| 11 | Modal — Bảng trường sau gộp | Bảng | N/A | N/A | Trường / Giá trị sau gộp / Lấy từ nguồn / cờ Xung đột (BR-IDR-05, BR-IDR-12) |
+| 12 | Modal — Bảng số liệu cộng dồn | Bảng | N/A | N/A | Tổng đơn, doanh thu, COD, công nợ — cộng dồn từ các nguồn |
+| 13 | Modal — Nút Quay lại chỉnh | Nút | N/A | N/A | Đóng modal, sửa lựa chọn |
+| 14 | Modal — Nút Xác nhận hợp nhất | Nút | N/A | N/A | Hợp nhất; thông báo "Đã hợp nhất {N} mã định danh vào hồ sơ {mã}. Lịch sử giao dịch và điểm số đã được tính lại." |
+
+**Trạng thái đặc biệt:**
+- **Không còn mã nghi trùng:** "Không còn mã KH nào nghi trùng cho khách hàng này."
+- **Bị người khác hợp nhất khi đang mở (E1):** "Hồ sơ này vừa được {tên người} hợp nhất. Bạn không thể thao tác tiếp trên bản cũ."
+- **Mất kết nối khi đối soát (E2):** thao tác chưa xác nhận không lưu; hồ sơ về lại danh sách chờ.
+- **Xung đột trường (E3):** đánh dấu "Xung đột", ưu tiên nguồn tin cậy cao nhất, cho xem giá trị nguồn khác.
+
+> **Điểm lệch prototype:** checkbox trong prototype tick sẵn mã ≥60% (CONF_LOW=60). Bản thật: tick sẵn mã **85–94%**, mã <85% không tick sẵn (BR-IDR-01). Danh sách mã đã tự gộp dùng nhãn "≥90%" — sửa thành **≥95%**.
+
+---
+
+## IV.5. SCR-IDR-03 — Đối soát & hợp nhất hồ sơ (3 tab)
+
+**Mục tiêu:** Màn tổng hợp gồm hàng đợi chờ xem xét, lịch sử gộp và danh sách đề xuất tách; phục vụ UC-IDR-02, UC-IDR-06, và tiếp nhận đầu vào UC-IDR-05.
+**Ánh xạ Use Case:** UC-IDR-02 (tab Chờ xem xét), UC-IDR-06 (tab Lịch sử gộp), UC-IDR-05 (tab Yêu cầu tách hồ sơ).
+**Layout (theo prototype v3):** 3 tab trên cùng — Chờ xem xét / Lịch sử gộp / Yêu cầu tách hồ sơ. Tab Chờ xem xét: các thẻ nhóm hồ sơ nghi trùng, bấm mở chi tiết đối chiếu. Tab Lịch sử gộp: bảng nhật ký gộp. Tab Yêu cầu tách: bảng đề xuất tách.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Tab Chờ xem xét | Tab | N/A | Tab mặc định | Danh sách nhóm hồ sơ nghi trùng (85–94%) chờ xác nhận (UC-IDR-02) |
+| 2 | Thẻ nhóm nghi trùng | Thẻ (card) | N/A | N/A | Mã nhóm, loại, khóa trùng, cảnh báo xung đột, số nguồn; bấm mở đối chiếu |
+| 3 | Tab Lịch sử gộp | Tab | N/A | N/A | Bảng nhật ký các lần gộp (UC-IDR-06) — chỉ Phụ trách dữ liệu/Quản trị xem đầy đủ |
+| 4 | Bảng lịch sử gộp | Bảng | N/A | N/A | ID, loại (tự động/thủ công), mã KH chính, mã gộp vào, độ tin cậy, khóa trùng, người quyết định, thời điểm |
+| 5 | Tab Yêu cầu tách hồ sơ | Tab | N/A | N/A | Danh sách đề xuất tách từ nút Báo cáo (UC-IDR-05) |
+| 6 | Bảng yêu cầu tách | Bảng | N/A | N/A | ID, mã KH liên quan, người báo cáo, thời gian, lý do, trạng thái |
+| 7 | Nút xử lý đề xuất tách | Nút | N/A | N/A | **Mở màn Tách hồ sơ (SCR-IDR-05) để Người phụ trách dữ liệu tách trực tiếp** — xem điểm lệch dưới |
+
+**Trạng thái đặc biệt:**
+- **Tab Chờ xem xét rỗng:** "Không còn nhóm nào chờ xem xét."
+- **Không đủ quyền (Tiếp thị/Kinh doanh/Vận hành với tab Lịch sử gộp):** ẩn tab hoặc thông báo quyền.
+
+> **Điểm lệch prototype (quan trọng — cần sửa khi triển khai):**
+> 1. Tab "Yêu cầu tách hồ sơ" trong prototype hiển thị **nút Phê duyệt / Từ chối** và ghi chú **"Chỉ Admin mới có thể phê duyệt hoặc từ chối yêu cầu Unmerge"** — đây là mô hình phê duyệt **cũ**. Theo solution D-07, giai đoạn này **không có bước phê duyệt riêng**: Người phụ trách dữ liệu xem đề xuất và **tự tách trực tiếp** qua SCR-IDR-05. Bỏ nút Phê duyệt/Từ chối và ghi chú Admin; thay bằng nút "Xử lý → mở màn Tách hồ sơ".
+> 2. Thẻ nhóm nghi trùng ghi "Độ tương đồng 60–89%" — sửa thành **85–94%** (BR-IDR-01).
+
+---
+
+## IV.6. SCR-IDR-04 — Rule hợp nhất định danh (read-only)
+
+**Mục tiêu:** Hiển thị bộ luật so khớp và các mức ngưỡng tin cậy đang áp dụng; phục vụ UC-IDR-07. Giai đoạn đầu chỉ xem.
+**Ánh xạ Use Case:** UC-IDR-07.
+**Layout (theo prototype v3):** Banner read-only trên cùng; khối sơ đồ các mức ngưỡng; bảng danh sách rule; ghi chú "sẽ mở ở giai đoạn sau".
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Banner read-only | Khối thông báo | N/A | N/A | "Giai đoạn đầu chỉ hiển thị; thêm/sửa rule mở ở giai đoạn sau" |
+| 2 | Khối sơ đồ ngưỡng tin cậy | Khối thẻ | N/A | N/A | **Bốn vùng: ≥95% tự gộp · 85–94% chờ xác nhận · 70–84% quan hệ nghi vấn · <70% không gộp** (BR-IDR-01) |
+| 3 | Bảng danh sách rule | Bảng | N/A | N/A | #, khóa khớp, trọng số, ngưỡng tin cậy, hành động, diễn giải, trạng thái |
+| 4 | Nút "Thêm rule (Giai đoạn sau)" | Nút vô hiệu | N/A | N/A | Vô hiệu hóa, chú thích "Giai đoạn sau" |
+| 5 | Nút "Sửa" mỗi dòng | Nút vô hiệu | N/A | N/A | Vô hiệu hóa |
+| 6 | Ghi chú giai đoạn sau | Nhãn | N/A | N/A | Nêu năng lực mở sau: thêm/sửa/bật-tắt rule, đặt thứ tự ưu tiên, rule chọn trường khi gộp |
+
+**Trạng thái đặc biệt:**
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này."
+
+> **Điểm lệch prototype (quan trọng — cần sửa khi triển khai):** prototype hiển thị **3 mức ngưỡng 90/60** và **thiếu vùng 70–84%**; danh sách rule thiếu 6 luật đối sánh của CDP.md 6.6.1 và có luật "SĐT + tên gần đúng → tự gộp" sai (tài liệu gốc: tên không được làm khóa gộp độc lập — BR-IDR-03). Bản thật phải: (a) hiển thị **4 vùng 95/85/70**; (b) bổ sung đủ 10 luật đối sánh tuyệt đối (6.6.1) + ghi nhận nhóm đối sánh xác suất FR-IDR-02 (ưu tiên Medium, chưa triển khai); (c) sửa hành động luật SĐT+tên về "chờ xác nhận", không tự gộp.
+
+---
+
+## IV.7. SCR-IDR-05 — Tách hồ sơ (CẦN BỔ SUNG — chưa có trong prototype)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3** (solution ghi rõ "Luồng tách — chưa có, cần bổ sung"). Đặc tả dưới đây theo solution BL-03 và tài liệu gốc 6.8.3, là **yêu cầu mới** để triển khai UC-IDR-04.
+
+**Mục tiêu:** Cho phép Người phụ trách dữ liệu tách một hoặc nhiều mã nguồn ra khỏi hồ sơ chuẩn khi gộp nhầm, có xem trước, chọn trường hợp tách và điền lý do bắt buộc.
+**Ánh xạ Use Case:** UC-IDR-04.
+**Layout (đề xuất):** Mở từ tab Hồ sơ liên kết (SCR-C360-02) hoặc từ nút xử lý đề xuất tách (SCR-IDR-03). Gồm: (1) Panel hồ sơ chuẩn hiện tại + danh sách mã nguồn đã gộp; (2) Vùng chọn mã cần tách; (3) Khối xem trước kết quả tách; (4) Chọn trường hợp tách + ô lý do; (5) Nút xác nhận.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Panel hồ sơ chuẩn hiện tại | Khối | N/A | N/A | Mã định danh CDP, tên KH, danh sách mã nguồn đã gộp (chỉ Người phụ trách dữ liệu thấy màn này) |
+| 2 | Danh sách mã nguồn (chọn để tách) | Bảng + ô chọn | Có (≥1 mã) | Không chọn | Mỗi mã nguồn một dòng có checkbox; chọn nhiều mã được |
+| 3 | Khối Xem trước kết quả tách | Khối | N/A | N/A | Hồ sơ chuẩn còn lại gì, hồ sơ mới nhận gì, điểm số dự kiến sau tính lại (BR-IDR-08) |
+| 4 | Chọn trường hợp tách | Danh sách chọn | Có | Chưa chọn | 1 trong 6 trường hợp (6.8.3): 2 cá nhân · cá nhân với DN · người gửi/người nhận · SĐT dùng chung · email dùng chung · yêu cầu chủ thể dữ liệu (BR-IDR-07) |
+| 5 | Ô Lý do tách | Ô nhập text | **Có** | Rỗng | **Bắt buộc điền**; rỗng chặn xác nhận (E2) |
+| 6 | Nút Xác nhận tách | Nút | N/A | N/A | Thực hiện tách, trả lại mã nguồn, tính lại điểm, ghi nhật ký tách (BR-IDR-07, BR-IDR-08) |
+| 7 | Nút Hủy | Nút | N/A | N/A | Đóng, không tách |
+| 8 | Cảnh báo chuỗi gộp phức tạp | Khối cảnh báo | N/A | N/A | Khi mã cần tách nằm giữa chuỗi gộp nhiều lần: cảnh báo và **không cho tách trực tiếp** (BR-IDR-09, E1) |
+
+**Trạng thái đặc biệt:**
+- **Tách xong:** thông báo tách thành công, cập nhật dấu hiệu "đã tách" ở tab Hồ sơ liên kết của cả hai hồ sơ.
+- **Không có quyền tách (CSKH/Kinh doanh/Vận hành/Tiếp thị):** không mở được màn này; các vai trò CSKH/Kinh doanh/Vận hành dùng nút Báo cáo (UC-IDR-05).
+- **Chuỗi gộp phức tạp (E1):** cảnh báo, chặn tách, ghi vào danh sách chờ xử lý riêng.
+
+> **[Cần xác nhận: câu chữ thông báo tách thành công]** — Baseline 7.3 chưa có câu chữ riêng cho "tách xong". Đề xuất tạm: "Đã tách {N} mã nguồn khỏi hồ sơ {mã}. Lịch sử giao dịch được giữ nguyên, điểm số đã tính lại." Cần VNPost/PO duyệt câu chữ.
+
+---
+
 ## Phụ lục — Giả định và câu hỏi mở áp dụng cho tài liệu này
 
 ### Giả định đang áp dụng
@@ -1061,8 +1803,43 @@ sequenceDiagram
 - [ ] OQ-08: Thời hạn lưu nhật ký 5 năm có đúng quy định nội bộ và pháp luật không? (Pháp chế)
 - [ ] OQ-09: VNPost đã có chính sách tần suất gửi tin cho khách hàng chưa? (Tiếp thị VNPost)
 
+### Câu hỏi mở riêng Lô 1 — Hợp nhất định danh (từ solution, chưa có câu trả lời từ VNPost)
+
+Đánh số theo namespace `OQ-IDR-` để không trùng dải OQ-01→09 ở trên.
+
+- [ ] OQ-IDR-01: Thời hạn lưu nhật ký gộp/tách là bao nhiêu năm theo quy định nội bộ VNPost và Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15? (Đang giả định 5 năm — GD-04, liên quan OQ-08) (Pháp chế)
+- [ ] OQ-IDR-02: Nhật ký gộp/tách và báo cáo tổng hợp gộp/tách đặt ở đâu — tab riêng trong màn Đối soát định danh, hay bổ sung vào tab Nhật ký của Customer 360? (áp dụng UC-IDR-06, SCR-IDR-03/SCR-C360-02) (PO / VNPost)
+- [ ] OQ-IDR-03: Vùng 70–84% (quan hệ nghi vấn, chưa gộp) lưu trong Identity Graph — người dùng nghiệp vụ có cần nhìn thấy nhóm này ở đâu không, hay chỉ phục vụ phân tích nội bộ? (áp dụng UC-IDR-07) (PO / Data Steward)
+- [ ] OQ-IDR-04: Bảng nguồn ưu tiên 6.10 đã đủ quyết định giá trị master chưa, hay cần bổ sung rule cho loại/nhóm khách hàng, trạng thái, hạng thân thiết? (áp dụng BR-IDR-12, UC-IDR-03) (Data Steward / VNPost)
+- [ ] OQ-IDR-05: Quyền tách hồ sơ có cần giới hạn theo cấp không — mọi Người phụ trách dữ liệu đều tách được, hay chỉ người được chỉ định riêng? (áp dụng UC-IDR-04, II.4) (VNPost)
+- [ ] OQ-IDR-06: Khi hồ sơ đã qua nhiều lần gộp và cần tách một mã giữa chuỗi thì tách đến đâu — chỉ lần gộp gần nhất, hay mã bất kỳ trong chuỗi? (áp dụng BR-IDR-09, UC-IDR-04) (Data Steward / VNPost)
+- [ ] OQ-IDR-07: Có cần ngưỡng cảnh báo khi số lần tách tăng bất thường không (dấu hiệu luật đối sánh gộp sai quá nhiều)? (liên quan rủi ro R5 solution) (Data Steward)
+- [ ] OQ-IDR-08: Câu chữ thông báo "tách hồ sơ thành công" chưa có trong bộ câu chữ chuẩn (baseline 7.3) — cần PO/VNPost duyệt câu đề xuất tạm ở SCR-IDR-05. (PO / Tiếp thị VNPost)
+- [ ] OQ-IDR-09: Mức che nhóm "Hồ sơ liên kết / định danh liên kết" (bảng III.C360) suy ra từ logic nghiệp vụ, chưa có dòng tường minh trong CDP.md/baseline — xác nhận việc Tiếp thị bị chặn hoàn toàn nhóm này. (VNPost / Data Steward)
+- [ ] OQ-IDR-10: SLA "Người phụ trách dữ liệu xem xét đề xuất tách trong 1–2 ngày làm việc" (UC-IDR-05, item 17 SCR-C360-02) đang là con số đề xuất — cần VNPost chốt cam kết xử lý. *(ghi nhận MINOR QA Lô 1 — chưa sửa nội dung vòng này)* (VNPost)
+- [ ] OQ-IDR-11: Câu chữ chuẩn cho "mất kết nối khi đang đối soát" (UC-IDR-03 E2) và "tra vận đơn chỉ có dữ liệu người nhận" (UC-C360-01 A2) chưa có trong bộ câu chữ 7.3 — cần bổ sung/duyệt. *(ghi nhận MINOR QA Lô 1 — chưa sửa nội dung vòng này)* (PO / Tiếp thị VNPost)
+
+### Ghi chú xử lý MINOR
+
+**Từ QA review v1.1 (khung tổng thể):**
+
+| Mã | Nội dung | Trạng thái sau Lô 1 |
+|---|---|---|
+| MI-01 | Câu chữ "hơn 8 luồng" (I.1) | Chưa chỉnh — thuần câu chữ khung, gom lô sau |
+| MI-02 | Câu nối 5 lớp ↔ 7 phân hệ (I.4) | Chưa chỉnh — như trên |
+| MI-03/04 | Bổ sung nhánh edge case swimlane (Quy trình 2) | **Đã bù ở tầng Use Case** — các edge case (hai người cùng xử lý, mất kết nối khi đối soát, tách giữa chuỗi gộp phức tạp) đã được đặc tả đầy đủ trong UC-IDR-02/03/04 (luồng ngoại lệ) và BR-IDR-09/10 |
+| MI-05 | Sequence luồng rút đồng ý khi tệp đã đẩy (Quy trình B) | Chưa chỉnh — thuộc Phân hệ 6 (Kích hoạt), xử lý ở lô Kích hoạt |
+
+**Từ QA review Lô 1 (5 MINOR — gom lô sau, không sửa nội dung vòng v1.3):**
+
+| Mã | Nội dung | Trạng thái |
+|---|---|---|
+| MI-L1-01 | UC-IDR-01 (tự động, actor Hệ thống) không map tới màn giao diện nào | Chấp nhận — đây là use case chạy nền, không có màn người dùng; đã nêu rõ actor là Hệ thống |
+| MI-L1-02 | SLA "1–2 ngày làm việc" chưa có căn cứ | Đã đưa vào **OQ-IDR-10** để không mất dấu |
+| MI-L1-03 | Câu chữ "mất kết nối khi đối soát" chưa chuẩn hóa | Đã đưa vào **OQ-IDR-11** |
+| MI-L1-04 | Validate ghi chú/gắn nhãn (UC-C360-03) mới ở mức "rỗng chặn lưu" | Chấp nhận cho MVP — độ dài tối đa/ký tự đặc biệt để lô sau nếu cần |
+| MI-L1-05 | Câu chữ tra vận đơn chỉ có dữ liệu người nhận chưa chuẩn hóa | Đã đưa vào **OQ-IDR-11** |
+
 ---
 
-*Kết thúc phiên bản v1 — Khung tổng thể (Mục I + Mục II). Mục III (Use Case), Mục IV (Giao diện — bám prototype v3), và Mục C (Yêu cầu phi chức năng) sẽ được bổ sung theo lô ở các vòng sau.*
-
-> **Ghi chú xử lý sau (từ QA review v1.1):** 5 vấn đề MINOR đã được ghi nhận, gộp vào lô Hợp nhất định danh để xử lý cùng chi tiết Mục III/IV — MI-01 (câu chữ "hơn 8 luồng"), MI-02 (câu nối 5 lớp ↔ 7 phân hệ trong I.4), MI-03/04 (một số nhánh edge case bổ sung trong swimlane), MI-05 (sequence luồng rút đồng ý khi tệp đã đẩy). Không ảnh hưởng nội dung khung tổng thể v1.1.
+*Kết thúc phiên bản v1.3 — Khung tổng thể (Mục I + Mục II) + Lô 1 (Mục III Use Case + Mục IV Giao diện cho Phân hệ 3 Hợp nhất định danh và Phân hệ 4 Customer 360), đã đồng bộ mã FR và xử lý QA Lô 1. Mục C (Yêu cầu phi chức năng) và các phân hệ còn lại của Mục III/IV sẽ được bổ sung theo lô ở các vòng sau.*
