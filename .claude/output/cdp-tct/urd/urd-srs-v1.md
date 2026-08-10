@@ -4,7 +4,7 @@ TỔNG CÔNG TY BƯU ĐIỆN VIỆT NAM (VNPost/TCT)
 
 ## Nền tảng Dữ liệu Khách hàng — Customer Data Platform (CDP)
 
-**Phiên bản:** v1 — Khung tổng thể (Mục I + Mục II)
+**Phiên bản:** v1.5 — Khung tổng thể (Mục I + Mục II) + Lô 1 (Phân hệ 3, 4) + Lô 2 (Phân hệ 1, 2)
 **Địa điểm – Thời gian:** Hà Nội – Tháng 08/2026
 
 ---
@@ -17,6 +17,8 @@ TỔNG CÔNG TY BƯU ĐIỆN VIỆT NAM (VNPost/TCT)
 | v1.1 | 08/2026 | Patch theo QA review — sửa 2 CRITICAL + 4 MAJOR: (CR-01) chốt MVP chỉ người gửi, người nhận Out of scope MVP theo A2, OQ-02 chuyển Out of scope P1; (CR-02) bổ sung "email dùng chung" vào danh sách cấm gộp tự động DP-05; (MA-01) tách bạch quyền Xem báo cáo gộp/tách và quyền Đề xuất tách (REQUEST_UNMERGE); (MA-02) bỏ quyền tách hồ sơ của Quản trị hệ thống; (MA-03) chú thích FR-GOV-03 là góc quản trị của cùng nhật ký FR-IDR-14; (MA-05) làm rõ 10 mã FR-IDR có tên trên 14 vị trí. 5 MINOR (MI-01→05) ghi nhận xử lý ở lô Hợp nhất định danh | BA |
 | v1.2 | 08/2026 | **Lô 1** — bổ sung Mục III (Đặc tả Use Case) và Mục IV (Giao diện chức năng) cho Phân hệ 3 (Hợp nhất định danh) và Phân hệ 4 (Customer 360): 11 Use Case (UC-IDR-01→07, UC-C360-01→04), 16 Business Rule (BR-IDR-01→12, BR-C360-01→04), 7 màn giao diện (SCR-IDR-01→05, SCR-C360-01→02) bám prototype v3. Đối chiếu thẳng tài liệu gốc CDP.md 6.6–6.10, 7.4, 7.5, 8.8, 8.9: xác nhận đủ tên **14 mã FR-IDR-01→14** và **15 mã FR-C360-01→15**. Áp ngưỡng 4 vùng 95/85/70 theo gốc; đánh dấu điểm lệch prototype (ngưỡng 90/60, mô hình phê duyệt tách cũ). Đặc tả bảng che dữ liệu theo vai trò (masking) theo 6.2 + 8.8. Bổ sung màn Tách hồ sơ (SCR-IDR-05 — prototype chưa có). Thêm OQ Lô 1 vào Phụ lục | BA |
 | v1.3 | 08/2026 | Patch theo QA review Lô 1 — sửa 1 CRITICAL + 5 MAJOR: (CR-01) đồng bộ mã FR giữa Mục I/II và III — cập nhật cây chức năng II.2 với đủ 14 tên FR-IDR (thêm 03/04/05/10) và 15 tên FR-C360, gỡ toàn bộ chú thích "chưa đặt tên"/`[Cần xác nhận: mã]` ở I.2.1, II.2 và diễn giải Phân hệ 3; (MA-01) sửa ghi chú UC-IDR-07 trỏ nhầm III.C360 → bảng luật gốc CDP.md 6.6.1; (MA-02) thống nhất "10 nhóm dữ liệu / 11 tab, tab Doanh nghiệp là tab điều kiện" ở UC-C360-02 và SCR-C360-02; (MA-03) thêm dòng masking "Hồ sơ liên kết/alias" vào bảng III.C360 (kèm OQ-IDR-09); (MA-04) làm rõ 3 điều kiện empty-state SCR-C360-01 để testable, đồng bộ UC-C360-01; (MA-05) thêm cột Trạng thái (đã gộp/đã tách) vào bảng định danh liên kết SCR-C360-02. Thêm OQ-IDR-09→11; ghi nhận 5 MINOR QA Lô 1 (MI-L1-01→05, gom lô sau) | BA |
+| v1.4 | 08/2026 | **Lô 2** — bổ sung Mục III (Đặc tả Use Case) và Mục IV (Giao diện chức năng) cho Phân hệ 1 (Tiếp nhận, FR-ING) và Phân hệ 2 (Chuẩn hóa và xử lý dữ liệu, FR-DPS): 13 Use Case (UC-ING-01→07, UC-DPS-01→06), 24 Business Rule (BR-ING-01→10, BR-DPS-01→14), 8 màn giao diện (SCR-ING-01→03, SCR-DPS-01→05 — trong đó 2 màn từ prototype v3 là màn giám sát luồng và panel chất lượng, 6 màn CẦN BỔ SUNG). Gộp 8 chức năng chuẩn hóa trường (FR-DPS-01→08) thành 2 UC (UC-DPS-01 định danh/liên hệ + UC-DPS-02 nghiệp vụ) với BR chi tiết từng trường. Đọc thẳng CDP.md 7.2 (FR-ING-01→10), 7.3 (FR-DPS-01→14), 6.10 (nguồn ưu tiên 12 nhóm), 6.11 (bảo vệ dữ liệu định danh): **cập nhật cây chức năng II.2** — gắn đủ 10 tên FR-ING và 14 tên FR-DPS, ghi rõ tương đương mã nhóm FR-INGEST≡FR-ING, FR-STD≡FR-DPS (chỉ điền tên mã gốc, không đổi cấu trúc cây, không đụng Phân hệ 3–7). Đặc tả SCR-ING-01 bằng ngôn ngữ nghiệp vụ, ghi khối điểm lệch yêu cầu **bỏ nhãn công nghệ Kafka/topic/lag/consumer** khỏi giao diện khi triển khai (D-04). Áp các con số baseline 7.2: thử lại 3 lần 1'–5'–15', hàng đợi lỗi 30 ngày, ngưỡng cảnh báo/báo động (vàng >15'/lỗi >1%; đỏ ngừng >15'/lỗi >5%/tồn >60'), độ trễ theo nhóm, mục tiêu chất lượng 6/12 tháng. Thêm 6 OQ Lô 2 (OQ-ING-01→04, OQ-DPS-01→02) — không có OQ critical chặn. Ranh giới quyền DATA-ENG vs DATA-STEWARD để mở (OQ-ING-01), không tự quyết | BA |
+| v1.5 | 08/2026 | Patch theo QA review Lô 2 — sửa 1 CRITICAL + 4 MAJOR (+2 MINOR nhanh): (CR-01) bỏ cặp số bịa "~690.000/~1.200" gắn nhãn baseline 7.2 trong BR-ING-08, thay bằng lập luận định tính đúng nguồn; rà toàn file xác nhận không còn số cụ thể gắn nhãn baseline mà baseline không có. (MA-01) **mở Mục II.3/II.4** bổ sung 2 dòng quyền "Cấu hình rule chất lượng dữ liệu" và "Cấu hình nguồn dữ liệu ưu tiên" (DATA-STEWARD=X, Quản trị=(X)); tách action **CONFIG** khỏi UPDATE ở II.4.3 khối Chất lượng dữ liệu + làm rõ định nghĩa CONFIG vs UPDATE ở II.4.2; nối traceability UC-DPS-05/06 và SCR-DPS-04/05 tới quyền CONFIG. (MA-02) thêm actor phụ **SYS-ADMIN (= IT Admin gốc)** vào UC-ING-06 với phân vai rõ vs DATA-ENG, đồng bộ II.4.3; phân biệt rõ với OQ-ING-01 (DATA-ENG vs DATA-STEWARD). (MA-03) ghi rõ nhánh 6.4 "đồng bộ sang kênh thất bại" là lỗi **outbound thuộc Phân hệ 6 (lô sau)**, không phải gap Lô 2. (MA-04) làm rõ BR-ING-05 chuyển trạng thái ngược chiều "Trong hàng đợi lỗi → (Sửa và nạp lại) → Chờ thử lại", đồng bộ SCR-ING-03 row 10 + UC-ING-04 E3. (MI-01) bỏ 2 nhãn tech lặp trong bảng SCR-ING-01 (rows 5/6/15/19 — mapping vẫn còn ở khối điểm lệch); (MI-06) ghi rõ UC-DPS-04 quan sát ở SCR-C360-02. Thêm OQ-DPS-03 (mức CONFIG của SYS-ADMIN). 4 MINOR còn lại (MI-02→05) gom lô sau | BA |
 
 ---
 
@@ -72,15 +74,19 @@ Tài liệu bao phủ **toàn bộ 7 phân hệ** của CDP, khoảng **99 mã y
 
 | # | Phân hệ | Nhóm mã yêu cầu | Nội dung chính |
 |---|---|---|---|
-| 1 | Tiếp nhận dữ liệu | FR-INGEST | Tiếp nhận dữ liệu thời gian thực và theo lô; kiểm tra cấu trúc; xử lý lỗi và thử lại; giám sát luồng |
-| 2 | Chuẩn hóa và xử lý dữ liệu | FR-STD | Chuẩn hóa số điện thoại, email, họ tên, địa chỉ, mã số thuế, mã vận đơn, trạng thái; theo dõi chất lượng dữ liệu |
+| 1 | Tiếp nhận dữ liệu | FR-ING (≡ FR-INGEST) | Tiếp nhận dữ liệu thời gian thực và theo lô; kiểm tra cấu trúc; xử lý lỗi và thử lại; giám sát luồng |
+| 2 | Chuẩn hóa và xử lý dữ liệu | FR-DPS (≡ FR-STD) | Chuẩn hóa số điện thoại, email, họ tên, địa chỉ, mã số thuế, mã vận đơn, trạng thái; theo dõi chất lượng dữ liệu |
 | 3 | Hợp nhất định danh | FR-IDR | Tính điểm tin cậy; đối sánh; gộp và tách hồ sơ; sơ đồ liên kết định danh; nhật ký gộp/tách |
 | 4 | Quản lý hồ sơ khách hàng 360 | FR-C360 | Tra cứu; hồ sơ hợp nhất 10 nhóm dữ liệu; hiển thị theo phân quyền; ghi chú và gắn nhãn |
 | 5 | Phân khúc, phân tích và trí tuệ nhân tạo | FR-SEG / FR-ANALYTICS | Phân khúc động; chấm điểm; cảnh báo rủi ro; phân tích theo mô hình gần đây/tần suất/giá trị; dự báo rời bỏ |
 | 6 | Kích hoạt dữ liệu | FR-ACT | Kiểm tra đồng ý; kiểm tra tần suất và khung giờ; phê duyệt theo ngưỡng; đẩy sang kênh; nhận phản hồi |
 | 7 | Quản trị, bảo mật và quyền riêng tư | FR-GOV | Quản lý tài khoản, vai trò, phạm vi; nhật ký bất biến; quản lý đồng ý; xử lý yêu cầu chủ thể dữ liệu; báo cáo tuân thủ |
 
-> **Về mã yêu cầu chi tiết:** Hai phân hệ của Lô 1 đã có **đủ tên mã theo tài liệu gốc `CDP.md`**: **14 mã FR-IDR-01→14** (mục 7.4) và **15 mã FR-C360-01→15** (mục 7.5) — xem cây chức năng đầy đủ ở Mục II.2 và danh mục ánh xạ ở Mục III.0. Năm phân hệ còn lại (Tiếp nhận FR-ING, Chuẩn hóa FR-DPS, Phân tích FR-ANA, Kích hoạt, Quản trị) cũng có bảng mã gốc trong `CDP.md` (mục 7.2, 7.3, 7.6…); tên và số hiệu chi tiết của từng mã sẽ được đưa vào cây chức năng khi làm chi tiết theo lô tương ứng.
+> **Về mã yêu cầu chi tiết:** Bốn phân hệ đã đặc tả chi tiết đều có **đủ tên mã theo tài liệu gốc `CDP.md`**: Lô 1 — **14 mã FR-IDR-01→14** (mục 7.4) và **15 mã FR-C360-01→15** (mục 7.5); Lô 2 — **10 mã FR-ING-01→10** (mục 7.2) và **14 mã FR-DPS-01→14** (mục 7.3). Xem cây chức năng đầy đủ ở Mục II.2 và danh mục ánh xạ ở Mục III.0 / III.3.0 / III.4.0.
+>
+> **Lưu ý mã nhóm:** tài liệu này dùng mã gốc CDP.md là **FR-ING** (Phân hệ 1) và **FR-DPS** (Phân hệ 2). Các mã nhóm cũ **FR-INGEST** và **FR-STD** từng dùng ở phiên bản khung là tương đương: **FR-INGEST ≡ FR-ING**, **FR-STD ≡ FR-DPS**. Từ v1.4, mọi tham chiếu chi tiết dùng FR-ING/FR-DPS.
+>
+> Ba phân hệ còn lại (Phân tích FR-ANA/FR-SEG, Kích hoạt FR-ACT, Quản trị FR-GOV) cũng có bảng mã gốc trong `CDP.md` (mục 7.6…); tên và số hiệu chi tiết của từng mã sẽ được đưa vào cây chức năng khi làm chi tiết theo lô tương ứng.
 
 ### I.2.2. Ranh giới hệ thống
 
@@ -596,22 +602,35 @@ flowchart TD
 ```
 CDP — Nền tảng Dữ liệu Khách hàng VNPost
 │
-├── Phân hệ 1: Tiếp nhận dữ liệu (FR-INGEST)
-│   ├── Tiếp nhận dữ liệu thời gian thực
-│   ├── Tiếp nhận dữ liệu theo lô (01:00–05:00)
-│   ├── Kiểm tra cấu trúc bản ghi
-│   ├── Xử lý lỗi và thử lại (1'–5'–15')
-│   ├── Quản lý hàng đợi lỗi (giữ 30 ngày)
-│   └── Giám sát luồng và cảnh báo
+├── Phân hệ 1: Tiếp nhận dữ liệu (FR-ING ≡ FR-INGEST)
+│   ├── API tiếp nhận sự kiện thời gian thực (FR-ING-01)
+│   ├── Kết nối đồng bộ dữ liệu theo lô 01:00–05:00 (FR-ING-02)
+│   ├── Tích hợp SDK cho Web/Mobile (FR-ING-03) [ưu tiên Medium]
+│   ├── Kiểm tra cấu trúc dữ liệu đầu vào — Schema Registry & Validation (FR-ING-04)
+│   ├── Quản lý kết nối nguồn dữ liệu — khai báo/bật-tắt/kiểm tra kết nối (FR-ING-05)
+│   ├── Tích hợp dữ liệu qua MPITS (FR-ING-06) [phụ thuộc OQ-04]
+│   ├── Kết nối dữ liệu từ kênh bên ngoài — Zalo/Facebook/SMS/Email/sàn TMĐT (FR-ING-07) [ưu tiên Medium]
+│   ├── Giám sát quá trình thu thập dữ liệu và cảnh báo (FR-ING-08)
+│   ├── Tự động thử lại và lưu hàng đợi lỗi — Retry & Dead Letter Queue, giữ 30 ngày (FR-ING-09)
+│   └── Ghi nhật ký tiếp nhận dữ liệu — Ingestion Audit Log (FR-ING-10)
+│       └── (Đủ 10 mã FR-ING-01→10 có tên theo CDP.md mục 7.2 — xem III.3.0)
 │
-├── Phân hệ 2: Chuẩn hóa và xử lý dữ liệu (FR-STD)
-│   ├── Chuẩn hóa số điện thoại
-│   ├── Chuẩn hóa email
-│   ├── Chuẩn hóa họ tên
-│   ├── Chuẩn hóa và bóc tách địa chỉ (ánh xạ mã địa chỉ số)
-│   ├── Chuẩn hóa mã số thuế, mã vận đơn
-│   ├── Ánh xạ trạng thái bưu gửi và thu hộ về bộ chuẩn
-│   └── Theo dõi chất lượng dữ liệu (bảng chỉ tiêu, danh sách xử lý)
+├── Phân hệ 2: Chuẩn hóa và xử lý dữ liệu (FR-DPS ≡ FR-STD)
+│   ├── Chuẩn hóa số điện thoại (FR-DPS-01)
+│   ├── Chuẩn hóa email (FR-DPS-02)
+│   ├── Chuẩn hóa họ tên khách hàng (FR-DPS-03)
+│   ├── Chuẩn hóa địa chỉ — bóc tách tỉnh/huyện/xã, liên kết VPostCode/Vmap (FR-DPS-04)
+│   ├── Kiểm tra mã số thuế 10/13 số (FR-DPS-05)
+│   ├── Kiểm tra và bảo vệ dữ liệu CCCD — masking/hạn chế quyền (FR-DPS-06)
+│   ├── Chuẩn hóa mã vận đơn/mã đơn hàng (FR-DPS-07)
+│   ├── Chuẩn hóa trạng thái nghiệp vụ — Status Mapping (FR-DPS-08)
+│   ├── Phát hiện và xử lý dữ liệu trùng lặp — Data Deduplication (FR-DPS-09)
+│   ├── Làm giàu dữ liệu khách hàng — Data Enrichment (FR-DPS-10)
+│   ├── Cấu hình quy tắc kiểm tra chất lượng dữ liệu (FR-DPS-11)
+│   ├── Bảng điều khiển chất lượng dữ liệu — Data Quality Dashboard (FR-DPS-12)
+│   ├── Danh sách rà soát và xử lý dữ liệu lỗi — Error Review & Correction Queue (FR-DPS-13)
+│   └── Cấu hình nguồn dữ liệu ưu tiên — Source Priority Rules (FR-DPS-14)
+│       └── (Đủ 14 mã FR-DPS-01→14 có tên theo CDP.md mục 7.3 — xem III.4.0)
 │
 ├── Phân hệ 3: Hợp nhất định danh (FR-IDR)
 │   ├── Luật đối sánh tuyệt đối (FR-IDR-01)
@@ -690,15 +709,15 @@ CDP — Nền tảng Dữ liệu Khách hàng VNPost
 
 **Diễn giải các phân hệ:**
 
-**Phân hệ 1 — Tiếp nhận dữ liệu (FR-INGEST)**
+**Phân hệ 1 — Tiếp nhận dữ liệu (FR-ING ≡ FR-INGEST)**
 - **Mục đích:** Đưa dữ liệu từ hơn 8 nguồn vào CDP an toàn, đúng cấu trúc, có kiểm soát lỗi.
 - **Giá trị nghiệp vụ:** Là cửa ngõ dữ liệu; nếu tiếp nhận sai hoặc mất dữ liệu, toàn bộ hồ sơ hạ nguồn đều sai. Nút thắt hiệu năng nằm ở đây (~1,7 triệu bản ghi/ngày).
-- **Chức năng con:** Tiếp nhận thời gian thực, tiếp nhận theo lô, kiểm tra cấu trúc, xử lý lỗi và thử lại, quản lý hàng đợi lỗi, giám sát luồng và cảnh báo.
+- **Chức năng con:** đủ **10 mã FR-ING-01→10** đã có tên theo CDP.md mục 7.2 — API thời gian thực (01), đồng bộ theo lô (02), SDK Web/Mobile (03), kiểm tra cấu trúc (04), quản lý kết nối nguồn (05), tích hợp MPITS (06), kết nối kênh ngoài (07), giám sát thu thập (08), thử lại + hàng đợi lỗi (09), ghi nhật ký tiếp nhận (10). Chi tiết Use Case xem III.3.
 
-**Phân hệ 2 — Chuẩn hóa và xử lý dữ liệu (FR-STD)**
+**Phân hệ 2 — Chuẩn hóa và xử lý dữ liệu (FR-DPS ≡ FR-STD)**
 - **Mục đích:** Đưa dữ liệu về một dạng chuẩn để có thể so khớp và hợp nhất.
 - **Giá trị nghiệp vụ:** Dữ liệu Việt Nam (địa chỉ viết tắt, số điện thoại nhiều dạng) không chuẩn hóa thì không hợp nhất được; ảnh hưởng trực tiếp chất lượng hồ sơ 360.
-- **Chức năng con:** Chuẩn hóa số điện thoại, email, họ tên, địa chỉ, mã số thuế, mã vận đơn, ánh xạ trạng thái, theo dõi chất lượng dữ liệu.
+- **Chức năng con:** đủ **14 mã FR-DPS-01→14** đã có tên theo CDP.md mục 7.3 — chuẩn hóa SĐT/email/tên/địa chỉ (01–04), kiểm tra MST/CCCD (05–06), chuẩn hóa mã vận đơn/trạng thái (07–08), phát hiện trùng lặp (09), làm giàu dữ liệu (10), cấu hình rule chất lượng (11), bảng điều khiển chất lượng (12), danh sách rà soát lỗi (13), cấu hình nguồn ưu tiên (14). Chi tiết Use Case xem III.4.
 
 **Phân hệ 3 — Hợp nhất định danh (FR-IDR)**
 - **Mục đích:** Nhận diện cùng một khách hàng đang có nhiều mã ở nhiều hệ thống, hợp nhất thành một hồ sơ chuẩn; tách khi gộp nhầm.
@@ -740,7 +759,9 @@ Ma trận dưới xây trên gốc bảng role × nhóm dữ liệu (mục 6.2 b
 |---|---|---|---|---|---|---|---|
 | **Tiếp nhận (FR-INGEST)** | Giám sát luồng | X | – | – | – | – | (X) |
 | | Xử lý bản ghi lỗi | X | – | – | – | – | (X) |
-| **Chuẩn hóa (FR-STD)** | Theo dõi chất lượng dữ liệu | X | (X) | – | – | – | (X) |
+| **Chuẩn hóa (FR-DPS)** | Theo dõi chất lượng dữ liệu | X | (X) | – | – | – | (X) |
+| | Cấu hình rule chất lượng dữ liệu | X | – | – | – | – | (X) |
+| | Cấu hình nguồn dữ liệu ưu tiên | X | – | – | – | – | (X) |
 | **Hợp nhất định danh (FR-IDR)** | Đối soát hàng đợi | X | – | – | – | – | (X) |
 | | Xác nhận gộp | X | – | – | – | – | (X) |
 | | Tách hồ sơ | X | – | – | – | – | – |
@@ -769,6 +790,7 @@ Ma trận dưới xây trên gốc bảng role × nhóm dữ liệu (mục 6.2 b
 - **Nguyên tắc che dữ liệu trong cùng màn hình:** cùng một chức năng "Xem hồ sơ 360" nhưng mỗi vai trò thấy mức chi tiết khác nhau — không chỉ ẩn/hiện cả khối mà còn che nội dung từng trường. Ví dụ: số điện thoại — CSKH và Vận hành che một phần, Kinh doanh và Người phụ trách dữ liệu xem đầy đủ; số định danh cá nhân — chỉ Quản trị xem đầy đủ theo quyền đặc biệt.
 - **Điểm rủi ro thu hộ và gian lận:** Tiếp thị và CSKH **không xem** hai điểm này (theo mục 6.2 baseline và ghi chú masking của wireframe: COD Risk Score và Fraud Score ẩn với CSKH/Marketing). Chỉ Kinh doanh và KHL, Vận hành và thu hộ, Người phụ trách dữ liệu và Quản trị hệ thống được xem.
 - **Tách hồ sơ** là thao tác không đảo ngược tự động (phải bắt buộc điền lý do, ghi nhật ký bất biến) — xem II.4.
+- **Quyền cấu hình chất lượng dữ liệu (Cấu hình rule chất lượng, Cấu hình nguồn dữ liệu ưu tiên):** giao cho **Người phụ trách dữ liệu (X)** — đây là chủ thể nghiệp vụ định nghĩa quy tắc chất lượng và nguồn master (UC-DPS-05, UC-DPS-06). Quản trị hệ thống để **(X)** (xem/hỗ trợ) chứ không phải X đầy đủ, theo nguyên tắc II.4.4 mục 3 — **tách quyền cấu hình khỏi quyền xem dữ liệu**: người cấu hình hệ thống không mặc nhiên là người định nghĩa quy tắc dữ liệu nghiệp vụ. `[Cần xác nhận: Quản trị hệ thống có cần quyền cấu hình đầy đủ hai chức năng này không, hay chỉ xem/hỗ trợ]` (OQ-DPS-03).
 - **Sáu vai trò chưa có giao diện** — Chủ sở hữu dữ liệu, Kỹ sư dữ liệu, Chuyên viên phân tích dữ liệu, An toàn thông tin, Pháp chế và tuân thủ, Lãnh đạo và quản lý đơn vị — chưa được đưa vào bảng chi tiết ở trên vì chưa chốt mức chi tiết giao diện. Định hướng quyền của nhóm này:
 
 | Vai trò | Định hướng quyền chính |
@@ -814,7 +836,7 @@ Ma trận dưới xây trên gốc bảng role × nhóm dữ liệu (mục 6.2 b
 | REQUEST_UNMERGE | Đề xuất tách qua nút Báo cáo — không tự tạo thao tác tách; người phụ trách dữ liệu xem và quyết định |
 | EXPORT | Xuất dữ liệu |
 | APPROVE | Phê duyệt (xuất/kích hoạt vượt ngưỡng) |
-| CONFIG | Cấu hình hệ thống |
+| CONFIG | Cấu hình hệ thống và quy tắc dữ liệu (rule chất lượng, nguồn dữ liệu ưu tiên, cấu hình kết nối/giám sát luồng) — **khác UPDATE** (UPDATE là sửa dữ liệu/bản ghi cụ thể; CONFIG là định nghĩa quy tắc áp cho toàn luồng) |
 | ADMIN | Quản trị người dùng và phân quyền |
 
 ### II.4.3. Ma trận ủy quyền theo khối chức năng (các vai trò trọng tâm)
@@ -822,7 +844,7 @@ Ma trận dưới xây trên gốc bảng role × nhóm dữ liệu (mục 6.2 b
 | Khối chức năng | DATA-STEWARD | MARKETING | CSKH | SALES-KHL | OPS-COD | SYS-ADMIN |
 |---|---|---|---|---|---|---|
 | Tiếp nhận / giám sát luồng | VIEW, UPDATE | – | – | – | – | VIEW, CONFIG |
-| Chất lượng dữ liệu | VIEW, UPDATE | VIEW | – | – | – | VIEW |
+| Chất lượng dữ liệu | VIEW, UPDATE, CONFIG | VIEW | – | – | – | VIEW |
 | Hợp nhất định danh | VIEW, MERGE, UNMERGE | – | VIEW, REQUEST_UNMERGE | VIEW, REQUEST_UNMERGE | VIEW, REQUEST_UNMERGE | VIEW |
 | Hồ sơ 360 | VIEW | VIEW | VIEW | VIEW | VIEW | VIEW |
 | Ghi chú / gắn nhãn | VIEW, CREATE | VIEW, CREATE | VIEW, CREATE | VIEW, CREATE | VIEW, CREATE | VIEW, CREATE |
@@ -835,6 +857,8 @@ Ma trận dưới xây trên gốc bảng role × nhóm dữ liệu (mục 6.2 b
 | Quản trị tài khoản/phân quyền | – | – | – | – | – | ADMIN, CONFIG |
 
 > Các vai trò DATA-OWNER, DATA-ENG, DATA-ANALYST, SEC-OFFICER, COMPLIANCE, LEADER chưa có ma trận chi tiết — xem `[Cần xác nhận]` ở II.3. Định hướng quyền của nhóm này đã nêu trong bảng II.3.
+>
+> **Ghi chú khối Chất lượng dữ liệu (khớp UC-DPS-05, UC-DPS-06):** DATA-STEWARD có **VIEW, UPDATE, CONFIG** — trong đó **UPDATE** là sửa dữ liệu lỗi/nạp lại bản ghi cụ thể (UC-DPS-05, SCR-DPS-03), còn **CONFIG** là cấu hình rule chất lượng (SCR-DPS-04) và cấu hình nguồn dữ liệu ưu tiên (SCR-DPS-05, UC-DPS-06). Tách hai quyền để phân biệt "sửa một bản ghi" với "định nghĩa quy tắc áp cho toàn luồng" (nguyên tắc II.4.4 mục 3). SYS-ADMIN giữ **VIEW** ở khối này, chưa gán CONFIG — xem OQ-DPS-03.
 
 ### II.4.4. Bảy nguyên tắc phân quyền
 
@@ -885,7 +909,7 @@ sequenceDiagram
     participant DB as Kho dữ liệu CDP
     actor DS as Người phụ trách dữ liệu
 
-    rect rgb(240, 248, 255)
+    rect rgba(106, 106, 106, 1)
         Note over SRC,DB: Giai đoạn 1 — Tiếp nhận
         SRC->>HT: Đẩy bản ghi (thời gian thực) / nạp tệp (theo lô)
         HT->>HT: Kiểm tra cấu trúc bản ghi
@@ -899,7 +923,7 @@ sequenceDiagram
         end
     end
 
-    rect rgb(245, 255, 245)
+    rect rgba(73, 72, 72, 1)
         Note over SRC,DB: Giai đoạn 2 — Chuẩn hóa
         HT->>HT: Chuẩn hóa SĐT, email, tên, MST, vận đơn, trạng thái
         alt Địa chỉ chuẩn hóa được
@@ -909,7 +933,7 @@ sequenceDiagram
         end
     end
 
-    rect rgb(255, 248, 240)
+    rect rgba(44, 44, 44, 1)
         Note over SRC,DS: Giai đoạn 3 — Hợp nhất định danh
         HT->>HT: Tính điểm tin cậy cho cặp nghi trùng
         alt Cấm gộp tự động
@@ -963,7 +987,7 @@ sequenceDiagram
     actor APR as Người phê duyệt
     participant CH as Kênh gửi (Zalo/SMS/email)
 
-    rect rgb(240, 248, 255)
+    rect rgba(113, 113, 113, 1)
         Note over MKT,DB: Giai đoạn 1 — Chọn và kiểm tra đồng ý
         MKT->>HT: Chọn phân khúc + kênh gửi
         HT->>DB: Lấy danh sách khách hàng trong phân khúc
@@ -975,7 +999,7 @@ sequenceDiagram
         end
     end
 
-    rect rgb(245, 255, 245)
+    rect rgba(67, 66, 66, 1)
         Note over MKT,DB: Giai đoạn 2 — Kiểm tra tần suất và ngưỡng
         HT->>HT: Kiểm tra tần suất (≤3/tuần, ≤1/kênh/ngày) và khung giờ (không 21h–08h)
         alt Vượt hạn tần suất
@@ -993,7 +1017,7 @@ sequenceDiagram
         end
     end
 
-    rect rgb(255, 248, 240)
+    rect rgba(49, 49, 49, 1)
         Note over HT,CH: Giai đoạn 3 — Đẩy tệp và nhận phản hồi
         HT->>CH: Đẩy tệp sang kênh
         HT->>DB: Ghi lịch sử kích hoạt (lưu 3 năm)
@@ -1503,6 +1527,531 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 
 ---
 
+## III.3. Phân hệ 1 — Tiếp nhận dữ liệu (UC-ING)
+
+> **Phạm vi III.3 (Lô 2):** Phân hệ 1 Tiếp nhận (FR-ING-01→10). Phần lớn Use Case có **actor chính là Hệ thống** (chạy nền, không có người vận hành) — bám hình luồng **Luồng 1** (Mục II.1 Quy trình 1) và bảng quyết định DP-01/DP-02/DP-03 đã có. Các UC có người vận hành dùng **Kỹ sư dữ liệu (DATA-ENG)** và **Người phụ trách dữ liệu (DATA-STEWARD)** theo đúng tác nhân gốc CDP.md 7.2.
+>
+> **Ranh giới inbound vs outbound:** Lô 2 chỉ xử lý lỗi **inbound** (dữ liệu ĐI VÀO CDP — tiếp nhận, kiểm tra cấu trúc, thử lại, hàng đợi lỗi tiếp nhận). Nhánh edge 6.4 **"Đồng bộ sang kênh nhận dữ liệu thất bại"** là lỗi **outbound** (CDP đẩy dữ liệu ĐI — đồng bộ sang CRM/kênh kích hoạt) thuộc **Phân hệ 6 Kích hoạt dữ liệu (lô sau)**, **KHÔNG thuộc Lô 2**. Đây là phân định phạm vi có chủ đích, không phải gap bị bỏ sót.
+>
+> **Lưu ý ranh giới quyền DATA-ENG vs DATA-STEWARD:** tài liệu gốc CDP.md 7.2 ghi tác nhân khối Tiếp nhận là "IT Admin/Data Engineer" và "System/Data Engineer"; II.3 khung tổng thể ghi hai vai trò Kỹ sư dữ liệu và Người phụ trách dữ liệu "trùng nhiều quyền" ở khối Tiếp nhận. **Tài liệu này KHÔNG tự quyết ranh giới phân quyền giữa hai vai trò** — chỗ nào cả hai cùng thao tác được ghi rõ "(DATA-ENG và/hoặc DATA-STEWARD)"; việc chốt ai làm gì thuộc VNPost (xem OQ-ING-01).
+
+### III.3.0. Danh mục Use Case và Business Rule của Phân hệ 1
+
+**Danh mục Use Case (7 UC):**
+
+| Mã UC | Tên Use Case | Actor chính | Chức năng (Function Tree II.2) | FR gốc liên quan |
+|---|---|---|---|---|
+| UC-ING-01 | Tiếp nhận sự kiện thời gian thực | Hệ thống (API) | API tiếp nhận sự kiện thời gian thực | FR-ING-01, 03 |
+| UC-ING-02 | Đồng bộ dữ liệu theo lô 01–05h | Hệ thống · Kỹ sư dữ liệu (cấu hình) | Kết nối đồng bộ theo lô | FR-ING-02, 06 |
+| UC-ING-03 | Kiểm tra cấu trúc và đẩy bản ghi lỗi | Hệ thống | Kiểm tra cấu trúc dữ liệu đầu vào | FR-ING-04 |
+| UC-ING-04 | Tự động thử lại và quản lý hàng đợi lỗi | Hệ thống · Kỹ sư dữ liệu / Người phụ trách dữ liệu (xử lý) | Thử lại và hàng đợi lỗi | FR-ING-09 |
+| UC-ING-05 | Giám sát luồng và phát cảnh báo/báo động | Hệ thống · Kỹ sư dữ liệu / Người phụ trách dữ liệu (theo dõi) | Giám sát quá trình thu thập | FR-ING-08 |
+| UC-ING-06 | Quản lý kết nối nguồn dữ liệu | Kỹ sư dữ liệu (DATA-ENG) · Quản trị hệ thống (SYS-ADMIN, tương ứng IT Admin) | Quản lý kết nối nguồn | FR-ING-05, 06, 07 |
+| UC-ING-07 | Ghi và tra cứu nhật ký tiếp nhận | Hệ thống (ghi) · Kỹ sư dữ liệu / Quản trị hệ thống (xem) | Ghi nhật ký tiếp nhận | FR-ING-10 |
+
+> **Ghi chú map màn:** UC-ING-01/02/03 là các use case **chạy nền, actor Hệ thống, không có màn người dùng riêng** (tương tự UC-IDR-01 Lô 1 — ghi nhận MINOR MI-L1-01). Kết quả của chúng được quan sát gián tiếp qua SCR-ING-01 (giám sát luồng) và SCR-ING-03 (hàng đợi lỗi). UC-ING-04/05/06/07 có màn tương ứng ở Mục IV.
+
+**Danh mục Business Rule của Phân hệ 1 (BR-ING):**
+
+| Mã BR | Nội dung | Nguồn |
+|---|---|---|
+| BR-ING-01 | **Độ trễ dữ liệu theo nhóm nguồn:** hành vi số / tạo đơn / tra cứu ≤ **5 phút** · trạng thái phát / thu hộ (COD) ≤ **15 phút** · hệ thống cũ (khai thác, vận tải, kho) đồng bộ **1 lần/ngày trong khung 01:00–05:00** · đối soát thu hộ **1 lần/ngày sau khi hệ thống thanh toán chốt sổ**. Mùa cao điểm cho phép trễ gấp 3 nhưng **không quá 30 phút** với nhóm thời gian thực | baseline 7.2, CDP.md 8.x |
+| BR-ING-02 | **Kiểm tra cấu trúc bản ghi (Schema Validation):** kiểm tra trường bắt buộc, kiểu dữ liệu, phiên bản cấu trúc. Bản ghi **sai cấu trúc đi thẳng vào hàng đợi lỗi, KHÔNG thử lại** (DP-01) | baseline 6.3, CDP.md 7.2 FR-ING-04 |
+| BR-ING-03 | **Thử lại khi lỗi tạm thời (mất kết nối / nguồn quá tải):** thử lại **3 lần theo nhịp 1 phút → 5 phút → 15 phút**; vẫn lỗi sau 3 lần thì đưa vào hàng đợi lỗi (DP-02) | baseline 7.2, CDP.md 7.2 FR-ING-09 |
+| BR-ING-04 | **Hàng đợi lỗi (Dead Letter Queue) giữ 30 ngày:** bản ghi lỗi lưu **30 ngày**, sau đó chuyển lưu trữ, **không xóa**. Bản ghi lỗi được Kỹ sư/Người phụ trách dữ liệu **xem, sửa và nạp lại** (khi sửa được thì chuyển trạng thái, xem BR-ING-05) | baseline 6.4, 7.2 |
+| BR-ING-05 | **Vòng đời bản ghi lỗi đồng bộ** (theo bảng chuyển trạng thái 6.3): *Chờ thử lại* → *Trong hàng đợi lỗi* (khi thử lại 3 lần vẫn thất bại) → *Đã xử lý / Bỏ qua* (do Người phụ trách dữ liệu quyết định — trạng thái cuối, không quay lại). **Chuyển trạng thái ngược chiều riêng:** thao tác "Sửa và nạp lại" đưa bản ghi từ *Trong hàng đợi lỗi* → *Chờ thử lại* (nạp lại vào luồng). Nút "Sửa và nạp lại" ở SCR-ING-03 (row 10) và UC-ING-04 E3 thực hiện đúng chuyển này | baseline 6.3 bảng chuyển trạng thái |
+| BR-ING-06 | **Ngưỡng cảnh báo luồng (mức vàng):** phát cảnh báo khi **tồn đọng cần hơn 15 phút xử lý**, hoặc **tỷ lệ bản ghi lỗi vượt 1% trong 1 giờ** | baseline 7.2 ngưỡng cảnh báo |
+| BR-ING-07 | **Ngưỡng báo động luồng (mức đỏ):** phát báo động khi **nguồn ngừng đẩy quá 15 phút trong khung giờ hoạt động**, hoặc **tỷ lệ lỗi vượt 5% trong 1 giờ**, hoặc **tồn đọng cần hơn 60 phút xử lý** | baseline 7.2, 6.4 (nguồn ngừng đẩy giữa chừng) |
+| BR-ING-08 | **Ngưỡng dùng tỷ lệ (%) và thời gian, không dùng số bản ghi tuyệt đối** — vì các luồng chênh nhau rất xa về lưu lượng nên tỷ lệ và thời gian phản ánh tình trạng công bằng hơn giữa các luồng (baseline 7.2) | baseline 7.2 |
+| BR-ING-09 | **Nhật ký tiếp nhận ghi theo nguồn:** mỗi lần đồng bộ ghi nguồn, thời gian, số bản ghi nhận vào, số bản ghi lỗi, trạng thái thành công/thất bại, người cấu hình. Nhật ký thao tác thường lưu **2 năm** (theo bảng thời hạn lưu nhật ký baseline 7.2) | CDP.md 7.2 FR-ING-10, baseline 7.2 |
+| BR-ING-10 | **Kết nối nguồn có trạng thái độc lập:** mỗi nguồn có thể ở trạng thái *Hoạt động tốt* / *Cần theo dõi* / *Lỗi* / *Ngưng hoạt động (idle)*; bật/tắt và kiểm tra kết nối từng nguồn không ảnh hưởng nguồn khác | CDP.md 7.2 FR-ING-05, prototype giám sát luồng |
+
+### UC-ING-01 — Tiếp nhận sự kiện thời gian thực
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ING-01 |
+| **Tên** | Tiếp nhận tức thời sự kiện hành vi và giao dịch từ nguồn thời gian thực |
+| **Actor chính** | Hệ thống (API tiếp nhận — không có người vận hành) |
+| **Actor phụ** | Hệ thống nguồn (MyVNPost, CAS, MPITS, PNS/DingDong); SDK Web/Mobile (FR-ING-03) |
+| **Mô tả** | Hệ thống cung cấp điểm tiếp nhận để nhận ngay các sự kiện phát sinh từ nguồn thời gian thực (mở app, đăng nhập, tạo đơn, tra cước, tracking, trạng thái phát, thu hộ) và chuyển sang bước kiểm tra cấu trúc. |
+| **Tiền điều kiện** | Nguồn đã được khai báo và ở trạng thái kết nối hoạt động (UC-ING-06). |
+| **Kích hoạt** | Nguồn phát sinh sự kiện và đẩy sang CDP. |
+
+**Luồng chính:**
+
+1. Hệ thống nguồn đẩy sự kiện sang điểm tiếp nhận thời gian thực của CDP ngay khi phát sinh.
+2. Hệ thống ghi nhận sự kiện, gắn nhãn nguồn và thời điểm nhận.
+3. Hệ thống chuyển bản ghi sang bước kiểm tra cấu trúc (UC-ING-03).
+4. Hệ thống bảo đảm độ trễ trong ngưỡng theo nhóm (BR-ING-01): ≤ 5 phút cho hành vi số/tạo đơn/tra cứu; ≤ 15 phút cho trạng thái phát/thu hộ.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Nguồn quá tải hoặc mất kết nối tạm thời | Chuyển cơ chế thử lại 3 lần 1'–5'–15' (UC-ING-04, BR-ING-03) |
+| E2 | Độ trễ vượt ngưỡng nhóm (không phải mùa cao điểm) | Tính vào chỉ số tồn đọng luồng; nếu vượt ngưỡng thì cảnh báo/báo động (UC-ING-05, BR-ING-06/07) |
+| E3 | Mùa cao điểm | Cho phép trễ gấp 3 nhưng không quá 30 phút với nhóm thời gian thực (BR-ING-01); vượt mức này vẫn báo động |
+| E4 | Sự kiện đến từ SDK Web/Mobile ở trạng thái ẩn danh (chưa đăng nhập — FR-ING-03) | Vẫn tiếp nhận và gắn định danh ẩn danh; liên kết với hồ sơ định danh sau khi khách hàng đăng nhập (thuộc Phân hệ 3 — FR-IDR-10, ngoài phạm vi UC này) |
+
+**Hậu điều kiện:** Sự kiện được ghi nhận, gắn nhãn nguồn/thời gian và chuyển sang kiểm tra cấu trúc. Lần đồng bộ được tính vào nhật ký tiếp nhận (UC-ING-07).
+
+**Business Rule liên quan:** BR-ING-01, BR-ING-03.
+**FR gốc:** FR-ING-01, FR-ING-03.
+
+> **[Cần xác nhận: phạm vi SDK Web/Mobile trong MVP]** (OQ-ING-02) — FR-ING-03 (SDK thu thập hành vi, gồm hành vi ẩn danh) có độ ưu tiên **Medium** ở gốc. Cần VNPost xác nhận SDK có thuộc phạm vi giai đoạn đầu không, hay chỉ tiếp nhận qua API/nguồn có sẵn.
+
+---
+
+### UC-ING-02 — Đồng bộ dữ liệu theo lô 01–05h
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ING-02 |
+| **Tên** | Đồng bộ dữ liệu theo lô từ hệ thống cũ trong khung 01:00–05:00 |
+| **Actor chính** | Hệ thống (chạy theo lịch); Kỹ sư dữ liệu (DATA-ENG) — cấu hình lịch và tham số |
+| **Mô tả** | Hệ thống lập lịch nạp dữ liệu định kỳ từ các hệ thống cũ (BCCP, TMS, WMS, PayPost) và Portal KHL/CRM qua cơ chế tệp/kết nối theo lô; đối soát thu hộ chạy sau khi hệ thống thanh toán chốt sổ. |
+| **Tiền điều kiện** | Nguồn theo lô đã được khai báo và cấu hình lịch (UC-ING-06). |
+| **Kích hoạt** | Đến giờ chạy lô (khung 01:00–05:00) hoặc sau khi hệ thống thanh toán chốt sổ (với đối soát thu hộ). |
+
+**Luồng chính:**
+
+1. Đến giờ theo lịch, hệ thống nạp tệp/kết nối theo lô từ nguồn.
+2. Hệ thống ghi nhận số bản ghi nạp vào và chuyển sang bước kiểm tra cấu trúc (UC-ING-03).
+3. Hệ thống cập nhật thời điểm đồng bộ cuối cùng cho nguồn (hiển thị ở SCR-ING-01).
+4. Với đối soát thu hộ: chạy sau khi hệ thống thanh toán (PayPost) chốt sổ (BR-ING-01).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Nguồn theo lô không sẵn sàng đúng giờ | Thử lại theo cơ chế BR-ING-03; nếu quá khung 05:00 vẫn chưa xong, ghi cảnh báo và tiếp tục ở lần chạy sau; ghi nhật ký (UC-ING-07) |
+| E2 | Tệp/lô sai định dạng cấu trúc | Bản ghi sai cấu trúc vào hàng đợi lỗi, không thử lại (UC-ING-03, BR-ING-02) |
+| E3 | Nguồn cũ thiếu trường (VD BCCP/TMS/WMS không có REST API — A4) | Chấp nhận theo cơ chế tệp export hằng ngày; bản ghi thiếu trường bắt buộc vào hàng đợi lỗi để rà soát (UC-DPS-05) |
+
+**Hậu điều kiện:** Dữ liệu lô được nạp, số bản ghi và thời điểm đồng bộ ghi vào nhật ký; bản ghi đạt cấu trúc chuyển sang chuẩn hóa.
+
+**Business Rule liên quan:** BR-ING-01, BR-ING-02, BR-ING-03, BR-ING-09.
+**FR gốc:** FR-ING-02, FR-ING-06.
+
+> **[Cần xác nhận: MPITS làm cổng dữ liệu chung hay tích hợp riêng lẻ]** (OQ-04) — Nếu MPITS mở kết nối và tổng hợp sẵn dữ liệu, một phần nguồn theo lô/thời gian thực có thể lấy qua một cổng thay vì tích hợp từng hệ thống (FR-ING-06). Ảnh hưởng số lượng kết nối khai báo ở UC-ING-06.
+
+---
+
+### UC-ING-03 — Kiểm tra cấu trúc và đẩy bản ghi lỗi
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ING-03 |
+| **Tên** | Kiểm tra cấu trúc dữ liệu đầu vào (Schema Registry & Validation) |
+| **Actor chính** | Hệ thống (không có người vận hành) |
+| **Mô tả** | Với mỗi bản ghi nhận vào (thời gian thực hoặc theo lô), hệ thống kiểm tra trường bắt buộc, kiểu dữ liệu, phiên bản cấu trúc. Bản ghi hợp lệ chuyển sang chuẩn hóa; bản ghi sai cấu trúc đi thẳng vào hàng đợi lỗi. |
+| **Tiền điều kiện** | Có bản ghi vừa được tiếp nhận (UC-ING-01 hoặc UC-ING-02). |
+| **Kích hoạt** | Một bản ghi đến bước kiểm tra cấu trúc. |
+
+**Luồng chính:**
+
+1. Hệ thống kiểm tra bản ghi theo bộ quy tắc cấu trúc: trường bắt buộc có đủ, đúng kiểu dữ liệu, đúng phiên bản cấu trúc (BR-ING-02).
+2. Bản ghi **đúng cấu trúc** → chuyển sang bước chuẩn hóa (Phân hệ 2, UC-DPS-01).
+3. Hệ thống đếm bản ghi hợp lệ / bản ghi lỗi phục vụ chỉ số giám sát (UC-ING-05) và nhật ký (UC-ING-07).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Bản ghi **sai cấu trúc** (thiếu trường bắt buộc / sai kiểu / sai phiên bản) — DP-01 | Đưa vào hàng đợi lỗi **ngay, KHÔNG thử lại**; trạng thái "Trong hàng đợi lỗi" (BR-ING-02, BR-ING-05); giữ 30 ngày (BR-ING-04) |
+| E2 | Tỷ lệ bản ghi sai cấu trúc trong 1 giờ vượt ngưỡng | Kích hoạt cảnh báo (>1%/giờ) hoặc báo động (>5%/giờ) theo BR-ING-06/07 |
+
+**Hậu điều kiện:** Bản ghi hợp lệ sang chuẩn hóa; bản ghi lỗi nằm trong hàng đợi lỗi chờ xử lý (SCR-ING-03). Số liệu hợp lệ/lỗi cập nhật cho giám sát và nhật ký.
+
+**Business Rule liên quan:** BR-ING-02, BR-ING-04, BR-ING-05, BR-ING-06, BR-ING-07.
+**FR gốc:** FR-ING-04.
+
+---
+
+### UC-ING-04 — Tự động thử lại và quản lý hàng đợi lỗi
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ING-04 |
+| **Tên** | Tự động thử lại khi lỗi tạm thời và quản lý hàng đợi lỗi (Retry & Dead Letter Queue) |
+| **Actor chính** | Hệ thống (thử lại tự động); Kỹ sư dữ liệu / Người phụ trách dữ liệu (xem, sửa, nạp lại, bỏ qua) |
+| **Mô tả** | Khi đồng bộ lỗi do mất kết nối hoặc nguồn quá tải, hệ thống tự thử lại 3 lần theo nhịp 1'–5'–15'; vẫn lỗi thì đưa vào hàng đợi lỗi giữ 30 ngày để người phụ trách xử lý. |
+| **Tiền điều kiện** | Có bản ghi/lô gặp lỗi tạm thời, hoặc có bản ghi sai cấu trúc đã vào hàng đợi lỗi. |
+| **Kích hoạt** | Phát sinh lỗi đồng bộ, hoặc người dùng mở hàng đợi lỗi (SCR-ING-03). |
+
+**Luồng chính:**
+
+1. Khi lỗi do mất kết nối / quá tải (DP-02), hệ thống **thử lại 3 lần theo nhịp 1 phút → 5 phút → 15 phút** (BR-ING-03). Trạng thái bản ghi: "Chờ thử lại".
+2. Nếu một lần thử lại thành công → bản ghi tiếp tục luồng bình thường (kiểm tra cấu trúc / chuẩn hóa).
+3. Nếu **thử lại 3 lần vẫn thất bại** → bản ghi chuyển trạng thái "Trong hàng đợi lỗi" (BR-ING-05), giữ 30 ngày (BR-ING-04).
+4. Kỹ sư dữ liệu / Người phụ trách dữ liệu mở hàng đợi lỗi, xem chi tiết lỗi, **sửa và nạp lại** (bản ghi quay lại "Chờ thử lại"), hoặc đánh dấu **Đã xử lý / Bỏ qua**.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Bản ghi sai cấu trúc (không phải lỗi tạm thời) | **KHÔNG thử lại**; vào hàng đợi lỗi ngay (BR-ING-02) |
+| E2 | Bản ghi trong hàng đợi lỗi không ai xử lý sau 30 ngày | Chuyển sang lưu trữ, **không xóa** (BR-ING-04) |
+| E3 | Nạp lại sau khi sửa nhưng vẫn lỗi | Quay lại quy trình thử lại; nếu vẫn thất bại, giữ trong hàng đợi lỗi |
+| E4 | Người dùng đánh dấu "Bỏ qua" | Trạng thái chuyển cuối, không quay lại (BR-ING-05); ghi nhật ký người quyết định |
+
+**Hậu điều kiện:** Bản ghi lỗi được xử lý (nạp lại thành công / đã xử lý / bỏ qua) hoặc lưu trữ sau 30 ngày. Thao tác xử lý ghi vào nhật ký.
+
+**Business Rule liên quan:** BR-ING-02, BR-ING-03, BR-ING-04, BR-ING-05.
+**FR gốc:** FR-ING-09.
+
+---
+
+### UC-ING-05 — Giám sát luồng và phát cảnh báo/báo động
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ING-05 |
+| **Tên** | Giám sát quá trình thu thập dữ liệu và phát cảnh báo/báo động luồng |
+| **Actor chính** | Hệ thống (tính chỉ số, phát cảnh báo); Kỹ sư dữ liệu / Người phụ trách dữ liệu (theo dõi, xử lý) |
+| **Mô tả** | Hệ thống theo dõi từng luồng dữ liệu theo nguồn: số bản ghi nhận vào, số bản ghi lỗi, độ trễ, trạng thái kết nối, thời điểm đồng bộ cuối cùng; phát cảnh báo (vàng) và báo động (đỏ) khi vượt ngưỡng. |
+| **Tiền điều kiện** | Có ít nhất một nguồn đang hoạt động; người dùng có quyền "Giám sát luồng" (II.3). |
+| **Kích hoạt** | Người dùng mở màn **Giám sát luồng dữ liệu** (SCR-ING-01), hoặc hệ thống định kỳ tính chỉ số và phát cảnh báo. |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị theo từng nguồn/luồng: trạng thái, số bản ghi/phút, tổng bản ghi trong ngày, độ trễ, số bản ghi lỗi trong ngày, thời điểm cập nhật gần nhất.
+2. Người dùng theo dõi tình trạng luồng; chọn một luồng để xem chi tiết (số bản ghi lỗi gần nhất, mô tả lỗi).
+3. Hệ thống hiển thị bảng cảnh báo gần đây (mức, thời điểm, nguồn, nội dung).
+4. Khi cần, người dùng thao tác **thử lại nguồn** hoặc **tạm dừng nguồn** (chuyển UC-ING-06/UC-ING-04).
+
+**Luồng thay thế / ngoại lệ (bám edge case 6.4):**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Tồn đọng cần hơn 15 phút xử lý **hoặc** tỷ lệ lỗi vượt 1%/giờ | Phát **cảnh báo (vàng)**: câu chữ mẫu — "Luồng {nguồn} đang xử lý chậm / tỷ lệ lỗi tăng. Vui lòng theo dõi." (BR-ING-06) |
+| E2 | Nguồn **ngừng đẩy quá 15 phút** trong khung giờ hoạt động, **hoặc** tỷ lệ lỗi vượt 5%/giờ, **hoặc** tồn đọng cần hơn 60 phút | Phát **báo động (đỏ)**: câu chữ mẫu — "Luồng {nguồn} đã ngừng nhận dữ liệu/vượt ngưỡng lỗi. Cần xử lý ngay." (BR-ING-07) |
+| E3 | Nguồn ở trạng thái ngưng hoạt động theo lịch (idle — VD nguồn địa chỉ cập nhật theo đợt) | Không phát báo động; hiển thị trạng thái "Ngưng hoạt động" để phân biệt với sự cố (BR-ING-10) |
+
+**Hậu điều kiện:** Người dùng nắm tình trạng luồng; cảnh báo/báo động được ghi nhận. Thao tác thử lại/tạm dừng (nếu có) ghi vào nhật ký.
+
+**Business Rule liên quan:** BR-ING-06, BR-ING-07, BR-ING-08, BR-ING-10.
+**FR gốc:** FR-ING-08.
+
+> **[Cần xác nhận: câu chữ cảnh báo/báo động luồng chuẩn]** (OQ-ING-03) — Baseline 7.3 định nghĩa "luồng dữ liệu có vấn đề: cảnh báo/báo động" nhưng chưa có câu chữ hiển thị chuẩn. Câu chữ mẫu trên là đề xuất — cần PO/VNPost duyệt.
+
+---
+
+### UC-ING-06 — Quản lý kết nối nguồn dữ liệu
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ING-06 |
+| **Tên** | Khai báo, cấu hình, bật/tắt và kiểm tra kết nối nguồn dữ liệu |
+| **Actor chính** | Kỹ sư dữ liệu (DATA-ENG) |
+| **Actor phụ** | Quản trị hệ thống (SYS-ADMIN — tương ứng "IT Admin" ở tác nhân gốc CDP.md 7.2 của FR-ING-05/06) |
+| **Mô tả** | Người dùng khai báo nguồn dữ liệu mới, cấu hình tham số kết nối và lịch đồng bộ, bật/tắt nguồn, kiểm tra kết nối và theo dõi trạng thái từng nguồn. **Phân vai:** DATA-ENG là người vận hành chính (khai báo, cấu hình lịch, sửa tham số kết nối); SYS-ADMIN thực hiện phần quản trị hạ tầng kết nối (kiểm tra/mở kết nối tới hệ thống nguồn, bật/tắt ở mức quản trị) và có quyền CONFIG khối Tiếp nhận theo II.4.3. |
+| **Tiền điều kiện** | Người dùng có quyền quản lý kết nối nguồn — DATA-ENG (định hướng II.3) hoặc SYS-ADMIN **VIEW, CONFIG** khối Tiếp nhận (II.4.3). |
+| **Kích hoạt** | Người dùng mở màn **Quản lý kết nối nguồn dữ liệu** (SCR-ING-02). |
+
+**Luồng chính:**
+
+1. Người dùng xem danh sách nguồn đã khai báo kèm trạng thái kết nối (BR-ING-10).
+2. Người dùng khai báo nguồn mới hoặc chọn nguồn có sẵn để cấu hình (loại nguồn, phương thức đồng bộ theo lô/thời gian thực, lịch chạy với nguồn theo lô).
+3. Người dùng **kiểm tra kết nối** — hệ thống thử kết nối và báo kết quả (thành công / thất bại kèm lý do).
+4. Người dùng **bật/tắt** nguồn; tắt nguồn không ảnh hưởng nguồn khác (BR-ING-10).
+5. Hệ thống ghi thay đổi cấu hình vào nhật ký tiếp nhận (UC-ING-07).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Kiểm tra kết nối thất bại | Hiển thị lý do (VD "Không kết nối được tới nguồn {tên}"); nguồn giữ trạng thái "Lỗi", không cho bật đồng bộ cho tới khi kết nối lại được |
+| E2 | Tắt một nguồn đang có dữ liệu tồn đọng | Cảnh báo còn tồn đọng chưa xử lý trước khi xác nhận tắt |
+| E3 | Nguồn qua MPITS (FR-ING-06) / kênh ngoài (FR-ING-07) | Khai báo theo cùng cơ chế; phạm vi phụ thuộc OQ-04 (MPITS) và danh sách kênh ngoài VNPost dùng (liên quan M3 clarification) |
+
+**Hậu điều kiện:** Nguồn được khai báo/cấu hình/bật-tắt đúng; trạng thái kết nối cập nhật; thay đổi ghi vào nhật ký.
+
+**Business Rule liên quan:** BR-ING-09, BR-ING-10.
+**FR gốc:** FR-ING-05, FR-ING-06, FR-ING-07.
+
+> **Ba vai trò ở khối Tiếp nhận — phân biệt rõ:** (1) **SYS-ADMIN** (= IT Admin ở gốc) làm quản trị hạ tầng kết nối, đã đưa vào UC-ING-06 làm actor phụ với quyền CONFIG khối Tiếp nhận (II.4.3) — điểm này **đã chốt, không phải OQ**. (2) Ranh giới **DATA-ENG vs DATA-STEWARD** (ai khai báo/cấu hình nguồn vs ai chỉ theo dõi/xử lý bản ghi lỗi) mới là điểm để mở — xem OQ-ING-01 ngay dưới.
+>
+> **[Cần xác nhận: ranh giới quyền DATA-ENG vs DATA-STEWARD ở khối Tiếp nhận]** (OQ-ING-01) — Gốc CDP.md 7.2 ghi tác nhân "IT Admin/Data Engineer"; II.3 ghi hai vai trò Kỹ sư dữ liệu và Người phụ trách dữ liệu trùng nhiều quyền. Cần VNPost chốt ai được khai báo/cấu hình nguồn (đề xuất DATA-ENG) và ai chỉ theo dõi/xử lý bản ghi lỗi. **Lưu ý: câu hỏi này KHÁC với vai trò SYS-ADMIN nêu trên.**
+
+---
+
+### UC-ING-07 — Ghi và tra cứu nhật ký tiếp nhận
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ING-07 |
+| **Tên** | Ghi nhật ký tiếp nhận và tra cứu lịch sử đồng bộ (Ingestion Audit Log) |
+| **Actor chính** | Hệ thống (ghi tự động); Kỹ sư dữ liệu / Quản trị hệ thống (tra cứu) |
+| **Mô tả** | Hệ thống ghi lịch sử đồng bộ theo nguồn, thời gian, số bản ghi, trạng thái thành công/thất bại và người cấu hình; người có quyền tra cứu để đối chiếu và giải trình. |
+| **Tiền điều kiện** | Có hoạt động đồng bộ/cấu hình nguồn đã diễn ra. |
+| **Kích hoạt** | Hệ thống ghi khi có sự kiện đồng bộ/cấu hình; người dùng mở phần Nhật ký tiếp nhận (trong SCR-ING-01 hoặc SCR-ING-02). |
+
+**Luồng chính:**
+
+1. Với mỗi lần đồng bộ, hệ thống ghi: nguồn, thời điểm, số bản ghi nhận vào, số bản ghi lỗi, trạng thái thành công/thất bại (BR-ING-09).
+2. Với mỗi thay đổi cấu hình nguồn (UC-ING-06), hệ thống ghi người thực hiện và nội dung thay đổi.
+3. Người dùng tra cứu nhật ký theo nguồn/khoảng thời gian để đối chiếu.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Chưa có bản ghi nhật ký | "Chưa có dữ liệu để hiển thị." |
+| A2 | Người dùng không có quyền xem nhật ký tiếp nhận | "Bạn không có quyền xem thông tin này. Liên hệ quản trị hệ thống nếu công việc của bạn cần dùng đến." |
+
+**Hậu điều kiện:** Lịch sử đồng bộ và cấu hình được ghi và tra cứu được; nhật ký thao tác thường lưu 2 năm (BR-ING-09).
+
+**Business Rule liên quan:** BR-ING-09.
+**FR gốc:** FR-ING-10.
+
+---
+
+## III.4. Phân hệ 2 — Chuẩn hóa và xử lý dữ liệu (UC-DPS)
+
+> **Phạm vi III.4 (Lô 2):** Phân hệ 2 Chuẩn hóa (FR-DPS-01→14). Tám chức năng chuẩn hóa trường (FR-DPS-01→08) được **gộp thành 2 Use Case** — UC-DPS-01 (trường định danh/liên hệ) và UC-DPS-02 (trường nghiệp vụ) — với **Business Rule chi tiết từng trường** thay cho 8 UC rời (theo thống nhất với BA). Actor chính phần lớn là **Hệ thống** (chạy nền, tự động sau tiếp nhận); phần cấu hình và rà soát lỗi là **Người phụ trách dữ liệu (DATA-STEWARD)**.
+
+### III.4.0. Danh mục Use Case và Business Rule của Phân hệ 2
+
+**Danh mục Use Case (6 UC):**
+
+| Mã UC | Tên Use Case | Actor chính | Chức năng (Function Tree II.2) | FR gốc liên quan |
+|---|---|---|---|---|
+| UC-DPS-01 | Chuẩn hóa trường định danh và liên hệ (SĐT/email/tên/địa chỉ) | Hệ thống | Chuẩn hóa SĐT, email, họ tên, địa chỉ | FR-DPS-01, 02, 03, 04 |
+| UC-DPS-02 | Kiểm tra và chuẩn hóa trường nghiệp vụ (MST/CCCD/mã vận đơn/trạng thái) | Hệ thống | Kiểm tra MST, CCCD; chuẩn hóa mã vận đơn, trạng thái | FR-DPS-05, 06, 07, 08 |
+| UC-DPS-03 | Phát hiện và xử lý dữ liệu trùng lặp | Hệ thống | Phát hiện trùng lặp | FR-DPS-09 |
+| UC-DPS-04 | Làm giàu dữ liệu khách hàng | Hệ thống | Làm giàu dữ liệu | FR-DPS-10 |
+| UC-DPS-05 | Cấu hình rule chất lượng và rà soát/xử lý dữ liệu lỗi | Người phụ trách dữ liệu | Cấu hình rule chất lượng · Danh sách rà soát lỗi | FR-DPS-11, 13 |
+| UC-DPS-06 | Cấu hình nguồn dữ liệu ưu tiên | Người phụ trách dữ liệu | Cấu hình nguồn ưu tiên | FR-DPS-14 |
+
+> **Ghi chú map màn:** UC-DPS-01/02/03/04 là các use case **chạy nền, actor Hệ thống, không có màn người dùng riêng** — kết quả quan sát qua bảng chất lượng dữ liệu (SCR-DPS-01/02) và danh sách rà soát lỗi (SCR-DPS-03). Chỉ tiêu chất lượng dùng để đánh giá đầu ra các UC này (BR-DPS-12). Bảng điều khiển chất lượng (FR-DPS-12) map SCR-DPS-01/02; UC-DPS-05 map SCR-DPS-03 (rà soát lỗi) + SCR-DPS-04 (cấu hình rule); UC-DPS-06 map SCR-DPS-05.
+
+**Danh mục Business Rule của Phân hệ 2 (BR-DPS):**
+
+| Mã BR | Nội dung | Nguồn |
+|---|---|---|
+| BR-DPS-01 | **Chuẩn hóa số điện thoại về một dạng thống nhất:** xử lý các dạng `0988xxxxxx`, `+84988xxxxxx`, `84988xxxxxx` về cùng một dạng chuẩn; loại khoảng trắng và ký tự phân tách. SĐT không hợp lệ đánh dấu chưa chuẩn hóa, đưa vào danh sách xử lý chất lượng | CDP.md 7.3 FR-DPS-01 |
+| BR-DPS-02 | **Chuẩn hóa email về chữ thường,** loại khoảng trắng, kiểm tra định dạng email hợp lệ; email sai định dạng đánh dấu chưa chuẩn hóa | CDP.md 7.3 FR-DPS-02 |
+| BR-DPS-03 | **Chuẩn hóa họ tên:** bỏ khoảng trắng thừa, xử lý tên không dấu, tên viết tắt, sai chính tả ở mức cơ bản. **Tên không bao giờ là khóa gộp độc lập** (nhắc lại BR-IDR-03) | CDP.md 7.3 FR-DPS-03, 6.9 |
+| BR-DPS-04 | **Chuẩn hóa địa chỉ:** bóc tách theo cấp hành chính tỉnh/huyện/xã, liên kết VPostCode/Vmap, gắn mã địa chỉ số và vùng phục vụ. Địa chỉ **không chuẩn hóa được → đánh dấu chưa chuẩn hóa, đưa vào danh sách xử lý chất lượng** (DP-03) | CDP.md 7.3 FR-DPS-04, baseline 6.3 |
+| BR-DPS-05 | **Kiểm tra mã số thuế (MST):** đúng định dạng **10 hoặc 13 số** với khách hàng doanh nghiệp/KHL; sai định dạng đánh dấu chưa hợp lệ | CDP.md 7.3 FR-DPS-05 |
+| BR-DPS-06 | **Kiểm tra và bảo vệ CCCD:** kiểm tra định dạng CCCD nếu có; **áp dụng che dữ liệu (masking) và hạn chế quyền truy cập** — CCCD chỉ Quản trị xem đầy đủ theo quyền đặc biệt (theo bảng che III.C360, CDP.md 6.11) | CDP.md 7.3 FR-DPS-06, 6.11 |
+| BR-DPS-07 | **Chuẩn hóa mã vận đơn/mã đơn hàng về chữ hoa** và định dạng thống nhất để liên kết giao dịch giữa CAS, MPITS, BCCP, PNS/DingDong, PayPost | CDP.md 7.3 FR-DPS-07, baseline 6.3 |
+| BR-DPS-08 | **Ánh xạ trạng thái nghiệp vụ về bộ chuẩn (Status Mapping):** trạng thái bưu gửi, trạng thái phát, trạng thái COD từ nhiều hệ thống ánh xạ về bộ trạng thái chuẩn của CDP | CDP.md 7.3 FR-DPS-08 |
+| BR-DPS-09 | **Phát hiện trùng lặp theo khóa:** số điện thoại, email, PostID, mã khách hàng, mã KHL, mã số thuế, user ID app. Số điện thoại/email **dùng chung** không dùng làm khóa gộp tự động (nhắc lại BR-IDR-02). Cặp trùng nghi vấn chuyển sang hợp nhất định danh (Phân hệ 3) theo ngưỡng BR-IDR-01 | CDP.md 7.3 FR-DPS-09 |
+| BR-DPS-10 | **Làm giàu dữ liệu:** bổ sung vùng phục vụ, loại khách hàng, nhóm dịch vụ, điểm chất lượng địa chỉ, trạng thái loyalty vào hồ sơ | CDP.md 7.3 FR-DPS-10 |
+| BR-DPS-11 | **Rule chất lượng cấu hình được:** rule kiểm tra dữ liệu thiếu, sai định dạng, sai cấu trúc, trùng lặp, không nhất quán giữa các hệ thống. Do Người phụ trách dữ liệu cấu hình | CDP.md 7.3 FR-DPS-11 |
+| BR-DPS-12 | **Mục tiêu chất lượng dữ liệu theo hai mốc 6/12 tháng:** hồ sơ có SĐT hợp lệ ≥ **90%/95%** · địa chỉ chuẩn hóa được ≥ **75%/85%** · hồ sơ trùng còn sót ≤ **5%/2%** · hồ sơ KHL đủ MST và mã KHL ≥ **95%/98%** · hồ sơ có trạng thái đồng ý rõ ràng ≥ **60%/80%**. Địa chỉ đặt thấp hơn vì địa chỉ Việt Nam vốn viết tắt; nhóm KHL đặt cao nhất vì có hợp đồng | baseline 7.2 mục tiêu chất lượng |
+| BR-DPS-13 | **Danh sách rà soát dữ liệu lỗi:** Người phụ trách dữ liệu xem bản ghi lỗi/chưa chuẩn hóa, **chỉnh sửa** hoặc **gửi lại hệ thống nguồn** xử lý. Bản ghi sửa được nạp lại vào luồng chuẩn hóa | CDP.md 7.3 FR-DPS-13 |
+| BR-DPS-14 | **Nguồn dữ liệu ưu tiên khi xung đột giá trị:** áp theo bảng **12 nhóm dữ liệu** (mục 6.10) — VD SĐT ưu tiên nguồn đã xác thực (PostID/MyVNPost); email ưu tiên email hợp đồng/doanh nghiệp; địa chỉ ưu tiên bản chuẩn hóa VPostCode/Vmap; trạng thái COD ưu tiên PayPost; consent ưu tiên trạng thái mới nhất có bằng chứng. Giá trị không được chọn giữ dưới dạng phụ/alias, không xóa (đồng bộ BR-IDR-12) | CDP.md 6.10 |
+
+### UC-DPS-01 — Chuẩn hóa trường định danh và liên hệ
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-DPS-01 |
+| **Tên** | Chuẩn hóa số điện thoại, email, họ tên và địa chỉ |
+| **Actor chính** | Hệ thống (không có người vận hành) |
+| **Mô tả** | Sau khi bản ghi đạt cấu trúc, hệ thống chuẩn hóa các trường định danh/liên hệ về bộ chuẩn: SĐT về một dạng, email chữ thường, họ tên bỏ khoảng trắng thừa/xử lý dấu, địa chỉ bóc tách và gắn mã địa chỉ số. |
+| **Tiền điều kiện** | Bản ghi đã qua kiểm tra cấu trúc hợp lệ (UC-ING-03). |
+| **Kích hoạt** | Một bản ghi đạt cấu trúc chuyển sang bước chuẩn hóa. |
+
+**Luồng chính:**
+
+1. Hệ thống **chuẩn hóa SĐT** về một dạng thống nhất (BR-DPS-01).
+2. Hệ thống **chuẩn hóa email** về chữ thường, kiểm tra định dạng (BR-DPS-02).
+3. Hệ thống **chuẩn hóa họ tên** — bỏ khoảng trắng thừa, xử lý dấu/viết tắt cơ bản (BR-DPS-03).
+4. Hệ thống **chuẩn hóa địa chỉ** — bóc tách tỉnh/huyện/xã, liên kết VPostCode/Vmap, gắn mã địa chỉ số và vùng phục vụ (BR-DPS-04).
+5. Bản ghi chuẩn hóa xong chuyển sang các bước tiếp theo (làm giàu UC-DPS-04, phát hiện trùng UC-DPS-03, rồi hợp nhất định danh Phân hệ 3).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | SĐT / email sai định dạng, không chuẩn hóa được | Đánh dấu **chưa chuẩn hóa**, đưa vào **danh sách xử lý chất lượng** (UC-DPS-05); không chặn các trường khác |
+| E2 | **Địa chỉ không chuẩn hóa được** (DP-03) | Đánh dấu chưa chuẩn hóa, đưa vào danh sách xử lý chất lượng (BR-DPS-04); giữ địa chỉ thô để tham chiếu |
+| E3 | Trường rỗng (nguồn không cung cấp) | Bỏ qua chuẩn hóa trường đó; tính vào chỉ tiêu độ đầy đủ hồ sơ (BR-DPS-12) |
+
+**Hậu điều kiện:** Các trường định danh/liên hệ đạt chuẩn; trường không chuẩn hóa được nằm trong danh sách xử lý chất lượng. Chỉ tiêu chất lượng (SĐT hợp lệ, địa chỉ chuẩn hóa) cập nhật (BR-DPS-12).
+
+**Business Rule liên quan:** BR-DPS-01, BR-DPS-02, BR-DPS-03, BR-DPS-04, BR-DPS-12.
+**FR gốc:** FR-DPS-01, FR-DPS-02, FR-DPS-03, FR-DPS-04.
+
+---
+
+### UC-DPS-02 — Kiểm tra và chuẩn hóa trường nghiệp vụ
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-DPS-02 |
+| **Tên** | Kiểm tra MST/CCCD và chuẩn hóa mã vận đơn/trạng thái nghiệp vụ |
+| **Actor chính** | Hệ thống (không có người vận hành) |
+| **Mô tả** | Hệ thống kiểm tra định dạng mã số thuế và CCCD (kèm che dữ liệu), chuẩn hóa mã vận đơn/mã đơn hàng về chữ hoa, và ánh xạ trạng thái bưu gửi/phát/COD về bộ trạng thái chuẩn. |
+| **Tiền điều kiện** | Bản ghi đã qua kiểm tra cấu trúc hợp lệ (UC-ING-03). |
+| **Kích hoạt** | Một bản ghi đạt cấu trúc chuyển sang bước chuẩn hóa. |
+
+**Luồng chính:**
+
+1. Hệ thống **kiểm tra MST** — đúng định dạng 10 hoặc 13 số với KH doanh nghiệp/KHL (BR-DPS-05).
+2. Hệ thống **kiểm tra CCCD** (nếu có) và **áp che dữ liệu (masking) + hạn chế quyền** — CCCD không hiển thị đầy đủ trừ Quản trị theo quyền đặc biệt (BR-DPS-06).
+3. Hệ thống **chuẩn hóa mã vận đơn/mã đơn hàng về chữ hoa** và định dạng thống nhất (BR-DPS-07).
+4. Hệ thống **ánh xạ trạng thái** bưu gửi/phát/COD về bộ trạng thái chuẩn (BR-DPS-08).
+5. Bản ghi chuyển sang các bước tiếp theo.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | MST sai định dạng (không phải 10/13 số) | Đánh dấu chưa hợp lệ, đưa vào danh sách xử lý chất lượng; ảnh hưởng chỉ tiêu "hồ sơ KHL đủ MST" (BR-DPS-12) |
+| E2 | CCCD sai định dạng | Đánh dấu chưa hợp lệ; vẫn áp che dữ liệu để bảo vệ (BR-DPS-06) |
+| E3 | Trạng thái nguồn không có trong bảng ánh xạ chuẩn | Giữ trạng thái gốc kèm nhãn "chưa ánh xạ", đưa vào danh sách xử lý chất lượng để bổ sung rule ánh xạ |
+| E4 | Mã vận đơn trùng giữa nhiều nguồn | Dùng làm khóa liên kết giao dịch; không tự dùng làm khóa gộp khách hàng (chỉ trùng vận đơn thuộc trường hợp cấm gộp tự động — BR-IDR-02) |
+
+**Hậu điều kiện:** MST/CCCD được kiểm tra và bảo vệ; mã vận đơn và trạng thái chuẩn hóa. Trường sai đưa vào danh sách xử lý chất lượng.
+
+**Business Rule liên quan:** BR-DPS-05, BR-DPS-06, BR-DPS-07, BR-DPS-08, BR-DPS-12.
+**FR gốc:** FR-DPS-05, FR-DPS-06, FR-DPS-07, FR-DPS-08.
+
+---
+
+### UC-DPS-03 — Phát hiện và xử lý dữ liệu trùng lặp
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-DPS-03 |
+| **Tên** | Phát hiện và xử lý bản ghi trùng lặp (Data Deduplication) |
+| **Actor chính** | Hệ thống (không có người vận hành) |
+| **Mô tả** | Hệ thống phát hiện bản ghi trùng dựa trên các khóa định danh và chuyển cặp nghi trùng sang bước hợp nhất định danh theo ngưỡng tin cậy. |
+| **Tiền điều kiện** | Bản ghi đã chuẩn hóa (UC-DPS-01, UC-DPS-02). |
+| **Kích hoạt** | Bản ghi chuẩn hóa xong đi vào bước phát hiện trùng. |
+
+**Luồng chính:**
+
+1. Hệ thống phát hiện bản ghi trùng theo khóa: SĐT, email, PostID, mã khách hàng, mã KHL, MST, user ID app (BR-DPS-09).
+2. Với cặp trùng rõ ràng (khóa mạnh), chuyển sang hợp nhất định danh (Phân hệ 3) theo ngưỡng BR-IDR-01.
+3. Với cặp trùng nghi vấn, chuyển vào hàng đợi đối soát hoặc lưu quan hệ nghi vấn theo vùng tin cậy (BR-IDR-01).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Khóa trùng là SĐT/email **dùng chung** (hotline, email doanh nghiệp) | **Không dùng làm khóa gộp tự động**; đánh dấu dùng chung, đưa vào hàng đợi đối soát (BR-DPS-09, BR-IDR-02) |
+| E2 | Chỉ trùng mã vận đơn/địa chỉ/thiết bị | Không đủ để gộp tự động (BR-IDR-02); giữ làm tín hiệu hỗ trợ |
+| E3 | Bản ghi thiếu dữ liệu để so khớp | Tạo hồ sơ tạm độ tin cậy thấp, không kích hoạt, chờ bổ sung (baseline 6.5) |
+
+**Hậu điều kiện:** Cặp trùng được nhận diện và chuyển đúng hướng xử lý (gộp/hàng đợi/quan hệ nghi vấn). Chỉ tiêu "hồ sơ trùng còn sót" phản ánh kết quả (BR-DPS-12).
+
+**Business Rule liên quan:** BR-DPS-09, BR-DPS-12, BR-IDR-01, BR-IDR-02.
+**FR gốc:** FR-DPS-09.
+
+---
+
+### UC-DPS-04 — Làm giàu dữ liệu khách hàng
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-DPS-04 |
+| **Tên** | Làm giàu dữ liệu khách hàng (Data Enrichment) |
+| **Actor chính** | Hệ thống (không có người vận hành) |
+| **Mô tả** | Hệ thống bổ sung thuộc tính phái sinh vào hồ sơ để tăng giá trị sử dụng: vùng phục vụ, loại khách hàng, nhóm dịch vụ, điểm chất lượng địa chỉ, trạng thái loyalty. |
+| **Tiền điều kiện** | Bản ghi đã chuẩn hóa (UC-DPS-01, UC-DPS-02). |
+| **Kích hoạt** | Bản ghi chuẩn hóa xong đi vào bước làm giàu. |
+
+**Luồng chính:**
+
+1. Hệ thống bổ sung **vùng phục vụ** từ địa chỉ đã chuẩn hóa.
+2. Hệ thống gắn **loại khách hàng, nhóm dịch vụ** theo dữ liệu giao dịch/hợp đồng.
+3. Hệ thống tính **điểm chất lượng địa chỉ** và gắn **trạng thái loyalty** (BR-DPS-10).
+4. Thuộc tính làm giàu đưa vào hồ sơ, phục vụ hồ sơ 360 và phân khúc.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Địa chỉ chưa chuẩn hóa được | Không gắn được vùng phục vụ; đánh dấu điểm chất lượng địa chỉ thấp |
+| E2 | Thiếu dữ liệu giao dịch để suy loại KH/nhóm dịch vụ | Để trống thuộc tính tương ứng, không suy đoán sai |
+
+**Hậu điều kiện:** Hồ sơ được bổ sung thuộc tính phái sinh; thuộc tính hiển thị trong hồ sơ 360 (nhóm dữ liệu tương ứng).
+
+> **Map màn:** UC-DPS-04 là use case chạy nền (actor Hệ thống), không có màn vận hành riêng. Kết quả làm giàu **quan sát ở SCR-C360-02** (Hồ sơ 360, Lô 1) — cụ thể: vùng phục vụ và địa chỉ ở tab Địa chỉ, loại/nhóm khách hàng và mảng dịch vụ ở header + tab Tổng quan, điểm chất lượng địa chỉ phản ánh vào chỉ số Độ đầy đủ hồ sơ, trạng thái loyalty ở chỉ số Điểm tích lũy. Chỉ tiêu chất lượng làm giàu theo dõi ở SCR-DPS-01/02.
+
+**Business Rule liên quan:** BR-DPS-10.
+**FR gốc:** FR-DPS-10.
+
+---
+
+### UC-DPS-05 — Cấu hình rule chất lượng và rà soát/xử lý dữ liệu lỗi
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-DPS-05 |
+| **Tên** | Cấu hình rule kiểm tra chất lượng và rà soát, xử lý dữ liệu lỗi |
+| **Actor chính** | Người phụ trách dữ liệu (DATA-STEWARD) |
+| **Mô tả** | Người dùng cấu hình các rule kiểm tra chất lượng dữ liệu; xem danh sách bản ghi lỗi/chưa chuẩn hóa để chỉnh sửa hoặc gửi lại hệ thống nguồn xử lý. |
+| **Tiền điều kiện** | Người dùng có quyền "Cấu hình rule chất lượng dữ liệu" (II.3 khối Chuẩn hóa) — tương ứng quyền **CONFIG** khối Chất lượng dữ liệu (II.4.3); quyền "Theo dõi chất lượng dữ liệu" (VIEW) và sửa dữ liệu lỗi (UPDATE) để rà soát/xử lý. |
+| **Kích hoạt** | Người dùng mở màn **Cấu hình rule chất lượng** (SCR-DPS-04) hoặc **Danh sách rà soát và xử lý dữ liệu lỗi** (SCR-DPS-03). |
+
+**Luồng chính:**
+
+1. Người dùng cấu hình rule chất lượng: kiểm tra dữ liệu thiếu, sai định dạng, sai cấu trúc, trùng lặp, không nhất quán giữa các hệ thống (BR-DPS-11).
+2. Hệ thống áp rule, đưa bản ghi vi phạm vào **danh sách rà soát dữ liệu lỗi**.
+3. Người dùng mở danh sách rà soát, xem chi tiết bản ghi lỗi và lý do vi phạm.
+4. Người dùng **chỉnh sửa** bản ghi và nạp lại luồng chuẩn hóa, **hoặc gửi lại hệ thống nguồn** xử lý (BR-DPS-13).
+5. Hệ thống cập nhật chỉ tiêu chất lượng sau khi xử lý (BR-DPS-12).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Danh sách rà soát rỗng | "Chưa có dữ liệu để hiển thị." |
+| E1 | Bản ghi lỗi thuộc nguồn cũ thiếu trường (A4) | Cho phép chỉnh sửa thủ công hoặc liên kết qua mã vận đơn để bổ sung; nếu không đủ, gửi lại nguồn |
+| E2 | Rule cấu hình sai gây chặn nhầm dữ liệu hợp lệ | Người dùng chỉnh rule; bản ghi bị chặn nhầm được đưa lại luồng |
+| E3 | Người dùng không có quyền cấu hình rule (chỉ theo dõi) | Ẩn thao tác cấu hình; chỉ xem chỉ tiêu và danh sách |
+
+**Hậu điều kiện:** Rule chất lượng được cấu hình; bản ghi lỗi được xử lý (sửa/nạp lại/gửi nguồn). Thao tác ghi vào nhật ký.
+
+**Business Rule liên quan:** BR-DPS-11, BR-DPS-12, BR-DPS-13.
+**FR gốc:** FR-DPS-11, FR-DPS-13.
+
+> **[Cần xác nhận: cơ chế "gửi lại hệ thống nguồn"]** (OQ-DPS-01) — Gốc FR-DPS-13 ghi "gửi lại hệ thống nguồn xử lý" nhưng chưa rõ là gửi tự động (thông báo/hàng đợi) hay thủ công (người phụ trách liên hệ nguồn). Mô tả ở mức nghiệp vụ; cần VNPost/SA chốt cơ chế.
+
+---
+
+### UC-DPS-06 — Cấu hình nguồn dữ liệu ưu tiên
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-DPS-06 |
+| **Tên** | Cấu hình nguồn dữ liệu ưu tiên khi xung đột giá trị |
+| **Actor chính** | Người phụ trách dữ liệu (DATA-STEWARD) |
+| **Mô tả** | Người dùng xem và cấu hình nguồn ưu tiên cho từng nhóm dữ liệu — quy tắc chọn giá trị master khi nhiều hệ thống cung cấp cùng một trường nhưng giá trị khác nhau. |
+| **Tiền điều kiện** | Người dùng có quyền "Cấu hình nguồn dữ liệu ưu tiên" (II.3 khối Chuẩn hóa) — tương ứng quyền **CONFIG** khối Chất lượng dữ liệu (II.4.3). |
+| **Kích hoạt** | Người dùng mở màn **Cấu hình nguồn dữ liệu ưu tiên** (SCR-DPS-05). |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị bảng **12 nhóm dữ liệu** với nguồn ưu tiên hiện hành và nguyên tắc xử lý xung đột (theo 6.10 — BR-DPS-14).
+2. Người dùng xem/điều chỉnh thứ tự nguồn ưu tiên cho từng nhóm.
+3. Hệ thống áp quy tắc khi chọn giá trị master hiển thị trong Customer 360 và dùng cho phân tích; giá trị không được chọn giữ dạng phụ/alias (không xóa).
+4. Thay đổi cấu hình ghi vào nhật ký.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Nguồn ưu tiên cao nhất không có giá trị cho một hồ sơ | Lần lượt lấy nguồn ưu tiên tiếp theo trong nhóm (BR-DPS-14) |
+| E2 | Hai nguồn cùng mức, giá trị khác nhau | Ưu tiên giá trị đã xác thực / cập nhật gần nhất theo nguyên tắc từng nhóm (6.10); trường còn xung đột đánh dấu ⚠ trong hồ sơ đa nguồn (SCR-C360-02) |
+
+**Hậu điều kiện:** Cấu hình nguồn ưu tiên được áp; giá trị master chọn nhất quán với bảng 6.10; thay đổi ghi nhật ký.
+
+**Business Rule liên quan:** BR-DPS-14 (đồng bộ BR-IDR-12).
+**FR gốc:** FR-DPS-14.
+
+> **[Cần xác nhận: bảng nguồn ưu tiên 6.10 đã đủ chưa]** (OQ-DPS-02, đồng bộ OQ-IDR-04) — Cần Data Steward/VNPost xác nhận bảng 12 nhóm đã đủ quyết định giá trị master chưa, hay cần bổ sung rule theo loại/nhóm khách hàng, trạng thái, hạng thân thiết.
+
+---
+
 # IV. GIAO DIỆN CHỨC NĂNG (PROTOTYPE CHÍNH)
 
 > **Nguồn giao diện chuẩn:** prototype v3 (`wireframe/prototype-v3.html`, bản chốt 24/07/2026). Bảy màn dưới đây thuộc Lô 1. Khi prototype khác tài liệu gốc CDP.md/solution về **nghiệp vụ** (ngưỡng, mô hình phê duyệt), tài liệu gốc/solution là chuẩn — điểm lệch được ghi rõ ngay tại màn liên quan.
@@ -1760,6 +2309,274 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 
 ---
 
+## IV.8. Giao diện Lô 2 — Tiếp nhận (SCR-ING) và Chuẩn hóa (SCR-DPS)
+
+> **Nguồn giao diện:** hai màn có sẵn trong prototype v3 (`KafkaScreen` → SCR-ING-01; panel "Chất lượng dữ liệu hợp nhất" của `DashboardScreen` → SCR-DPS-01). Sáu màn còn lại **CẦN BỔ SUNG** — chưa có trong prototype, đặc tả theo mô tả FR gốc CDP.md 7.2/7.3 + baseline (như SCR-IDR-05 ở Lô 1).
+>
+> **Ràng buộc D-04 (bắt buộc):** giao diện nghiệp vụ **KHÔNG lộ tên công nghệ** (Kafka, topic, partition, consumer group, offset, Dead Letter Queue). Mọi nhãn kỹ thuật trong prototype phải dịch sang ngôn ngữ nghiệp vụ khi triển khai — chi tiết ở khối "điểm lệch prototype" của SCR-ING-01.
+
+**Danh mục màn hình Lô 2:**
+
+| Mã màn | Tên màn | Component prototype | Ánh xạ Use Case | Trạng thái prototype |
+|---|---|---|---|---|
+| SCR-ING-01 | Giám sát luồng dữ liệu | `KafkaScreen` | UC-ING-05 (+ quan sát UC-ING-01/02/03) | Đang chạy (cần dịch nhãn kỹ thuật sang nghiệp vụ — D-04) |
+| SCR-ING-02 | Quản lý kết nối nguồn dữ liệu | **Chưa có — CẦN BỔ SUNG** | UC-ING-06 | Chưa có trong prototype |
+| SCR-ING-03 | Hàng đợi lỗi tiếp nhận | **Chưa có — CẦN BỔ SUNG** | UC-ING-04 | Chưa có trong prototype |
+| SCR-DPS-01 | Bảng chất lượng dữ liệu hợp nhất (panel Tổng quan) | Panel trong `DashboardScreen` | UC-DPS-05 (chỉ tiêu) | Đang chạy (chỉ là panel tóm tắt) |
+| SCR-DPS-02 | Bảng điều khiển chất lượng dữ liệu (đầy đủ) | **Chưa có — CẦN BỔ SUNG** | UC-DPS-05 | Chưa có (mở rộng từ panel SCR-DPS-01) |
+| SCR-DPS-03 | Danh sách rà soát và xử lý dữ liệu lỗi | **Chưa có — CẦN BỔ SUNG** | UC-DPS-05 | Chưa có trong prototype |
+| SCR-DPS-04 | Cấu hình rule chất lượng dữ liệu | **Chưa có — CẦN BỔ SUNG** | UC-DPS-05 | Chưa có trong prototype |
+| SCR-DPS-05 | Cấu hình nguồn dữ liệu ưu tiên | **Chưa có — CẦN BỔ SUNG** | UC-DPS-06 | Chưa có trong prototype |
+
+---
+
+### IV.8.1. SCR-ING-01 — Giám sát luồng dữ liệu
+
+**Mục tiêu:** Cho Kỹ sư/Người phụ trách dữ liệu theo dõi tình trạng từng luồng dữ liệu theo nguồn: lưu lượng, độ trễ, bản ghi lỗi, cảnh báo; là màn thực thi UC-ING-05, đồng thời là nơi quan sát gián tiếp kết quả UC-ING-01/02/03.
+**Ánh xạ Use Case:** UC-ING-05 (+ UC-ING-07 phần cảnh báo/nhật ký).
+**Layout (theo prototype v3 — `KafkaScreen`):** (1) Dải 6 ô chỉ số tổng; (2) Biểu đồ lưu lượng theo thời gian + khung cảnh báo gần đây; (3) Bảng danh sách luồng theo nguồn (lọc theo trạng thái); (4) Bảng trượt chi tiết một luồng khi bấm chọn.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Ô chỉ số Số luồng giám sát | Ô số | N/A | N/A | Tổng số luồng dữ liệu đang giám sát |
+| 2 | Ô chỉ số Hoạt động tốt | Ô số | N/A | N/A | Số luồng trạng thái tốt (BR-ING-10) |
+| 3 | Ô chỉ số Cần theo dõi | Ô số | N/A | N/A | Số luồng ở mức cảnh báo (vàng) |
+| 4 | Ô chỉ số Lỗi cần xử lý | Ô số | N/A | N/A | Số luồng ở mức báo động (đỏ) |
+| 5 | Ô chỉ số Lưu lượng hiện tại | Ô số | N/A | N/A | Số bản ghi/phút toàn hệ thống |
+| 6 | Ô chỉ số Bản ghi lỗi 24h | Ô số | N/A | N/A | Tổng bản ghi lỗi trong 24 giờ |
+| 7 | Biểu đồ lưu lượng theo thời gian | Biểu đồ cột | N/A | Khoảng 6 giờ | Chọn khoảng 1h/6h/24h/7 ngày; phân biệt bản ghi thành công / lỗi |
+| 8 | Khung Cảnh báo gần đây | Danh sách cảnh báo | N/A | N/A | Mức (cảnh báo/báo động), thời điểm, nguồn, nội dung; câu chữ theo BR-ING-06/07 |
+| 9 | Bộ lọc trạng thái luồng | Nút lọc | Không | Tất cả | Tất cả / Hoạt động tốt / Cần theo dõi / Lỗi / Ngưng hoạt động |
+| 10 | Cột Trạng thái luồng | Nhãn màu | N/A | N/A | Tốt / Cần theo dõi / Lỗi / Ngưng hoạt động (BR-ING-10) |
+| 11 | Cột Nguồn dữ liệu | Cột bảng | N/A | N/A | Tên hệ thống nguồn (VD CAS, MPITS, PayPost, MyVNPost) |
+| 12 | Cột Loại dữ liệu | Cột bảng | N/A | N/A | Khách hàng / Đơn hàng / Trạng thái phát / COD / Hành vi / Địa chỉ |
+| 13 | Cột Bản ghi/phút | Cột bảng (số) | N/A | N/A | Lưu lượng hiện tại của luồng |
+| 14 | Cột Tổng 24h | Cột bảng (số) | N/A | N/A | Tổng bản ghi nhận trong 24 giờ |
+| 15 | Cột Độ trễ | Cột bảng (số) | N/A | N/A | Độ trễ hiện tại; tô đỏ khi vượt ngưỡng |
+| 16 | Cột Bản ghi lỗi 24h | Cột bảng (số) | N/A | N/A | Số bản ghi lỗi; tô vàng/đỏ theo mức |
+| 17 | Cột Cập nhật | Cột bảng (thời gian) | N/A | N/A | Thời điểm đồng bộ gần nhất |
+| 18 | Bảng trượt chi tiết luồng | Bảng trượt | N/A | N/A | Nguồn, loại dữ liệu, bản ghi/phút, tổng 24h, độ trễ, bản ghi lỗi 24h + danh sách bản ghi lỗi gần nhất (mô tả lỗi, thời điểm) |
+| 19 | Nút Thử lại nguồn | Nút | N/A | N/A | Kích hoạt thử lại luồng; chuyển UC-ING-04 |
+| 20 | Nút Tạm dừng nguồn | Nút | N/A | N/A | Tạm dừng nhận từ nguồn; xác nhận nếu còn tồn đọng (UC-ING-06 E2) |
+
+**Trạng thái đặc biệt:**
+- **Cảnh báo (vàng):** "Luồng {nguồn} đang xử lý chậm / tỷ lệ lỗi tăng. Vui lòng theo dõi." (BR-ING-06).
+- **Báo động (đỏ):** "Luồng {nguồn} đã ngừng nhận dữ liệu/vượt ngưỡng lỗi. Cần xử lý ngay." (BR-ING-07).
+- **Luồng ngưng hoạt động theo lịch (idle):** hiển thị "Ngưng hoạt động" — không phát báo động (BR-ING-10, UC-ING-05 E3).
+- **Không đủ quyền:** màn không hiện trên điều hướng; truy cập trực tiếp → "Bạn không có quyền truy cập chức năng này."
+- **Loading/empty:** đang tải chỉ số; chưa có luồng nào → "Chưa có dữ liệu để hiển thị."
+
+> **Điểm lệch prototype (quan trọng — bắt buộc sửa khi triển khai theo D-04):** prototype `KafkaScreen` đang **lộ tên công nghệ** ra giao diện — tiêu đề "Kafka Topics", cột "Tên Topic" (giá trị dạng `cdp.customer.profile`), "Consumer lag", "Partition", "Consumer group", nút "Retry consumer", nhãn "Throughput/msg". Bản thật phải dịch sang nghiệp vụ: **Kafka Topics → Luồng dữ liệu theo nguồn** · Tên Topic → **Nguồn + Loại dữ liệu** (ẩn tên kỹ thuật) · Consumer lag → **Độ trễ** · Throughput/msg → **Lưu lượng (bản ghi/phút)** · Message lỗi → **Bản ghi lỗi** · Retry consumer → **Thử lại nguồn** · bỏ Partition/Consumer group khỏi giao diện nghiệp vụ (D-04 đã ẩn màn này khỏi sidebar nghiệp vụ). Ngưỡng cảnh báo/báo động phải theo BR-ING-06/07 (vàng/đỏ), không dùng ngưỡng lag tùy ý của prototype.
+
+---
+
+### IV.8.2. SCR-ING-02 — Quản lý kết nối nguồn dữ liệu (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-ING-05 (+06/07) và baseline; là yêu cầu mới để triển khai UC-ING-06.
+
+**Mục tiêu:** Cho Kỹ sư dữ liệu khai báo, cấu hình, bật/tắt và kiểm tra kết nối từng nguồn dữ liệu.
+**Ánh xạ Use Case:** UC-ING-06.
+**Layout (đề xuất):** (1) Danh sách nguồn đã khai báo kèm trạng thái; (2) Nút Thêm nguồn; (3) Bảng/biểu mẫu cấu hình một nguồn; (4) Nút Kiểm tra kết nối, Bật/Tắt, Lưu.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Danh sách nguồn | Bảng | N/A | N/A | Tên nguồn, loại, phương thức đồng bộ (thời gian thực/theo lô), trạng thái kết nối, lần đồng bộ gần nhất (BR-ING-10) |
+| 2 | Nút Thêm nguồn | Nút | N/A | N/A | Mở biểu mẫu khai báo nguồn mới |
+| 3 | Trường Tên nguồn | Ô nhập text | Có | Rỗng | Tên hệ thống nguồn; rỗng chặn lưu |
+| 4 | Trường Loại nguồn | Danh sách chọn | Có | Chưa chọn | Nội bộ / MPITS / kênh ngoài |
+| 5 | Trường Phương thức đồng bộ | Danh sách chọn | Có | Chưa chọn | Thời gian thực / Theo lô |
+| 6 | Trường Lịch chạy (nếu theo lô) | Ô chọn giờ | Có (khi theo lô) | 01:00–05:00 | Khung giờ chạy lô; ẩn khi chọn thời gian thực |
+| 7 | Nút Kiểm tra kết nối | Nút | N/A | N/A | Thử kết nối, báo kết quả thành công/thất bại kèm lý do (E1) |
+| 8 | Công tắc Bật/Tắt nguồn | Công tắc | Không | Theo trạng thái hiện tại | Bật/tắt độc lập từng nguồn (BR-ING-10); tắt nguồn còn tồn đọng → cảnh báo (E2) |
+| 9 | Nút Lưu cấu hình | Nút | N/A | N/A | Lưu; ghi thay đổi vào nhật ký tiếp nhận (UC-ING-07) |
+| 10 | Cột Trạng thái kết nối | Nhãn màu | N/A | N/A | Hoạt động tốt / Cần theo dõi / Lỗi / Ngưng hoạt động |
+
+**Trạng thái đặc biệt:**
+- **Kiểm tra kết nối thất bại:** "Không kết nối được tới nguồn {tên}. Kiểm tra lại cấu hình." (E1) — nguồn giữ trạng thái "Lỗi".
+- **Tắt nguồn còn tồn đọng:** "Nguồn {tên} còn {N} bản ghi chưa xử lý. Vẫn tắt?" (E2).
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này."
+
+> **[Cần xác nhận: phạm vi nguồn MPITS/kênh ngoài trong màn này]** (OQ-ING-04) — Số lượng và loại nguồn khai báo phụ thuộc OQ-04 (MPITS làm cổng chung hay tích hợp riêng) và danh sách kênh ngoài VNPost dùng (FR-ING-07, liên quan M3 clarification).
+
+---
+
+### IV.8.3. SCR-ING-03 — Hàng đợi lỗi tiếp nhận (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có riêng trong prototype v3** (prototype chỉ hiển thị bản ghi lỗi gần nhất trong bảng trượt của SCR-ING-01). Tách riêng để phục vụ UC-ING-04.
+
+**Mục tiêu:** Cho Kỹ sư/Người phụ trách dữ liệu xem, xử lý bản ghi trong hàng đợi lỗi tiếp nhận theo vòng đời trạng thái.
+**Ánh xạ Use Case:** UC-ING-04.
+**Layout (đề xuất):** (1) Bộ lọc theo nguồn/trạng thái/loại lỗi; (2) Bảng bản ghi lỗi; (3) Bảng trượt chi tiết một bản ghi + hành động sửa/nạp lại/bỏ qua.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Bộ lọc Nguồn | Danh sách chọn | Không | Tất cả nguồn | Lọc bản ghi lỗi theo nguồn |
+| 2 | Bộ lọc Trạng thái | Danh sách chọn | Không | Tất cả | Chờ thử lại / Trong hàng đợi lỗi / Đã xử lý / Bỏ qua (BR-ING-05) |
+| 3 | Bộ lọc Loại lỗi | Danh sách chọn | Không | Tất cả | Sai cấu trúc / Lỗi tạm thời (mất kết nối, quá tải) |
+| 4 | Cột Nguồn | Cột bảng | N/A | N/A | Hệ thống nguồn của bản ghi |
+| 5 | Cột Loại lỗi | Nhãn màu | N/A | N/A | Sai cấu trúc (không thử lại) / Lỗi tạm thời (đã thử 3 lần) |
+| 6 | Cột Mô tả lỗi | Cột bảng | N/A | N/A | Chi tiết lý do lỗi (VD "thiếu trường bắt buộc {tên}") |
+| 7 | Cột Trạng thái | Nhãn màu | N/A | N/A | Theo vòng đời BR-ING-05 |
+| 8 | Cột Thời điểm vào hàng đợi | Cột bảng (thời gian) | N/A | N/A | Dùng để tính thời hạn giữ 30 ngày (BR-ING-04) |
+| 9 | Bảng trượt chi tiết bản ghi | Bảng trượt | N/A | N/A | Nội dung bản ghi lỗi + lịch sử thử lại |
+| 10 | Nút Sửa và nạp lại | Nút | N/A | N/A | Sửa bản ghi, chuyển về "Chờ thử lại" (UC-ING-04) |
+| 11 | Nút Đánh dấu Đã xử lý | Nút | N/A | N/A | Chuyển trạng thái cuối "Đã xử lý" (BR-ING-05) |
+| 12 | Nút Bỏ qua | Nút | N/A | N/A | Chuyển trạng thái cuối "Bỏ qua"; ghi người quyết định (E4) |
+
+**Trạng thái đặc biệt:**
+- **Hàng đợi rỗng:** "Không có bản ghi lỗi nào cần xử lý."
+- **Bản ghi quá 30 ngày:** hiển thị nhãn "Đã chuyển lưu trữ" (BR-ING-04, E2) — không xóa.
+- **Nạp lại vẫn lỗi:** giữ trong hàng đợi, tăng số lần thử (E3).
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này."
+
+---
+
+### IV.8.4. SCR-DPS-01 — Bảng chất lượng dữ liệu hợp nhất (panel Tổng quan)
+
+**Mục tiêu:** Hiển thị tóm tắt mức độ chất lượng dữ liệu toàn hệ thống ngay trên màn Tổng quan; là điểm nhìn nhanh, dẫn tới bảng đầy đủ SCR-DPS-02.
+**Ánh xạ Use Case:** UC-DPS-05 (phần chỉ tiêu chất lượng — FR-DPS-12).
+**Layout (theo prototype v3 — panel "Chất lượng dữ liệu hợp nhất" trong `DashboardScreen`):** Một panel gồm chỉ số tổng (mức độ đầy đủ trung bình) + danh sách 4 chỉ tiêu con.
+
+> **Phạm vi:** chỉ đặc tả **panel chất lượng dữ liệu** trong màn Tổng quan, KHÔNG đặc tả lại toàn màn Tổng quan (dashboard tổng thuộc lô khác).
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Chỉ số Mức độ đầy đủ dữ liệu | Ô số + thanh | N/A | N/A | Phần trăm đầy đủ dữ liệu trung bình toàn hệ thống, có thanh tiến độ |
+| 2 | Chỉ tiêu Tự động hợp nhất thành công | Dòng chỉ tiêu | N/A | N/A | Tỷ lệ hồ sơ tự động hợp nhất |
+| 3 | Chỉ tiêu Trường dữ liệu xung đột cần xử lý | Dòng chỉ tiêu (số) | N/A | N/A | Số trường xung đột chờ xử lý (liên kết BR-DPS-14) |
+| 4 | Chỉ tiêu Dữ liệu có đồng ý hợp lệ | Dòng chỉ tiêu | N/A | N/A | Tỷ lệ hồ sơ có trạng thái đồng ý rõ ràng (đối chiếu BR-DPS-12: ≥60%/80%) |
+| 5 | Chỉ tiêu Nguồn cập nhật thời gian thực | Dòng chỉ tiêu | N/A | N/A | Số nguồn thời gian thực / tổng nguồn |
+| 6 | Liên kết Xem chi tiết | Liên kết | N/A | N/A | Mở bảng điều khiển chất lượng đầy đủ (SCR-DPS-02) |
+
+**Trạng thái đặc biệt:**
+- **Chưa có dữ liệu chất lượng:** hiển thị "Chưa có dữ liệu" trong panel.
+- **Quyền hiển thị:** Người phụ trách dữ liệu và Quản trị xem đầy đủ; Tiếp thị xem ở mức tổng hợp (theo II.3 "Theo dõi chất lượng dữ liệu").
+
+> **Điểm cần đối chiếu:** prototype hiển thị các con số mẫu cố định (65% đầy đủ, 87% tự động hợp nhất, 72% đồng ý). Bản thật lấy số thực và **đối chiếu với mục tiêu chất lượng BR-DPS-12** (tô màu đạt/chưa đạt theo mốc 6/12 tháng).
+
+---
+
+### IV.8.5. SCR-DPS-02 — Bảng điều khiển chất lượng dữ liệu (CẦN BỔ SUNG)
+
+> **Trạng thái:** Prototype **chỉ có panel tóm tắt** (SCR-DPS-01), chưa có bảng điều khiển đầy đủ. Đặc tả theo FR-DPS-12 + mục tiêu chất lượng baseline 7.2.
+
+**Mục tiêu:** Cho Người phụ trách dữ liệu/Quản trị theo dõi đầy đủ các chỉ tiêu chất lượng dữ liệu, so với mục tiêu 6/12 tháng, bóc tách theo nguồn/nhóm.
+**Ánh xạ Use Case:** UC-DPS-05.
+**Layout (đề xuất):** (1) Dải chỉ tiêu chính so với mục tiêu; (2) Bảng chỉ tiêu theo nguồn dữ liệu; (3) Liên kết sang danh sách rà soát lỗi (SCR-DPS-03).
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Chỉ tiêu SĐT hợp lệ | Ô số + mục tiêu | N/A | N/A | Tỷ lệ hồ sơ có SĐT hợp lệ; đối chiếu mục tiêu ≥90%/95% (BR-DPS-12), tô đạt/chưa đạt |
+| 2 | Chỉ tiêu Địa chỉ chuẩn hóa được | Ô số + mục tiêu | N/A | N/A | Đối chiếu ≥75%/85% (BR-DPS-12) |
+| 3 | Chỉ tiêu Hồ sơ trùng còn sót | Ô số + mục tiêu | N/A | N/A | Đối chiếu ≤5%/2% (BR-DPS-12) |
+| 4 | Chỉ tiêu Hồ sơ KHL đủ MST + mã KHL | Ô số + mục tiêu | N/A | N/A | Đối chiếu ≥95%/98% (BR-DPS-12) |
+| 5 | Chỉ tiêu Hồ sơ có đồng ý rõ ràng | Ô số + mục tiêu | N/A | N/A | Đối chiếu ≥60%/80% (BR-DPS-12) |
+| 6 | Bảng chỉ tiêu theo nguồn | Bảng | N/A | N/A | Từng nguồn: tỷ lệ hợp lệ, lỗi, trùng, thiếu SĐT/email/địa chỉ/đồng ý (FR-DPS-12) |
+| 7 | Bộ lọc theo nguồn/nhóm dịch vụ | Danh sách chọn | Không | Tất cả | Lọc chỉ tiêu theo nguồn hoặc nhóm |
+| 8 | Nút Xem danh sách dữ liệu lỗi | Nút | N/A | N/A | Mở SCR-DPS-03 |
+
+**Trạng thái đặc biệt:**
+- **Chỉ tiêu chưa đạt mục tiêu:** tô nhấn (VD đỏ/vàng) và ghi rõ mốc mục tiêu đang so.
+- **Chưa có dữ liệu:** "Chưa có dữ liệu để hiển thị."
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này."
+
+---
+
+### IV.8.6. SCR-DPS-03 — Danh sách rà soát và xử lý dữ liệu lỗi (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-DPS-13 + baseline; phục vụ UC-DPS-05.
+
+**Mục tiêu:** Cho Người phụ trách dữ liệu xem bản ghi lỗi/chưa chuẩn hóa, chỉnh sửa hoặc gửi lại hệ thống nguồn.
+**Ánh xạ Use Case:** UC-DPS-05.
+**Layout (đề xuất):** (1) Bộ lọc theo loại lỗi/trường/nguồn; (2) Bảng bản ghi lỗi; (3) Bảng trượt chi tiết + hành động sửa/gửi lại nguồn.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Bộ lọc Loại lỗi | Danh sách chọn | Không | Tất cả | Thiếu dữ liệu / sai định dạng / sai cấu trúc / trùng lặp / không nhất quán (BR-DPS-11) |
+| 2 | Bộ lọc Trường lỗi | Danh sách chọn | Không | Tất cả | SĐT / email / địa chỉ / MST / CCCD / mã vận đơn / trạng thái |
+| 3 | Bộ lọc Nguồn | Danh sách chọn | Không | Tất cả nguồn | Lọc theo nguồn phát sinh |
+| 4 | Cột Bản ghi / Hồ sơ | Cột bảng | N/A | N/A | Định danh bản ghi; SĐT/CCCD **che theo vai trò** (BR-DPS-06) |
+| 5 | Cột Trường lỗi | Nhãn | N/A | N/A | Trường vi phạm |
+| 6 | Cột Lý do | Cột bảng | N/A | N/A | Mô tả vi phạm (VD "SĐT sai định dạng", "địa chỉ không chuẩn hóa được") |
+| 7 | Cột Nguồn | Cột bảng | N/A | N/A | Hệ thống nguồn |
+| 8 | Bảng trượt chi tiết | Bảng trượt | N/A | N/A | Giá trị hiện tại + giá trị đề xuất chuẩn hóa (nếu có) |
+| 9 | Ô sửa giá trị | Ô nhập | Có (khi sửa) | Giá trị hiện tại | Người dùng chỉnh giá trị đúng; rỗng chặn lưu |
+| 10 | Nút Sửa và nạp lại | Nút | N/A | N/A | Lưu giá trị sửa, nạp lại luồng chuẩn hóa (BR-DPS-13) |
+| 11 | Nút Gửi lại hệ thống nguồn | Nút | N/A | N/A | Chuyển bản ghi về nguồn xử lý (BR-DPS-13) — cơ chế xem OQ-DPS-01 |
+
+**Trạng thái đặc biệt:**
+- **Danh sách rỗng:** "Chưa có dữ liệu để hiển thị."
+- **Sửa thành công:** "Đã cập nhật và nạp lại {N} bản ghi vào luồng chuẩn hóa."
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này."
+
+---
+
+### IV.8.7. SCR-DPS-04 — Cấu hình rule chất lượng dữ liệu (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-DPS-11; phục vụ UC-DPS-05.
+
+**Mục tiêu:** Cho Người phụ trách dữ liệu cấu hình các rule kiểm tra chất lượng dữ liệu.
+**Ánh xạ Use Case:** UC-DPS-05.
+**Layout (đề xuất):** (1) Danh sách rule đang áp dụng; (2) Nút Thêm rule; (3) Biểu mẫu cấu hình một rule; (4) Công tắc bật/tắt từng rule.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Danh sách rule | Bảng | N/A | N/A | Tên rule, loại kiểm tra, trường áp dụng, trạng thái bật/tắt |
+| 2 | Nút Thêm rule | Nút | N/A | N/A | Mở biểu mẫu tạo rule mới |
+| 3 | Trường Loại kiểm tra | Danh sách chọn | Có | Chưa chọn | Thiếu dữ liệu / sai định dạng / sai cấu trúc / trùng lặp / không nhất quán (BR-DPS-11) |
+| 4 | Trường Trường áp dụng | Danh sách chọn | Có | Chưa chọn | Trường dữ liệu rule kiểm tra |
+| 5 | Trường Điều kiện | Ô nhập/chọn | Có | Rỗng | Điều kiện vi phạm (mô tả nghiệp vụ, không cú pháp kỹ thuật) |
+| 6 | Công tắc Bật/Tắt rule | Công tắc | Không | Bật | Bật/tắt rule mà không xóa |
+| 7 | Nút Lưu rule | Nút | N/A | N/A | Lưu; áp dụng cho luồng chuẩn hóa |
+
+**Trạng thái đặc biệt:**
+- **Rule chặn nhầm dữ liệu hợp lệ:** người dùng chỉnh/tắt rule; bản ghi bị chặn nhầm được đưa lại luồng (UC-DPS-05 E2).
+- **Chưa có rule:** "Chưa có rule chất lượng nào. Thêm rule để bắt đầu kiểm tra."
+- **Không đủ quyền cấu hình (chỉ theo dõi):** ẩn thao tác thêm/sửa/tắt rule (UC-DPS-05 E3). Màn này yêu cầu quyền **CONFIG** khối Chất lượng dữ liệu (II.4.3 — DATA-STEWARD); vai trò chỉ có VIEW thấy danh sách rule ở dạng đọc.
+
+---
+
+### IV.8.8. SCR-DPS-05 — Cấu hình nguồn dữ liệu ưu tiên (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-DPS-14 + bảng 6.10; phục vụ UC-DPS-06.
+
+**Mục tiêu:** Cho Người phụ trách dữ liệu xem và cấu hình nguồn ưu tiên theo 12 nhóm dữ liệu khi xung đột giá trị.
+**Ánh xạ Use Case:** UC-DPS-06.
+**Layout (đề xuất):** Bảng 12 nhóm dữ liệu, mỗi nhóm có thứ tự nguồn ưu tiên (kéo/sắp) và nguyên tắc xử lý xung đột.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Bảng 12 nhóm dữ liệu | Bảng | N/A | N/A | Nhóm dữ liệu · thứ tự nguồn ưu tiên · nguyên tắc xử lý xung đột (theo 6.10 — BR-DPS-14) |
+| 2 | Cột Nhóm dữ liệu | Cột bảng | N/A | N/A | 12 nhóm: PostID/User ID, SĐT, email, tên cá nhân, tên DN, MST, địa chỉ, trạng thái COD, trạng thái phát, khiếu nại, segment/score, đồng ý |
+| 3 | Cột Thứ tự nguồn ưu tiên | Danh sách sắp xếp | Có | Theo 6.10 | Sắp thứ tự nguồn cho từng nhóm (VD SĐT: PostID/MyVNPost → CRM → CAS → Portal KHL) |
+| 4 | Cột Nguyên tắc xử lý xung đột | Cột bảng | N/A | N/A | Diễn giải (VD "ưu tiên SĐT đã xác thực; lưu SĐT khác dưới dạng phụ/alias") |
+| 5 | Nút Lưu cấu hình | Nút | N/A | N/A | Lưu; áp dụng khi chọn giá trị master; ghi nhật ký (UC-DPS-06) |
+
+**Trạng thái đặc biệt:**
+- **Nguồn ưu tiên cao nhất không có giá trị:** hệ thống tự lấy nguồn tiếp theo (UC-DPS-06 E1) — không cần thao tác tay.
+- **Trường còn xung đột sau khi áp quy tắc:** đánh dấu ⚠ trong hồ sơ đa nguồn (SCR-C360-02, UC-DPS-06 E2).
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này."
+
+> **[Cần xác nhận: bảng nguồn ưu tiên 6.10 đã đủ chưa]** (OQ-DPS-02, đồng bộ OQ-IDR-04) — xem UC-DPS-06.
+
+---
+
 ## Phụ lục — Giả định và câu hỏi mở áp dụng cho tài liệu này
 
 ### Giả định đang áp dụng
@@ -1819,6 +2636,18 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 - [ ] OQ-IDR-10: SLA "Người phụ trách dữ liệu xem xét đề xuất tách trong 1–2 ngày làm việc" (UC-IDR-05, item 17 SCR-C360-02) đang là con số đề xuất — cần VNPost chốt cam kết xử lý. *(ghi nhận MINOR QA Lô 1 — chưa sửa nội dung vòng này)* (VNPost)
 - [ ] OQ-IDR-11: Câu chữ chuẩn cho "mất kết nối khi đang đối soát" (UC-IDR-03 E2) và "tra vận đơn chỉ có dữ liệu người nhận" (UC-C360-01 A2) chưa có trong bộ câu chữ 7.3 — cần bổ sung/duyệt. *(ghi nhận MINOR QA Lô 1 — chưa sửa nội dung vòng này)* (PO / Tiếp thị VNPost)
 
+### Câu hỏi mở riêng Lô 2 — Tiếp nhận (OQ-ING) và Chuẩn hóa (OQ-DPS)
+
+Đánh số theo namespace `OQ-ING-` / `OQ-DPS-` để không trùng dải OQ-01→09 và OQ-IDR ở trên.
+
+- [ ] OQ-ING-01: Ranh giới quyền giữa **Kỹ sư dữ liệu (DATA-ENG)** và **Người phụ trách dữ liệu (DATA-STEWARD)** ở khối Tiếp nhận — ai được khai báo/cấu hình nguồn, ai chỉ theo dõi và xử lý bản ghi lỗi? (gốc CDP.md 7.2 ghi chung "IT Admin/Data Engineer"; II.3 ghi hai vai trò trùng nhiều quyền) (áp dụng UC-ING-04/05/06, II.3/II.4) (VNPost)
+- [ ] OQ-ING-02: SDK Web/Mobile thu thập hành vi (gồm hành vi ẩn danh — FR-ING-03, ưu tiên Medium) có thuộc phạm vi giai đoạn đầu không, hay chỉ tiếp nhận qua API/nguồn có sẵn? (áp dụng UC-ING-01) (VNPost / CNTT)
+- [ ] OQ-ING-03: Câu chữ hiển thị chuẩn cho cảnh báo (vàng) và báo động (đỏ) luồng dữ liệu — baseline 7.3 mới định nghĩa mức, chưa có câu chữ. Câu mẫu ở UC-ING-05/SCR-ING-01 là đề xuất, cần duyệt. (PO / Tiếp thị VNPost)
+- [ ] OQ-ING-04: Số lượng và loại nguồn khai báo ở SCR-ING-02 phụ thuộc OQ-04 (MPITS làm cổng chung hay tích hợp riêng — FR-ING-06) và danh sách kênh ngoài VNPost dùng (FR-ING-07). (CNTT VNPost)
+- [ ] OQ-DPS-01: Cơ chế "gửi lại hệ thống nguồn xử lý" (FR-DPS-13, UC-DPS-05) là tự động (thông báo/hàng đợi tới nguồn) hay thủ công (người phụ trách liên hệ nguồn)? (áp dụng UC-DPS-05, SCR-DPS-03) (VNPost / SA)
+- [ ] OQ-DPS-02: Bảng nguồn ưu tiên 12 nhóm (6.10) đã đủ quyết định giá trị master chưa, hay cần bổ sung rule theo loại/nhóm khách hàng, trạng thái, hạng thân thiết? *(đồng bộ OQ-IDR-04)* (áp dụng BR-DPS-14, UC-DPS-06) (Data Steward / VNPost)
+- [ ] OQ-DPS-03: Quản trị hệ thống (SYS-ADMIN) có cần quyền **CONFIG đầy đủ** hai chức năng cấu hình rule chất lượng và nguồn dữ liệu ưu tiên không, hay chỉ **(X)** xem/hỗ trợ? Hiện để (X) theo nguyên tắc tách quyền cấu hình khỏi quyền xem (II.4.4 mục 3). (áp dụng II.3 khối Chuẩn hóa, II.4.3) (VNPost)
+
 ### Ghi chú xử lý MINOR
 
 **Từ QA review v1.1 (khung tổng thể):**
@@ -1842,4 +2671,4 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 
 ---
 
-*Kết thúc phiên bản v1.3 — Khung tổng thể (Mục I + Mục II) + Lô 1 (Mục III Use Case + Mục IV Giao diện cho Phân hệ 3 Hợp nhất định danh và Phân hệ 4 Customer 360), đã đồng bộ mã FR và xử lý QA Lô 1. Mục C (Yêu cầu phi chức năng) và các phân hệ còn lại của Mục III/IV sẽ được bổ sung theo lô ở các vòng sau.*
+*Kết thúc phiên bản v1.5 — Khung tổng thể (Mục I + Mục II) + Lô 1 (Phân hệ 3 Hợp nhất định danh, Phân hệ 4 Customer 360) + Lô 2 (Phân hệ 1 Tiếp nhận FR-ING, Phân hệ 2 Chuẩn hóa FR-DPS): Mục III bổ sung III.3 (7 UC-ING) và III.4 (6 UC-DPS); Mục IV bổ sung IV.8 (8 màn — 2 từ prototype, 6 CẦN BỔ SUNG); đã gắn mã FR-ING-01→10 và FR-DPS-01→14 vào cây chức năng II.2; đã xử lý QA Lô 2 (1 CRITICAL + 4 MAJOR + 2 MINOR nhanh — có mở II.3/II.4 bổ sung quyền cấu hình). Mục C (Yêu cầu phi chức năng) và ba phân hệ còn lại của Mục III/IV (Phân tích, Kích hoạt, Quản trị) sẽ được bổ sung theo lô ở các vòng sau.*
