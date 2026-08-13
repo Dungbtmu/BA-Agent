@@ -4,7 +4,7 @@ TỔNG CÔNG TY BƯU ĐIỆN VIỆT NAM (VNPost/TCT)
 
 ## Nền tảng Dữ liệu Khách hàng — Customer Data Platform (CDP)
 
-**Phiên bản:** v1.5 — Khung tổng thể (Mục I + Mục II) + Lô 1 (Phân hệ 3, 4) + Lô 2 (Phân hệ 1, 2)
+**Phiên bản:** v1.7 — Khung tổng thể (Mục I + Mục II) + Lô 1 (Phân hệ 3, 4) + Lô 2 (Phân hệ 1, 2) + Lô 3 (Phân hệ 5)
 **Địa điểm – Thời gian:** Hà Nội – Tháng 08/2026
 
 ---
@@ -19,6 +19,8 @@ TỔNG CÔNG TY BƯU ĐIỆN VIỆT NAM (VNPost/TCT)
 | v1.3 | 08/2026 | Patch theo QA review Lô 1 — sửa 1 CRITICAL + 5 MAJOR: (CR-01) đồng bộ mã FR giữa Mục I/II và III — cập nhật cây chức năng II.2 với đủ 14 tên FR-IDR (thêm 03/04/05/10) và 15 tên FR-C360, gỡ toàn bộ chú thích "chưa đặt tên"/`[Cần xác nhận: mã]` ở I.2.1, II.2 và diễn giải Phân hệ 3; (MA-01) sửa ghi chú UC-IDR-07 trỏ nhầm III.C360 → bảng luật gốc CDP.md 6.6.1; (MA-02) thống nhất "10 nhóm dữ liệu / 11 tab, tab Doanh nghiệp là tab điều kiện" ở UC-C360-02 và SCR-C360-02; (MA-03) thêm dòng masking "Hồ sơ liên kết/alias" vào bảng III.C360 (kèm OQ-IDR-09); (MA-04) làm rõ 3 điều kiện empty-state SCR-C360-01 để testable, đồng bộ UC-C360-01; (MA-05) thêm cột Trạng thái (đã gộp/đã tách) vào bảng định danh liên kết SCR-C360-02. Thêm OQ-IDR-09→11; ghi nhận 5 MINOR QA Lô 1 (MI-L1-01→05, gom lô sau) | BA |
 | v1.4 | 08/2026 | **Lô 2** — bổ sung Mục III (Đặc tả Use Case) và Mục IV (Giao diện chức năng) cho Phân hệ 1 (Tiếp nhận, FR-ING) và Phân hệ 2 (Chuẩn hóa và xử lý dữ liệu, FR-DPS): 13 Use Case (UC-ING-01→07, UC-DPS-01→06), 24 Business Rule (BR-ING-01→10, BR-DPS-01→14), 8 màn giao diện (SCR-ING-01→03, SCR-DPS-01→05 — trong đó 2 màn từ prototype v3 là màn giám sát luồng và panel chất lượng, 6 màn CẦN BỔ SUNG). Gộp 8 chức năng chuẩn hóa trường (FR-DPS-01→08) thành 2 UC (UC-DPS-01 định danh/liên hệ + UC-DPS-02 nghiệp vụ) với BR chi tiết từng trường. Đọc thẳng CDP.md 7.2 (FR-ING-01→10), 7.3 (FR-DPS-01→14), 6.10 (nguồn ưu tiên 12 nhóm), 6.11 (bảo vệ dữ liệu định danh): **cập nhật cây chức năng II.2** — gắn đủ 10 tên FR-ING và 14 tên FR-DPS, ghi rõ tương đương mã nhóm FR-INGEST≡FR-ING, FR-STD≡FR-DPS (chỉ điền tên mã gốc, không đổi cấu trúc cây, không đụng Phân hệ 3–7). Đặc tả SCR-ING-01 bằng ngôn ngữ nghiệp vụ, ghi khối điểm lệch yêu cầu **bỏ nhãn công nghệ Kafka/topic/lag/consumer** khỏi giao diện khi triển khai (D-04). Áp các con số baseline 7.2: thử lại 3 lần 1'–5'–15', hàng đợi lỗi 30 ngày, ngưỡng cảnh báo/báo động (vàng >15'/lỗi >1%; đỏ ngừng >15'/lỗi >5%/tồn >60'), độ trễ theo nhóm, mục tiêu chất lượng 6/12 tháng. Thêm 6 OQ Lô 2 (OQ-ING-01→04, OQ-DPS-01→02) — không có OQ critical chặn. Ranh giới quyền DATA-ENG vs DATA-STEWARD để mở (OQ-ING-01), không tự quyết | BA |
 | v1.5 | 08/2026 | Patch theo QA review Lô 2 — sửa 1 CRITICAL + 4 MAJOR (+2 MINOR nhanh): (CR-01) bỏ cặp số bịa "~690.000/~1.200" gắn nhãn baseline 7.2 trong BR-ING-08, thay bằng lập luận định tính đúng nguồn; rà toàn file xác nhận không còn số cụ thể gắn nhãn baseline mà baseline không có. (MA-01) **mở Mục II.3/II.4** bổ sung 2 dòng quyền "Cấu hình rule chất lượng dữ liệu" và "Cấu hình nguồn dữ liệu ưu tiên" (DATA-STEWARD=X, Quản trị=(X)); tách action **CONFIG** khỏi UPDATE ở II.4.3 khối Chất lượng dữ liệu + làm rõ định nghĩa CONFIG vs UPDATE ở II.4.2; nối traceability UC-DPS-05/06 và SCR-DPS-04/05 tới quyền CONFIG. (MA-02) thêm actor phụ **SYS-ADMIN (= IT Admin gốc)** vào UC-ING-06 với phân vai rõ vs DATA-ENG, đồng bộ II.4.3; phân biệt rõ với OQ-ING-01 (DATA-ENG vs DATA-STEWARD). (MA-03) ghi rõ nhánh 6.4 "đồng bộ sang kênh thất bại" là lỗi **outbound thuộc Phân hệ 6 (lô sau)**, không phải gap Lô 2. (MA-04) làm rõ BR-ING-05 chuyển trạng thái ngược chiều "Trong hàng đợi lỗi → (Sửa và nạp lại) → Chờ thử lại", đồng bộ SCR-ING-03 row 10 + UC-ING-04 E3. (MI-01) bỏ 2 nhãn tech lặp trong bảng SCR-ING-01 (rows 5/6/15/19 — mapping vẫn còn ở khối điểm lệch); (MI-06) ghi rõ UC-DPS-04 quan sát ở SCR-C360-02. Thêm OQ-DPS-03 (mức CONFIG của SYS-ADMIN). 4 MINOR còn lại (MI-02→05) gom lô sau | BA |
+| v1.6 | 08/2026 | **Lô 3** — bổ sung Mục III (Đặc tả Use Case) và Mục IV (Giao diện chức năng) cho Phân hệ 5 (Phân khúc, phân tích và AI, FR-ANA): 9 Use Case (UC-ANA-01→09), 12 Business Rule (BR-ANA-01→12), 7 màn giao diện (SCR-ANA-01→07 — trong đó 3 màn từ prototype v3 là danh sách/trình tạo/chi tiết phân khúc, 4 màn CẦN BỔ SUNG: dashboard BI, cấu hình ngưỡng cảnh báo, phân tích hiệu quả chiến dịch, quản lý mô hình AI). Đọc thẳng CDP.md 7.6: **cập nhật cây chức năng II.2** — gắn đủ 15 tên FR-ANA-01→15 với độ ưu tiên P1/P2, ghi rõ tương đương mã nhóm **FR-ANA ≡ FR-SEG/FR-ANALYTICS** (chỉ điền tên mã, không đổi cấu trúc cây, không đụng Phân hệ 6/7). Cập nhật ghi chú mã FR ở I.2.1. Gộp 7 mã chấm điểm/rủi ro (FR-ANA-04→10) thành 1 UC chấm điểm nền (UC-ANA-05) + 1 UC người dùng xem/xử lý (UC-ANA-06), định nghĩa nghiệp vụ từng loại điểm tách riêng ở BR-ANA-05→09 (không trộn công thức). Đánh dấu **P1 cho rủi ro COD (FR-ANA-08) và nguy cơ hoàn hàng (FR-ANA-09)** — ưu tiên cao theo bài toán giảm hoàn hàng; **P2 cho RFM/CLV/churn/fraud/recommendation/campaign/model/clustering**. **Giữ ranh giới BA vs Data Science:** đặc tả use case + đầu ra + cách dùng, KHÔNG đi vào thuật toán/công thức/tham số mô hình. **Che điểm số nhất quán tuyệt đối với III.C360/BR-C360-03 Lô 1** (BR-ANA-11: COD Risk + Fraud ẩn với MARKETING và CSKH). Không bịa số ngưỡng cảnh báo (đúng bài học Lô 2 CR-01) — để [Cần xác nhận] OQ-ANA-02. NOT trong builder để [Cần xác nhận] OQ-ANA-01 (prototype hiện chỉ AND/OR). Thêm 7 OQ Lô 3 (OQ-ANA-01→07) — không có OQ critical chặn | BA |
+| v1.7 | 08/2026 | Patch theo QA review Lô 3 — sửa 3 MAJOR (0 CRITICAL) + 2 MINOR nhanh: (MA-01) **thêm UC-ANA-10 "Cấu hình ngưỡng cảnh báo điểm số"** (actor người dùng DATA-STEWARD, [Cần xác nhận] OQ-ANA-02) để nối traceability cho SCR-ANA-05 — trước đó màn cấu hình ngưỡng (có nút Lưu + quyền) trỏ nhầm UC-ANA-05 (actor Hệ thống, thuần nền, không có bước nhập ngưỡng); giữ UC-ANA-05 thuần nền tiêu thụ ngưỡng đã cấu hình; cập nhật ánh xạ SCR-ANA-05 → UC-ANA-10; danh mục III.5.0 nay 10 UC. (MA-02) **mở Mục II.3/II.4** bổ sung 2 dòng quyền khối Phân khúc/Phân tích: "Cấu hình ngưỡng cảnh báo điểm số" (DATA-STEWARD **VIEW, CONFIG**; SYS-ADMIN VIEW — cùng khuôn CONFIG Lô 2) và "Quản lý mô hình AI (mức nghiệp vụ)" (VIEW cho DATA-STEWARD/SYS-ADMIN góc hỗ trợ, actor chính DATA-ANALYST để [Cần xác nhận] OQ-ANA-07); nối SCR-ANA-05/07 tới quyền tương ứng, gỡ trạng thái "Không đủ quyền" treo không nguồn. (MA-03) thêm ghi chú **FR-ANA-07 là mã ô dù** ở BR-ANA-07 và III.5.0: điểm chồng lấn lấy ưu tiên theo mã chuyên biệt — COD risk theo FR-ANA-08 (P1), fraud theo FR-ANA-10 (P2); P2 của FR-ANA-07 chỉ áp cho engagement/value/service quality, COD risk là P1 không bị kéo xuống. (MI-02) thêm ngoại lệ **cây điều kiện rỗng hoàn toàn** chặn lưu (UC-ANA-01 E3, đồng bộ SCR-ANA-02). (MI-04) chuẩn hóa tên vai trò trong BR-ANA-11 kèm mã role code. 3 MINOR còn lại (MI-01, 03, 05) gom lô sau | BA |
 
 ---
 
@@ -78,15 +80,15 @@ Tài liệu bao phủ **toàn bộ 7 phân hệ** của CDP, khoảng **99 mã y
 | 2 | Chuẩn hóa và xử lý dữ liệu | FR-DPS (≡ FR-STD) | Chuẩn hóa số điện thoại, email, họ tên, địa chỉ, mã số thuế, mã vận đơn, trạng thái; theo dõi chất lượng dữ liệu |
 | 3 | Hợp nhất định danh | FR-IDR | Tính điểm tin cậy; đối sánh; gộp và tách hồ sơ; sơ đồ liên kết định danh; nhật ký gộp/tách |
 | 4 | Quản lý hồ sơ khách hàng 360 | FR-C360 | Tra cứu; hồ sơ hợp nhất 10 nhóm dữ liệu; hiển thị theo phân quyền; ghi chú và gắn nhãn |
-| 5 | Phân khúc, phân tích và trí tuệ nhân tạo | FR-SEG / FR-ANALYTICS | Phân khúc động; chấm điểm; cảnh báo rủi ro; phân tích theo mô hình gần đây/tần suất/giá trị; dự báo rời bỏ |
+| 5 | Phân khúc, phân tích và trí tuệ nhân tạo | FR-ANA (≡ FR-SEG/FR-ANALYTICS) | Phân khúc động; chấm điểm; cảnh báo rủi ro; phân tích theo mô hình gần đây/tần suất/giá trị; dự báo rời bỏ |
 | 6 | Kích hoạt dữ liệu | FR-ACT | Kiểm tra đồng ý; kiểm tra tần suất và khung giờ; phê duyệt theo ngưỡng; đẩy sang kênh; nhận phản hồi |
 | 7 | Quản trị, bảo mật và quyền riêng tư | FR-GOV | Quản lý tài khoản, vai trò, phạm vi; nhật ký bất biến; quản lý đồng ý; xử lý yêu cầu chủ thể dữ liệu; báo cáo tuân thủ |
 
-> **Về mã yêu cầu chi tiết:** Bốn phân hệ đã đặc tả chi tiết đều có **đủ tên mã theo tài liệu gốc `CDP.md`**: Lô 1 — **14 mã FR-IDR-01→14** (mục 7.4) và **15 mã FR-C360-01→15** (mục 7.5); Lô 2 — **10 mã FR-ING-01→10** (mục 7.2) và **14 mã FR-DPS-01→14** (mục 7.3). Xem cây chức năng đầy đủ ở Mục II.2 và danh mục ánh xạ ở Mục III.0 / III.3.0 / III.4.0.
+> **Về mã yêu cầu chi tiết:** Năm phân hệ đã đặc tả chi tiết đều có **đủ tên mã theo tài liệu gốc `CDP.md`**: Lô 1 — **14 mã FR-IDR-01→14** (mục 7.4) và **15 mã FR-C360-01→15** (mục 7.5); Lô 2 — **10 mã FR-ING-01→10** (mục 7.2) và **14 mã FR-DPS-01→14** (mục 7.3); Lô 3 — **15 mã FR-ANA-01→15** (mục 7.6). Xem cây chức năng đầy đủ ở Mục II.2 và danh mục ánh xạ ở Mục III.0 / III.3.0 / III.4.0 / III.5.0.
 >
-> **Lưu ý mã nhóm:** tài liệu này dùng mã gốc CDP.md là **FR-ING** (Phân hệ 1) và **FR-DPS** (Phân hệ 2). Các mã nhóm cũ **FR-INGEST** và **FR-STD** từng dùng ở phiên bản khung là tương đương: **FR-INGEST ≡ FR-ING**, **FR-STD ≡ FR-DPS**. Từ v1.4, mọi tham chiếu chi tiết dùng FR-ING/FR-DPS.
+> **Lưu ý mã nhóm:** tài liệu này dùng mã gốc CDP.md là **FR-ING** (Phân hệ 1), **FR-DPS** (Phân hệ 2) và **FR-ANA** (Phân hệ 5). Các mã nhóm cũ từng dùng ở phiên bản khung là tương đương: **FR-INGEST ≡ FR-ING**, **FR-STD ≡ FR-DPS**, **FR-SEG/FR-ANALYTICS ≡ FR-ANA**. Từ v1.6, mọi tham chiếu chi tiết Phân hệ 5 dùng FR-ANA.
 >
-> Ba phân hệ còn lại (Phân tích FR-ANA/FR-SEG, Kích hoạt FR-ACT, Quản trị FR-GOV) cũng có bảng mã gốc trong `CDP.md` (mục 7.6…); tên và số hiệu chi tiết của từng mã sẽ được đưa vào cây chức năng khi làm chi tiết theo lô tương ứng.
+> Hai phân hệ còn lại (Kích hoạt FR-ACT mục 7.7, Quản trị FR-GOV mục 7.8) cũng có bảng mã gốc trong `CDP.md`; tên và số hiệu chi tiết của từng mã sẽ được đưa vào cây chức năng khi làm chi tiết theo lô tương ứng.
 
 ### I.2.2. Ranh giới hệ thống
 
@@ -668,18 +670,23 @@ CDP — Nền tảng Dữ liệu Khách hàng VNPost
 │   └── Tính toán thuộc tính phái sinh (FR-C360-15)
 │       └── (Đủ 15 mã FR-C360-01→15 có tên theo CDP.md mục 7.5 — xem III.0)
 │
-├── Phân hệ 5: Phân khúc, phân tích và trí tuệ nhân tạo (FR-SEG / FR-ANALYTICS)
-│   ├── Xem danh sách phân khúc
-│   ├── Tạo phân khúc (visual rule, không SQL)
-│   ├── Sửa phân khúc (cảnh báo khi đang chạy chiến dịch)
-│   ├── Nhân bản phân khúc
-│   ├── Tạm dừng / kích hoạt lại phân khúc
-│   ├── Xóa phân khúc
-│   ├── Ước lượng số khách hàng khớp (real-time)
-│   ├── Chấm điểm khách hàng (tương tác, CLV, rời bỏ, rủi ro thu hộ, gian lận, chất lượng)
-│   ├── Phân tích gần đây/tần suất/giá trị · dự báo rời bỏ [P2]
-│   └── Cảnh báo rủi ro theo ngưỡng
-│       └── [Cần xác nhận: mã yêu cầu chi tiết phân hệ 5 — FR-SEG-xx / FR-ANALYTICS-xx]
+├── Phân hệ 5: Phân khúc, phân tích và trí tuệ nhân tạo (FR-ANA ≡ FR-SEG/FR-ANALYTICS)
+│   ├── Thiết lập phân khúc theo quy tắc — Visual Rule Builder, điều kiện lồng AND/OR/NOT (FR-ANA-01)
+│   ├── Ước lượng quy mô tệp khách hàng theo thời gian thực (FR-ANA-02) [ưu tiên Medium]
+│   ├── Tự động cập nhật phân khúc — Dynamic Audience Refresh (FR-ANA-03)
+│   ├── Phân tích RFM — gần đây/tần suất/giá trị (FR-ANA-04) [P2]
+│   ├── Phân tích giá trị vòng đời khách hàng — CLV (FR-ANA-05) [P2, ưu tiên Medium]
+│   ├── Dự báo nguy cơ khách hàng rời bỏ — Churn Prediction (FR-ANA-06) [P2]
+│   ├── Chấm điểm khách hàng — engagement/value/churn/COD/fraud/service (FR-ANA-07) [P2]
+│   ├── Chấm điểm rủi ro COD — COD Risk Scoring (FR-ANA-08) [P1]
+│   ├── Phân tích nguy cơ hoàn hàng — Return Risk Analysis (FR-ANA-09) [P1]
+│   ├── Phát hiện rủi ro/gian lận — Fraud/Risk Detection (FR-ANA-10) [P2, ưu tiên Medium]
+│   ├── Gợi ý sản phẩm/dịch vụ phù hợp — Recommendation (FR-ANA-11) [P2, ưu tiên Medium]
+│   ├── Phân tích hiệu quả chiến dịch — Campaign Analytics (FR-ANA-12) [P2, ưu tiên Medium]
+│   ├── Bảng điều khiển và báo cáo phân tích — Dashboard & BI (FR-ANA-13) [P2]
+│   ├── Quản lý mô hình AI — AI Model Management (FR-ANA-14) [P2, ưu tiên Low/Medium]
+│   └── Phân nhóm khách hàng tự động bằng AI — AI Clustering (FR-ANA-15) [P2, ưu tiên Medium]
+│       └── (Đủ 15 mã FR-ANA-01→15 có tên theo CDP.md mục 7.6 — xem III.5.0)
 │
 ├── Phân hệ 6: Kích hoạt dữ liệu (FR-ACT)
 │   ├── Chọn phân khúc và kênh gửi
@@ -729,10 +736,10 @@ CDP — Nền tảng Dữ liệu Khách hàng VNPost
 - **Giá trị nghiệp vụ:** Đội bán hàng và CSKH thay vì tra 5–7 hệ thống chỉ cần một màn hình; nền tảng cho mọi phân tích.
 - **Chức năng con:** Tìm kiếm, xem hồ sơ 360, hiển thị theo phân quyền, so sánh nguồn, hồ sơ liên kết, ghi chú/gắn nhãn, xuất danh sách.
 
-**Phân hệ 5 — Phân khúc, phân tích và trí tuệ nhân tạo (FR-SEG / FR-ANALYTICS)**
+**Phân hệ 5 — Phân khúc, phân tích và trí tuệ nhân tạo (FR-ANA ≡ FR-SEG/FR-ANALYTICS)**
 - **Mục đích:** Nhóm khách hàng theo điều kiện nghiệp vụ và tính các điểm số phục vụ quyết định.
 - **Giá trị nghiệp vụ:** Phát hiện sớm khách hàng có nguy cơ rời bỏ, đo được hiệu quả chiến dịch, giảm hoàn hàng.
-- **Chức năng con:** CRUD phân khúc, ước lượng số khách hàng, chấm điểm, phân tích nâng cao, cảnh báo rủi ro.
+- **Chức năng con:** đủ **15 mã FR-ANA-01→15** đã có tên theo CDP.md mục 7.6 — thiết lập phân khúc theo quy tắc (01), ước lượng quy mô tệp (02), tự động cập nhật phân khúc (03), phân tích RFM (04), CLV (05), dự báo rời bỏ (06), chấm điểm khách hàng (07), rủi ro COD (08), nguy cơ hoàn hàng (09), phát hiện gian lận (10), gợi ý dịch vụ (11), phân tích hiệu quả chiến dịch (12), dashboard & BI (13), quản lý mô hình AI (14), phân nhóm AI (15). Chi tiết Use Case xem III.5.
 
 **Phân hệ 6 — Kích hoạt dữ liệu (FR-ACT)**
 - **Mục đích:** Đưa phân khúc sang kênh giao tiếp để chạy chiến dịch, có kiểm soát đồng ý, tần suất, ngưỡng.
@@ -773,9 +780,11 @@ Ma trận dưới xây trên gốc bảng role × nhóm dữ liệu (mục 6.2 b
 | | Xem điểm rủi ro thu hộ/gian lận | (X) | – | – | (X) | (X) | (X) |
 | | Ghi chú / gắn nhãn | X | X | X | X | X | X |
 | | Xuất danh sách khách hàng | X | X | X | X | X | X |
-| **Phân khúc và phân tích (FR-SEG)** | Xem danh sách phân khúc | (X) | X | – | (X) | – | (X) |
+| **Phân khúc và phân tích (FR-ANA)** | Xem danh sách phân khúc | (X) | X | – | (X) | – | (X) |
 | | Tạo / sửa / xóa phân khúc | – | X | – | – | – | X |
 | | Xem điểm số khách hàng | (X) | (X) | (X) | (X) | – | (X) |
+| | Cấu hình ngưỡng cảnh báo điểm số | X | – | – | – | – | (X) |
+| | Quản lý mô hình AI (mức nghiệp vụ) | (X)* | – | – | – | – | (X)* |
 | **Kích hoạt (FR-ACT)** | Chọn phân khúc và kênh | – | X | – | – | – | (X) |
 | | Kích hoạt chiến dịch | – | X | – | – | – | (X) |
 | | Phê duyệt tệp vượt ngưỡng | – | (X) | – | – | – | X |
@@ -789,6 +798,8 @@ Ma trận dưới xây trên gốc bảng role × nhóm dữ liệu (mục 6.2 b
 
 - **Nguyên tắc che dữ liệu trong cùng màn hình:** cùng một chức năng "Xem hồ sơ 360" nhưng mỗi vai trò thấy mức chi tiết khác nhau — không chỉ ẩn/hiện cả khối mà còn che nội dung từng trường. Ví dụ: số điện thoại — CSKH và Vận hành che một phần, Kinh doanh và Người phụ trách dữ liệu xem đầy đủ; số định danh cá nhân — chỉ Quản trị xem đầy đủ theo quyền đặc biệt.
 - **Điểm rủi ro thu hộ và gian lận:** Tiếp thị và CSKH **không xem** hai điểm này (theo mục 6.2 baseline và ghi chú masking của wireframe: COD Risk Score và Fraud Score ẩn với CSKH/Marketing). Chỉ Kinh doanh và KHL, Vận hành và thu hộ, Người phụ trách dữ liệu và Quản trị hệ thống được xem.
+- **Cấu hình ngưỡng cảnh báo điểm số (khối Phân khúc và phân tích):** giao cho **Người phụ trách dữ liệu (X)** — chủ thể nghiệp vụ định nghĩa ngưỡng cảnh báo (UC-ANA-10, SCR-ANA-05), dùng đúng khuôn action **CONFIG** đã thiết lập ở Lô 2 (II.4.2). Quản trị hệ thống để **(X)** (xem/hỗ trợ) theo nguyên tắc tách quyền cấu hình khỏi quyền xem (II.4.4 mục 3). Vai trò cấu hình có đúng là Người phụ trách dữ liệu không — **[Cần xác nhận]** (OQ-ANA-02).
+- **Quản lý mô hình AI (mức nghiệp vụ) — dấu `*`:** actor chính theo UC-ANA-09 là **Chuyên viên phân tích dữ liệu (DATA-ANALYST)**, thuộc **6 vai trò chưa có ma trận chi tiết** (bảng dưới), nên chưa có cột riêng trong bảng trên. Dòng này tạm ghi (X)* cho Người phụ trách dữ liệu và Quản trị hệ thống ở góc quản trị/hỗ trợ; mức quyền chính thức của DATA-ANALYST và ranh giới với Data Scientist — **[Cần xác nhận]** (OQ-ANA-07). Đây là quyền **xem/bật-tắt mức nghiệp vụ**, KHÔNG bao gồm huấn luyện/chỉnh tham số (ngoài phạm vi — UC-ANA-09).
 - **Tách hồ sơ** là thao tác không đảo ngược tự động (phải bắt buộc điền lý do, ghi nhật ký bất biến) — xem II.4.
 - **Quyền cấu hình chất lượng dữ liệu (Cấu hình rule chất lượng, Cấu hình nguồn dữ liệu ưu tiên):** giao cho **Người phụ trách dữ liệu (X)** — đây là chủ thể nghiệp vụ định nghĩa quy tắc chất lượng và nguồn master (UC-DPS-05, UC-DPS-06). Quản trị hệ thống để **(X)** (xem/hỗ trợ) chứ không phải X đầy đủ, theo nguyên tắc II.4.4 mục 3 — **tách quyền cấu hình khỏi quyền xem dữ liệu**: người cấu hình hệ thống không mặc nhiên là người định nghĩa quy tắc dữ liệu nghiệp vụ. `[Cần xác nhận: Quản trị hệ thống có cần quyền cấu hình đầy đủ hai chức năng này không, hay chỉ xem/hỗ trợ]` (OQ-DPS-03).
 - **Sáu vai trò chưa có giao diện** — Chủ sở hữu dữ liệu, Kỹ sư dữ liệu, Chuyên viên phân tích dữ liệu, An toàn thông tin, Pháp chế và tuân thủ, Lãnh đạo và quản lý đơn vị — chưa được đưa vào bảng chi tiết ở trên vì chưa chốt mức chi tiết giao diện. Định hướng quyền của nhóm này:
@@ -850,6 +861,8 @@ Ma trận dưới xây trên gốc bảng role × nhóm dữ liệu (mục 6.2 b
 | Ghi chú / gắn nhãn | VIEW, CREATE | VIEW, CREATE | VIEW, CREATE | VIEW, CREATE | VIEW, CREATE | VIEW, CREATE |
 | Xuất danh sách | VIEW, EXPORT | VIEW, EXPORT | VIEW, EXPORT | VIEW, EXPORT | VIEW, EXPORT | VIEW, EXPORT |
 | Phân khúc | VIEW | VIEW, CREATE, UPDATE, DELETE | – | VIEW | – | VIEW, CREATE, UPDATE, DELETE |
+| Cấu hình ngưỡng cảnh báo điểm số | VIEW, CONFIG | – | – | – | – | VIEW |
+| Quản lý mô hình AI (mức nghiệp vụ) | VIEW | – | – | – | – | VIEW |
 | Kích hoạt | – | VIEW, CREATE | – | – | – | VIEW |
 | Phê duyệt xuất/kích hoạt | – | – | – | – | – | APPROVE |
 | Quản lý đồng ý | VIEW, UPDATE | VIEW | VIEW, UPDATE | – | – | VIEW, UPDATE |
@@ -859,6 +872,8 @@ Ma trận dưới xây trên gốc bảng role × nhóm dữ liệu (mục 6.2 b
 > Các vai trò DATA-OWNER, DATA-ENG, DATA-ANALYST, SEC-OFFICER, COMPLIANCE, LEADER chưa có ma trận chi tiết — xem `[Cần xác nhận]` ở II.3. Định hướng quyền của nhóm này đã nêu trong bảng II.3.
 >
 > **Ghi chú khối Chất lượng dữ liệu (khớp UC-DPS-05, UC-DPS-06):** DATA-STEWARD có **VIEW, UPDATE, CONFIG** — trong đó **UPDATE** là sửa dữ liệu lỗi/nạp lại bản ghi cụ thể (UC-DPS-05, SCR-DPS-03), còn **CONFIG** là cấu hình rule chất lượng (SCR-DPS-04) và cấu hình nguồn dữ liệu ưu tiên (SCR-DPS-05, UC-DPS-06). Tách hai quyền để phân biệt "sửa một bản ghi" với "định nghĩa quy tắc áp cho toàn luồng" (nguyên tắc II.4.4 mục 3). SYS-ADMIN giữ **VIEW** ở khối này, chưa gán CONFIG — xem OQ-DPS-03.
+>
+> **Ghi chú khối Phân khúc/Phân tích (Lô 3 — khớp UC-ANA-10, UC-ANA-09):** (1) **Cấu hình ngưỡng cảnh báo điểm số** — DATA-STEWARD có **VIEW, CONFIG** (định nghĩa ngưỡng cảnh báo, phân khúc đích, kênh — UC-ANA-10, SCR-ANA-05), dùng cùng khuôn CONFIG với khối Chất lượng dữ liệu; SYS-ADMIN giữ **VIEW** (hỗ trợ), chưa gán CONFIG theo nguyên tắc II.4.4 mục 3; vai trò cấu hình có đúng là DATA-STEWARD không — xem OQ-ANA-02. (2) **Quản lý mô hình AI (mức nghiệp vụ)** — bảng để **VIEW** cho DATA-STEWARD và SYS-ADMIN ở góc hỗ trợ; actor chính theo UC-ANA-09 là **DATA-ANALYST** (chưa có ma trận chi tiết — nằm trong nhóm 6 vai trò trên); mức quyền bật/tắt mô hình và ranh giới với Data Scientist — xem OQ-ANA-07. Quyền này chỉ ở mức **xem/bật-tắt nghiệp vụ**, KHÔNG gồm huấn luyện/chỉnh tham số.
 
 ### II.4.4. Bảy nguyên tắc phân quyền
 
@@ -2052,9 +2067,416 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 
 ---
 
+## III.5. Phân hệ 5 — Phân khúc, phân tích và AI (UC-ANA)
+
+> **Ranh giới BA vs Data Science (áp dụng cho toàn Mục III.5):** tài liệu đặc tả use case ở mức **nghiệp vụ + đầu ra người dùng nhìn thấy + cách người dùng sử dụng kết quả** (xem điểm ở đâu, ngưỡng nào đưa vào phân khúc nào, ai được xem điểm nào theo che dữ liệu). Tài liệu **KHÔNG** đi vào thuật toán, công thức tính điểm, feature engineering, kiến trúc/tham số mô hình — đó là phạm vi Data Scientist/SA. Định nghĩa nghiệp vụ từng loại điểm lấy đúng theo baseline/CDP.md, không tự chế công thức.
+>
+> **Giai đoạn triển khai:** phần lớn chức năng phân tích/AI (FR-ANA-04→07, 10, 11, 14, 15) thuộc **P2 — Nâng cao** theo I.2.3. Hai chức năng rủi ro vận hành (FR-ANA-08 rủi ro COD, FR-ANA-09 nguy cơ hoàn hàng) thuộc **P1** vì gắn trực tiếp bài toán giảm hoàn hàng/thất thoát thu hộ. Phân khúc động (FR-ANA-01→03) thuộc **P1**. Mỗi Use Case ghi rõ độ ưu tiên/giai đoạn.
+
+### III.5.0. Danh mục Use Case và Business Rule của Phân hệ 5
+
+**Danh mục Use Case (10 UC — gộp hợp lý từ 15 mã FR-ANA):**
+
+| Mã UC | Tên Use Case | Actor chính | Chức năng (Function Tree II.2) | FR-ANA gốc | Giai đoạn |
+|---|---|---|---|---|---|
+| UC-ANA-01 | Tạo/sửa phân khúc theo quy tắc (builder cây lồng + ước lượng real-time) | Tiếp thị và CRM (MARKETING) | Thiết lập phân khúc theo quy tắc · Ước lượng quy mô tệp | FR-ANA-01, 02 | P1 |
+| UC-ANA-02 | Quản lý danh sách phân khúc (xem, nhân bản, tạm dừng/kích hoạt lại, xóa) | Tiếp thị và CRM (MARKETING) | Danh sách phân khúc · Trạng thái phân khúc | FR-ANA-01 | P1 |
+| UC-ANA-03 | Sửa điều kiện phân khúc đang được chiến dịch dùng (cảnh báo tác động) | Tiếp thị và CRM (MARKETING) | Sửa phân khúc (cảnh báo khi đang chạy chiến dịch) | FR-ANA-01, 03 | P1 |
+| UC-ANA-04 | Phân khúc động tự cập nhật định kỳ (xử lý nền) | Hệ thống | Tự động cập nhật phân khúc | FR-ANA-03 | P1 |
+| UC-ANA-05 | Hệ thống chấm điểm khách hàng định kỳ + phát cảnh báo rủi ro (xử lý nền) | Hệ thống | Chấm điểm khách hàng · Cảnh báo rủi ro theo ngưỡng | FR-ANA-04→10 | P1 (08, 09) / P2 (04–07, 10) |
+| UC-ANA-06 | Xem điểm số và xử lý cảnh báo rủi ro (theo che dữ liệu vai trò) | Kinh doanh và KHL (SALES-KHL) · Vận hành và thu hộ (OPS-COD) · Chuyên viên phân tích dữ liệu (DATA-ANALYST) · Tiếp thị và CRM (MARKETING) | Xem điểm số khách hàng · Cảnh báo rủi ro | FR-ANA-04→10 | P1/P2 theo loại điểm |
+| UC-ANA-07 | Xem bảng điều khiển phân tích và báo cáo BI | Lãnh đạo và quản lý đơn vị (LEADER) · Chuyên viên phân tích dữ liệu (DATA-ANALYST) | Bảng điều khiển và báo cáo phân tích | FR-ANA-13 | P2 |
+| UC-ANA-08 | Xem gợi ý dịch vụ và phân tích hiệu quả chiến dịch (mức nghiệp vụ) | Tiếp thị và CRM (MARKETING) | Gợi ý dịch vụ · Phân tích hiệu quả chiến dịch | FR-ANA-11, 12 | P2 |
+| UC-ANA-09 | Quản lý mô hình AI (mức nghiệp vụ) + phân nhóm AI clustering (nền) | Chuyên viên phân tích dữ liệu (DATA-ANALYST) | Quản lý mô hình AI · Phân nhóm khách hàng bằng AI | FR-ANA-14, 15 | P2 |
+| UC-ANA-10 | Cấu hình ngưỡng cảnh báo điểm số (người dùng nhập ngưỡng, phân khúc đích, kênh) | Người phụ trách dữ liệu (DATA-STEWARD) — [Cần xác nhận] OQ-ANA-02 | Cảnh báo rủi ro theo ngưỡng (cấu hình) | FR-ANA-07→10 (đầu vào cấu hình) | P1/P2 theo loại điểm |
+
+> **Ghi chú đối chiếu tài liệu gốc:** đọc thẳng `CDP.md` mục 7.6 xác nhận **cả 15 mã FR-ANA-01→15 đều đã có tên, độ ưu tiên và tác nhân đầy đủ**. Từ v1.6, Mục I.2.1 và cây chức năng II.2 đã cập nhật khớp danh sách gốc này (mã nhóm FR-ANA ≡ FR-SEG/FR-ANALYTICS).
+>
+> **Về cách gộp UC:** 15 mã FR được gộp thành 10 UC theo nguyên tắc "cùng một hành động nghiệp vụ của một actor gộp làm một". Cụ thể: 7 mã chấm điểm/phân tích rủi ro (FR-ANA-04→10) gộp thành **1 UC chấm điểm nền (UC-ANA-05, actor Hệ thống)** + **1 UC người dùng xem/xử lý (UC-ANA-06)** + **1 UC người dùng cấu hình ngưỡng (UC-ANA-10, actor DATA-STEWARD)** — tách ba vì ba actor/thời điểm khác nhau: hệ thống tính điểm nền, người dùng cấu hình ngưỡng đầu vào, người dùng xem kết quả. Chi tiết định nghĩa nghiệp vụ và giai đoạn của **từng loại điểm** đặt riêng ở Business Rule (BR-ANA-05→09), không trộn lẫn trong luồng UC.
+>
+> **FR-ANA-07 là mã ô dù (chấm điểm tổng hợp):** gốc 7.6 đánh P2 nguyên khối, nhưng các điểm chồng lấn lấy độ ưu tiên **theo mã chuyên biệt** — điểm rủi ro COD theo **FR-ANA-08 (P1)**, điểm gian lận theo **FR-ANA-10 (P2)**. Vì vậy **P2 của FR-ANA-07 chỉ áp cho engagement / value / service quality**; **điểm rủi ro COD là P1**, không bị kéo xuống P2 theo mã ô dù (xem BR-ANA-07).
+
+**Danh mục Business Rule của Phân hệ 5 (BR-ANA-01→12):**
+
+| Mã BR | Nội dung | Nguồn |
+|---|---|---|
+| BR-ANA-01 | **Trường điều kiện và toán tử của trình tạo phân khúc:** điều kiện dựng trên 11 nhóm trường — Loại khách hàng · Nhóm khách hàng · Tỉnh/Thành phố · Điểm rời bỏ · Điểm rủi ro COD · Tỷ lệ hoàn · Tổng đơn · Tổng doanh thu · Nhóm RFM · Ngày giao dịch gần nhất · Vai trò; 8 toán tử: `=`, `≠`, `>`, `<`, `≥`, `≤`, `chứa`, `thuộc`. Không dùng ngôn ngữ truy vấn thô (không SQL) | Prototype v3 SegmentScreen (FIELDS, OPS); baseline Luồng 4 |
+| BR-ANA-02 | **Điều kiện lồng nhiều tầng theo nhóm logic:** mỗi nhóm mang logic **TẤT CẢ (AND)** hoặc **BẤT KỲ (OR)**; nhóm chứa được cả điều kiện lá lẫn nhóm con, lồng **tối đa 3 tầng**. Hệ thống sinh câu tóm tắt tiếng Việt tự động từ cây điều kiện ("Phân khúc này lấy khách hàng thoả: …") để người dùng đọc là hiểu | Prototype v3 (MAX_DEPTH=3, summarize); baseline Luồng 4 mục 3 |
+| BR-ANA-03 | **Phép phủ định (NOT):** tài liệu gốc FR-ANA-01 nêu điều kiện logic đa lớp kết hợp AND/OR/**NOT**. Prototype v3 hiện **chỉ có AND/OR** (chưa có phần tử NOT tường minh); phủ định được thể hiện gián tiếp qua toán tử `≠` ở mức điều kiện lá. Cách thể hiện NOT ở mức nhóm — **[Cần xác nhận]** (OQ-ANA-01), không tự thêm nút NOT | CDP.md 7.6 FR-ANA-01; prototype v3 |
+| BR-ANA-04 | **Phân khúc động vs tĩnh:** *phân khúc động* tự cập nhật thành viên khi dữ liệu khách hàng (giao dịch, hành vi, trạng thái COD, tương tác) thay đổi; *phân khúc tĩnh* chốt danh sách một lần tại thời điểm tạo, không tự đổi. Tần suất cập nhật phân khúc động chọn theo cấu hình: Hàng ngày lúc 02:00 · Mỗi giờ · Thời gian thực · Thủ công | Thuật ngữ I.3 số 16; CDP.md FR-ANA-03; prototype v3 (segType, segFreq) |
+| BR-ANA-05 | **Định nghĩa RFM (FR-ANA-04):** phân nhóm khách hàng theo ba chiều — **R (Recency, gần đây):** mức độ gần đây của giao dịch cuối · **F (Frequency, tần suất):** tần suất giao dịch · **M (Monetary, giá trị):** giá trị giao dịch. Kết quả là nhãn nhóm RFM (ví dụ Champions) dùng làm trường điều kiện phân khúc và hiển thị trong hồ sơ 360. **Không đặc tả công thức tính** — thuộc Data Science | CDP.md 7.6 FR-ANA-04; baseline Luồng 5 |
+| BR-ANA-06 | **Định nghĩa CLV (FR-ANA-05) và Churn (FR-ANA-06):** *CLV — giá trị vòng đời khách hàng:* ước lượng tổng giá trị một khách hàng mang lại (thuật ngữ I.3 số 24), phục vụ chính sách chăm sóc/ưu tiên. *Điểm rời bỏ — churn:* mức nguy cơ khách hàng ngừng dùng dịch vụ, nhận diện theo dấu hiệu nghiệp vụ (giảm sản lượng, giảm tần suất gửi, tăng khiếu nại, tăng tỷ lệ hoàn, ngừng tạo đơn). **Không đặc tả công thức/mô hình** | CDP.md 7.6 FR-ANA-05/06; baseline Luồng 5 |
+| BR-ANA-07 | **Định nghĩa các điểm chấm khách hàng khác (FR-ANA-07):** *engagement (mức độ tương tác)* · *value score (điểm giá trị)* · *service quality score (điểm chất lượng dịch vụ)* — mỗi loại là một chỉ số nghiệp vụ hiển thị trong tab Điểm số của hồ sơ 360, dùng làm căn cứ chăm sóc/phân khúc. **Không đặc tả công thức.** **Lưu ý FR-ANA-07 là mã ô dù (chấm điểm tổng hợp):** gốc 7.6 xếp FR-ANA-07 độ ưu tiên P2 nguyên khối, nhưng các loại điểm chồng lấn lấy độ ưu tiên **theo mã chuyên biệt** — điểm rủi ro COD theo **FR-ANA-08 (P1)**, điểm gian lận theo **FR-ANA-10 (P2)**. Do đó **P2 của FR-ANA-07 chỉ áp cho engagement / value / service quality**; điểm rủi ro COD **là P1**, không bị kéo xuống P2 theo mã ô dù. BR-ANA-07 cố ý **không** định nghĩa COD/fraud (đã tách riêng ở BR-ANA-08/09) đúng theo phân tách này | CDP.md 7.6 FR-ANA-07; baseline Luồng 5 mục 1 |
+| BR-ANA-08 | **Định nghĩa điểm rủi ro COD (FR-ANA-08, P1) và nguy cơ hoàn hàng (FR-ANA-09, P1):** *điểm rủi ro COD* đánh giá nguy cơ một giao dịch thu hộ không thu được tiền hoặc bị hoàn (thuật ngữ I.3 số 23); *nguy cơ hoàn hàng* đánh giá khả năng bưu gửi bị hoàn theo người gửi/người nhận/địa chỉ/tuyến phát/loại hàng/lịch sử phát thất bại. Hai điểm này **ưu tiên P1** do gắn bài toán giảm hoàn hàng và thất thoát thu hộ. **Không đặc tả công thức** | CDP.md 7.6 FR-ANA-08/09; baseline mục 2, 5 |
+| BR-ANA-09 | **Định nghĩa điểm gian lận (FR-ANA-10, P2):** phát hiện bất thường theo dấu hiệu nghiệp vụ (nhiều tên dùng chung một số điện thoại, địa chỉ có tỷ lệ từ chối cao, tài khoản tạo đơn bất thường). Là điểm nhạy cảm — áp che dữ liệu như điểm rủi ro COD (BR-ANA-11). **Không đặc tả thuật toán phát hiện** | CDP.md 7.6 FR-ANA-10 |
+| BR-ANA-10 | **Ngưỡng cảnh báo đưa khách hàng vào phân khúc:** khi một điểm số vượt ngưỡng cảnh báo, hệ thống đưa khách hàng vào phân khúc tương ứng và phát cảnh báo tới bộ phận liên quan qua thông báo trong ứng dụng và email (Luồng 5). **Giá trị ngưỡng cụ thể của từng loại điểm — [Cần xác nhận]** (OQ-ANA-02): baseline không nêu con số ngưỡng, không tự chế | Baseline Luồng 5 mục 3–4; DP tương ứng |
+| BR-ANA-11 | **Che điểm số theo vai trò — nhất quán tuyệt đối với III.C360/BR-C360-03 (Lô 1):** điểm RFM, CLV, điểm rời bỏ (churn), mức độ tương tác — **Xem** với hầu hết vai trò có quyền (CSKH và tổng đài · Tiếp thị và CRM · Kinh doanh và KHL · Người phụ trách dữ liệu · Quản trị hệ thống; **Vận hành và thu hộ không xem** nhóm điểm hành vi này theo 6.2). **Điểm rủi ro COD (COD Risk) và điểm gian lận (Fraud) ẩn hoàn toàn với Tiếp thị và CRM (MARKETING) và CSKH và tổng đài (CSKH)** — chỉ Kinh doanh và KHL (SALES-KHL), Vận hành và thu hộ (OPS-COD), Người phụ trách dữ liệu (DATA-STEWARD), Quản trị hệ thống (SYS-ADMIN) được xem | CDP.md 6.11 mục 7, 8.8; baseline 6.2; đồng bộ BR-C360-03 |
+| BR-ANA-12 | **Sửa điều kiện phân khúc đang được chiến dịch dùng:** hệ thống cảnh báo và **liệt kê các chiến dịch bị ảnh hưởng** trước khi lưu; chỉ khi người dùng xác nhận thì phân khúc mới cập nhật theo điều kiện mới. Nếu hủy thì giữ nguyên điều kiện cũ (edge case 6.4, DP-08) | Baseline 6.4, DP-08; CDP.md FR-ANA-01 |
+
+---
+
+## III.5.1. Nhóm phân khúc (UC-ANA-01 → UC-ANA-04)
+
+### UC-ANA-01 — Tạo/sửa phân khúc theo quy tắc
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ANA-01 |
+| **Tên** | Tạo mới hoặc sửa một phân khúc bằng trình dựng điều kiện trực quan, ước lượng quy mô tệp theo thời gian thực |
+| **Actor chính** | Tiếp thị và CRM (MARKETING) |
+| **Actor phụ** | Quản trị hệ thống (SYS-ADMIN) — cũng có quyền tạo/sửa/xóa phân khúc (II.4.3) |
+| **Mô tả** | Người dùng đặt tên/mô tả phân khúc, chọn loại (động/tĩnh) và tần suất cập nhật, dựng điều kiện lọc dạng cây nhóm lồng AND/OR (tối đa 3 tầng) trên 11 nhóm trường, ước tính số khách hàng khớp, rồi lưu. |
+| **Tiền điều kiện** | Người dùng có quyền "Tạo / sửa / xóa phân khúc" (II.3, chỉ MARKETING và SYS-ADMIN). Dữ liệu khách hàng và các trường điều kiện (điểm số, giao dịch, địa bàn) đã sẵn sàng. |
+| **Kích hoạt** | Người dùng bấm "+ Tạo phân khúc" ở màn Danh sách phân khúc (SCR-ANA-01), hoặc "Chỉnh sửa điều kiện" ở màn Chi tiết phân khúc (SCR-ANA-03). |
+
+**Luồng chính:**
+
+1. Người dùng mở trình tạo phân khúc (SCR-ANA-02); nhập **Tên** phân khúc và **Mô tả**.
+2. Người dùng chọn **Loại phân khúc** (động/tĩnh — BR-ANA-04), **Mảng dịch vụ trọng tâm** (tùy chọn), **Tần suất cập nhật** (Hàng ngày 02:00 / Mỗi giờ / Thời gian thực / Thủ công).
+3. Người dùng dựng **điều kiện lọc** dạng cây nhóm lồng: mỗi nhóm đặt logic **TẤT CẢ (AND)** hoặc **BẤT KỲ (OR)**; thêm điều kiện lá (chọn trường trong 11 nhóm — BR-ANA-01, chọn toán tử, nhập giá trị) hoặc thêm nhóm con (tối đa 3 tầng — BR-ANA-02).
+4. Hệ thống hiển thị **câu tóm tắt tiếng Việt tự sinh** phản ánh toàn bộ cây điều kiện, cập nhật ngay khi người dùng sửa.
+5. Người dùng bấm **Ước tính số KH** — hệ thống trả **quy mô dự kiến** (số khách hàng khớp điều kiện) cùng gợi ý kênh kích hoạt phù hợp và top hành vi chung (FR-ANA-02).
+6. Người dùng bấm **Lưu phân khúc** — hệ thống lưu phân khúc; nếu là phân khúc động thì bắt đầu tự cập nhật theo tần suất đã chọn (chuyển UC-ANA-04). Hiển thị: "Phân khúc \"{tên}\" đã được tạo và sẽ cập nhật tự động {theo tần suất}."
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Sửa điều kiện của phân khúc **đang được chiến dịch dùng** | Chuyển UC-ANA-03 (cảnh báo và liệt kê chiến dịch bị ảnh hưởng — BR-ANA-12) trước khi lưu |
+| A2 | Nhóm điều kiện để trống (0 điều kiện) | Hiển thị "Nhóm trống — thêm điều kiện hoặc xóa nhóm"; không tính vào cây khi ước tính/lưu |
+| A3 | Cần phép phủ định NOT ở mức nhóm | Prototype hiện chỉ AND/OR; phủ định dùng toán tử `≠` ở lá (BR-ANA-03). Cách thể hiện NOT mức nhóm — **[Cần xác nhận]** OQ-ANA-01 |
+| E1 | Chưa nhập tên phân khúc khi lưu | Hệ thống vẫn lưu với nhãn "Không có tên" (theo prototype) nhưng **[Cần xác nhận]** OQ-ANA-06 có bắt buộc tên không; đề xuất đặt tên bắt buộc |
+| E2 | Ước tính trả về 0 khách hàng khớp | Hiển thị quy mô = 0 và cảnh báo "Không có khách hàng nào khớp điều kiện hiện tại"; vẫn cho lưu (phân khúc động có thể có thành viên sau) |
+| E3 | **Toàn bộ cây điều kiện rỗng** (không có điều kiện lá nào — mọi nhóm đều trống) khi lưu | **Chặn lưu**; hiển thị "Phân khúc phải có ít nhất một điều kiện lọc." Nút Lưu phân khúc bị vô hiệu hóa cho tới khi có ≥1 điều kiện. Khác A2 (một nhóm trống trong cây còn điều kiện khác — chỉ bỏ qua nhóm trống, vẫn lưu được) |
+
+**Hậu điều kiện:** Phân khúc được lưu với điều kiện, loại, tần suất; xuất hiện trong Danh sách phân khúc (SCR-ANA-01). Thao tác tạo/sửa phân khúc được ghi nhật ký (Luồng 8 mục 3).
+
+**Business Rule liên quan:** BR-ANA-01, BR-ANA-02, BR-ANA-03, BR-ANA-04, BR-ANA-12.
+**FR gốc:** FR-ANA-01, FR-ANA-02.
+**Giai đoạn:** P1.
+
+---
+
+### UC-ANA-02 — Quản lý danh sách phân khúc
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ANA-02 |
+| **Tên** | Xem danh sách phân khúc, xem chi tiết, nhân bản, tạm dừng/kích hoạt lại, xóa phân khúc |
+| **Actor chính** | Tiếp thị và CRM (MARKETING) |
+| **Actor phụ** | Quản trị hệ thống (SYS-ADMIN); Kinh doanh/KHL và Người phụ trách dữ liệu chỉ **xem** danh sách (II.3) |
+| **Mô tả** | Người dùng xem danh sách phân khúc kèm điều kiện, loại, ngày cập nhật, trạng thái và số khách hàng; mở chi tiết; nhân bản; chuyển trạng thái Đang hoạt động ↔ Tạm dừng; xóa. |
+| **Tiền điều kiện** | Người dùng có quyền tương ứng (II.3 khối Phân khúc và phân tích). Có ít nhất một phân khúc. |
+| **Kích hoạt** | Người dùng mở màn Danh sách phân khúc (SCR-ANA-01). |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị danh sách phân khúc: tên, mô tả/điều kiện, loại (động/tĩnh), ngày cập nhật, trạng thái, và (với người có quyền tạo) các thao tác.
+2. Người dùng bấm một phân khúc để mở **Chi tiết phân khúc** (SCR-ANA-03) — xem thông tin chung và điều kiện lọc read-only.
+3. Người dùng bấm **Xem KH** để chuyển sang màn danh sách khách hàng đã lọc theo phân khúc (liên kết SCR-C360-01 với bộ lọc phân khúc — Lô 1).
+4. Người dùng bấm nút trạng thái để **Tạm dừng** một phân khúc đang hoạt động, hoặc **kích hoạt lại** một phân khúc đang tạm dừng (BR-ANA-04, chuyển trạng thái 6.3).
+5. Người dùng **nhân bản** một phân khúc để tạo bản sao điều kiện làm nền cho phân khúc mới (chuyển UC-ANA-01 với điều kiện đã điền sẵn).
+6. Người dùng **xóa** một phân khúc — hệ thống yêu cầu xác nhận hai bước với cảnh báo "Hành động không thể hoàn tác" (II.4.6).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Vai trò chỉ có quyền xem (Kinh doanh/KHL, Người phụ trách dữ liệu) | Ẩn các nút Tạo/Sửa/Xóa/Tạm dừng; chỉ hiển thị danh sách và nút Xem KH |
+| A2 | Vai trò không có quyền xem phân khúc (Vận hành/thu hộ) | Màn Phân khúc không hiện trên thanh điều hướng; truy cập trực tiếp: "Bạn không có quyền truy cập chức năng này." |
+| A3 | Danh sách phân khúc rỗng | Hiển thị "Chưa có phân khúc nào. Bấm \"+ Tạo phân khúc\" để bắt đầu." |
+| E1 | Xóa phân khúc đang được chiến dịch dùng | Cảnh báo và liệt kê chiến dịch bị ảnh hưởng trước khi xóa (đồng bộ BR-ANA-12); chặn nếu chiến dịch đang chạy — **[Cần xác nhận]** OQ-ANA-05 (chặn hẳn hay cảnh báo cho xóa) |
+
+**Hậu điều kiện:** Danh sách phản ánh đúng trạng thái sau thao tác (nhân bản/tạm dừng/kích hoạt lại/xóa). Thay đổi trạng thái/xóa được ghi nhật ký.
+
+**Business Rule liên quan:** BR-ANA-04, BR-ANA-12.
+**FR gốc:** FR-ANA-01.
+**Giai đoạn:** P1.
+
+---
+
+### UC-ANA-03 — Sửa điều kiện phân khúc đang được chiến dịch dùng
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ANA-03 |
+| **Tên** | Cảnh báo và liệt kê chiến dịch bị ảnh hưởng khi sửa điều kiện của phân khúc đang được chiến dịch sử dụng |
+| **Actor chính** | Tiếp thị và CRM (MARKETING) |
+| **Mô tả** | Khi người dùng sửa điều kiện một phân khúc đang được một hoặc nhiều chiến dịch sử dụng, hệ thống cảnh báo và liệt kê các chiến dịch bị ảnh hưởng; chỉ cập nhật khi người dùng xác nhận. |
+| **Tiền điều kiện** | Phân khúc đang được ít nhất một chiến dịch sử dụng. Người dùng có quyền sửa phân khúc. |
+| **Kích hoạt** | Người dùng lưu thay đổi điều kiện của phân khúc đó (từ UC-ANA-01 A1). |
+
+**Luồng chính:**
+
+1. Người dùng sửa điều kiện lọc của phân khúc và bấm Lưu.
+2. Hệ thống phát hiện phân khúc đang được chiến dịch dùng (DP-08) và **hiển thị cảnh báo** kèm **danh sách các chiến dịch bị ảnh hưởng** (BR-ANA-12).
+3. Người dùng **xác nhận** — hệ thống cập nhật phân khúc theo điều kiện mới; phân khúc động tính lại thành viên; các chiến dịch dùng phân khúc này sẽ áp tệp theo điều kiện mới ở lần kích hoạt sau.
+4. Hoặc người dùng **hủy** — giữ nguyên điều kiện cũ, không thay đổi gì.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Phân khúc **không** được chiến dịch nào dùng | Bỏ qua cảnh báo; lưu trực tiếp như UC-ANA-01 luồng chính |
+| E1 | Chiến dịch bị ảnh hưởng **đang chạy** (đã đẩy tệp) | Cảnh báo rõ tác động lên chiến dịch đang chạy; hành vi chốt (chặn hay cho sửa với ghi nhận) — **[Cần xác nhận]** OQ-ANA-05. Baseline 6.4 chỉ nêu "cảnh báo và liệt kê", chưa nêu chặn |
+
+**Hậu điều kiện:** Điều kiện phân khúc được cập nhật (nếu xác nhận) hoặc giữ nguyên (nếu hủy); danh sách chiến dịch bị ảnh hưởng đã được người dùng thấy trước khi quyết định. Thao tác ghi nhật ký.
+
+**Business Rule liên quan:** BR-ANA-12.
+**FR gốc:** FR-ANA-01, FR-ANA-03.
+**Giai đoạn:** P1.
+
+---
+
+### UC-ANA-04 — Phân khúc động tự cập nhật định kỳ (xử lý nền)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ANA-04 |
+| **Tên** | Hệ thống tự thêm/loại khách hàng khỏi phân khúc động khi dữ liệu thay đổi |
+| **Actor chính** | Hệ thống (tự động, không có người vận hành) |
+| **Mô tả** | Theo tần suất cấu hình, hệ thống rà điều kiện của từng phân khúc động và cập nhật thành viên: thêm khách hàng mới thỏa điều kiện, loại khách hàng không còn thỏa. |
+| **Tiền điều kiện** | Có ít nhất một phân khúc động ở trạng thái Đang hoạt động. |
+| **Kích hoạt** | Đến chu kỳ cập nhật theo tần suất của phân khúc (Hàng ngày 02:00 / Mỗi giờ / Thời gian thực / Thủ công), hoặc dữ liệu khách hàng liên quan điều kiện thay đổi. |
+
+**Luồng chính:**
+
+1. Đến chu kỳ, hệ thống lấy điều kiện của phân khúc động và đối chiếu với dữ liệu khách hàng hiện tại.
+2. Hệ thống **thêm** khách hàng mới thỏa điều kiện, **loại** khách hàng không còn thỏa (FR-ANA-03).
+3. Hệ thống cập nhật số khách hàng khớp và ngày cập nhật của phân khúc.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Phân khúc ở trạng thái **Tạm dừng** | Không cập nhật thành viên cho tới khi kích hoạt lại |
+| A2 | Phân khúc **tĩnh** | Không tự cập nhật — giữ danh sách đã chốt tại thời điểm tạo (BR-ANA-04) |
+| A3 | Điều kiện tham chiếu điểm số chưa được tính (điểm ở giai đoạn P2 chưa triển khai) | Điều kiện đó tạm không lọc ra khách hàng nào cho tới khi điểm số sẵn sàng — **[Cần xác nhận]** OQ-ANA-03 hành vi khi trường điều kiện chưa có dữ liệu |
+
+**Hậu điều kiện:** Thành viên phân khúc động phản ánh đúng dữ liệu khách hàng hiện tại; số lượng và ngày cập nhật được làm mới.
+
+**Business Rule liên quan:** BR-ANA-04.
+**FR gốc:** FR-ANA-03.
+**Giai đoạn:** P1.
+
+---
+
+## III.5.2. Nhóm phân tích và điểm số (UC-ANA-05 → UC-ANA-09)
+
+### UC-ANA-05 — Hệ thống chấm điểm khách hàng định kỳ và phát cảnh báo (xử lý nền)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ANA-05 |
+| **Tên** | Tính định kỳ các điểm số khách hàng, ghi vào hồ sơ và phát cảnh báo khi vượt ngưỡng |
+| **Actor chính** | Hệ thống (tự động, không có người vận hành) |
+| **Mô tả** | Theo chu kỳ, hệ thống tính các loại điểm cho từng khách hàng (RFM, CLV, churn, engagement, rủi ro COD, nguy cơ hoàn hàng, gian lận, chất lượng dịch vụ), ghi vào hồ sơ và hiển thị theo che dữ liệu vai trò; khi điểm vượt **ngưỡng cảnh báo đã được cấu hình ở UC-ANA-10** thì đưa khách hàng vào phân khúc tương ứng và phát cảnh báo. UC này **thuần xử lý nền** — không có bước người dùng nhập ngưỡng (việc đó thuộc UC-ANA-10). |
+| **Tiền điều kiện** | Hồ sơ khách hàng hợp nhất đã sẵn sàng. Mô hình/quy tắc tính điểm tương ứng đã được triển khai (một số loại điểm thuộc P2 — xem giai đoạn từng loại ở BR-ANA-05→09). **Ngưỡng cảnh báo đã được cấu hình** (UC-ANA-10). |
+| **Kích hoạt** | Đến chu kỳ tính điểm định kỳ (Luồng 5), hoặc dữ liệu đầu vào của điểm thay đổi đáng kể. |
+
+**Luồng chính:**
+
+1. Đến chu kỳ, hệ thống tính các điểm cho từng khách hàng theo định nghĩa nghiệp vụ từng loại (BR-ANA-05→09) — **thuật toán và công thức thuộc Data Science, ngoài phạm vi tài liệu này**.
+2. Hệ thống **ghi điểm vào hồ sơ** khách hàng (hiển thị ở tab Điểm số & Phân khúc của SCR-C360-02 — Lô 1) và áp **che dữ liệu theo vai trò** (BR-ANA-11).
+3. Hệ thống kiểm tra từng điểm có **vượt ngưỡng cảnh báo** không (BR-ANA-10).
+4. Nếu vượt ngưỡng: hệ thống **đưa khách hàng vào phân khúc tương ứng** (ví dụ "Có nguy cơ rời bỏ", "Tỷ lệ hoàn cao") và **phát cảnh báo** tới bộ phận liên quan qua thông báo trong ứng dụng và email (chuyển đầu vào cho UC-ANA-06).
+5. Nếu không vượt ngưỡng: kết thúc chu kỳ cho khách hàng đó.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Loại điểm thuộc P2 chưa triển khai giai đoạn đầu (RFM/CLV/churn/fraud — FR-ANA-04,05,06,10) | Không tính điểm đó ở giai đoạn đầu; tab Điểm số hiển thị "Chưa có dữ liệu" cho loại điểm đó (đồng bộ BR-C360-02 không hiện ô rỗng gây hiểu nhầm) |
+| A2 | Thiếu dữ liệu đầu vào để tính một điểm cho một khách hàng | Bỏ qua điểm đó cho khách hàng này ở chu kỳ hiện tại; không phát cảnh báo sai |
+| A3 | Giá trị ngưỡng cảnh báo chưa được chốt | **[Cần xác nhận]** OQ-ANA-02 — không dùng ngưỡng tự đặt; chờ VNPost cung cấp ngưỡng nghiệp vụ |
+
+**Hậu điều kiện:** Điểm số của khách hàng được cập nhật trong hồ sơ; khách hàng vượt ngưỡng được đưa vào phân khúc rủi ro tương ứng và có cảnh báo phát đi.
+
+**Business Rule liên quan:** BR-ANA-05, BR-ANA-06, BR-ANA-07, BR-ANA-08, BR-ANA-09, BR-ANA-10, BR-ANA-11.
+**FR gốc:** FR-ANA-04, 05, 06, 07, 08, 09, 10.
+**Giai đoạn:** **P1** cho rủi ro COD (FR-ANA-08) và nguy cơ hoàn hàng (FR-ANA-09); **P2** cho RFM/CLV/churn/engagement/gian lận (FR-ANA-04, 05, 06, 07, 10).
+
+---
+
+### UC-ANA-06 — Xem điểm số và xử lý cảnh báo rủi ro
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ANA-06 |
+| **Tên** | Người dùng xem điểm số khách hàng theo quyền và xử lý cảnh báo rủi ro |
+| **Actor chính** | Kinh doanh và KHL (SALES-KHL) · Vận hành và thu hộ (OPS-COD) · Chuyên viên phân tích dữ liệu (DATA-ANALYST) · Tiếp thị và CRM (MARKETING) |
+| **Mô tả** | Người dùng mở hồ sơ khách hàng để xem các điểm số theo quyền của vai trò (có che dữ liệu), xem căn cứ cảnh báo rủi ro và ghi nhận hành động xử lý. |
+| **Tiền điều kiện** | Điểm số đã được tính (UC-ANA-05). Người dùng có quyền xem loại điểm tương ứng (II.3, BR-ANA-11). |
+| **Kích hoạt** | Người dùng nhận cảnh báo (thông báo trong ứng dụng/email) và mở hồ sơ; hoặc chủ động mở tab Điểm số & Phân khúc của hồ sơ 360. |
+
+**Luồng chính:**
+
+1. Người dùng mở hồ sơ khách hàng (SCR-C360-02), vào tab **Điểm số & Phân khúc** (Lô 1).
+2. Hệ thống hiển thị các điểm theo **che dữ liệu vai trò** (BR-ANA-11): RFM, CLV, điểm rời bỏ, mức độ tương tác hiển thị với vai trò có quyền; **điểm rủi ro COD và điểm gian lận chỉ hiển thị với Kinh doanh/KHL, Vận hành/thu hộ, Phụ trách dữ liệu, Quản trị** — **ẩn với Tiếp thị và CSKH**.
+3. Người dùng xem **căn cứ** của cảnh báo (khách hàng vào phân khúc rủi ro nào, điểm vượt ngưỡng nào).
+4. Người dùng **ghi nhận hành động xử lý** (ví dụ ghi chú/gắn nhãn theo UC-C360-03 Lô 1).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Vai trò **Tiếp thị/CSKH** cố xem điểm rủi ro COD/gian lận | Hiển thị "Bạn không có quyền xem thông tin này. Liên hệ quản trị hệ thống nếu công việc của bạn cần dùng đến." (che hoàn toàn — BR-ANA-11, đồng bộ BR-C360-03) |
+| A2 | Điểm chưa được tính (P2 chưa triển khai / thiếu dữ liệu) | Hiển thị "Chưa có dữ liệu" cho loại điểm đó (BR-C360-02), không hiện ô rỗng gây hiểu nhầm |
+| A3 | Vai trò Vận hành/thu hộ xem nhóm điểm hành vi (RFM/CLV/churn) | Theo 6.2, Vận hành **không xem** nhóm điểm hành vi; hiển thị che tương ứng |
+
+**Hậu điều kiện:** Người dùng thấy điểm số theo đúng quyền; hành động xử lý cảnh báo (nếu có) được ghi nhận và ghi nhật ký.
+
+**Business Rule liên quan:** BR-ANA-10, BR-ANA-11.
+**FR gốc:** FR-ANA-04→10 (phần hiển thị/sử dụng).
+**Giai đoạn:** P1/P2 theo loại điểm (xem UC-ANA-05).
+
+> **Ghi chú màn:** UC này **không có màn riêng của Phân hệ 5** — quan sát và thao tác trên **tab Điểm số & Phân khúc của SCR-C360-02 (Lô 1)**. Lô 3 không đặc tả lại tab này, chỉ tham chiếu.
+
+---
+
+### UC-ANA-07 — Xem bảng điều khiển phân tích và báo cáo BI
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ANA-07 |
+| **Tên** | Xem bảng điều khiển tổng hợp về phân khúc, điểm số, rủi ro và chất lượng dữ liệu |
+| **Actor chính** | Lãnh đạo và quản lý đơn vị (LEADER) · Chuyên viên phân tích dữ liệu (DATA-ANALYST) |
+| **Mô tả** | Người dùng xem các chỉ số tổng hợp và biểu đồ về Customer 360, phân khúc, churn, RFM, CLV, COD, hoàn hàng, chất lượng dịch vụ và chất lượng dữ liệu theo phạm vi phân quyền. |
+| **Tiền điều kiện** | Có dữ liệu phân tích. Người dùng có quyền xem báo cáo theo phạm vi (II.4.5 — phạm vi theo đơn vị/vùng với LEADER; dữ liệu đã che với DATA-ANALYST). |
+| **Kích hoạt** | Người dùng mở màn Bảng điều khiển phân tích (SCR-ANA-04). |
+
+**Luồng chính:**
+
+1. Người dùng mở bảng điều khiển; hệ thống hiển thị các chỉ số tổng hợp và biểu đồ theo phạm vi phân quyền của người dùng (FR-ANA-13).
+2. Người dùng lọc theo mảng dịch vụ, đơn vị/địa bàn, khoảng thời gian.
+3. Người dùng xem chi tiết một nhóm chỉ số (ví dụ phân bố churn, top phân khúc theo quy mô).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Chưa có dữ liệu cho khoảng lọc | Hiển thị "Chưa có dữ liệu cho điều kiện đã chọn." |
+| A2 | Chỉ số chứa điểm nhạy cảm (rủi ro COD/gian lận) và người xem là vai trò bị che | Ẩn/tổng hợp các chỉ số nhạy cảm theo BR-ANA-11 — **[Cần xác nhận]** OQ-ANA-04 mức che điểm nhạy cảm với LEADER ở dashboard |
+| A3 | Người dùng vượt phạm vi phân quyền (đơn vị khác) | Chỉ hiển thị dữ liệu trong phạm vi được giao (II.4.5) |
+
+**Hậu điều kiện:** Người dùng xem được các chỉ số tổng hợp trong phạm vi phân quyền. Truy cập được ghi nhật ký.
+
+**Business Rule liên quan:** BR-ANA-11.
+**FR gốc:** FR-ANA-13.
+**Giai đoạn:** P2.
+
+---
+
+### UC-ANA-08 — Xem gợi ý dịch vụ và phân tích hiệu quả chiến dịch (mức nghiệp vụ)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ANA-08 |
+| **Tên** | Xem gợi ý dịch vụ/hành động tiếp theo cho khách hàng và đo hiệu quả chiến dịch |
+| **Actor chính** | Tiếp thị và CRM (MARKETING) |
+| **Mô tả** | Người dùng xem gợi ý dịch vụ/ưu đãi/hành động tiếp theo cho khách hàng (kết quả recommendation) và xem báo cáo hiệu quả chiến dịch theo tệp, kênh, tỷ lệ gửi/mở/phản hồi/chuyển đổi. |
+| **Tiền điều kiện** | Đã có kết quả gợi ý (recommendation) và/hoặc dữ liệu phản hồi chiến dịch. |
+| **Kích hoạt** | Người dùng mở màn Phân tích hiệu quả chiến dịch (SCR-ANA-06), hoặc xem gợi ý dịch vụ trong ngữ cảnh khách hàng. |
+
+**Luồng chính:**
+
+1. Người dùng mở màn phân tích hiệu quả chiến dịch; hệ thống hiển thị các chỉ số theo tệp khách hàng, kênh gửi, tỷ lệ gửi thành công/mở/phản hồi/chuyển đổi và doanh thu (FR-ANA-12).
+2. Người dùng xem **gợi ý dịch vụ/hành động tiếp theo** cho một khách hàng hoặc nhóm (FR-ANA-11) — ở mức nghiệp vụ: gợi ý là gì, dựa trên hành vi/lịch sử nào (mô tả định tính, **không đặc tả mô hình gợi ý**).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Chưa có dữ liệu phản hồi chiến dịch | Hiển thị "Chưa có dữ liệu chiến dịch để phân tích." |
+| A2 | Chưa có gợi ý cho khách hàng | Hiển thị "Chưa có gợi ý cho khách hàng này." |
+
+**Hậu điều kiện:** Người dùng xem được hiệu quả chiến dịch và gợi ý dịch vụ trong phạm vi phân quyền.
+
+**Business Rule liên quan:** —
+**FR gốc:** FR-ANA-11, FR-ANA-12.
+**Giai đoạn:** P2.
+
+> **Ghi chú ranh giới:** dữ liệu phản hồi chiến dịch (gửi/mở/phản hồi) đến từ **Phân hệ 6 (Kích hoạt, lô sau)**; UC này chỉ đặc tả phần **xem và phân tích** kết quả, không đặc tả luồng đẩy chiến dịch. Cơ chế đồng bộ gợi ý sang hệ thống kinh doanh (FR-ACT-07) thuộc Phân hệ 6.
+
+---
+
+### UC-ANA-09 — Quản lý mô hình AI (mức nghiệp vụ) và phân nhóm AI clustering (nền)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ANA-09 |
+| **Tên** | Xem danh sách/phiên bản mô hình AI, bật/tắt mô hình ở mức nghiệp vụ; hệ thống phân nhóm khách hàng bằng AI (nền) |
+| **Actor chính** | Chuyên viên phân tích dữ liệu (DATA-ANALYST) |
+| **Actor phụ** | Quản trị hệ thống (SYS-ADMIN) ở góc quản trị — [Cần xác nhận] ranh giới với Data Scientist (OQ-ANA-07) |
+| **Mô tả** | Người dùng xem danh sách mô hình AI đang dùng (tên, phiên bản, thời điểm huấn luyện, trạng thái triển khai) và bật/tắt mô hình ở mức nghiệp vụ. Việc phân nhóm khách hàng tự động bằng AI (clustering) chạy nền, kết quả dùng để gợi ý nhóm tiềm năng. |
+| **Tiền điều kiện** | Có ít nhất một mô hình AI được triển khai. Người dùng có quyền quản lý mô hình (mức nghiệp vụ). |
+| **Kích hoạt** | Người dùng mở màn Quản lý mô hình AI (SCR-ANA-07); hoặc đến chu kỳ chạy clustering nền. |
+
+**Luồng chính:**
+
+1. Người dùng mở màn Quản lý mô hình AI; hệ thống hiển thị danh sách mô hình: tên, phiên bản, thời điểm huấn luyện, độ chính xác (hiển thị nếu có), trạng thái triển khai (FR-ANA-14).
+2. Người dùng **xem phiên bản** và **lịch sử thay đổi** của một mô hình.
+3. Người dùng **bật/tắt** một mô hình ở mức nghiệp vụ (đưa vào/ngừng sử dụng) — **không huấn luyện, không chỉnh tham số** (ngoài phạm vi BA/tài liệu).
+4. (Nền) Đến chu kỳ, hệ thống phân nhóm khách hàng tự động bằng AI theo hành vi/tần suất/giá trị/tỷ lệ hoàn/COD/tương tác (FR-ANA-15); kết quả nhóm dùng để gợi ý nhóm khách hàng tiềm năng.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Chưa có mô hình nào triển khai | Hiển thị "Chưa có mô hình AI nào được triển khai." |
+| A2 | Người dùng cố chỉnh tham số/huấn luyện | Ngoài phạm vi giao diện nghiệp vụ; thao tác này thuộc công cụ Data Science riêng — **[Cần xác nhận]** OQ-ANA-07 ranh giới thao tác của DATA-ANALYST vs Data Scientist |
+
+**Hậu điều kiện:** Trạng thái bật/tắt mô hình được cập nhật và ghi nhật ký; kết quả clustering nền sẵn sàng phục vụ gợi ý nhóm.
+
+**Business Rule liên quan:** —
+**FR gốc:** FR-ANA-14, FR-ANA-15.
+**Giai đoạn:** P2.
+
+> **Ghi chú ranh giới BA vs Data Science:** UC-ANA-09 chỉ đặc tả **góc quản trị mức nghiệp vụ** (xem phiên bản, bật/tắt). Huấn luyện mô hình, chọn dữ liệu đầu vào kỹ thuật, feature engineering, tinh chỉnh tham số — **ngoài phạm vi tài liệu**, thuộc Data Scientist/SA. FR-ANA-14 gốc ghi tác nhân "Data Scientist/IT Admin"; tài liệu này đặt DATA-ANALYST làm actor cho phần **xem/bật-tắt nghiệp vụ** và để mở ranh giới với Data Scientist (OQ-ANA-07).
+
+---
+
+### UC-ANA-10 — Cấu hình ngưỡng cảnh báo điểm số
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ANA-10 |
+| **Tên** | Người dùng cấu hình ngưỡng cảnh báo cho từng loại điểm và phân khúc đích khi vượt ngưỡng |
+| **Actor chính** | Người phụ trách dữ liệu (DATA-STEWARD) — **[Cần xác nhận]** OQ-ANA-02 (vai trò cấu hình ngưỡng có phải DATA-STEWARD hay bộ phận nghiệp vụ khác) |
+| **Actor phụ** | Quản trị hệ thống (SYS-ADMIN) ở góc hỗ trợ cấu hình — [Cần xác nhận] cùng OQ-ANA-02 |
+| **Mô tả** | Người dùng mở màn cấu hình ngưỡng, chọn loại điểm, nhập ngưỡng cảnh báo, chọn phân khúc đích khi vượt ngưỡng và kênh gửi cảnh báo, bật/tắt cảnh báo cho từng loại điểm, rồi lưu. Cấu hình này là **đầu vào** cho luồng chấm điểm nền (UC-ANA-05). |
+| **Tiền điều kiện** | Người dùng có quyền **CONFIG** khối Phân khúc/Phân tích (II.4.3). Có sẵn danh mục loại điểm và danh sách phân khúc để chọn làm đích. |
+| **Kích hoạt** | Người dùng mở màn Cấu hình ngưỡng cảnh báo điểm số (SCR-ANA-05). |
+
+**Luồng chính:**
+
+1. Người dùng mở màn cấu hình; hệ thống hiển thị bảng các loại điểm (RFM, CLV, churn, engagement, rủi ro COD, nguy cơ hoàn hàng, gian lận, chất lượng dịch vụ) kèm cấu hình hiện tại.
+2. Người dùng chọn một loại điểm và **nhập ngưỡng cảnh báo** (giá trị vượt để phát cảnh báo).
+3. Người dùng **chọn phân khúc đích** — khách hàng vượt ngưỡng sẽ được đưa vào phân khúc này (BR-ANA-10).
+4. Người dùng chọn **kênh gửi cảnh báo** (mặc định: thông báo trong ứng dụng + email) và **bật/tắt** cảnh báo cho loại điểm đó.
+5. Người dùng bấm **Lưu cấu hình** — hệ thống lưu ngưỡng, áp cho chu kỳ chấm điểm nền kế tiếp (UC-ANA-05 tiêu thụ) và **ghi nhật ký** thay đổi cấu hình.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| E1 | Ngưỡng để trống khi lưu | Chặn lưu dòng đó; hiển thị "Vui lòng nhập ngưỡng cảnh báo cho loại điểm này." |
+| E2 | Loại điểm thuộc **P2 chưa triển khai** giai đoạn đầu (RFM/CLV/churn/engagement/gian lận) | Dòng hiển thị "Chưa triển khai giai đoạn này" và **khóa/ẩn** cấu hình loại điểm đó cho tới khi điểm được triển khai |
+| E3 | Chưa có phân khúc đích phù hợp để chọn | Cho lưu ngưỡng mà chưa gán phân khúc đích, nhưng cảnh báo "Chưa gán phân khúc đích — khách hàng vượt ngưỡng sẽ chỉ phát cảnh báo, chưa được đưa vào phân khúc." |
+| E4 | Người dùng không có quyền CONFIG | "Bạn không có quyền truy cập chức năng này." (đồng bộ trạng thái "Không đủ quyền" của SCR-ANA-05) |
+| E5 | Giá trị ngưỡng chuẩn của loại điểm chưa được VNPost chốt | Vẫn cho nhập, nhưng ghi nhận **[Cần xác nhận]** OQ-ANA-02 — tài liệu không đề xuất giá trị mặc định |
+
+**Hậu điều kiện:** Ngưỡng cảnh báo, phân khúc đích và kênh của từng loại điểm được lưu và áp cho chu kỳ chấm điểm nền kế tiếp (UC-ANA-05). Thay đổi cấu hình được ghi nhật ký.
+
+**Business Rule liên quan:** BR-ANA-10, BR-ANA-11.
+**FR gốc:** FR-ANA-07→10 (phần cấu hình ngưỡng đầu vào cho chấm điểm/cảnh báo).
+**Giai đoạn:** P1 cho ngưỡng rủi ro COD/hoàn hàng (FR-ANA-08, 09); P2 cho các loại điểm còn lại.
+
+---
+
 # IV. GIAO DIỆN CHỨC NĂNG (PROTOTYPE CHÍNH)
 
-> **Nguồn giao diện chuẩn:** prototype v3 (`wireframe/prototype-v3.html`, bản chốt 24/07/2026). Bảy màn dưới đây thuộc Lô 1. Khi prototype khác tài liệu gốc CDP.md/solution về **nghiệp vụ** (ngưỡng, mô hình phê duyệt), tài liệu gốc/solution là chuẩn — điểm lệch được ghi rõ ngay tại màn liên quan.
+> **Nguồn giao diện chuẩn:** prototype v3 (`wireframe/prototype-v3.html`, bản chốt 24/07/2026). Bảy màn ở Mục IV.1–IV.7 thuộc Lô 1; tám màn ở IV.8 thuộc Lô 2; bảy màn ở IV.9 thuộc Lô 3. Khi prototype khác tài liệu gốc CDP.md/solution về **nghiệp vụ** (ngưỡng, mô hình phê duyệt), tài liệu gốc/solution là chuẩn — điểm lệch được ghi rõ ngay tại màn liên quan.
 >
 > **Quy ước cột "Bắt buộc" và "Mặc định":** ghi `N/A` cho thành phần chỉ hiển thị (Label, nút thao tác, badge, bảng đọc). Cột "Quyền hiển thị" mô tả che/ẩn theo vai trò (masking).
 
@@ -2577,6 +2999,230 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 
 ---
 
+## IV.9. Giao diện Lô 3 — Phân khúc và phân tích (SCR-ANA)
+
+> **Nguồn giao diện:** ba màn có sẵn trong prototype v3 (`SegmentScreen` — list/builder/detail → SCR-ANA-01/02/03). Bốn màn còn lại **CẦN BỔ SUNG** — chưa có trong prototype, đặc tả theo mô tả FR gốc CDP.md 7.6 + baseline Luồng 4/5 (như SCR-IDR-05 ở Lô 1). Các chức năng chạy nền (chấm điểm định kỳ UC-ANA-05, phân khúc động tự cập nhật UC-ANA-04, AI clustering UC-ANA-09) **không có màn riêng** — mô tả là xử lý nền trong Use Case tương ứng.
+>
+> **Che dữ liệu điểm số:** mọi màn hiển thị điểm rủi ro COD/gian lận đều tuân **BR-ANA-11** — ẩn hoàn toàn với Tiếp thị (MARKETING) và CSKH, nhất quán tuyệt đối với III.C360/BR-C360-03 (Lô 1).
+
+**Danh mục màn hình Lô 3:**
+
+| Mã màn | Tên màn | Component prototype | Ánh xạ Use Case | Trạng thái prototype |
+|---|---|---|---|---|
+| SCR-ANA-01 | Danh sách phân khúc | `SegmentScreen` (view=list) | UC-ANA-02 | Đang chạy |
+| SCR-ANA-02 | Trình tạo/sửa phân khúc | `SegmentScreen` (view=builder) + `RuleGroup` | UC-ANA-01 (+ UC-ANA-03 phần cảnh báo) | Đang chạy |
+| SCR-ANA-03 | Chi tiết phân khúc | `SegmentScreen` (view=detail) + `RuleView` | UC-ANA-02 | Đang chạy |
+| SCR-ANA-04 | Bảng điều khiển phân tích và BI | **Chưa có — CẦN BỔ SUNG** | UC-ANA-07 | Chưa có trong prototype |
+| SCR-ANA-05 | Cấu hình ngưỡng cảnh báo điểm số | **Chưa có — CẦN BỔ SUNG** | UC-ANA-10 | Chưa có trong prototype |
+| SCR-ANA-06 | Phân tích hiệu quả chiến dịch | **Chưa có — CẦN BỔ SUNG** | UC-ANA-08 | Chưa có trong prototype |
+| SCR-ANA-07 | Quản lý mô hình AI (mức nghiệp vụ) | **Chưa có — CẦN BỔ SUNG** | UC-ANA-09 | Chưa có trong prototype |
+
+> **Điểm số RFM/CLV/churn/COD/fraud KHÔNG có màn riêng ở Lô 3** — được hiển thị trong **tab Điểm số & Phân khúc của SCR-C360-02 (Lô 1)**. UC-ANA-06 (xem điểm và xử lý cảnh báo) quan sát trên tab đó; Lô 3 chỉ tham chiếu, không đặc tả lại.
+
+---
+
+### IV.9.1. SCR-ANA-01 — Danh sách phân khúc
+
+**Mục tiêu:** Cho người dùng xem toàn bộ phân khúc kèm điều kiện, loại, ngày cập nhật, trạng thái; mở chi tiết, chuyển trạng thái, mở danh sách khách hàng của phân khúc; là điểm vào của UC-ANA-02.
+**Ánh xạ Use Case:** UC-ANA-02.
+**Layout (theo prototype v3 — `SegmentScreen` view=list):** (1) Tiêu đề + nút "+ Tạo phân khúc"; (2) Bảng danh sách phân khúc 6 cột.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Nút "+ Tạo phân khúc" | Nút | N/A | N/A | Mở trình tạo (SCR-ANA-02); **chỉ hiện với MARKETING/SYS-ADMIN** (quyền Tạo/sửa/xóa — II.3). Vai trò chỉ xem: ẩn |
+| 2 | Cột Tên phân khúc | Cột bảng (liên kết) | N/A | N/A | Bấm mở Chi tiết phân khúc (SCR-ANA-03) |
+| 3 | Cột Điều kiện / Mô tả | Cột bảng | N/A | N/A | Mô tả ngắn điều kiện phân khúc |
+| 4 | Cột Loại | Nhãn màu | N/A | N/A | Động / Tĩnh (BR-ANA-04); nhãn "Động" có chú thích "Tự động cập nhật theo điều kiện" |
+| 5 | Cột Cập nhật | Cột bảng (ngày) | N/A | N/A | Ngày cập nhật gần nhất |
+| 6 | Cột Trạng thái (nút chuyển) | Nút trạng thái | N/A | Đang hoạt động | Bấm chuyển Đang hoạt động ↔ Tạm dừng (BR-ANA-04, 6.3); **chỉ MARKETING/SYS-ADMIN thao tác được**, vai trò xem thấy nhãn tĩnh |
+| 7 | Nút Xem KH | Nút | N/A | N/A | Mở danh sách khách hàng lọc theo phân khúc (chuyển SCR-C360-01 với bộ lọc phân khúc — Lô 1) |
+| 8 | Nút Nhân bản | Nút | N/A | N/A | Tạo bản sao điều kiện làm nền cho phân khúc mới (chuyển SCR-ANA-02); chỉ MARKETING/SYS-ADMIN |
+| 9 | Nút Xóa | Nút | N/A | N/A | Xóa phân khúc — xác nhận hai bước "Hành động không thể hoàn tác" (II.4.6); chỉ MARKETING/SYS-ADMIN |
+
+**Trạng thái đặc biệt:**
+- **Danh sách rỗng:** "Chưa có phân khúc nào. Bấm \"+ Tạo phân khúc\" để bắt đầu."
+- **Vai trò chỉ xem (Kinh doanh/KHL, Người phụ trách dữ liệu):** ẩn nút Tạo/Nhân bản/Xóa và khóa nút chuyển trạng thái; giữ nút Xem KH.
+- **Vai trò không có quyền (Vận hành/thu hộ):** màn Phân khúc không hiện trên điều hướng; truy cập trực tiếp: "Bạn không có quyền truy cập chức năng này."
+- **Xóa phân khúc đang dùng chiến dịch:** cảnh báo và liệt kê chiến dịch bị ảnh hưởng trước khi xóa (UC-ANA-02 E1) — hành vi chặn/cho xóa xem OQ-ANA-05.
+
+---
+
+### IV.9.2. SCR-ANA-02 — Trình tạo/sửa phân khúc
+
+**Mục tiêu:** Cho người dùng dựng điều kiện phân khúc dạng cây nhóm lồng AND/OR (tối đa 3 tầng), xem câu tóm tắt tự sinh, ước tính quy mô tệp và lưu; là màn cốt lõi của UC-ANA-01 (và bước cảnh báo của UC-ANA-03).
+**Ánh xạ Use Case:** UC-ANA-01, UC-ANA-03.
+**Layout (theo prototype v3 — `SegmentScreen` view=builder):** hai cột — (trái) biểu mẫu thông tin + trình dựng điều kiện; (phải) panel Xem trước kết quả. Trình dựng điều kiện dùng đệ quy `RuleGroup`: mỗi nhóm có toggle logic, đường kẻ dọc thụt lề, nút thêm điều kiện/nhóm con.
+
+**Bảng thành phần — Thông tin và cấu hình:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Ô Tên phân khúc | Ô nhập text | **Có** (đề xuất) | Rỗng | Placeholder "VD: Khách hàng nguy cơ rời bỏ Q3". Prototype cho lưu khi rỗng (nhãn "Không có tên") — đề xuất bắt buộc, xem OQ-ANA-06 |
+| 2 | Ô Mô tả | Ô nhập text | Không | Rỗng | Mô tả ngắn mục tiêu phân khúc |
+| 3 | Chọn Loại phân khúc | Danh sách chọn | Có | Phân khúc động | Động / Tĩnh (BR-ANA-04) |
+| 4 | Chọn Mảng dịch vụ trọng tâm | Danh sách chọn | Không | Tất cả mảng | 7 mảng dịch vụ chính hoặc Tất cả |
+| 5 | Chọn Tần suất cập nhật | Danh sách chọn | Có | Hàng ngày lúc 02:00 | Hàng ngày 02:00 / Mỗi giờ / Thời gian thực / Thủ công (BR-ANA-04) |
+
+**Bảng thành phần — Trình dựng điều kiện và xem trước:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 6 | Câu tóm tắt tự sinh | Khối hiển thị | N/A | N/A | "PHÂN KHÚC NÀY LẤY KHÁCH HÀNG THOẢ: …" — dựng tự động từ cây điều kiện, cập nhật ngay khi sửa (BR-ANA-02) |
+| 7 | Toggle logic nhóm | Nút chuyển | Có | TẤT CẢ (AND) | Mỗi nhóm: **TẤT CẢ (AND)** / **BẤT KỲ (OR)** (BR-ANA-02). **Prototype chỉ có AND/OR — không có NOT** (BR-ANA-03, OQ-ANA-01) |
+| 8 | Điều kiện lá (Trường · Toán tử · Giá trị) | Bộ 3 ô (chọn·chọn·nhập) | Có (≥1 điều kiện) | Trường "Điểm rời bỏ", toán tử "≥" | Trường: 11 nhóm (BR-ANA-01); Toán tử: 8 phép `=,≠,>,<,≥,≤,chứa,thuộc`; Giá trị: ô nhập tự do |
+| 9 | Nút Thêm điều kiện | Nút | N/A | N/A | Thêm một điều kiện lá vào nhóm |
+| 10 | Nút Thêm nhóm con | Nút | N/A | N/A | Thêm nhóm con (lồng thêm 1 tầng); ẩn/khóa khi đã đạt tối đa **3 tầng** (BR-ANA-02) — hiển thị "Đã đạt tối đa 3 tầng lồng" |
+| 11 | Nút Xóa điều kiện / Xóa nhóm | Nút | N/A | N/A | Xóa một điều kiện hoặc cả nhóm |
+| 12 | Nút Ước tính số KH | Nút | N/A | N/A | Gọi ước lượng real-time (FR-ANA-02); trả kết quả sang panel Xem trước |
+| 13 | Nút Lưu phân khúc | Nút | N/A | N/A | Lưu; nếu phân khúc đang dùng chiến dịch → cảnh báo tác động (UC-ANA-03) trước khi lưu |
+| 14 | Nút Hủy | Nút | N/A | N/A | Về Danh sách phân khúc, không lưu |
+| 15 | Panel Xem trước — Quy mô dự kiến | Khối chỉ số | N/A | N/A | Số khách hàng khớp điều kiện; hiển thị sau khi bấm Ước tính (FR-ANA-02) |
+| 16 | Panel Xem trước — Kênh kích hoạt phù hợp | Khối | N/A | N/A | Gợi ý kênh (đã lọc theo trạng thái Đồng ý dữ liệu); nhắc "kiểm tra lại Consent trước khi kích hoạt" |
+| 17 | Panel Xem trước — Top hành vi chung | Khối | N/A | N/A | Đặc điểm hành vi chung của tệp (mô tả định tính) |
+
+**Trạng thái đặc biệt:**
+- **Chưa ước tính:** panel Xem trước hiển thị "Bấm \"Ước tính số KH\" để xem trước quy mô và kênh kích hoạt phù hợp."
+- **Ước tính = 0 khách hàng:** hiển thị quy mô 0 + cảnh báo "Không có khách hàng nào khớp điều kiện hiện tại" (UC-ANA-01 E2).
+- **Nhóm điều kiện trống:** "Nhóm trống — thêm điều kiện hoặc xóa nhóm" (UC-ANA-01 A2).
+- **Cây điều kiện rỗng hoàn toàn:** nút Lưu phân khúc bị vô hiệu hóa; hiển thị "Phân khúc phải có ít nhất một điều kiện lọc." (UC-ANA-01 E3).
+- **Lưu thành công:** hộp thoại "Phân khúc \"{tên}\" đã được tạo và sẽ cập nhật tự động {theo tần suất}."
+- **Sửa phân khúc đang dùng chiến dịch (UC-ANA-03):** hộp cảnh báo liệt kê chiến dịch bị ảnh hưởng, nút Xác nhận/Hủy (BR-ANA-12).
+
+> **[Cần xác nhận: cách thể hiện phép phủ định NOT]** (OQ-ANA-01) — Tài liệu gốc FR-ANA-01 nêu AND/OR/**NOT**; prototype v3 hiện **chỉ có AND/OR**, phủ định gián tiếp qua toán tử `≠` ở điều kiện lá. Cần VNPost/PO chốt có cần NOT ở mức nhóm không và cách thể hiện; **không tự thêm nút NOT** vào đặc tả.
+
+---
+
+### IV.9.3. SCR-ANA-03 — Chi tiết phân khúc
+
+**Mục tiêu:** Hiển thị thông tin chung và điều kiện lọc read-only của một phân khúc; là điểm dừng trước khi chỉnh sửa (UC-ANA-02).
+**Ánh xạ Use Case:** UC-ANA-02.
+**Layout (theo prototype v3 — `SegmentScreen` view=detail):** (1) Panel Thông tin phân khúc; (2) Panel Điều kiện lọc (câu tóm tắt + cây read-only `RuleView`); (3) Nút Chỉnh sửa điều kiện.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Nút Quay lại danh sách | Nút | N/A | N/A | Về SCR-ANA-01 |
+| 2 | Panel Thông tin phân khúc | Khối | N/A | N/A | Tên, Loại, Số KH hiện tại, Cập nhật lần cuối, Trạng thái, Mô tả |
+| 3 | Câu tóm tắt điều kiện | Khối hiển thị | N/A | N/A | "LẤY KHÁCH HÀNG THOẢ: …" (BR-ANA-02) |
+| 4 | Cây điều kiện read-only | Khối cây | N/A | N/A | Hiển thị điều kiện lồng AND/OR không cho sửa (`RuleView`) |
+| 5 | Nút Chỉnh sửa điều kiện | Nút | N/A | N/A | Mở trình tạo/sửa (SCR-ANA-02); **chỉ MARKETING/SYS-ADMIN**; vai trò xem: ẩn nút |
+
+**Trạng thái đặc biệt:**
+- **Phân khúc chưa có điều kiện:** "Chưa có điều kiện."
+- **Vai trò chỉ xem:** ẩn nút Chỉnh sửa điều kiện, chỉ xem thông tin và cây điều kiện.
+
+---
+
+### IV.9.4. SCR-ANA-04 — Bảng điều khiển phân tích và BI (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-ANA-13 + baseline; phục vụ UC-ANA-07. **Giai đoạn P2.**
+
+**Mục tiêu:** Cho Lãnh đạo/Chuyên viên phân tích xem chỉ số tổng hợp và biểu đồ về Customer 360, phân khúc, churn, RFM, CLV, COD, hoàn hàng, chất lượng dịch vụ và chất lượng dữ liệu theo phạm vi phân quyền.
+**Ánh xạ Use Case:** UC-ANA-07.
+**Layout (đề xuất):** (1) Dải bộ lọc (mảng dịch vụ, đơn vị/địa bàn, khoảng thời gian); (2) Dải ô chỉ số tổng; (3) Lưới biểu đồ theo chủ đề; (4) Bảng chi tiết khi bấm vào một nhóm chỉ số.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Bộ lọc Mảng dịch vụ | Danh sách chọn | Không | Tất cả mảng | Lọc theo mảng dịch vụ chính |
+| 2 | Bộ lọc Đơn vị / Địa bàn | Danh sách chọn | Không | Theo phạm vi phân quyền | Giới hạn theo đơn vị/vùng được giao (II.4.5) |
+| 3 | Bộ lọc Khoảng thời gian | Bộ chọn ngày | Không | 30 ngày gần nhất | Khoảng thời gian báo cáo |
+| 4 | Dải ô chỉ số tổng | Khối chỉ số | N/A | N/A | Tổng KH, số phân khúc, tỷ lệ churn, tỷ lệ hoàn... theo phạm vi |
+| 5 | Lưới biểu đồ theo chủ đề | Khối biểu đồ | N/A | N/A | Phân bố churn, top phân khúc theo quy mô, xu hướng COD/hoàn hàng, chất lượng dữ liệu |
+| 6 | Chỉ số nhạy cảm (rủi ro COD/gian lận) | Khối chỉ số | N/A | N/A | **Che theo BR-ANA-11**; với vai trò bị che (nếu áp dụng cho LEADER) hiển thị dạng tổng hợp/ẩn — mức che xem OQ-ANA-04 |
+
+**Trạng thái đặc biệt:**
+- **Chưa có dữ liệu cho khoảng lọc:** "Chưa có dữ liệu cho điều kiện đã chọn."
+- **Đang tải:** hiển thị khung chờ ở từng khối biểu đồ.
+- **Ngoài phạm vi phân quyền:** chỉ hiển thị dữ liệu trong đơn vị/vùng được giao (UC-ANA-07 A3).
+
+> **[Cần xác nhận: mức che điểm nhạy cảm với Lãnh đạo ở dashboard]** (OQ-ANA-04) — Bảng che 6.2 chưa có dòng cho vai trò Lãnh đạo. Cần VNPost chốt Lãnh đạo có xem chỉ số rủi ro COD/gian lận ở mức tổng hợp không.
+
+---
+
+### IV.9.5. SCR-ANA-05 — Cấu hình ngưỡng cảnh báo điểm số (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo Luồng 5 + baseline; là màn thực thi UC-ANA-10 (cấu hình đầu vào cho chấm điểm nền UC-ANA-05). **Giai đoạn P1/P2 theo loại điểm.**
+
+**Mục tiêu:** Cho Người phụ trách dữ liệu cấu hình ngưỡng cảnh báo cho từng loại điểm và phân khúc đích tương ứng khi vượt ngưỡng.
+**Ánh xạ Use Case:** UC-ANA-10.
+**Layout (đề xuất):** Bảng các loại điểm, mỗi dòng có ngưỡng cảnh báo, phân khúc đích khi vượt ngưỡng, công tắc bật/tắt cảnh báo, kênh gửi cảnh báo.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Bảng loại điểm | Bảng | N/A | N/A | RFM, CLV, churn, engagement, rủi ro COD, nguy cơ hoàn hàng, gian lận, chất lượng dịch vụ |
+| 2 | Cột Ngưỡng cảnh báo | Ô nhập số | Có | **[Cần xác nhận]** | Ngưỡng vượt để phát cảnh báo — **giá trị mặc định chưa có, xem OQ-ANA-02**, không tự chế số (UC-ANA-10 bước 2) |
+| 3 | Cột Phân khúc đích khi vượt ngưỡng | Danh sách chọn | Có | Chưa chọn | Phân khúc khách hàng được đưa vào khi vượt ngưỡng (BR-ANA-10, UC-ANA-10 bước 3) |
+| 4 | Cột Kênh gửi cảnh báo | Nhóm chọn | Không | Thông báo trong ứng dụng + email | Kênh phát cảnh báo (Luồng 5 mục 4) |
+| 5 | Công tắc Bật/Tắt cảnh báo | Công tắc | Không | Bật | Bật/tắt cảnh báo cho loại điểm |
+| 6 | Nút Lưu cấu hình | Nút | N/A | N/A | Lưu; áp cho chu kỳ chấm điểm nền kế tiếp (UC-ANA-05 tiêu thụ); ghi nhật ký. **Yêu cầu quyền CONFIG** khối Phân khúc/Phân tích (II.4.3 — DATA-STEWARD) |
+
+**Trạng thái đặc biệt:**
+- **Ngưỡng để trống:** chặn lưu dòng đó; hiển thị "Vui lòng nhập ngưỡng cảnh báo cho loại điểm này." (UC-ANA-10 E1).
+- **Loại điểm thuộc P2 chưa triển khai:** dòng hiển thị "Chưa triển khai giai đoạn này" và khóa cấu hình (UC-ANA-10 E2).
+- **Chưa gán phân khúc đích:** cho lưu ngưỡng kèm cảnh báo "Chưa gán phân khúc đích — khách hàng vượt ngưỡng sẽ chỉ phát cảnh báo, chưa được đưa vào phân khúc." (UC-ANA-10 E3).
+- **Không đủ quyền (thiếu quyền CONFIG):** "Bạn không có quyền truy cập chức năng này." (UC-ANA-10 E4). Màn này yêu cầu quyền **CONFIG** khối Phân khúc/Phân tích (II.4.3 — DATA-STEWARD); vai trò chỉ có VIEW không mở được.
+
+> **[Cần xác nhận: giá trị ngưỡng cảnh báo từng loại điểm]** (OQ-ANA-02) — Baseline/CDP.md **không nêu con số ngưỡng cụ thể**. Tài liệu không tự chế số (bài học Lô 2 CR-01); cần VNPost cung cấp ngưỡng nghiệp vụ cho từng loại điểm.
+
+---
+
+### IV.9.6. SCR-ANA-06 — Phân tích hiệu quả chiến dịch (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-ANA-12 + FR-ANA-11; phục vụ UC-ANA-08. **Giai đoạn P2.**
+
+**Mục tiêu:** Cho Tiếp thị đo hiệu quả chiến dịch theo tệp/kênh/tỷ lệ và xem gợi ý dịch vụ ở mức nghiệp vụ.
+**Ánh xạ Use Case:** UC-ANA-08.
+**Layout (đề xuất):** (1) Bộ lọc chiến dịch/kênh/thời gian; (2) Bảng chỉ số hiệu quả theo chiến dịch; (3) Khối gợi ý dịch vụ cho khách hàng/nhóm.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Bộ lọc Chiến dịch / Kênh / Thời gian | Danh sách chọn + ngày | Không | Tất cả | Lọc theo chiến dịch, kênh gửi, khoảng thời gian |
+| 2 | Bảng chỉ số hiệu quả | Bảng | N/A | N/A | Tệp khách hàng, kênh gửi, tỷ lệ gửi thành công/mở/phản hồi/chuyển đổi, doanh thu (FR-ANA-12) |
+| 3 | Khối Gợi ý dịch vụ | Khối | N/A | N/A | Gợi ý dịch vụ/ưu đãi/hành động tiếp theo cho khách hàng/nhóm — mô tả nghiệp vụ (FR-ANA-11), **không hiển thị chi tiết mô hình** |
+
+**Trạng thái đặc biệt:**
+- **Chưa có dữ liệu chiến dịch:** "Chưa có dữ liệu chiến dịch để phân tích." (UC-ANA-08 A1)
+- **Chưa có gợi ý:** "Chưa có gợi ý cho khách hàng này." (UC-ANA-08 A2)
+- **Đang tải:** khung chờ ở bảng chỉ số.
+
+> **Ghi chú ranh giới:** dữ liệu phản hồi chiến dịch (gửi/mở/phản hồi/chuyển đổi) đến từ **Phân hệ 6 (Kích hoạt, lô sau)**. Màn này chỉ **xem và phân tích**, không đặc tả luồng đẩy chiến dịch.
+
+---
+
+### IV.9.7. SCR-ANA-07 — Quản lý mô hình AI (mức nghiệp vụ) (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-ANA-14 ở **mức nghiệp vụ** (xem phiên bản, bật/tắt); phục vụ UC-ANA-09. **Giai đoạn P2.**
+
+**Mục tiêu:** Cho Chuyên viên phân tích xem danh sách/phiên bản mô hình AI và bật/tắt mô hình ở mức nghiệp vụ — **không huấn luyện, không chỉnh tham số**.
+**Ánh xạ Use Case:** UC-ANA-09.
+**Layout (đề xuất):** Bảng danh sách mô hình + panel chi tiết phiên bản một mô hình.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Bảng danh sách mô hình | Bảng | N/A | N/A | Tên mô hình, mục đích (churn/COD/clustering...), phiên bản, thời điểm huấn luyện, trạng thái triển khai (FR-ANA-14) |
+| 2 | Cột Độ chính xác | Cột bảng | N/A | N/A | Hiển thị nếu có; chỉ đọc — con số do Data Science cung cấp, **không tính trong tài liệu** |
+| 3 | Công tắc Bật/Tắt mô hình | Công tắc | Không | Theo trạng thái hiện tại | Đưa vào/ngừng sử dụng ở mức nghiệp vụ (UC-ANA-09) |
+| 4 | Panel Lịch sử phiên bản | Khối | N/A | N/A | Lịch sử thay đổi/phiên bản của mô hình (chỉ đọc) |
+
+**Trạng thái đặc biệt:**
+- **Chưa có mô hình:** "Chưa có mô hình AI nào được triển khai." (UC-ANA-09 A1)
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này." Màn này yêu cầu quyền **Quản lý mô hình AI (mức nghiệp vụ)** — II.3/II.4.3 khối Phân khúc/Phân tích; actor chính DATA-ANALYST, mức quyền chính thức xem OQ-ANA-07.
+
+> **[Cần xác nhận: ranh giới thao tác DATA-ANALYST vs Data Scientist]** (OQ-ANA-07) — FR-ANA-14 gốc ghi tác nhân "Data Scientist/IT Admin". Tài liệu đặt DATA-ANALYST làm actor cho phần xem/bật-tắt nghiệp vụ; huấn luyện/chỉnh tham số ngoài phạm vi. Cần VNPost chốt ai được bật/tắt mô hình ở mức nghiệp vụ.
+
+---
+
 ## Phụ lục — Giả định và câu hỏi mở áp dụng cho tài liệu này
 
 ### Giả định đang áp dụng
@@ -2648,6 +3294,18 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 - [ ] OQ-DPS-02: Bảng nguồn ưu tiên 12 nhóm (6.10) đã đủ quyết định giá trị master chưa, hay cần bổ sung rule theo loại/nhóm khách hàng, trạng thái, hạng thân thiết? *(đồng bộ OQ-IDR-04)* (áp dụng BR-DPS-14, UC-DPS-06) (Data Steward / VNPost)
 - [ ] OQ-DPS-03: Quản trị hệ thống (SYS-ADMIN) có cần quyền **CONFIG đầy đủ** hai chức năng cấu hình rule chất lượng và nguồn dữ liệu ưu tiên không, hay chỉ **(X)** xem/hỗ trợ? Hiện để (X) theo nguyên tắc tách quyền cấu hình khỏi quyền xem (II.4.4 mục 3). (áp dụng II.3 khối Chuẩn hóa, II.4.3) (VNPost)
 
+### Câu hỏi mở riêng Lô 3 — Phân khúc, phân tích và AI (OQ-ANA)
+
+Đánh số theo namespace `OQ-ANA-` để không trùng các dải OQ trước. Không có OQ critical chặn (actor, phân quyền, quy trình chính đã rõ từ khung tổng thể và baseline Luồng 4/5).
+
+- [ ] OQ-ANA-01: Phép phủ định **NOT** — tài liệu gốc FR-ANA-01 nêu điều kiện AND/OR/NOT; prototype v3 hiện chỉ có AND/OR (phủ định gián tiếp qua toán tử `≠` ở điều kiện lá). Có cần NOT ở mức nhóm không, và thể hiện thế nào? (áp dụng BR-ANA-03, UC-ANA-01 A3, SCR-ANA-02) (PO / Tiếp thị VNPost)
+- [ ] OQ-ANA-02: **Giá trị ngưỡng cảnh báo** cho từng loại điểm (churn, rủi ro COD, nguy cơ hoàn hàng, gian lận...) là bao nhiêu? Baseline/CDP.md không nêu con số — tài liệu không tự chế. (áp dụng BR-ANA-10, UC-ANA-05 A3, SCR-ANA-05) (VNPost / Data Steward)
+- [ ] OQ-ANA-03: Khi trường điều kiện phân khúc tham chiếu một điểm số **chưa được tính** (điểm P2 chưa triển khai / thiếu dữ liệu), hành vi lọc thế nào — bỏ qua điều kiện, hay không lọc ra khách hàng nào? (áp dụng UC-ANA-04 A3) (VNPost / SA)
+- [ ] OQ-ANA-04: Ở bảng điều khiển BI, vai trò **Lãnh đạo** có được xem chỉ số rủi ro COD/gian lận ở mức tổng hợp không? Bảng che 6.2 chưa có dòng cho Lãnh đạo. (áp dụng BR-ANA-11, UC-ANA-07 A2, SCR-ANA-04) (VNPost)
+- [ ] OQ-ANA-05: Khi **sửa/xóa phân khúc đang được chiến dịch dùng** (đặc biệt chiến dịch đang chạy) — chặn hẳn, hay cảnh báo và cho phép với ghi nhận? Baseline 6.4 chỉ nêu "cảnh báo và liệt kê chiến dịch bị ảnh hưởng". (áp dụng BR-ANA-12, UC-ANA-02 E1, UC-ANA-03 E1) (PO / Tiếp thị VNPost)
+- [ ] OQ-ANA-06: Tên phân khúc có **bắt buộc** không? Prototype cho lưu khi rỗng (nhãn "Không có tên"); đề xuất đặt bắt buộc. (áp dụng UC-ANA-01 E1, SCR-ANA-02 item 1) (PO / Tiếp thị VNPost)
+- [ ] OQ-ANA-07: Ranh giới thao tác giữa **Chuyên viên phân tích dữ liệu (DATA-ANALYST)** và **Data Scientist** ở màn Quản lý mô hình AI — ai được bật/tắt mô hình ở mức nghiệp vụ? FR-ANA-14 gốc ghi "Data Scientist/IT Admin". (áp dụng UC-ANA-09, SCR-ANA-07) (VNPost / CNTT)
+
 ### Ghi chú xử lý MINOR
 
 **Từ QA review v1.1 (khung tổng thể):**
@@ -2671,4 +3329,4 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 
 ---
 
-*Kết thúc phiên bản v1.5 — Khung tổng thể (Mục I + Mục II) + Lô 1 (Phân hệ 3 Hợp nhất định danh, Phân hệ 4 Customer 360) + Lô 2 (Phân hệ 1 Tiếp nhận FR-ING, Phân hệ 2 Chuẩn hóa FR-DPS): Mục III bổ sung III.3 (7 UC-ING) và III.4 (6 UC-DPS); Mục IV bổ sung IV.8 (8 màn — 2 từ prototype, 6 CẦN BỔ SUNG); đã gắn mã FR-ING-01→10 và FR-DPS-01→14 vào cây chức năng II.2; đã xử lý QA Lô 2 (1 CRITICAL + 4 MAJOR + 2 MINOR nhanh — có mở II.3/II.4 bổ sung quyền cấu hình). Mục C (Yêu cầu phi chức năng) và ba phân hệ còn lại của Mục III/IV (Phân tích, Kích hoạt, Quản trị) sẽ được bổ sung theo lô ở các vòng sau.*
+*Kết thúc phiên bản v1.7 — Khung tổng thể (Mục I + Mục II) + Lô 1 (Phân hệ 3 Hợp nhất định danh, Phân hệ 4 Customer 360) + Lô 2 (Phân hệ 1 Tiếp nhận FR-ING, Phân hệ 2 Chuẩn hóa FR-DPS) + Lô 3 (Phân hệ 5 Phân khúc, phân tích và AI FR-ANA): Mục III bổ sung III.5 (10 UC-ANA); Mục IV bổ sung IV.9 (7 màn — 3 từ prototype, 4 CẦN BỔ SUNG); đã gắn mã FR-ANA-01→15 với độ ưu tiên P1/P2 vào cây chức năng II.2 (FR-ANA ≡ FR-SEG/FR-ANALYTICS); đã xử lý QA Lô 3 (3 MAJOR + 2 MINOR — thêm UC-ANA-10, mở II.3/II.4 bổ sung quyền cấu hình ngưỡng + mô hình AI, ghi chú FR-ANA-07 ô dù); giữ ranh giới BA vs Data Science, che điểm số nhất quán với III.C360 Lô 1. Mục C (Yêu cầu phi chức năng) và hai phân hệ còn lại của Mục III/IV (Phân hệ 6 Kích hoạt, Phân hệ 7 Quản trị) sẽ được bổ sung theo lô ở các vòng sau.*
