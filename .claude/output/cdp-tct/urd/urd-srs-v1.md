@@ -4,7 +4,7 @@ TỔNG CÔNG TY BƯU ĐIỆN VIỆT NAM (VNPost/TCT)
 
 ## Nền tảng Dữ liệu Khách hàng — Customer Data Platform (CDP)
 
-**Phiên bản:** v1.7 — Khung tổng thể (Mục I + Mục II) + Lô 1 (Phân hệ 3, 4) + Lô 2 (Phân hệ 1, 2) + Lô 3 (Phân hệ 5)
+**Phiên bản:** v1.8 — **KHUNG ĐẦY ĐỦ (Mục I → IV + C, cả 7 phân hệ)** — Mục I + Mục II + Lô 1 (Phân hệ 3, 4) + Lô 2 (Phân hệ 1, 2) + Lô 3 (Phân hệ 5) + Lô 4 (Phân hệ 6, 7) + Mục C (Yêu cầu phi chức năng)
 **Địa điểm – Thời gian:** Hà Nội – Tháng 08/2026
 
 ---
@@ -20,26 +20,25 @@ TỔNG CÔNG TY BƯU ĐIỆN VIỆT NAM (VNPost/TCT)
 | v1.4 | 08/2026 | **Lô 2** — bổ sung Mục III (Đặc tả Use Case) và Mục IV (Giao diện chức năng) cho Phân hệ 1 (Tiếp nhận, FR-ING) và Phân hệ 2 (Chuẩn hóa và xử lý dữ liệu, FR-DPS): 13 Use Case (UC-ING-01→07, UC-DPS-01→06), 24 Business Rule (BR-ING-01→10, BR-DPS-01→14), 8 màn giao diện (SCR-ING-01→03, SCR-DPS-01→05 — trong đó 2 màn từ prototype v3 là màn giám sát luồng và panel chất lượng, 6 màn CẦN BỔ SUNG). Gộp 8 chức năng chuẩn hóa trường (FR-DPS-01→08) thành 2 UC (UC-DPS-01 định danh/liên hệ + UC-DPS-02 nghiệp vụ) với BR chi tiết từng trường. Đọc thẳng CDP.md 7.2 (FR-ING-01→10), 7.3 (FR-DPS-01→14), 6.10 (nguồn ưu tiên 12 nhóm), 6.11 (bảo vệ dữ liệu định danh): **cập nhật cây chức năng II.2** — gắn đủ 10 tên FR-ING và 14 tên FR-DPS, ghi rõ tương đương mã nhóm FR-INGEST≡FR-ING, FR-STD≡FR-DPS (chỉ điền tên mã gốc, không đổi cấu trúc cây, không đụng Phân hệ 3–7). Đặc tả SCR-ING-01 bằng ngôn ngữ nghiệp vụ, ghi khối điểm lệch yêu cầu **bỏ nhãn công nghệ Kafka/topic/lag/consumer** khỏi giao diện khi triển khai (D-04). Áp các con số baseline 7.2: thử lại 3 lần 1'–5'–15', hàng đợi lỗi 30 ngày, ngưỡng cảnh báo/báo động (vàng >15'/lỗi >1%; đỏ ngừng >15'/lỗi >5%/tồn >60'), độ trễ theo nhóm, mục tiêu chất lượng 6/12 tháng. Thêm 6 OQ Lô 2 (OQ-ING-01→04, OQ-DPS-01→02) — không có OQ critical chặn. Ranh giới quyền DATA-ENG vs DATA-STEWARD để mở (OQ-ING-01), không tự quyết | BA |
 | v1.5 | 08/2026 | Patch theo QA review Lô 2 — sửa 1 CRITICAL + 4 MAJOR (+2 MINOR nhanh): (CR-01) bỏ cặp số bịa "~690.000/~1.200" gắn nhãn baseline 7.2 trong BR-ING-08, thay bằng lập luận định tính đúng nguồn; rà toàn file xác nhận không còn số cụ thể gắn nhãn baseline mà baseline không có. (MA-01) **mở Mục II.3/II.4** bổ sung 2 dòng quyền "Cấu hình rule chất lượng dữ liệu" và "Cấu hình nguồn dữ liệu ưu tiên" (DATA-STEWARD=X, Quản trị=(X)); tách action **CONFIG** khỏi UPDATE ở II.4.3 khối Chất lượng dữ liệu + làm rõ định nghĩa CONFIG vs UPDATE ở II.4.2; nối traceability UC-DPS-05/06 và SCR-DPS-04/05 tới quyền CONFIG. (MA-02) thêm actor phụ **SYS-ADMIN (= IT Admin gốc)** vào UC-ING-06 với phân vai rõ vs DATA-ENG, đồng bộ II.4.3; phân biệt rõ với OQ-ING-01 (DATA-ENG vs DATA-STEWARD). (MA-03) ghi rõ nhánh 6.4 "đồng bộ sang kênh thất bại" là lỗi **outbound thuộc Phân hệ 6 (lô sau)**, không phải gap Lô 2. (MA-04) làm rõ BR-ING-05 chuyển trạng thái ngược chiều "Trong hàng đợi lỗi → (Sửa và nạp lại) → Chờ thử lại", đồng bộ SCR-ING-03 row 10 + UC-ING-04 E3. (MI-01) bỏ 2 nhãn tech lặp trong bảng SCR-ING-01 (rows 5/6/15/19 — mapping vẫn còn ở khối điểm lệch); (MI-06) ghi rõ UC-DPS-04 quan sát ở SCR-C360-02. Thêm OQ-DPS-03 (mức CONFIG của SYS-ADMIN). 4 MINOR còn lại (MI-02→05) gom lô sau | BA |
 | v1.6 | 08/2026 | **Lô 3** — bổ sung Mục III (Đặc tả Use Case) và Mục IV (Giao diện chức năng) cho Phân hệ 5 (Phân khúc, phân tích và AI, FR-ANA): 9 Use Case (UC-ANA-01→09), 12 Business Rule (BR-ANA-01→12), 7 màn giao diện (SCR-ANA-01→07 — trong đó 3 màn từ prototype v3 là danh sách/trình tạo/chi tiết phân khúc, 4 màn CẦN BỔ SUNG: dashboard BI, cấu hình ngưỡng cảnh báo, phân tích hiệu quả chiến dịch, quản lý mô hình AI). Đọc thẳng CDP.md 7.6: **cập nhật cây chức năng II.2** — gắn đủ 15 tên FR-ANA-01→15 với độ ưu tiên P1/P2, ghi rõ tương đương mã nhóm **FR-ANA ≡ FR-SEG/FR-ANALYTICS** (chỉ điền tên mã, không đổi cấu trúc cây, không đụng Phân hệ 6/7). Cập nhật ghi chú mã FR ở I.2.1. Gộp 7 mã chấm điểm/rủi ro (FR-ANA-04→10) thành 1 UC chấm điểm nền (UC-ANA-05) + 1 UC người dùng xem/xử lý (UC-ANA-06), định nghĩa nghiệp vụ từng loại điểm tách riêng ở BR-ANA-05→09 (không trộn công thức). Đánh dấu **P1 cho rủi ro COD (FR-ANA-08) và nguy cơ hoàn hàng (FR-ANA-09)** — ưu tiên cao theo bài toán giảm hoàn hàng; **P2 cho RFM/CLV/churn/fraud/recommendation/campaign/model/clustering**. **Giữ ranh giới BA vs Data Science:** đặc tả use case + đầu ra + cách dùng, KHÔNG đi vào thuật toán/công thức/tham số mô hình. **Che điểm số nhất quán tuyệt đối với III.C360/BR-C360-03 Lô 1** (BR-ANA-11: COD Risk + Fraud ẩn với MARKETING và CSKH). Không bịa số ngưỡng cảnh báo (đúng bài học Lô 2 CR-01) — để [Cần xác nhận] OQ-ANA-02. NOT trong builder để [Cần xác nhận] OQ-ANA-01 (prototype hiện chỉ AND/OR). Thêm 7 OQ Lô 3 (OQ-ANA-01→07) — không có OQ critical chặn | BA |
+| v1.8 | 08/2026 | **Lô 4 (lô cuối) — hoàn tất cả 7 phân hệ + Mục C.** Bổ sung Mục III: III.6 (6 UC-ACT-01→06) cho Phân hệ 6 Kích hoạt (FR-ACT) và III.7 (9 UC-GOV-01→09) cho Phân hệ 7 Quản trị (FR-GOV); 21 Business Rule (BR-ACT-01→11, BR-GOV-01→10). Bổ sung Mục IV: IV.10 (12 màn — SCR-ACT-01→05, SCR-GOV-01→07, **tất cả CẦN BỔ SUNG** vì prototype v3 chưa phủ Phân hệ 6/7). Bổ sung **Mục C — Yêu cầu phi chức năng** (NFR-PERF/SEC/STOR/REL/COMP + bảng chất lượng dữ liệu 6/12 tháng), lấy từ baseline 7.2 + GD-01→09, không tự chế chỉ tiêu hiệu năng (RPS/uptime để [Cần xác nhận] OQ-GOV-07). Đọc thẳng CDP.md 7.7 (FR-ACT-01→14), 7.8 (FR-GOV-01→17), 7.9 (ma trận giai đoạn): **cập nhật cây chức năng II.2** — gắn đủ 14 tên FR-ACT + 17 tên FR-GOV với P1/P2; sau lô này **II.2 không còn `[Cần xác nhận: mã FR]` nào**. **⚠️ Sửa tham chiếu pháp lý lỗi thời (2 chỗ):** Nghị định 13/2023/NĐ-CP (hết hiệu lực 01/01/2026) → **Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15 (thông qua 26/6/2025) + Nghị định 356/2025/NĐ-CP (ban hành 31/12/2025)** ở thuật ngữ I.3 số 36 và mục đích Phân hệ 7 (II.2); bổ sung chế tài mới (tối đa 3 tỷ VND / 5% doanh thu xuyên biên giới); rà toàn file sạch NĐ 13. UC xương sống Luồng 6 (UC-ACT-01) gộp consent check + suppression + frequency + approval; edge 6.4 rút đồng ý sau đẩy tệp tách UC-ACT-06; Luồng 7 xử lý yêu cầu KH gộp UC-GOV-04 (thời hạn ở BR-GOV-08); Luồng 8 quản trị tách UC-GOV-01/02/09. Giữ ranh giới BA vs SA/IT Security (mã hóa/lineage/điều tra sự cố mức nghiệp vụ); masking tham chiếu Lô 1 không lặp; con số ngưỡng kích hoạt (>1.000/>100.000), xuất (≤1.000/1.001–10.000/>10.000/trần 100.000), tần suất (≤3/tuần, ≤1/kênh/ngày, 21h–08h), nhật ký (5/3/2 năm) lấy đúng baseline. Thêm 13 OQ Lô 4 (OQ-ACT-01→06, OQ-GOV-01→07) — không có OQ critical chặn | BA |
+| v1.9 | 08/2026 | **Patch theo review 10 quy trình (Mục II.1) — sửa 1 CRITICAL + 3 MAJOR + biến hóa tham số giả định.** (CR-01) **Tách 2 tầng hợp nhất định danh** đúng bản chất engine CDP.md 6.6.1/6.6.2: trước đây Quy trình 2 + Sequence A + Lô 1 gộp cả deterministic và probabilistic về **một thang điểm duy nhất** → sai (Dev hiểu mọi cặp đều phải chấm điểm xác suất). Nay tách rõ **Tầng 1 Deterministic** (trùng khóa mạnh MST/căn cước/PostID/CRM ID/SĐT+email → gộp thẳng, KHÔNG chấm điểm) và **Tầng 2 Probabilistic** (chỉ khi thiếu khóa mạnh mới chấm điểm 4 vùng 95/85/70). Sửa: swimlane QT2, Sequence A giai đoạn 3, thêm **BR-IDR-00**, sửa BR-IDR-01/02, UC-IDR-01 (luồng chính + ngoại lệ + tên), UC-IDR-03 bước 1, UC-IDR-07 luồng chính. (MA-01) **Chuyển "thiếu đồng ý" ra khỏi nhánh cấm gộp** — consent chỉ chặn kích hoạt (QT6/Phân hệ 6), KHÔNG chặn merge (CDP.md 6.8.2 case 7); thêm **BR-IDR-13**; sửa QT2 swimlane/diễn giải + UC-IDR-01 E3. (MA-02) **Gắn nhãn nguồn cho "email dùng chung"** trong nhánh cấm gộp — suy từ 6.6.1 case 2 + 6.8.3 case 5, không nằm tường minh 6.8.2 gốc (điều chỉnh cách ghi của v1.1 CR-02). (MA/MI) **"ngừng xử lý" → "hạn chế xử lý theo mục đích"** đúng thuật ngữ CDP.md 8.12 case 5 (QT7 + thuật ngữ I.3 số 37). **Biến hóa toàn bộ con số giả định trong Mục II.1 + II.5** thành biến có tên `{...}` (retry, tần suất, khung giờ, ngưỡng kích hoạt/xuất, SLA, thời hạn nhật ký, ngưỡng cảnh báo luồng…) + thêm **Bảng tham số giả định ở đầu Mục II.1** (24 biến, giá trị đề xuất, OQ tương ứng) — nối GD-02. Thêm **OQ-GOV-08** (ngưỡng xuất dữ liệu chưa có OQ). Phạm vi: Mục II.1, II.5, Lô 1 (III.0/III.1) — không đụng Mục IV, NFR, Phân hệ 2/3/5/6/7 phần ngoài số | BA |
 | v1.7 | 08/2026 | Patch theo QA review Lô 3 — sửa 3 MAJOR (0 CRITICAL) + 2 MINOR nhanh: (MA-01) **thêm UC-ANA-10 "Cấu hình ngưỡng cảnh báo điểm số"** (actor người dùng DATA-STEWARD, [Cần xác nhận] OQ-ANA-02) để nối traceability cho SCR-ANA-05 — trước đó màn cấu hình ngưỡng (có nút Lưu + quyền) trỏ nhầm UC-ANA-05 (actor Hệ thống, thuần nền, không có bước nhập ngưỡng); giữ UC-ANA-05 thuần nền tiêu thụ ngưỡng đã cấu hình; cập nhật ánh xạ SCR-ANA-05 → UC-ANA-10; danh mục III.5.0 nay 10 UC. (MA-02) **mở Mục II.3/II.4** bổ sung 2 dòng quyền khối Phân khúc/Phân tích: "Cấu hình ngưỡng cảnh báo điểm số" (DATA-STEWARD **VIEW, CONFIG**; SYS-ADMIN VIEW — cùng khuôn CONFIG Lô 2) và "Quản lý mô hình AI (mức nghiệp vụ)" (VIEW cho DATA-STEWARD/SYS-ADMIN góc hỗ trợ, actor chính DATA-ANALYST để [Cần xác nhận] OQ-ANA-07); nối SCR-ANA-05/07 tới quyền tương ứng, gỡ trạng thái "Không đủ quyền" treo không nguồn. (MA-03) thêm ghi chú **FR-ANA-07 là mã ô dù** ở BR-ANA-07 và III.5.0: điểm chồng lấn lấy ưu tiên theo mã chuyên biệt — COD risk theo FR-ANA-08 (P1), fraud theo FR-ANA-10 (P2); P2 của FR-ANA-07 chỉ áp cho engagement/value/service quality, COD risk là P1 không bị kéo xuống. (MI-02) thêm ngoại lệ **cây điều kiện rỗng hoàn toàn** chặn lưu (UC-ANA-01 E3, đồng bộ SCR-ANA-02). (MI-04) chuẩn hóa tên vai trò trong BR-ANA-11 kèm mã role code. 3 MINOR còn lại (MI-01, 03, 05) gom lô sau | BA |
 
 ---
 
 ## Về phạm vi của phiên bản tài liệu này
 
-Đây là **vòng khung tổng thể**. Tài liệu chỉ bao gồm:
+Từ **v1.8, tài liệu đã hoàn tất khung URD/SRS đầy đủ cho cả 7 phân hệ**, gồm:
 
 - **Mục I — Giới thiệu** (I.1 Mục đích · I.2 Phạm vi · I.3 Thuật ngữ · I.4 Kiến trúc tổng thể)
 - **Mục II — Yêu cầu tổng thể** (II.1 Workflow · II.2 Function Tree · II.3 Permission Matrix · II.4 RBAC · II.5 Sequence)
+- **Mục III — Đặc tả Use Case** cho cả 7 phân hệ (III.1 IDR · III.2 C360 · III.3 ING · III.4 DPS · III.5 ANA · III.6 ACT · III.7 GOV)
+- **Mục IV — Giao diện chức năng** (IV.1–IV.7 Lô 1 · IV.8 Lô 2 · IV.9 Lô 3 · IV.10 Lô 4)
+- **Mục C — Yêu cầu phi chức năng** (hiệu năng/quy mô, bảo mật/quyền riêng tư, lưu trữ, độ tin cậy, chất lượng dữ liệu, tương thích/truy cập)
 
-**Mục III (Đặc tả Use Case)**, **Mục IV (Giao diện chức năng)** và **Mục C (Yêu cầu phi chức năng)** sẽ được viết theo lô ở các vòng sau, thứ tự đề xuất:
+Các lô đã hoàn tất theo thứ tự: (1) Hợp nhất định danh + Customer 360 — Lô 1; (2) Tiếp nhận + Chuẩn hóa — Lô 2; (3) Phân khúc, phân tích và AI — Lô 3; (4) Kích hoạt + Quản trị, bảo mật, quyền riêng tư — Lô 4.
 
-1. Hợp nhất định danh + Hồ sơ khách hàng 360 (đã có giao diện, đã làm rõ nhất)
-2. Tiếp nhận và chuẩn hóa dữ liệu
-3. Phân khúc và phân tích
-4. Kích hoạt dữ liệu
-5. Quản trị, bảo mật và quyền riêng tư
-
-**Nguồn giao diện chuẩn cho Mục IV ở các lô sau là prototype v3** (`.claude/output/cdp-tct/wireframe/prototype-v3.html` — bản chốt 24/07/2026), không phải `wireframe-v1.md`. Mọi tên màn hình được tham chiếu trong tài liệu này lấy theo prototype v3.
+**Nguồn giao diện chuẩn cho Mục IV là prototype v3** (`.claude/output/cdp-tct/wireframe/prototype-v3.html` — bản chốt 24/07/2026), không phải `wireframe-v1.md`. Prototype v3 phủ Lô 1–3; **12 màn Lô 4 (IV.10) là CẦN BỔ SUNG** vì prototype chưa phủ Phân hệ 6/7 — layout mô tả theo FR gốc + baseline, đánh dấu rõ tại từng màn.
 
 > **Lưu ý về giả định và câu hỏi mở:** Toàn bộ dự án hiện chưa có buổi họp chính thức với VNPost và chưa có tài liệu yêu cầu từ phía VNPost. Các nội dung trong tài liệu này được viết theo **giả định có mã** (tham chiếu GD-01→GD-09 và A1→A8). Chỗ nào phụ thuộc câu trả lời chưa có từ VNPost được đánh dấu `[Cần xác nhận: ...]` ngay tại vị trí đó, không dùng "TBD".
 
@@ -84,11 +83,9 @@ Tài liệu bao phủ **toàn bộ 7 phân hệ** của CDP, khoảng **99 mã y
 | 6 | Kích hoạt dữ liệu | FR-ACT | Kiểm tra đồng ý; kiểm tra tần suất và khung giờ; phê duyệt theo ngưỡng; đẩy sang kênh; nhận phản hồi |
 | 7 | Quản trị, bảo mật và quyền riêng tư | FR-GOV | Quản lý tài khoản, vai trò, phạm vi; nhật ký bất biến; quản lý đồng ý; xử lý yêu cầu chủ thể dữ liệu; báo cáo tuân thủ |
 
-> **Về mã yêu cầu chi tiết:** Năm phân hệ đã đặc tả chi tiết đều có **đủ tên mã theo tài liệu gốc `CDP.md`**: Lô 1 — **14 mã FR-IDR-01→14** (mục 7.4) và **15 mã FR-C360-01→15** (mục 7.5); Lô 2 — **10 mã FR-ING-01→10** (mục 7.2) và **14 mã FR-DPS-01→14** (mục 7.3); Lô 3 — **15 mã FR-ANA-01→15** (mục 7.6). Xem cây chức năng đầy đủ ở Mục II.2 và danh mục ánh xạ ở Mục III.0 / III.3.0 / III.4.0 / III.5.0.
+> **Về mã yêu cầu chi tiết:** **Cả 7 phân hệ đã có đủ tên mã theo tài liệu gốc `CDP.md`**: Lô 1 — **14 mã FR-IDR-01→14** (mục 7.4) và **15 mã FR-C360-01→15** (mục 7.5); Lô 2 — **10 mã FR-ING-01→10** (mục 7.2) và **14 mã FR-DPS-01→14** (mục 7.3); Lô 3 — **15 mã FR-ANA-01→15** (mục 7.6); Lô 4 — **14 mã FR-ACT-01→14** (mục 7.7) và **17 mã FR-GOV-01→17** (mục 7.8). Xem cây chức năng đầy đủ ở Mục II.2 và danh mục ánh xạ ở Mục III.0 / III.3.0 / III.4.0 / III.5.0 / III.6.0 / III.7.0.
 >
-> **Lưu ý mã nhóm:** tài liệu này dùng mã gốc CDP.md là **FR-ING** (Phân hệ 1), **FR-DPS** (Phân hệ 2) và **FR-ANA** (Phân hệ 5). Các mã nhóm cũ từng dùng ở phiên bản khung là tương đương: **FR-INGEST ≡ FR-ING**, **FR-STD ≡ FR-DPS**, **FR-SEG/FR-ANALYTICS ≡ FR-ANA**. Từ v1.6, mọi tham chiếu chi tiết Phân hệ 5 dùng FR-ANA.
->
-> Hai phân hệ còn lại (Kích hoạt FR-ACT mục 7.7, Quản trị FR-GOV mục 7.8) cũng có bảng mã gốc trong `CDP.md`; tên và số hiệu chi tiết của từng mã sẽ được đưa vào cây chức năng khi làm chi tiết theo lô tương ứng.
+> **Lưu ý mã nhóm:** tài liệu này dùng mã gốc CDP.md là **FR-ING** (Phân hệ 1), **FR-DPS** (Phân hệ 2), **FR-ANA** (Phân hệ 5), **FR-ACT** (Phân hệ 6), **FR-GOV** (Phân hệ 7). Các mã nhóm cũ từng dùng ở phiên bản khung là tương đương: **FR-INGEST ≡ FR-ING**, **FR-STD ≡ FR-DPS**, **FR-SEG/FR-ANALYTICS ≡ FR-ANA**. Từ v1.8, mọi tham chiếu chi tiết đều dùng mã gốc CDP.md và **không còn** `[Cần xác nhận: mã FR]` nào trong cây chức năng II.2.
 
 ### I.2.2. Ranh giới hệ thống
 
@@ -157,8 +154,8 @@ CDP triển khai theo bốn giai đoạn ưu tiên. Bảng dưới giúp Dev/Tes
 | 33 | **WMS** (Warehouse Management System) | Hệ thống quản lý kho — nguồn dữ liệu theo lô (hệ thống cũ) |
 | 34 | **PayPost** | Hệ thống thanh toán — nguồn dữ liệu thu hộ và đối soát tài chính (theo lô, sau khi chốt sổ) |
 | 35 | **PostID** | Hệ thống định danh người dùng của VNPost. Độ phủ khách hàng phụ thuộc OQ-03 |
-| 36 | **Nghị định 13/2023/NĐ-CP** | Nghị định về bảo vệ dữ liệu cá nhân, áp dụng bắt buộc. Yêu cầu CDP có quản lý đồng ý, quyền được lãng quên, và nhật ký kiểm toán từ ngày đầu |
-| 37 | **Quyền chủ thể dữ liệu** | Quyền của khách hàng: xem, chỉnh sửa, rút đồng ý, ngừng xử lý, xóa/ẩn danh, yêu cầu giải thích |
+| 36 | **Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15 và Nghị định 356/2025/NĐ-CP** | Khung pháp lý về bảo vệ dữ liệu cá nhân, áp dụng bắt buộc. **Luật số 91/2025/QH15** được Quốc hội thông qua ngày 26/6/2025, hiệu lực từ 01/01/2026; **Nghị định 356/2025/NĐ-CP** ban hành 31/12/2025 quy định chi tiết. Yêu cầu CDP có quản lý đồng ý, quyền được lãng quên, và nhật ký kiểm toán từ ngày đầu. **Chế tài mới:** vi phạm thông thường phạt tối đa **3 tỷ VND**; chuyển dữ liệu xuyên biên giới trái phép phạt tối đa **5% doanh thu năm liền trước**. (Thay thế Nghị định 13/2023/NĐ-CP đã hết hiệu lực từ 01/01/2026) |
+| 37 | **Quyền chủ thể dữ liệu** | Quyền của khách hàng: xem, chỉnh sửa, rút đồng ý, hạn chế xử lý theo mục đích, xóa/ẩn danh, yêu cầu giải thích (theo CDP.md 8.12) |
 | 38 | **Che dữ liệu** (Masking) | Ẩn một phần hoặc toàn bộ giá trị nhạy cảm theo phân quyền vai trò (ví dụ: `090***123`) |
 
 ## I.4. Kiến trúc tổng thể hệ thống
@@ -257,6 +254,49 @@ flowchart TB
 
 ---
 
+### Tham số giả định áp dụng cho toàn bộ Mục II.1
+
+> **Quan trọng — đọc trước khi xem quy trình.** Các sơ đồ và diễn giải bên dưới dùng **biến có tên** (dạng `{TÊN_BIẾN}`) cho mọi con số giới hạn/ngưỡng/thời hạn. Toàn bộ giá trị đề xuất là **do người phân tích đề xuất, VNPost chưa duyệt** (xem GD-02). Bảng này là nơi tra cứu giá trị đề xuất duy nhất — khi VNPost chốt số thật, chỉ cập nhật ở đây và các biến trong quy trình tự đúng theo.
+
+| Biến | Ý nghĩa | Giá trị đề xuất | Câu hỏi mở |
+|---|---|---|---|
+| `{N_RETRY}` | Số lần tự động thử lại khi lỗi mất kết nối/quá tải | 3 lần | OQ-ING (Lô 2) |
+| `{NHIP_RETRY}` | Nhịp giãn giữa các lần thử lại | 1 phút → 5 phút → 15 phút | OQ-ING (Lô 2) |
+| `{TTL_LOI}` | Thời gian giữ bản ghi trong hàng đợi lỗi trước khi chuyển lưu trữ | 30 ngày | OQ-ING (Lô 2) |
+| `{FREQ_TUAN}` | Trần số tin gửi tối đa mỗi khách hàng mỗi tuần (mọi kênh) | 3 tin/tuần | OQ-09 |
+| `{FREQ_NGAY}` | Trần số tin gửi tối đa mỗi kênh mỗi ngày | 1 tin/kênh/ngày | OQ-09 |
+| `{GIO_CHAN_TT}` | Khung giờ không gửi tin tiếp thị | 21:00 – 08:00 | OQ-09 |
+| `{NG_DUYET_KH}` | Ngưỡng số bản ghi trong tệp kích hoạt cần phê duyệt trước khi gửi | trên 1.000 | OQ-ACT-02 |
+| `{NG_CHAN_KH}` | Ngưỡng số bản ghi tệp kích hoạt bị chặn, yêu cầu thu hẹp | trên 100.000 | OQ-ACT-02 |
+| `{NG_XUAT_1}` | Ngưỡng xuất dữ liệu cần duyệt bởi quản lý trực tiếp | 1.001 – 10.000 | OQ-GOV-08 |
+| `{NG_XUAT_2}` | Ngưỡng xuất dữ liệu cần duyệt bởi quản trị dữ liệu và tuân thủ | trên 10.000 | OQ-GOV-08 |
+| `{NG_XUAT_TRAN}` | Trần cứng số bản ghi mỗi lần xuất, không cho vượt | 100.000/lần | OQ-GOV-08 |
+| `{SLA_RUT_DY}` | Hạn nội bộ xử lý yêu cầu rút đồng ý | 4 giờ làm việc | OQ liên quan (GD-03) |
+| `{SLA_XEM_SUA}` | Hạn nội bộ xử lý yêu cầu xem/sửa dữ liệu | 7 ngày | OQ liên quan (GD-03) |
+| `{SLA_HAN_CHE}` | Hạn nội bộ xử lý yêu cầu hạn chế xử lý theo mục đích | 10 ngày | OQ liên quan (GD-03) |
+| `{SLA_XOA}` | Hạn nội bộ xử lý yêu cầu xóa/ẩn danh dữ liệu | 15 ngày | OQ liên quan (GD-03) |
+| `{TON_DONG_HD}` | Ngưỡng tồn đọng hàng đợi đối soát phát cảnh báo | 200 hồ sơ | OQ-IDR |
+| `{CHO_TOI_DA}` | Thời gian một hồ sơ chờ trong hàng đợi đối soát trước khi cảnh báo | 5 ngày | OQ-IDR |
+| `{TTL_NHATKY}` | Thời hạn lưu nhật ký gộp/tách và nhật ký đồng ý (bất biến) | 5 năm | OQ-08, OQ-IDR-01 (GD-04) |
+| `{TTL_KICHHOAT}` | Thời hạn lưu lịch sử kích hoạt chiến dịch | 3 năm | OQ-GOV-02 (baseline 7.2) |
+| `{SLA_RUT_KENH}` | Thời hạn đẩy trạng thái rút đồng ý sang kênh để loại khỏi hàng chờ chưa gửi | 24 giờ | OQ-ACT-06 |
+| `{CB_TON_TG}` | Ngưỡng thời gian tồn đọng luồng tiếp nhận phát cảnh báo | 15 phút | OQ-ING (Lô 2) |
+| `{CB_LOI_GIO}` | Ngưỡng tỷ lệ lỗi tiếp nhận mỗi giờ phát cảnh báo | 1%/giờ | OQ-ING (Lô 2) |
+| `{BD_NGUNG}` | Ngưỡng thời gian nguồn ngừng đẩy phát báo động | 15 phút | OQ-ING (Lô 2) |
+| `{BD_LOI_GIO}` | Ngưỡng tỷ lệ lỗi tiếp nhận mỗi giờ phát báo động | 5%/giờ | OQ-ING (Lô 2) |
+| `{BD_TON_TG}` | Ngưỡng thời gian tồn đọng luồng tiếp nhận phát báo động | 60 phút | OQ-ING (Lô 2) |
+
+### Hai tầng hợp nhất định danh — nguyên tắc bắt buộc cho Quy trình 2 và Sequence A
+
+> **Bản chất engine hợp nhất định danh gồm hai tầng chạy nối tiếp, KHÔNG phải một thang điểm duy nhất** (CDP.md mục 6.6.1 và 6.6.2):
+>
+> - **Tầng 1 — Đối sánh tuyệt đối (Deterministic Matching, 6.6.1):** khi hai bản ghi **trùng khóa định danh mạnh** (mã số thuế, căn cước, mã định danh VNPost/PostID, mã khách hàng CRM, hoặc số điện thoại kèm email — đều đã chuẩn hóa và không thuộc danh sách dùng chung) → hệ thống **gộp thẳng, KHÔNG chấm điểm phần trăm**. Trước khi gộp vẫn phải qua bước kiểm trường hợp cấm gộp tự động (6.8.2); nếu vướng thì đẩy hàng đợi đối soát.
+> - **Tầng 2 — Đối sánh xác suất (Probabilistic Matching, 6.6.2):** **chỉ khi không đủ khóa mạnh** ở tầng 1, hệ thống mới tính điểm tin cậy theo tín hiệu hỗ trợ (địa chỉ, thiết bị, hành vi, tên gần giống…), rồi phân loại theo **bốn vùng: ≥95% tự gộp · 85–94% hàng đợi đối soát · 70–84% lưu quan hệ nghi vấn · dưới 70% không gộp**.
+>
+> Bốn vùng phần trăm chỉ áp dụng cho **tầng 2**. Phần lớn hồ sơ VNPost (khách hàng lớn có mã số thuế, tài khoản app có PostID) sẽ được gộp ở **tầng 1 — không đi qua chấm điểm**.
+
+---
+
 ### Quy trình 1: Tiếp nhận và chuẩn hóa dữ liệu
 
 **Swimlane Diagram:**
@@ -271,10 +311,10 @@ flowchart TD
     subgraph HT["⚙️ Hệ thống"]
         A --> C["Tiếp nhận bản ghi<br/>Kiểm tra trường bắt buộc, kiểu dữ liệu, phiên bản cấu trúc"]
         C --> D{"Bản ghi đúng cấu trúc?"}
-        D -- Sai cấu trúc --> E["Vào hàng đợi lỗi ngay<br/>Không thử lại · giữ 30 ngày"]
+        D -- Sai cấu trúc --> E["Vào hàng đợi lỗi ngay<br/>Không thử lại · giữ {TTL_LOI}"]
         D -- Đúng --> F{"Lỗi mất kết nối / nguồn quá tải?"}
-        F -- Có --> G["Thử lại 3 lần: 1' → 5' → 15'"]
-        G --> H{"Còn lỗi sau 3 lần?"}
+        F -- Có --> G["Thử lại {N_RETRY} lần: {NHIP_RETRY}"]
+        G --> H{"Còn lỗi sau {N_RETRY} lần?"}
         H -- Có --> E
         H -- Không --> I
         F -- Không --> I["Chuẩn hóa dữ liệu<br/>SĐT · email · tên · địa chỉ · MST · vận đơn · trạng thái"]
@@ -293,14 +333,14 @@ flowchart TD
 |---|---|---|
 | 1 | Hệ thống nguồn | Phát sinh dữ liệu — nhóm thời gian thực đẩy sự kiện ngay; nhóm hệ thống cũ xuất theo lô 01:00–05:00 |
 | 1.1 | Hệ thống | Tiếp nhận và kiểm tra cấu trúc bản ghi: trường bắt buộc, kiểu dữ liệu, phiên bản cấu trúc |
-| **Trường hợp sai cấu trúc (DP-01)** | Hệ thống | Đưa bản ghi vào hàng đợi lỗi ngay, **không thử lại**; giữ 30 ngày rồi chuyển lưu trữ |
-| **Trường hợp lỗi mất kết nối/quá tải (DP-02)** | Hệ thống | Thử lại 3 lần theo nhịp 1 phút → 5 phút → 15 phút; vẫn lỗi thì vào hàng đợi lỗi |
+| **Trường hợp sai cấu trúc (DP-01)** | Hệ thống | Đưa bản ghi vào hàng đợi lỗi ngay, **không thử lại**; giữ `{TTL_LOI}` rồi chuyển lưu trữ |
+| **Trường hợp lỗi mất kết nối/quá tải (DP-02)** | Hệ thống | Thử lại `{N_RETRY}` lần theo nhịp `{NHIP_RETRY}`; vẫn lỗi thì vào hàng đợi lỗi |
 | 2 | Hệ thống | Chuẩn hóa bản ghi đạt cấu trúc: số điện thoại về một dạng, email về chữ thường, họ tên bỏ khoảng trắng thừa và xử lý dấu, mã số thuế kiểm tra độ dài, mã vận đơn chuẩn hóa chữ hoa, trạng thái bưu gửi và thu hộ ánh xạ về bộ chuẩn |
 | 2.1 | Hệ thống | Bóc tách địa chỉ theo cấp hành chính và ánh xạ mã địa chỉ số |
 | **Trường hợp địa chỉ không chuẩn hóa được (DP-03)** | Hệ thống | Đánh dấu chưa chuẩn hóa, đưa vào danh sách xử lý chất lượng dữ liệu |
 | 3 | Hệ thống | Bản ghi đạt chuẩn chuyển sang bước so khớp định danh (Quy trình 2) |
 | 4 | Kỹ sư dữ liệu / Người phụ trách dữ liệu | Theo dõi tình trạng luồng trên bảng giám sát; xem, sửa hoặc trả bản ghi lỗi về nguồn |
-| **Cảnh báo luồng** | Hệ thống | Cảnh báo khi tồn đọng cần hơn 15 phút xử lý hoặc tỷ lệ lỗi vượt 1%/giờ; báo động khi nguồn ngừng đẩy quá 15 phút trong khung giờ hoạt động, tỷ lệ lỗi vượt 5%/giờ, hoặc tồn đọng cần hơn 60 phút |
+| **Cảnh báo luồng** | Hệ thống | Cảnh báo khi tồn đọng cần hơn `{CB_TON_TG}` xử lý hoặc tỷ lệ lỗi vượt `{CB_LOI_GIO}`; báo động khi nguồn ngừng đẩy quá `{BD_NGUNG}` trong khung giờ hoạt động, tỷ lệ lỗi vượt `{BD_LOI_GIO}`, hoặc tồn đọng cần hơn `{BD_TON_TG}` |
 
 ---
 
@@ -311,15 +351,20 @@ flowchart TD
 ```mermaid
 flowchart TD
     subgraph HT["⚙️ Hệ thống"]
-        A([Bản ghi đạt chuẩn]) --> B["Tính điểm tin cậy cho từng cặp nghi trùng"]
-        B --> CG{"Thuộc trường hợp cấm gộp tự động?<br/>chỉ trùng vận đơn/địa chỉ/IP/thiết bị · SĐT dùng chung · email dùng chung/email DN · khác vai trò gửi-nhận · thiếu đồng ý"}
-        CG -- Có --> Q["Đưa vào hàng đợi đối soát dù điểm cao"]
-        CG -- Không --> D{"Điểm tin cậy thuộc vùng nào?"}
-        D -- "≥ 95%" --> E["Tự động gộp<br/>Sinh mã định danh CDP · giữ mã nguồn · tính lại điểm"]
+        A([Bản ghi đạt chuẩn]) --> KM{"Tầng 1 — Trùng khóa định danh mạnh?<br/>MST · căn cước · PostID · mã KH CRM · SĐT+email<br/>(đã chuẩn hóa, không thuộc danh sách dùng chung)"}
+        KM -- Có --> CG{"Thuộc trường hợp cấm gộp tự động? (6.8.2)<br/>chỉ trùng vận đơn/địa chỉ/IP/thiết bị · SĐT dùng chung · email dùng chung/email DN · khác vai trò gửi-nhận"}
+        CG -- Có --> Q["Đưa vào hàng đợi đối soát dù trùng khóa mạnh"]
+        CG -- Không --> E["Gộp deterministic ngay (KHÔNG chấm điểm)<br/>Sinh mã định danh CDP · giữ mã nguồn · tính lại điểm"]
+        KM -- Không --> B["Tầng 2 — Tính điểm tin cậy xác suất<br/>cho từng cặp nghi trùng (6.6.2)"]
+        B --> CG2{"Thuộc trường hợp cấm gộp tự động? (6.8.2)"}
+        CG2 -- Có --> Q
+        CG2 -- Không --> D{"Điểm tin cậy thuộc vùng nào?"}
+        D -- "≥ 95%" --> E
         D -- "85–94%" --> Q
         D -- "70–84%" --> G["Lưu quan hệ nghi vấn trong Identity Graph<br/>Không gộp · không vào hàng đợi"]
         D -- "< 70%" --> H["Không gộp"]
-        E --> LOG["Ghi nhật ký gộp (bất biến, lưu 5 năm)"]
+        E --> CS["Đánh dấu giới hạn mục đích nếu thiếu đồng ý<br/>(không chặn gộp · chỉ chặn kích hoạt — xem Quy trình 6)"]
+        CS --> LOG["Ghi nhật ký gộp (bất biến, lưu {TTL_NHATKY})"]
     end
 
     subgraph ND["👤 Người phụ trách dữ liệu"]
@@ -341,9 +386,11 @@ flowchart TD
 
 | Bước | Tác nhân | Mô tả |
 |---|---|---|
-| 1 | Hệ thống | Tính điểm tin cậy cho từng cặp bản ghi nghi trùng theo bộ luật đối sánh tuyệt đối và tín hiệu hỗ trợ |
-| **Nhánh cấm gộp tự động (DP-05)** | Hệ thống | Nếu chỉ trùng mã vận đơn / địa chỉ / địa chỉ mạng / thiết bị, hoặc số điện thoại dùng chung, hoặc **email dùng chung / email doanh nghiệp**, hoặc người gửi–người nhận chỉ trùng một thông tin phụ, hoặc thiếu đồng ý cho mục đích kích hoạt → đưa vào hàng đợi đối soát dù điểm cao |
-| **Nhánh vùng tin cậy (DP-04)** | Hệ thống | Từ 95%: tự động gộp · 85–94%: vào hàng đợi đối soát · 70–84%: lưu quan hệ nghi vấn (không gộp, không vào hàng đợi) · dưới 70%: không gộp |
+| **1 — Tầng 1 (Deterministic, 6.6.1)** | Hệ thống | Kiểm tra cặp bản ghi có **trùng khóa định danh mạnh** không (mã số thuế · căn cước · PostID · mã khách hàng CRM · số điện thoại kèm email — đã chuẩn hóa, không thuộc danh sách dùng chung). Nếu có và không vướng cấm gộp tự động → **gộp thẳng, KHÔNG chấm điểm phần trăm** |
+| **2 — Tầng 2 (Probabilistic, 6.6.2)** | Hệ thống | **Chỉ khi không đủ khóa mạnh ở tầng 1**, hệ thống mới tính điểm tin cậy theo tín hiệu hỗ trợ (địa chỉ, thiết bị, hành vi, tên gần giống…) rồi phân loại theo bốn vùng |
+| **Nhánh cấm gộp tự động (DP-05)** | Hệ thống | Áp dụng cho **cả hai tầng** trước khi gộp. Nếu chỉ trùng mã vận đơn / địa chỉ / địa chỉ mạng / thiết bị, hoặc số điện thoại dùng chung, hoặc **email dùng chung / email doanh nghiệp** *(suy từ CDP.md 6.6.1 case 2 — email dùng chung không được làm khóa gộp mạnh — và 6.8.3 case 5; không nằm tường minh trong danh sách 6.8.2 gốc)*, hoặc người gửi–người nhận chỉ trùng một thông tin phụ → đưa vào hàng đợi đối soát dù trùng khóa mạnh hoặc điểm cao. **Lưu ý: thiếu đồng ý KHÔNG thuộc nhánh này** — consent chỉ chặn kích hoạt (Quy trình 6), không chặn gộp (6.8.2 case 7) |
+| **Nhánh vùng tin cậy — chỉ Tầng 2 (DP-04)** | Hệ thống | Từ 95%: tự động gộp · 85–94%: vào hàng đợi đối soát · 70–84%: lưu quan hệ nghi vấn (không gộp, không vào hàng đợi) · dưới 70%: không gộp. **Bốn vùng này không áp dụng cho cặp đã gộp ở tầng 1** |
+| **Nhánh thiếu đồng ý** | Hệ thống | Cặp vẫn được gộp bình thường (phục vụ hồ sơ 360 và vận hành), nhưng **đánh dấu giới hạn mục đích**; hệ quả chỉ là không đưa vào tệp kích hoạt (xử lý ở Quy trình 6), không ảnh hưởng quyết định gộp |
 | 2 | Người phụ trách dữ liệu | Mở hồ sơ trong hàng đợi, xem bảng so sánh từng cột giữa các mã nguồn |
 | 2.1 | Người phụ trách dữ liệu | Tick chọn mã thuộc cùng khách hàng, xem trước hồ sơ chuẩn dự kiến |
 | 2.2 | Người phụ trách dữ liệu | Xác nhận hợp nhất, **hoặc** đánh dấu là các khách hàng khác nhau (DP-06) |
@@ -508,12 +555,12 @@ flowchart TD
 | 1.1 | Hệ thống (DP-09) | Kiểm tra đồng ý cho từng khách hàng theo đúng mục đích và đúng kênh |
 | **Trường hợp bị loại** | Hệ thống | Khách hàng chưa đồng ý, đã từ chối, hoặc trong danh sách loại trừ bị loại khỏi tệp; báo số lượng bị loại: "{N} khách hàng trong phân khúc chưa đồng ý nhận {kênh}. Hệ thống đã loại khỏi tệp gửi." |
 | **Trường hợp toàn bộ bị loại** | Hệ thống | "Không có khách hàng nào trong phân khúc này đủ điều kiện nhận {kênh}. Tệp gửi trống." |
-| 1.2 | Hệ thống (DP-10) | Kiểm tra hạn mức tần suất (≤ 3 tin/khách hàng/tuần mọi kênh; ≤ 1 tin/kênh/ngày) và khung giờ (không gửi tiếp thị 21:00–08:00). Vượt hạn thì giữ lại, gửi ở chu kỳ sau |
-| 1.3 | Hệ thống (DP-11) | Kiểm tra ngưỡng phê duyệt: trên 1.000 bản ghi cần phê duyệt; trên 100.000 chặn, yêu cầu thu hẹp |
-| 2 | Hệ thống | Đẩy tệp sang kênh; theo dõi trạng thái đồng bộ; ghi lịch sử kích hoạt (lưu 3 năm) |
+| 1.2 | Hệ thống (DP-10) | Kiểm tra hạn mức tần suất (≤ `{FREQ_TUAN}` mọi kênh; ≤ `{FREQ_NGAY}`) và khung giờ (không gửi tiếp thị `{GIO_CHAN_TT}`). Vượt hạn thì giữ lại, gửi ở chu kỳ sau |
+| 1.3 | Hệ thống (DP-11) | Kiểm tra ngưỡng phê duyệt: `{NG_DUYET_KH}` bản ghi cần phê duyệt; `{NG_CHAN_KH}` chặn, yêu cầu thu hẹp |
+| 2 | Hệ thống | Đẩy tệp sang kênh; theo dõi trạng thái đồng bộ; ghi lịch sử kích hoạt (lưu `{TTL_KICHHOAT}`) |
 | **Trường hợp đồng bộ lỗi** | Hệ thống | Thử lại theo cơ chế tiếp nhận; cảnh báo cho quản trị; ghi vào lịch sử đồng bộ |
 | 3 | Hệ thống | Nhận phản hồi từ kênh (gửi thành công, mở, phản hồi) và cập nhật lại hồ sơ khách hàng |
-| **Trường hợp khách hàng rút đồng ý khi tệp đã đẩy** | Hệ thống | Chặn ngay khi tạo tệp tiếp theo; đẩy trạng thái rút đồng ý sang kênh trong 24 giờ để kênh loại khỏi hàng chờ chưa gửi. Tin đã gửi thì ghi nhận vào lịch sử, không thu hồi |
+| **Trường hợp khách hàng rút đồng ý khi tệp đã đẩy** | Hệ thống | Chặn ngay khi tạo tệp tiếp theo; đẩy trạng thái rút đồng ý sang kênh trong `{SLA_RUT_KENH}` để kênh loại khỏi hàng chờ chưa gửi. Tin đã gửi thì ghi nhận vào lịch sử, không thu hồi |
 
 ---
 
@@ -547,12 +594,12 @@ flowchart TD
 | 1 | Khách hàng | Gửi yêu cầu qua ứng dụng, website, bưu cục, tổng đài hoặc CSKH (không có kênh tự phục vụ vào CDP — xem I.2.2) |
 | 2 | CSKH tiếp nhận | Xác thực danh tính người yêu cầu để tránh trả dữ liệu cho sai người |
 | **Trường hợp không xác thực được (DP-12)** | CSKH tiếp nhận | Từ chối, ghi lý do |
-| 3 | CSKH tiếp nhận | Phân loại yêu cầu: xem dữ liệu, chỉnh sửa, rút đồng ý, ngừng xử lý, xóa/ẩn danh, yêu cầu giải thích |
+| 3 | CSKH tiếp nhận | Phân loại yêu cầu: xem dữ liệu, chỉnh sửa, rút đồng ý, **hạn chế xử lý theo mục đích**, xóa/ẩn danh, yêu cầu giải thích *(dùng đúng thuật ngữ CDP.md 8.12 case 5 — "hạn chế xử lý", không phải "ngừng xử lý")* |
 | 4 | Người phụ trách dữ liệu | Kiểm tra phạm vi dữ liệu trong CDP và các hệ thống nguồn liên quan |
 | 5 | Người phụ trách dữ liệu | Xử lý trong CDP, hoặc chuyển yêu cầu sang hệ thống nguồn nếu dữ liệu gốc nằm ở đó |
 | 5.1 | Hệ thống | Cập nhật trạng thái, ghi nhật ký, thông báo kết quả cho khách hàng |
 | 5.2 | Hệ thống | Đồng bộ thay đổi sang các hệ thống nhận dữ liệu nếu ảnh hưởng tới đồng ý hoặc kích hoạt |
-| **Cảnh báo thời hạn** | Hệ thống | Cảnh báo khi còn một phần ba thời hạn nội bộ; báo lên quản lý ngay khi quá hạn nội bộ (rút đồng ý mục tiêu 4 giờ làm việc; xem/sửa 7 ngày; ngừng xử lý 10 ngày; xóa/ẩn danh 15 ngày) |
+| **Cảnh báo thời hạn** | Hệ thống | Cảnh báo khi còn một phần ba thời hạn nội bộ; báo lên quản lý ngay khi quá hạn nội bộ (rút đồng ý mục tiêu `{SLA_RUT_DY}`; xem/sửa `{SLA_XEM_SUA}`; hạn chế xử lý `{SLA_HAN_CHE}`; xóa/ẩn danh `{SLA_XOA}`). **Các hạn nội bộ này đặt chặt hơn trần luật (GD-03), là giả định chưa được VNPost duyệt** |
 
 ---
 
@@ -587,7 +634,7 @@ flowchart TD
 | 1 | Quản trị hệ thống | Tạo tài khoản, gán vai trò và phạm vi dữ liệu theo đơn vị, địa bàn, nhóm khách hàng phụ trách |
 | 2 | Quản trị hệ thống | Cấp quyền đặc biệt có thời hạn; hệ thống tự cho hết hạn khi đến hạn |
 | 2.1 | Hệ thống | Ghi nhật ký không thể xóa cho mọi thao tác quan trọng (danh sách trong sơ đồ) |
-| 3 | Hệ thống (DP tương ứng ngưỡng xuất) | Xuất dữ liệu vượt ngưỡng phải qua phê duyệt: 1.001–10.000 duyệt bởi quản lý trực tiếp; trên 10.000 duyệt bởi quản trị dữ liệu và tuân thủ; trần cứng 100.000/lần không cho vượt |
+| 3 | Hệ thống (DP tương ứng ngưỡng xuất) | Xuất dữ liệu vượt ngưỡng phải qua phê duyệt: `{NG_XUAT_1}` duyệt bởi quản lý trực tiếp; `{NG_XUAT_2}` duyệt bởi quản trị dữ liệu và tuân thủ; trần cứng `{NG_XUAT_TRAN}` không cho vượt |
 | 3.1 | Hệ thống | Tệp xuất luôn che dữ liệu nhạy cảm trừ khi người xuất có quyền đặc biệt và ghi rõ lý do |
 | 4 | An toàn thông tin | Theo dõi truy cập bất thường: truy cập ngoài giờ, tải dữ liệu lớn, tra cứu nhiều lần dữ liệu định danh |
 | 5 | Pháp chế và tuân thủ | Xem báo cáo định kỳ về đồng ý, truy cập, xuất dữ liệu, xử lý yêu cầu khách hàng, chất lượng dữ liệu |
@@ -689,29 +736,41 @@ CDP — Nền tảng Dữ liệu Khách hàng VNPost
 │       └── (Đủ 15 mã FR-ANA-01→15 có tên theo CDP.md mục 7.6 — xem III.5.0)
 │
 ├── Phân hệ 6: Kích hoạt dữ liệu (FR-ACT)
-│   ├── Chọn phân khúc và kênh gửi
-│   ├── Kiểm tra đồng ý theo mục đích và kênh
-│   ├── Quản lý danh sách loại trừ
-│   ├── Kiểm tra tần suất và khung giờ gửi
-│   ├── Phê duyệt theo ngưỡng
-│   ├── Đẩy tệp sang kênh · theo dõi đồng bộ
-│   ├── Ghi lịch sử kích hoạt (lưu 3 năm)
-│   └── Nhận phản hồi từ kênh · cập nhật hồ sơ
-│       └── [Cần xác nhận: mã yêu cầu chi tiết phân hệ 6 — FR-ACT-xx]
+│   ├── Đồng bộ dữ liệu sang CRM (FR-ACT-01) [P1]
+│   ├── Đồng bộ dữ liệu sang kênh marketing — SMS/Email/Zalo OA/Push (FR-ACT-02) [P1]
+│   ├── Kiểm tra đồng ý trước khi kích hoạt — Consent Check (FR-ACT-03) [P1]
+│   ├── Quản lý danh sách loại trừ — Suppression List (FR-ACT-04) [P1]
+│   ├── Xuất tệp khách hàng phục vụ chiến dịch — Campaign Audience Export (FR-ACT-05) [P2, ưu tiên Medium]
+│   ├── API cá nhân hóa theo thời gian thực (FR-ACT-06) [P2, ưu tiên Medium]
+│   ├── Đồng bộ gợi ý dịch vụ sang hệ thống kinh doanh/BSS (FR-ACT-07) [P2, ưu tiên Medium]
+│   ├── Tích hợp dữ liệu với hệ thống CSKH (FR-ACT-08) [P1]
+│   ├── Kích hoạt cảnh báo rủi ro — COD/hoàn hàng/gian lận/churn (FR-ACT-09) [P2, ưu tiên Medium]
+│   ├── Lưu lịch sử kích hoạt — Activation History, lưu 3 năm (FR-ACT-10) [P1]
+│   ├── Kiểm soát tần suất gửi — Frequency Capping (FR-ACT-11) [P2, ưu tiên Medium]
+│   ├── Quy trình phê duyệt kích hoạt — Activation Approval Workflow (FR-ACT-12) [P2, ưu tiên Medium]
+│   ├── Giám sát đồng bộ sang hệ thống đích — Downstream Sync Monitoring (FR-ACT-13) [P2, ưu tiên Medium]
+│   └── Tiếp nhận phản hồi từ kênh — Result Feedback Loop (FR-ACT-14) [P2, ưu tiên Medium]
+│       └── (Đủ 14 mã FR-ACT-01→14 có tên theo CDP.md mục 7.7 — xem III.6.0)
 │
 └── Phân hệ 7: Quản trị, bảo mật và quyền riêng tư (FR-GOV)
-    ├── Quản lý tài khoản (nhận danh tính từ cổng chung — không quản lý mật khẩu)
-    ├── Quản lý vai trò và phạm vi dữ liệu (đơn vị, địa bàn, nhóm KH)
-    ├── Quản lý quyền đặc biệt có thời hạn
-    ├── Quản lý đồng ý dữ liệu (theo mục đích và kênh)
-    ├── Xử lý yêu cầu chủ thể dữ liệu (xem/sửa/rút đồng ý/ngừng/xóa/giải thích)
-    ├── Quản lý nhật ký bất biến (gộp/tách, đồng ý, thao tác)
-    ├── Kiểm soát và phê duyệt xuất dữ liệu
-    ├── Theo dõi truy cập bất thường
-    ├── Phân quyền theo đơn vị/tỉnh/thành (FR-GOV-14) [P2]
-    ├── Nhật ký hợp nhất định danh (FR-GOV-03) [góc quản trị của cùng nhật ký merge/unmerge FR-IDR-14 ở Phân hệ 3 — không phải chức năng nhật ký thứ hai]
-    └── Báo cáo tuân thủ (đồng ý, truy cập, xuất, yêu cầu KH, chất lượng)
-        └── [Cần xác nhận: mã yêu cầu chi tiết phân hệ 7 — FR-GOV-xx còn lại]
+    ├── Che giấu và mã hóa dữ liệu cá nhân — PII Masking & Encryption (FR-GOV-01) [P1]
+    ├── Quản lý đồng ý — Consent Management (FR-GOV-02) [P1]
+    ├── Phân quyền truy cập và ghi nhật ký thao tác — RBAC & Audit Trail (FR-GOV-03) [P1] [góc quản trị của cùng nhật ký merge/unmerge FR-IDR-14 ở Phân hệ 3 — không phải chức năng nhật ký thứ hai]
+    ├── Danh mục dữ liệu — Data Catalog (FR-GOV-04) [P2]
+    ├── Quản lý siêu dữ liệu — Metadata Management (FR-GOV-05) [P2]
+    ├── Truy vết dòng dữ liệu — Data Lineage (FR-GOV-06) [P2] [phần kỹ thuật thuộc SA/IT]
+    ├── Quản lý chất lượng dữ liệu — Data Quality Management (FR-GOV-07) [P2] [góc quản trị của cùng chức năng chất lượng FR-DPS ở Phân hệ 2]
+    ├── Phân quyền truy cập dữ liệu theo vai trò — Role-based Data Access (FR-GOV-08) [P1]
+    ├── Kiểm soát xuất dữ liệu — Export Control (FR-GOV-09) [P2]
+    ├── Phân loại dữ liệu nhạy cảm — Sensitive Data Classification (FR-GOV-10) [P2]
+    ├── Hỗ trợ xử lý yêu cầu chủ thể dữ liệu — Data Subject Request Support (FR-GOV-11) [P1/P2 theo loại yêu cầu]
+    ├── Xóa/ẩn danh theo yêu cầu hợp lệ — Right to be Forgotten (FR-GOV-12) [P1/P2]
+    ├── Hỗ trợ điều tra sự cố dữ liệu — Breach Investigation Support (FR-GOV-13) [P2] [phần kỹ thuật thuộc SA/IT Security]
+    ├── Quản trị dữ liệu theo đơn vị/tỉnh/thành — Unit-based Governance (FR-GOV-14) [P2]
+    ├── Báo cáo tuân thủ — Compliance Report (FR-GOV-15) [P2]
+    ├── Quản lý vòng đời consent — Consent Lifecycle Management (FR-GOV-16) [P2]
+    └── Kiểm soát sử dụng dữ liệu theo mục đích — Purpose-based Data Usage Control (FR-GOV-17) [P2]
+        └── (Đủ 17 mã FR-GOV-01→17 có tên theo CDP.md mục 7.8 — xem III.7.0)
 ```
 
 **Diễn giải các phân hệ:**
@@ -744,12 +803,12 @@ CDP — Nền tảng Dữ liệu Khách hàng VNPost
 **Phân hệ 6 — Kích hoạt dữ liệu (FR-ACT)**
 - **Mục đích:** Đưa phân khúc sang kênh giao tiếp để chạy chiến dịch, có kiểm soát đồng ý, tần suất, ngưỡng.
 - **Giá trị nghiệp vụ:** Biến phân tích thành hành động; đồng thời là hàng rào tuân thủ (không kích hoạt với khách hàng thiếu đồng ý).
-- **Chức năng con:** Chọn phân khúc và kênh, kiểm tra đồng ý, danh sách loại trừ, kiểm tra tần suất/khung giờ, phê duyệt, đẩy tệp, ghi lịch sử, nhận phản hồi.
+- **Chức năng con:** đủ **14 mã FR-ACT-01→14** đã có tên theo CDP.md mục 7.7 — đồng bộ CRM (01), đồng bộ kênh marketing (02), kiểm tra đồng ý trước kích hoạt (03), danh sách loại trừ (04), xuất tệp chiến dịch (05), API cá nhân hóa (06), đồng bộ gợi ý sang BSS (07), tích hợp CSKH (08), kích hoạt cảnh báo rủi ro (09), lịch sử kích hoạt (10), kiểm soát tần suất (11), quy trình phê duyệt (12), giám sát đồng bộ đích (13), phản hồi từ kênh (14). Chi tiết Use Case xem III.6.
 
 **Phân hệ 7 — Quản trị, bảo mật và quyền riêng tư (FR-GOV)**
-- **Mục đích:** Kiểm soát ai được làm gì, ghi vết mọi thao tác quan trọng, đảm bảo tuân thủ Nghị định 13.
+- **Mục đích:** Kiểm soát ai được làm gì, ghi vết mọi thao tác quan trọng, đảm bảo tuân thủ **Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15 và Nghị định 356/2025/NĐ-CP** (hiệu lực 01/01/2026).
 - **Giá trị nghiệp vụ:** Là điều kiện pháp lý bắt buộc để CDP được phép xử lý dữ liệu cá nhân quy mô lớn; xuyên suốt mọi phân hệ khác.
-- **Chức năng con:** Quản lý tài khoản/vai trò/phạm vi, quyền đặc biệt, quản lý đồng ý, xử lý yêu cầu chủ thể dữ liệu, nhật ký bất biến, kiểm soát xuất, theo dõi truy cập, báo cáo tuân thủ.
+- **Chức năng con:** đủ **17 mã FR-GOV-01→17** đã có tên theo CDP.md mục 7.8 — che/mã hóa PII (01), quản lý đồng ý (02), RBAC & Audit Trail (03), danh mục dữ liệu (04), siêu dữ liệu (05), truy vết dòng dữ liệu (06), quản lý chất lượng (07), phân quyền theo vai trò (08), kiểm soát xuất (09), phân loại dữ liệu nhạy cảm (10), hỗ trợ yêu cầu chủ thể dữ liệu (11), xóa/ẩn danh (12), hỗ trợ điều tra sự cố (13), quản trị theo đơn vị/tỉnh (14), báo cáo tuân thủ (15), vòng đời consent (16), kiểm soát theo mục đích (17). **FR-GOV-01/02/03 và 08 thuộc P1/Giai đoạn 1** (CDP.md 7.9); phần lớn FR-GOV-04→17 thuộc P2. Chi tiết Use Case xem III.7.
 
 ## II.3. Ma trận phân quyền hệ thống (Permission Matrix)
 
@@ -929,9 +988,9 @@ sequenceDiagram
         SRC->>HT: Đẩy bản ghi (thời gian thực) / nạp tệp (theo lô)
         HT->>HT: Kiểm tra cấu trúc bản ghi
         alt Sai cấu trúc
-            HT->>DB: Đưa vào hàng đợi lỗi (không thử lại, giữ 30 ngày)
+            HT->>DB: Đưa vào hàng đợi lỗi (không thử lại, giữ {TTL_LOI})
         else Lỗi mất kết nối / quá tải
-            HT->>HT: Thử lại 3 lần (1' → 5' → 15')
+            HT->>HT: Thử lại {N_RETRY} lần ({NHIP_RETRY})
             HT->>DB: Vẫn lỗi → hàng đợi lỗi
         else Hợp lệ
             HT->>HT: Chuyển sang chuẩn hóa
@@ -949,28 +1008,39 @@ sequenceDiagram
     end
 
     rect rgba(44, 44, 44, 1)
-        Note over SRC,DS: Giai đoạn 3 — Hợp nhất định danh
-        HT->>HT: Tính điểm tin cậy cho cặp nghi trùng
-        alt Cấm gộp tự động
-            HT->>DB: Đưa vào hàng đợi đối soát dù điểm cao
-        else Điểm ≥ 95%
-            HT->>DB: Tự động gộp, sinh mã định danh CDP, giữ mã nguồn, tính lại điểm
+        Note over SRC,DS: Giai đoạn 3 — Hợp nhất định danh (2 tầng)
+        Note over HT: Tầng 1 — Deterministic (6.6.1): không chấm điểm
+        HT->>HT: Kiểm tra trùng khóa định danh mạnh (MST/căn cước/PostID/CRM ID/SĐT+email)
+        alt Trùng khóa mạnh + không cấm gộp tự động
+            HT->>DB: Gộp deterministic ngay (KHÔNG chấm điểm), sinh mã CDP, giữ mã nguồn, tính lại điểm
             HT->>DB: Ghi nhật ký gộp (bất biến)
-        else Điểm 85–94%
-            HT->>DB: Đưa vào hàng đợi đối soát
-            DS->>HT: Mở hồ sơ, so sánh cột, tick chọn mã, xem trước hồ sơ chuẩn
-            alt Xác nhận cùng khách hàng
-                DS->>HT: Xác nhận hợp nhất
-                HT->>DB: Gộp, sinh mã CDP, ghi nhật ký gộp (bất biến)
-            else Khác khách hàng
-                DS->>HT: Đánh dấu khác người
-                HT->>DB: Gỡ cờ nghi trùng, không đề xuất lại
+        else Trùng khóa mạnh nhưng vướng cấm gộp tự động (6.8.2)
+            HT->>DB: Đưa vào hàng đợi đối soát dù trùng khóa mạnh
+        else Không đủ khóa mạnh → sang Tầng 2
+            Note over HT: Tầng 2 — Probabilistic (6.6.2): chấm điểm 4 vùng
+            HT->>HT: Tính điểm tin cậy xác suất cho cặp nghi trùng
+            alt Cấm gộp tự động (6.8.2)
+                HT->>DB: Đưa vào hàng đợi đối soát dù điểm cao
+            else Điểm ≥ 95%
+                HT->>DB: Tự động gộp, sinh mã CDP, giữ mã nguồn, tính lại điểm
+                HT->>DB: Ghi nhật ký gộp (bất biến)
+            else Điểm 85–94%
+                HT->>DB: Đưa vào hàng đợi đối soát
+                DS->>HT: Mở hồ sơ, so sánh cột, tick chọn mã, xem trước hồ sơ chuẩn
+                alt Xác nhận cùng khách hàng
+                    DS->>HT: Xác nhận hợp nhất
+                    HT->>DB: Gộp, sinh mã CDP, ghi nhật ký gộp (bất biến)
+                else Khác khách hàng
+                    DS->>HT: Đánh dấu khác người
+                    HT->>DB: Gỡ cờ nghi trùng, không đề xuất lại
+                end
+            else Điểm 70–84%
+                HT->>DB: Lưu quan hệ nghi vấn trong Identity Graph (không gộp)
+            else Điểm < 70%
+                HT->>HT: Không gộp
             end
-        else Điểm 70–84%
-            HT->>DB: Lưu quan hệ nghi vấn trong Identity Graph (không gộp)
-        else Điểm < 70%
-            HT->>HT: Không gộp
         end
+        Note over HT,DB: Thiếu đồng ý KHÔNG chặn gộp — chỉ đánh dấu giới hạn mục đích (chặn kích hoạt ở Quy trình 6)
     end
 ```
 
@@ -980,17 +1050,21 @@ sequenceDiagram
 |---|---|---|---|---|
 | Tiếp nhận | 1 | Hệ thống nguồn | CDP | Đẩy bản ghi (thời gian thực) hoặc nạp tệp (theo lô 01:00–05:00) |
 | | 2 | CDP | CDP | Kiểm tra cấu trúc: trường bắt buộc, kiểu dữ liệu, phiên bản |
-| | 2a | CDP | Kho dữ liệu | **Nhánh sai cấu trúc:** vào hàng đợi lỗi, không thử lại, giữ 30 ngày |
-| | 2b | CDP | Kho dữ liệu | **Nhánh lỗi mất kết nối:** thử lại 3 lần 1'–5'–15'; vẫn lỗi → hàng đợi lỗi |
+| | 2a | CDP | Kho dữ liệu | **Nhánh sai cấu trúc:** vào hàng đợi lỗi, không thử lại, giữ `{TTL_LOI}` |
+| | 2b | CDP | Kho dữ liệu | **Nhánh lỗi mất kết nối:** thử lại `{N_RETRY}` lần `{NHIP_RETRY}`; vẫn lỗi → hàng đợi lỗi |
 | Chuẩn hóa | 3 | CDP | CDP | Chuẩn hóa số điện thoại, email, tên, mã số thuế, mã vận đơn, trạng thái |
 | | 3a | CDP | Kho dữ liệu | **Nhánh địa chỉ chuẩn hóa được:** gắn mã địa chỉ số và vùng phục vụ |
 | | 3b | CDP | Kho dữ liệu | **Nhánh không chuẩn hóa được:** đánh dấu, đưa vào danh sách xử lý chất lượng |
-| Hợp nhất | 4 | CDP | CDP | Tính điểm tin cậy cho cặp nghi trùng |
-| | 4a | CDP | Kho dữ liệu | **Nhánh cấm gộp tự động:** vào hàng đợi đối soát dù điểm cao |
-| | 4b | CDP | Kho dữ liệu | **Nhánh ≥ 95%:** tự động gộp, sinh mã CDP, giữ mã nguồn, ghi nhật ký gộp |
-| | 4c | Người phụ trách dữ liệu | CDP | **Nhánh 85–94%:** vào hàng đợi; người dùng đối soát, xác nhận gộp hoặc đánh dấu khác người |
-| | 4d | CDP | Kho dữ liệu | **Nhánh 70–84%:** lưu quan hệ nghi vấn, không gộp |
-| | 4e | CDP | CDP | **Nhánh < 70%:** không gộp |
+| Hợp nhất — Tầng 1 (Deterministic 6.6.1) | 4 | CDP | CDP | Kiểm tra trùng khóa định danh mạnh (MST/căn cước/PostID/CRM ID/SĐT+email) — **không chấm điểm** |
+| | 4a | CDP | Kho dữ liệu | **Trùng khóa mạnh + không cấm gộp:** gộp deterministic ngay, sinh mã CDP, giữ mã nguồn, ghi nhật ký gộp |
+| | 4b | CDP | Kho dữ liệu | **Trùng khóa mạnh nhưng vướng cấm gộp tự động (6.8.2):** vào hàng đợi đối soát |
+| Hợp nhất — Tầng 2 (Probabilistic 6.6.2) | 5 | CDP | CDP | **Chỉ khi không đủ khóa mạnh:** tính điểm tin cậy xác suất cho cặp nghi trùng |
+| | 5a | CDP | Kho dữ liệu | **Nhánh cấm gộp tự động:** vào hàng đợi đối soát dù điểm cao |
+| | 5b | CDP | Kho dữ liệu | **Nhánh ≥ 95%:** tự động gộp, sinh mã CDP, giữ mã nguồn, ghi nhật ký gộp |
+| | 5c | Người phụ trách dữ liệu | CDP | **Nhánh 85–94%:** vào hàng đợi; người dùng đối soát, xác nhận gộp hoặc đánh dấu khác người |
+| | 5d | CDP | Kho dữ liệu | **Nhánh 70–84%:** lưu quan hệ nghi vấn, không gộp |
+| | 5e | CDP | CDP | **Nhánh < 70%:** không gộp |
+| | 6 | CDP | Kho dữ liệu | **Thiếu đồng ý:** không chặn gộp — chỉ đánh dấu giới hạn mục đích (chặn kích hoạt ở Quy trình 6) |
 
 ### Quy trình B: Kích hoạt dữ liệu có kiểm tra đồng ý
 
@@ -1016,14 +1090,14 @@ sequenceDiagram
 
     rect rgba(67, 66, 66, 1)
         Note over MKT,DB: Giai đoạn 2 — Kiểm tra tần suất và ngưỡng
-        HT->>HT: Kiểm tra tần suất (≤3/tuần, ≤1/kênh/ngày) và khung giờ (không 21h–08h)
+        HT->>HT: Kiểm tra tần suất (≤{FREQ_TUAN}, ≤{FREQ_NGAY}) và khung giờ (không {GIO_CHAN_TT})
         alt Vượt hạn tần suất
             HT->>DB: Giữ lại, gửi ở chu kỳ sau
         else Trong hạn
             HT->>HT: Kiểm tra ngưỡng phê duyệt
-            alt Trên 100.000 bản ghi
+            alt {NG_CHAN_KH} bản ghi
                 HT-->>MKT: Chặn, yêu cầu thu hẹp điều kiện lọc
-            else Trên 1.000 bản ghi
+            else {NG_DUYET_KH} bản ghi
                 HT->>APR: Chuyển tệp chờ phê duyệt
                 APR-->>HT: Phê duyệt
             else Trong ngưỡng cho phép
@@ -1035,7 +1109,7 @@ sequenceDiagram
     rect rgba(49, 49, 49, 1)
         Note over HT,CH: Giai đoạn 3 — Đẩy tệp và nhận phản hồi
         HT->>CH: Đẩy tệp sang kênh
-        HT->>DB: Ghi lịch sử kích hoạt (lưu 3 năm)
+        HT->>DB: Ghi lịch sử kích hoạt (lưu {TTL_KICHHOAT})
         alt Đồng bộ thành công
             CH-->>HT: Phản hồi (gửi thành công, mở, phản hồi)
             HT->>DB: Cập nhật hồ sơ khách hàng
@@ -1054,11 +1128,11 @@ sequenceDiagram
 | | 2 | CDP | Kho dữ liệu | Lấy danh sách khách hàng trong phân khúc |
 | | 3 | CDP | CDP | Kiểm tra đồng ý theo mục đích và kênh |
 | | 3a | CDP | Tiếp thị và CRM | **Nhánh bị loại:** chưa đồng ý / đã từ chối / trong danh sách loại trừ → loại khỏi tệp, báo số lượng bị loại |
-| Kiểm tra tần suất và ngưỡng | 4 | CDP | CDP | Kiểm tra tần suất (≤3/tuần, ≤1/kênh/ngày) và khung giờ (không gửi 21h–08h) |
+| Kiểm tra tần suất và ngưỡng | 4 | CDP | CDP | Kiểm tra tần suất (≤ `{FREQ_TUAN}`, ≤ `{FREQ_NGAY}`) và khung giờ (không gửi `{GIO_CHAN_TT}`) |
 | | 4a | CDP | Kho dữ liệu | **Nhánh vượt hạn:** giữ lại, gửi ở chu kỳ sau |
 | | 5 | CDP | CDP | Kiểm tra ngưỡng phê duyệt |
-| | 5a | CDP | Tiếp thị và CRM | **Nhánh trên 100.000:** chặn, yêu cầu thu hẹp |
-| | 5b | Người phê duyệt | CDP | **Nhánh trên 1.000:** chuyển chờ phê duyệt; người phê duyệt duyệt |
+| | 5a | CDP | Tiếp thị và CRM | **Nhánh `{NG_CHAN_KH}`:** chặn, yêu cầu thu hẹp |
+| | 5b | Người phê duyệt | CDP | **Nhánh `{NG_DUYET_KH}`:** chuyển chờ phê duyệt; người phê duyệt duyệt |
 | | 5c | CDP | CDP | **Nhánh trong ngưỡng:** cho phép gửi trực tiếp |
 | Đẩy tệp và nhận phản hồi | 6 | CDP | Kênh gửi | Đẩy tệp sang kênh; ghi lịch sử kích hoạt |
 | | 6a | Kênh gửi | CDP | **Nhánh thành công:** nhận phản hồi, cập nhật hồ sơ khách hàng |
@@ -1084,7 +1158,7 @@ sequenceDiagram
 
 | Mã UC | Tên Use Case | Actor chính | Chức năng (Function Tree II.2) | FR gốc liên quan |
 |---|---|---|---|---|
-| UC-IDR-01 | Tự động gộp hồ sơ (vùng ≥95%) | Hệ thống | Gộp hồ sơ · Tính điểm tin cậy | FR-IDR-04, 05, 06, 11 |
+| UC-IDR-01 | Tự động gộp hồ sơ (Tầng 1 trùng khóa mạnh không chấm điểm · Tầng 2 điểm ≥95%) | Hệ thống | Gộp hồ sơ · Đối sánh tuyệt đối/xác suất | FR-IDR-01, 04, 05, 06, 11 |
 | UC-IDR-02 | Đối soát và xác nhận gộp thủ công (vùng 85–94%) | Người phụ trách dữ liệu | Danh sách rà soát · Gộp hồ sơ | FR-IDR-06, 11, 12 |
 | UC-IDR-03 | Đối chiếu hồ sơ nghi trùng (so sánh cột, xem trước, hợp nhất) | Người phụ trách dữ liệu | Danh sách rà soát · Gộp hồ sơ · Xử lý xung đột | FR-IDR-06, 12, 13 |
 | UC-IDR-04 | Tách hồ sơ khi gộp nhầm | Người phụ trách dữ liệu | Tách hồ sơ | FR-IDR-07, 08, 09, 14 |
@@ -1102,8 +1176,10 @@ sequenceDiagram
 
 | Mã BR | Nội dung | Nguồn |
 |---|---|---|
-| BR-IDR-01 | **Bốn vùng tin cậy quyết định hành vi gộp:** ≥95% tự gộp (nếu không xung đột dữ liệu và không vướng đồng ý) · 85–94% đưa vào hàng đợi đối soát chờ người xác nhận · 70–84% lưu quan hệ nghi vấn trong Identity Graph, **không gộp, không vào hàng đợi** · <70% không gộp | CDP.md 6.6.2 |
-| BR-IDR-02 | **Trường hợp cấm gộp tự động dù điểm cao** (đưa vào hàng đợi đối soát): chỉ trùng mã vận đơn · chỉ trùng địa chỉ · chỉ trùng địa chỉ mạng (IP) · chỉ trùng thiết bị (Device ID) · số điện thoại là hotline/tổng đài/số dùng chung · email dùng chung/email doanh nghiệp · người gửi và người nhận chỉ trùng một thông tin phụ · thiếu đồng ý cho mục đích kích hoạt | CDP.md 6.8.2 |
+| BR-IDR-00 | **Hai tầng hợp nhất định danh chạy nối tiếp** (CDP.md 6.6.1, 6.6.2): **Tầng 1 — Deterministic** — trùng khóa định danh mạnh (mã số thuế, căn cước, PostID, mã khách hàng CRM, hoặc số điện thoại kèm email — đã chuẩn hóa, không thuộc danh sách dùng chung) → **gộp thẳng, KHÔNG chấm điểm phần trăm** (vẫn qua kiểm cấm gộp tự động BR-IDR-02). **Tầng 2 — Probabilistic** — **chỉ khi không đủ khóa mạnh ở tầng 1** — mới tính điểm tin cậy và áp bốn vùng ở BR-IDR-01. Bốn vùng phần trăm **chỉ áp dụng cho tầng 2** | CDP.md 6.6.1, 6.6.2, 6.8.1 case 1 |
+| BR-IDR-01 | **Bốn vùng tin cậy quyết định hành vi gộp — chỉ áp dụng cho Tầng 2 (Probabilistic):** ≥95% tự gộp (nếu không xung đột dữ liệu) · 85–94% đưa vào hàng đợi đối soát chờ người xác nhận · 70–84% lưu quan hệ nghi vấn trong Identity Graph, **không gộp, không vào hàng đợi** · <70% không gộp. **Không dùng thang này cho cặp trùng khóa mạnh — cặp đó gộp ở Tầng 1** (BR-IDR-00) | CDP.md 6.6.2 |
+| BR-IDR-02 | **Trường hợp cấm gộp tự động** (áp dụng cho **cả hai tầng** — đưa vào hàng đợi đối soát dù trùng khóa mạnh hoặc điểm cao): chỉ trùng mã vận đơn · chỉ trùng địa chỉ · chỉ trùng địa chỉ mạng (IP) · chỉ trùng thiết bị (Device ID) · số điện thoại là hotline/tổng đài/số dùng chung · người gửi và người nhận chỉ trùng một thông tin phụ · **email dùng chung/email doanh nghiệp** *(suy từ CDP.md 6.6.1 case 2 và 6.8.3 case 5 — email dùng chung không được làm khóa gộp mạnh; không nằm tường minh trong 6.8.2 gốc)*. **KHÔNG bao gồm "thiếu đồng ý"** — thiếu đồng ý không chặn gộp, chỉ chặn kích hoạt (xem BR-IDR-13) | CDP.md 6.8.2 (+ suy luận email từ 6.6.1/6.8.3) |
+| BR-IDR-13 | **Thiếu đồng ý KHÔNG chặn hợp nhất định danh** — cặp vẫn được gộp để phục vụ hồ sơ 360 và vận hành; hệ thống chỉ đánh dấu **giới hạn mục đích**, hệ quả là không đưa vào tệp kích hoạt (xử lý ở Quy trình 6/Phân hệ 6). Consent là ràng buộc của **activation**, không phải của **merge** | CDP.md 6.8.2 case 7, 8.10 |
 | BR-IDR-03 | **Tên khách hàng không bao giờ được dùng làm khóa gộp độc lập** — chỉ là tín hiệu hỗ trợ đi kèm định danh mạnh khác | CDP.md 6.9 case 11 |
 | BR-IDR-04 | **Mã nguồn không bao giờ bị xóa sau khi gộp** — giữ lại làm mã thay thế (alias) để truy vết và đồng bộ ngược | CDP.md 6.7, 6.8.1 case 6 |
 | BR-IDR-05 | **Bắt buộc xem trước hồ sơ chuẩn dự kiến trước khi hợp nhất thủ công** — thể hiện từng trường lấy giá trị từ nguồn nào, số liệu giao dịch/tài chính cộng dồn ra sao | CDP.md 6.8.1, thiết kế solution BL-01 |
@@ -1123,24 +1199,25 @@ sequenceDiagram
 
 ## III.1. Phân hệ 3 — Hợp nhất định danh (UC-IDR)
 
-### UC-IDR-01 — Tự động gộp hồ sơ (vùng tin cậy ≥95%)
+### UC-IDR-01 — Tự động gộp hồ sơ (trùng khóa mạnh hoặc điểm ≥95%)
 
 | Mục | Nội dung |
 |---|---|
 | **Mã Use Case** | UC-IDR-01 |
-| **Tên** | Tự động gộp hồ sơ khi điểm tin cậy đạt vùng ≥95% |
+| **Tên** | Tự động gộp hồ sơ: Tầng 1 trùng khóa định danh mạnh (không chấm điểm) hoặc Tầng 2 điểm ≥95% |
 | **Actor chính** | Hệ thống (tự động, không có người vận hành) |
 | **Actor phụ** | Không |
-| **Mô tả** | Sau khi bản ghi đạt chuẩn, hệ thống tính điểm tin cậy cho từng cặp nghi trùng. Cặp đạt ≥95% và không thuộc trường hợp cấm gộp tự động được hợp nhất ngay, không cần người xác nhận. |
+| **Mô tả** | Sau khi bản ghi đạt chuẩn, hệ thống hợp nhất tự động theo **hai tầng** (BR-IDR-00): cặp **trùng khóa định danh mạnh** được gộp thẳng ở Tầng 1 (không chấm điểm); cặp không đủ khóa mạnh mới chuyển Tầng 2 chấm điểm, và chỉ cặp **≥95%** được gộp tự động. Cả hai đều không cần người xác nhận và đều qua kiểm cấm gộp tự động. |
 | **Tiền điều kiện** | Bản ghi đã qua tiếp nhận và chuẩn hóa (Quy trình 1). Bộ luật đối sánh (UC-IDR-07) đang áp dụng. |
 | **Kích hoạt** | Có cặp bản ghi nghi trùng mới phát sinh hoặc dữ liệu định danh thay đổi. |
 
 **Luồng chính:**
 
-1. Hệ thống lấy cặp bản ghi nghi trùng, tính điểm tin cậy theo luật đối sánh tuyệt đối (FR-IDR-01) và tín hiệu hỗ trợ.
+1. **Tầng 1 — Deterministic (BR-IDR-00):** hệ thống kiểm tra cặp có **trùng khóa định danh mạnh** không (mã số thuế, căn cước, PostID, mã khách hàng CRM, hoặc số điện thoại kèm email — đã chuẩn hóa, không dùng chung; theo luật đối sánh tuyệt đối FR-IDR-01).
 2. Hệ thống kiểm tra cặp có thuộc **trường hợp cấm gộp tự động** không (BR-IDR-02). Nếu có → chuyển UC-IDR-02 (hàng đợi đối soát), kết thúc luồng này.
-3. Hệ thống kiểm tra điểm thuộc vùng nào (BR-IDR-01). Nếu **≥95%** → tiếp tục; các vùng khác xử lý theo BR-IDR-01, kết thúc luồng này.
-4. Hệ thống kiểm tra không có xung đột dữ liệu nghiêm trọng và không vướng ràng buộc đồng ý.
+3. **Nếu trùng khóa mạnh** (Tầng 1) và không cấm gộp → **gộp thẳng, KHÔNG chấm điểm**, sang bước 5. **Nếu không đủ khóa mạnh** → sang Tầng 2 (bước 4).
+4. **Tầng 2 — Probabilistic:** hệ thống tính điểm tin cậy theo tín hiệu hỗ trợ và kiểm tra điểm thuộc vùng nào (BR-IDR-01). Nếu **≥95%** → tiếp tục; các vùng khác xử lý theo BR-IDR-01, kết thúc luồng này.
+4b. Hệ thống kiểm tra không có xung đột dữ liệu nghiêm trọng (đồng ý không ảnh hưởng quyết định gộp — BR-IDR-13).
 5. Hệ thống sinh **mã khách hàng hợp nhất (mã định danh CDP)** nếu chưa có (FR-IDR-04), gộp các mã nguồn về hồ sơ chuẩn.
 6. Hệ thống giữ toàn bộ mã nguồn cũ làm **mã thay thế (alias)** (FR-IDR-05, BR-IDR-04).
 7. Hệ thống tính lại điểm số của hồ sơ chuẩn (CLV, điểm rủi ro thu hộ, gian lận…).
@@ -1150,17 +1227,17 @@ sequenceDiagram
 
 | Mã | Điều kiện | Xử lý |
 |---|---|---|
-| E1 | Thuộc trường hợp cấm gộp tự động (BR-IDR-02) dù điểm ≥95% | Đưa vào hàng đợi đối soát (UC-IDR-02), không tự gộp |
+| E1 | Thuộc trường hợp cấm gộp tự động (BR-IDR-02) — dù trùng khóa mạnh (Tầng 1) hoặc điểm ≥95% (Tầng 2) | Đưa vào hàng đợi đối soát (UC-IDR-02), không tự gộp |
 | E2 | Có xung đột dữ liệu nghiêm trọng (khác loại khách hàng cá nhân/doanh nghiệp) | Không tự gộp, chuyển hàng đợi đối soát kèm cờ cảnh báo xung đột (FR-IDR-13) |
-| E3 | Thiếu đồng ý cho mục đích kích hoạt | Vẫn được gộp để phục vụ vận hành/hồ sơ 360, nhưng đánh dấu giới hạn mục đích; không đưa vào tệp kích hoạt (không thuộc phạm vi UC này) |
-| E4 | Điểm 85–94% | Chuyển UC-IDR-02 (chờ người xác nhận) |
-| E5 | Điểm 70–84% | Lưu quan hệ nghi vấn trong Identity Graph, không gộp, không vào hàng đợi |
-| E6 | Điểm <70% | Không gộp |
+| E3 | Thiếu đồng ý cho mục đích kích hoạt | **Vẫn được gộp bình thường** để phục vụ vận hành/hồ sơ 360 (đồng ý không chặn merge — BR-IDR-13); chỉ đánh dấu giới hạn mục đích, không đưa vào tệp kích hoạt (xử lý ở Phân hệ 6) |
+| E4 | **Tầng 2** — điểm 85–94% | Chuyển UC-IDR-02 (chờ người xác nhận) |
+| E5 | **Tầng 2** — điểm 70–84% | Lưu quan hệ nghi vấn trong Identity Graph, không gộp, không vào hàng đợi |
+| E6 | **Tầng 2** — điểm <70% | Không gộp |
 
 **Hậu điều kiện:** Hồ sơ chuẩn mang một mã định danh CDP; mã nguồn được giữ làm alias; điểm số cập nhật; có bản ghi nhật ký gộp bất biến. Hồ sơ xuất hiện đầy đủ trong Customer 360 (tab Hồ sơ đa nguồn).
 
-**Business Rule liên quan:** BR-IDR-01, BR-IDR-02, BR-IDR-04, BR-IDR-12.
-**FR gốc:** FR-IDR-04, FR-IDR-05, FR-IDR-06, FR-IDR-11, FR-IDR-14.
+**Business Rule liên quan:** BR-IDR-00, BR-IDR-01, BR-IDR-02, BR-IDR-04, BR-IDR-12, BR-IDR-13.
+**FR gốc:** FR-IDR-01, FR-IDR-04, FR-IDR-05, FR-IDR-06, FR-IDR-11, FR-IDR-14.
 
 ---
 
@@ -1211,7 +1288,7 @@ sequenceDiagram
 
 **Luồng chính:**
 
-1. Hệ thống hiển thị: hồ sơ gốc (mã nguồn neo), các mã đã **tự động gộp từ khóa mạnh (≥95%)** (chỉ hiển thị, không hỏi lại), và bảng đối chiếu các mã chờ duyệt — mỗi mã một cột, mỗi trường một hàng.
+1. Hệ thống hiển thị: hồ sơ gốc (mã nguồn neo), các mã đã **tự động gộp** — gồm mã gộp ở Tầng 1 (trùng khóa định danh mạnh, không qua điểm) và mã gộp ở Tầng 2 (điểm ≥95%) — chỉ hiển thị, không hỏi lại; và bảng đối chiếu các mã chờ duyệt (thuộc Tầng 2 vùng 85–94% hoặc bị đưa vào hàng đợi do cấm gộp) — mỗi mã một cột, mỗi trường một hàng.
 2. Hệ thống tick sẵn các mã vùng 85–94%; **không** tick sẵn mã <85% (nếu có hiển thị dạng gợi ý tin cậy thấp, làm mờ).
 3. Với cặp có dấu hiệu rủi ro (BR-IDR-06), hệ thống hiển thị **cảnh báo nổi bật** trên đầu bảng trước khi người dùng quyết định.
 4. Người dùng bỏ tick mã không phải cùng người, hoặc tick thêm mã tin cậy thấp nếu chắc chắn.
@@ -1357,15 +1434,16 @@ sequenceDiagram
 | **Mã Use Case** | UC-IDR-07 |
 | **Tên** | Xem bộ luật đối sánh và ngưỡng tin cậy đang áp dụng |
 | **Actor chính** | Người phụ trách dữ liệu (DATA-STEWARD) · Quản trị hệ thống (SYS-ADMIN) |
-| **Mô tả** | Người dùng xem bộ luật so khớp định danh và ba/bốn mức ngưỡng tin cậy hệ thống đang áp dụng — đây cũng là nguồn sinh ra cảnh báo nghi trùng. Giai đoạn đầu chỉ xem, không sửa. |
+| **Mô tả** | Người dùng xem bộ luật so khớp định danh theo **hai tầng** (Tầng 1 đối sánh tuyệt đối theo khóa mạnh — gộp không chấm điểm; Tầng 2 đối sánh xác suất theo bốn vùng ngưỡng) — đây cũng là nguồn sinh ra cảnh báo nghi trùng. Giai đoạn đầu chỉ xem, không sửa. |
 | **Tiền điều kiện** | Người dùng có quyền truy cập màn Rule hợp nhất định danh. |
 | **Kích hoạt** | Người dùng mở màn **Rule hợp nhất định danh** (SCR-IDR-04). |
 
 **Luồng chính:**
 
 1. Hệ thống hiển thị banner read-only ("giai đoạn đầu chỉ hiển thị; thêm/sửa rule mở ở giai đoạn sau").
-2. Hệ thống hiển thị sơ đồ **bốn vùng ngưỡng tin cậy** (≥95% tự gộp · 85–94% chờ xác nhận · 70–84% lưu quan hệ nghi vấn · <70% không gộp) — theo BR-IDR-01.
-3. Hệ thống hiển thị bảng danh sách luật so khớp: khóa khớp, trọng số, ngưỡng tin cậy, hành động, diễn giải, trạng thái áp dụng.
+2. Hệ thống hiển thị **Tầng 1 — Đối sánh tuyệt đối (Deterministic):** danh sách khóa định danh mạnh (mã số thuế, căn cước, PostID, mã khách hàng CRM, số điện thoại kèm email) → hành động **gộp thẳng, không chấm điểm** (BR-IDR-00), kèm ghi chú luôn qua kiểm cấm gộp tự động (BR-IDR-02).
+3. Hệ thống hiển thị **Tầng 2 — Đối sánh xác suất (Probabilistic):** sơ đồ **bốn vùng ngưỡng tin cậy** (≥95% tự gộp · 85–94% chờ xác nhận · 70–84% lưu quan hệ nghi vấn · <70% không gộp) — theo BR-IDR-01, chỉ áp dụng khi không đủ khóa mạnh ở Tầng 1.
+4. Hệ thống hiển thị bảng danh sách luật so khớp: khóa khớp, trọng số, ngưỡng tin cậy, hành động, diễn giải, trạng thái áp dụng.
 
 **Luồng thay thế / ngoại lệ:**
 
@@ -2474,9 +2552,644 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 
 ---
 
+## III.6. Phân hệ 6 — Kích hoạt dữ liệu (UC-ACT)
+
+> **Ranh giới phạm vi (áp dụng toàn Mục III.6):** Phân hệ 6 đưa phân khúc sang kênh giao tiếp/hệ thống đích, có kiểm soát đồng ý, tần suất, ngưỡng phê duyệt. Việc **gửi tin thực tế** nằm ở kênh đích (SMS Gateway, Zalo OA, Email, CRM, CSKH, BSS…); CDP **chuẩn bị tệp đủ điều kiện, đẩy sang kênh và theo dõi đồng bộ**, không tự vận hành hạ tầng gửi tin. Danh sách kênh kích hoạt thực tế VNPost đang dùng — **[Cần xác nhận]** (đã ghi ở II.1, nối OQ-ACT-01). Các con số ngưỡng/tần suất/thời hạn lấy đúng baseline mục 7.2, không tự chế.
+>
+> **Giai đoạn triển khai:** đồng bộ CRM (FR-ACT-01), đồng bộ kênh marketing (FR-ACT-02), kiểm tra đồng ý (FR-ACT-03), danh sách loại trừ (FR-ACT-04), tích hợp CSKH (FR-ACT-08), lịch sử kích hoạt (FR-ACT-10) thuộc **P1/Giai đoạn 2** (CDP.md 7.9). Các chức năng còn lại (xuất tệp, API real-time, đồng bộ BSS, cảnh báo rủi ro, tần suất, phê duyệt, giám sát đồng bộ, phản hồi) phần lớn **P2**. Mỗi Use Case ghi rõ giai đoạn.
+
+### III.6.0. Danh mục Use Case và Business Rule của Phân hệ 6
+
+**Danh mục Use Case (6 UC — gộp hợp lý từ 14 mã FR-ACT):**
+
+| Mã UC | Tên Use Case | Actor chính | Chức năng (Function Tree II.2) | FR-ACT gốc | Giai đoạn |
+|---|---|---|---|---|---|
+| UC-ACT-01 | Kích hoạt dữ liệu có kiểm tra đồng ý (UC xương sống — Luồng 6: consent + loại trừ + tần suất + phê duyệt + đẩy kênh) | Tiếp thị và CRM (MARKETING) | Kiểm tra đồng ý · Danh sách loại trừ · Tần suất/khung giờ · Phê duyệt · Đẩy sang kênh | FR-ACT-01, 02, 03, 04, 07, 08, 11, 12 | P1 (lõi) |
+| UC-ACT-02 | Quản lý danh sách loại trừ (Suppression List) | Tiếp thị và CRM (MARKETING) · Pháp chế và tuân thủ (COMPLIANCE) | Quản lý danh sách loại trừ | FR-ACT-04 | P1 |
+| UC-ACT-03 | Xuất tệp khách hàng phục vụ chiến dịch (có ngưỡng phê duyệt + che dữ liệu) | Tiếp thị và CRM (MARKETING) | Xuất tệp chiến dịch · Kiểm soát xuất | FR-ACT-05 (+ FR-GOV-09) | P2 |
+| UC-ACT-04 | Giám sát đồng bộ sang hệ thống đích và nhận phản hồi từ kênh | Quản trị hệ thống (SYS-ADMIN) · Tiếp thị và CRM (MARKETING) | Giám sát đồng bộ đích · Phản hồi từ kênh · Cảnh báo rủi ro | FR-ACT-09, 13, 14 | P2 |
+| UC-ACT-05 | Xem lịch sử kích hoạt (Activation History) | Tiếp thị và CRM (MARKETING) · Người phụ trách dữ liệu (DATA-STEWARD) | Lịch sử kích hoạt (lưu 3 năm) | FR-ACT-10 | P1 |
+| UC-ACT-06 | Xử lý rút đồng ý sau khi tệp đã đẩy sang kênh (edge 6.4) | Hệ thống · Người phụ trách dữ liệu (DATA-STEWARD) | Kiểm tra đồng ý · Đẩy trạng thái rút đồng ý sang kênh | FR-ACT-03, 14 (+ FR-GOV-16) | P1 |
+
+> **Về cách gộp UC:** 14 mã FR-ACT gộp thành 6 UC theo nguyên tắc "cùng một hành động nghiệp vụ của một actor gộp làm một". Các chức năng đồng bộ theo kênh đích (FR-ACT-01 CRM, FR-ACT-02 marketing, FR-ACT-07 BSS, FR-ACT-08 CSKH) **không tách UC rời từng kênh** — chúng là các **kênh đích** của cùng luồng kích hoạt UC-ACT-01; điểm khác nhau giữa kênh nằm ở nội dung đồng bộ, không ở luồng nghiệp vụ. FR-ACT-06 (API cá nhân hóa real-time) là **giao diện lập trình cho hệ thống ngoài gọi vào**, không có màn người dùng — mô tả ở BR-ACT-10 mức nghiệp vụ, chi tiết endpoint/kỹ thuật thuộc SA/Dev.
+
+**Danh mục Business Rule của Phân hệ 6 (BR-ACT-01→11):**
+
+| Mã BR | Nội dung | Nguồn |
+|---|---|---|
+| BR-ACT-01 | **Kiểm tra đồng ý theo TỪNG mục đích và TỪNG kênh:** trước khi đưa một khách hàng vào tệp gửi, hệ thống kiểm tra khách hàng có đồng ý nhận **đúng kênh** (SMS, Zalo, email…) cho **đúng mục đích** (tiếp thị, phân tích…) chưa. Đồng ý cho mục đích vận hành **không tự động** dùng được cho tiếp thị; đồng ý kênh này **không** suy ra kênh khác (thuật ngữ I.3 số 14). Khách hàng chưa đồng ý / đã từ chối / thu hồi đồng ý cho mục đích+kênh đó bị **loại khỏi tệp** | Baseline Luồng 6 mục 2–3, DP-09; CDP.md FR-ACT-03 |
+| BR-ACT-02 | **Danh sách loại trừ (Suppression List) chặn tuyệt đối:** khách hàng trong danh sách loại trừ bị loại khỏi **mọi tệp kích hoạt tiếp thị bất kể trạng thái đồng ý** (thuật ngữ I.3 số 15). Danh sách gồm: khách hàng opt-out toàn cục, số điện thoại/email bị chặn hoặc không hợp lệ, khách hàng do nghiệp vụ/pháp chế đưa vào. Kiểm tra danh sách loại trừ **sau** kiểm tra đồng ý, cả hai đều phải qua | Baseline Luồng 6 mục 3; CDP.md FR-ACT-04 |
+| BR-ACT-03 | **Kiểm soát tần suất gửi (Frequency Capping):** tối đa **3 tin tiếp thị/khách hàng/tuần** gộp mọi kênh; tối đa **1 tin/khách hàng/kênh/ngày**; **không gửi tin tiếp thị từ 21:00 đến 08:00** (khoảng lặng). **Tin vận hành** (thông báo bưu gửi đang tới, nhắc thu hộ, kết quả phát — dịch vụ khách hàng đã mua) **không tính vào hạn mức** và không bị giới hạn khung giờ. Khách vượt hạn mức/ngoài khung giờ bị **giữ lại, chuyển sang chu kỳ gửi sau**, không loại khỏi tệp | Baseline 7.2 (tần suất), DP-10; CDP.md FR-ACT-11 |
+| BR-ACT-04 | **Ngưỡng phê duyệt kích hoạt:** tệp gửi **>1.000 bản ghi** phải chuyển **chờ phê duyệt** trước khi đẩy sang kênh; tệp **>100.000 bản ghi** bị **chặn**, yêu cầu người dùng thu hẹp điều kiện. Tệp ≤1.000 gửi trực tiếp không cần phê duyệt. Người phê duyệt theo cấp — **[Cần xác nhận]** (OQ-ACT-02) | Baseline Luồng 6 mục 5, DP-11 (>1.000 / >100.000); CDP.md FR-ACT-12 |
+| BR-ACT-05 | **Ngưỡng xuất tệp khách hàng (Export Control) — 4 mức:** **≤1.000** bản ghi xuất trực tiếp, ghi nhật ký; **1.001–10.000** cần **phê duyệt của quản lý trực tiếp**; **>10.000** cần **phê duyệt của quản trị dữ liệu và bộ phận tuân thủ**; **trần cứng 100.000** bản ghi/lần xuất, **không cho vượt kể cả khi đã phê duyệt**. Tệp xuất **luôn che dữ liệu nhạy cảm** trừ khi người xuất có quyền đặc biệt và ghi rõ lý do vào nhật ký (đồng bộ BR-GOV-05) | Baseline 8 (ngưỡng xuất ≤1.000/1.001–10.000/>10.000/trần 100.000); CDP.md FR-ACT-05, FR-GOV-09 |
+| BR-ACT-06 | **Thứ tự kiểm tra trong luồng kích hoạt:** (1) kiểm tra đồng ý theo mục đích+kênh (BR-ACT-01) → (2) loại khách trong danh sách loại trừ (BR-ACT-02) → (3) kiểm tra tần suất + khung giờ (BR-ACT-03) → (4) kiểm tra ngưỡng phê duyệt (BR-ACT-04) → (5) đẩy sang kênh. Ở mỗi bước hệ thống **đếm và báo số khách bị loại/giữ lại** theo từng lý do để người dùng thấy rõ (câu chữ "Vướng đồng ý dữ liệu" 7.3) | Baseline Luồng 6 (hình luồng); CDP.md 7.7 |
+| BR-ACT-07 | **Rút đồng ý sau khi tệp đã đẩy sang kênh (edge 6.4):** khi khách hàng rút đồng ý mà tệp chứa khách đó **đã đẩy** sang kênh, hệ thống: (a) **chặn ngay** khách đó khỏi tệp ở **chu kỳ gửi tiếp theo**; (b) **đẩy trạng thái rút đồng ý sang kênh trong vòng 24 giờ** để kênh tự loại khỏi hàng chờ chưa gửi; (c) **tin đã gửi đi thì ghi nhận vào lịch sử kích hoạt, KHÔNG thu hồi** (không thể lấy lại tin đã phát). Câu chữ thông báo cho tình huống này — **[Cần xác nhận]** (OQ-ACT-04) | Baseline 6.4 (rút đồng ý khi tệp đã đẩy); CDP.md FR-ACT-14, FR-GOV-16 |
+| BR-ACT-08 | **Ghi lịch sử kích hoạt (Activation History):** mỗi lần kích hoạt ghi lại: khách hàng thuộc **tệp nào, chiến dịch nào, gửi qua kênh nào, thời điểm nào, kết quả ra sao** (gửi thành công/mở/phản hồi/chuyển đổi). Lịch sử kích hoạt **lưu 3 năm** (baseline 7.2). Đây là nhật ký hoạt động kích hoạt, khác nhật ký bất biến gộp/tách (5 năm — BR-GOV-06) | Baseline 7.2 (kích hoạt 3 năm); CDP.md FR-ACT-10 |
+| BR-ACT-09 | **Phản hồi từ kênh cập nhật hồ sơ (Feedback Loop):** kết quả phản hồi từ kênh (gửi thành công, mở, click, phản hồi, chuyển đổi) được nhận về và **cập nhật lại Customer 360** (dòng thời gian tương tác đa kênh — FR-C360-06) và phục vụ phân tích hiệu quả chiến dịch (UC-ANA-08). Phản hồi này là nguồn dữ liệu cho màn Phân tích hiệu quả chiến dịch (SCR-ANA-06 Lô 3) | Baseline Luồng 6 mục 7; CDP.md FR-ACT-14 |
+| BR-ACT-10 | **Kích hoạt cảnh báo rủi ro và API cá nhân hóa (mức nghiệp vụ):** cảnh báo rủi ro COD/hoàn hàng/gian lận/churn được **gửi sang** CRM/CSKH/vận hành/dashboard khi vượt ngưỡng cảnh báo (FR-ACT-09, tiêu thụ ngưỡng cấu hình ở UC-ANA-10). API cá nhân hóa real-time (FR-ACT-06) cho app/web/portal lấy phân khúc/điểm số/nội dung cá nhân hóa — mô tả ở mức nghiệp vụ, **chi tiết endpoint/kỹ thuật thuộc SA/Dev, không đặc tả trong tài liệu này** | CDP.md FR-ACT-06, 09 |
+| BR-ACT-11 | **Đồng bộ theo kênh đích:** cùng luồng kích hoạt đẩy dữ liệu sang nhiều loại kênh đích với nội dung khác nhau — **CRM** (FR-ACT-01: Customer ID, phân khúc, điểm số, nguy cơ churn, khách tiềm năng, lịch sử tương tác); **kênh marketing** (FR-ACT-02: tệp đủ điều kiện sang SMS/Email/Zalo/Push); **BSS** (FR-ACT-07: gợi ý dịch vụ, chính sách giá, ưu đãi, hành động tiếp theo); **CSKH** (FR-ACT-08: Customer 360, lịch sử tương tác/khiếu nại, điểm số, cảnh báo rủi ro). Nội dung đồng bộ tuân thủ che dữ liệu theo vai trò của hệ thống đích | CDP.md FR-ACT-01, 02, 07, 08 |
+
+---
+
+### III.6.1. UC-ACT-01 — Kích hoạt dữ liệu có kiểm tra đồng ý (UC xương sống)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ACT-01 |
+| **Tên** | Kích hoạt một phân khúc sang kênh giao tiếp, có kiểm tra đồng ý theo mục đích+kênh, danh sách loại trừ, tần suất/khung giờ và ngưỡng phê duyệt trước khi đẩy sang kênh |
+| **Actor chính** | Tiếp thị và CRM (MARKETING) |
+| **Actor phụ** | Quản trị hệ thống (SYS-ADMIN) — phê duyệt tệp vượt ngưỡng (II.3); Hệ thống — thực hiện kiểm tra đồng ý/tần suất tự động |
+| **Mô tả** | Người dùng chọn phân khúc và kênh gửi; hệ thống lần lượt kiểm tra đồng ý, loại trừ, tần suất/khung giờ, ngưỡng phê duyệt; báo rõ số khách bị loại/giữ lại theo từng lý do; sau khi qua đủ điều kiện (và phê duyệt nếu cần), tệp được đẩy sang kênh và ghi lịch sử. |
+| **Tiền điều kiện** | Người dùng có quyền "Kích hoạt chiến dịch" (II.3, chỉ MARKETING và SYS-ADMIN). Đã có ít nhất một phân khúc. Kênh gửi khả dụng và đã cấu hình tích hợp. |
+| **Kích hoạt** | Người dùng bấm "Kích hoạt" trên một phân khúc (từ SCR-ANA-01/03 Lô 3) hoặc mở màn Tạo kích hoạt chiến dịch (SCR-ACT-01). |
+
+**Luồng chính:**
+
+1. Người dùng chọn **phân khúc** cần kích hoạt và **kênh gửi** (SMS/Zalo/email/CRM/CSKH…), đặt **mục đích** (tiếp thị/phân tích) và tên chiến dịch (BR-ACT-11 xác định nội dung đồng bộ theo kênh đích).
+2. Hệ thống **kiểm tra đồng ý** cho từng khách hàng theo **đúng mục đích + đúng kênh** (BR-ACT-01); loại khách chưa đồng ý/đã từ chối khỏi tệp, đếm số bị loại.
+3. Hệ thống **loại khách trong danh sách loại trừ** (BR-ACT-02), đếm số bị loại; hiển thị câu chữ "Vướng đồng ý dữ liệu" (7.3): "{N} khách hàng trong phân khúc chưa đồng ý nhận {kênh}. Hệ thống đã loại khỏi tệp gửi."
+4. Hệ thống **kiểm tra tần suất + khung giờ** (BR-ACT-03): khách vượt hạn mức (>3 tin/tuần hoặc >1 tin/kênh/ngày) hoặc rơi vào khung 21:00–08:00 bị **giữ lại chuyển chu kỳ sau**, đếm số giữ lại.
+5. Hệ thống hiển thị **tóm tắt tệp cuối cùng**: tổng khách trong phân khúc, số đủ điều kiện gửi, số bị loại (theo lý do), số giữ lại chu kỳ sau.
+6. Hệ thống **kiểm tra ngưỡng phê duyệt** (BR-ACT-04): nếu tệp >1.000 bản ghi → chuyển **chờ phê duyệt** (câu chữ "Cần phê duyệt" 7.3); nếu ≤1.000 → chuyển thẳng bước 8.
+7. Người phê duyệt (SYS-ADMIN) xem tệp và **phê duyệt** hoặc **từ chối** kèm lý do.
+8. Hệ thống **đẩy tệp sang kênh**, theo dõi trạng thái đồng bộ (chuyển UC-ACT-04) và **ghi lịch sử kích hoạt** (BR-ACT-08).
+9. Hệ thống hiển thị: "Đã kích hoạt chiến dịch \"{tên}\" — {N} khách hàng đã được gửi qua {kênh}."
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | **Toàn bộ khách bị loại** do thiếu đồng ý/loại trừ (tệp trống) | Chặn kích hoạt; hiển thị "Không có khách hàng nào trong phân khúc này đủ điều kiện nhận {kênh}. Tệp gửi trống." (7.3) |
+| A2 | Tệp **>100.000 bản ghi** | **Chặn**; hiển thị "Không thể gửi quá 100.000 bản ghi trong một lần. Vui lòng thu hẹp điều kiện phân khúc." (đồng bộ trần cứng 7.3); không cho phê duyệt vượt |
+| A3 | Người duyệt **từ chối** tệp vượt ngưỡng | Tệp không được đẩy; ghi nhật ký lý do từ chối; thông báo người tạo |
+| A4 | Kênh gửi **chưa cấu hình/không khả dụng** | Chặn chọn kênh đó; hiển thị "Kênh {tên} chưa sẵn sàng." — [Cần xác nhận] danh sách kênh thực tế (OQ-ACT-01) |
+| E1 | Người dùng **không có quyền kích hoạt** (không phải MARKETING/SYS-ADMIN) | "Bạn không có quyền truy cập chức năng này." (7.3) |
+| E2 | Có khách rút đồng ý **sau khi tệp đã đẩy** | Chuyển UC-ACT-06 (edge 6.4, BR-ACT-07) — chặn chu kỳ sau + đẩy trạng thái sang kênh 24h |
+| E3 | **Đồng bộ sang kênh thất bại** ở bước đẩy | Cảnh báo + thử lại; theo dõi ở UC-ACT-04 (giám sát đồng bộ đích); nếu vẫn lỗi thì báo động |
+
+**Hậu điều kiện:** Tệp đủ điều kiện được đẩy sang kênh; lịch sử kích hoạt được ghi (3 năm — BR-ACT-08); thao tác kích hoạt chiến dịch được ghi nhật ký (Luồng 8 mục 3). Số bị loại/giữ lại được lưu để đối chiếu tuân thủ.
+
+**Business Rule liên quan:** BR-ACT-01, 02, 03, 04, 06, 07, 08, 11.
+**FR gốc:** FR-ACT-01, 02, 03, 04, 07, 08, 11, 12.
+**Giai đoạn:** P1 (luồng lõi consent + đồng bộ CRM/marketing/CSKH); P2 (tần suất FR-ACT-11, phê duyệt FR-ACT-12).
+
+---
+
+### III.6.2. UC-ACT-02 — Quản lý danh sách loại trừ (Suppression List)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ACT-02 |
+| **Tên** | Xem, thêm, gỡ khách hàng/số điện thoại/email khỏi danh sách loại trừ khỏi mọi tệp kích hoạt tiếp thị |
+| **Actor chính** | Tiếp thị và CRM (MARKETING) |
+| **Actor phụ** | Pháp chế và tuân thủ (COMPLIANCE) — đưa khách vào danh sách theo yêu cầu tuân thủ; Người phụ trách dữ liệu (DATA-STEWARD) |
+| **Mô tả** | Người dùng quản lý danh sách khách hàng bị loại trừ khỏi mọi chiến dịch tiếp thị bất kể trạng thái đồng ý; thêm thủ công hoặc theo nguồn tự động (opt-out toàn cục, số/email không hợp lệ). |
+| **Tiền điều kiện** | Người dùng có quyền quản lý danh sách loại trừ (khối Kích hoạt). |
+| **Kích hoạt** | Người dùng mở màn Quản lý danh sách loại trừ (SCR-ACT-02). |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị danh sách loại trừ: định danh khách hàng/số điện thoại/email, lý do loại trừ, nguồn (thủ công / opt-out / không hợp lệ / tuân thủ), thời điểm thêm, người thêm.
+2. Người dùng **thêm** một khách hàng/số/email vào danh sách kèm **lý do bắt buộc** và nguồn.
+3. Người dùng **gỡ** một mục khỏi danh sách — hệ thống yêu cầu xác nhận và ghi nhật ký (thao tác ảnh hưởng tuân thủ).
+4. Người dùng **tìm kiếm/lọc** theo lý do, nguồn, khoảng thời gian.
+5. (Nền) Hệ thống tự động cập nhật danh sách từ nguồn: khách opt-out toàn cục, số điện thoại/email bị đánh dấu không hợp lệ (BR-ACT-02).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Danh sách loại trừ rỗng | Hiển thị "Chưa có khách hàng nào trong danh sách loại trừ." |
+| A2 | Thêm khách đã có trong danh sách | Báo "Khách hàng này đã có trong danh sách loại trừ." — không thêm trùng |
+| E1 | Gỡ mục do nguồn **tuân thủ/pháp chế** đưa vào | Chỉ COMPLIANCE (hoặc vai trò được ủy quyền) được gỡ — **[Cần xác nhận]** OQ-ACT-03 (ai được gỡ mục do tuân thủ đưa vào); ghi nhật ký |
+| E2 | Không có lý do khi thêm | Chặn lưu; "Vui lòng nhập lý do loại trừ." |
+
+**Hậu điều kiện:** Danh sách loại trừ cập nhật; thay đổi được ghi nhật ký. Mọi tệp kích hoạt sau đó áp danh sách mới (BR-ACT-02).
+
+**Business Rule liên quan:** BR-ACT-02.
+**FR gốc:** FR-ACT-04.
+**Giai đoạn:** P1.
+
+---
+
+### III.6.3. UC-ACT-03 — Xuất tệp khách hàng phục vụ chiến dịch
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ACT-03 |
+| **Tên** | Xuất tệp khách hàng theo phân khúc phục vụ chiến dịch, có che dữ liệu nhạy cảm, giới hạn trường và phê duyệt theo ngưỡng |
+| **Actor chính** | Tiếp thị và CRM (MARKETING) |
+| **Actor phụ** | Quản trị hệ thống (SYS-ADMIN) / quản lý trực tiếp / quản trị dữ liệu + tuân thủ — phê duyệt theo ngưỡng (BR-ACT-05) |
+| **Mô tả** | Người dùng xuất tệp khách hàng của một phân khúc; hệ thống áp che dữ liệu nhạy cảm, giới hạn trường theo quyền và yêu cầu phê duyệt nếu vượt ngưỡng xuất. |
+| **Tiền điều kiện** | Người dùng có quyền "Xuất danh sách khách hàng" (II.3). Có phân khúc/tệp cần xuất. |
+| **Kích hoạt** | Người dùng bấm "Xuất tệp" ở màn Xuất tệp chiến dịch (SCR-ACT-05) hoặc từ danh sách khách hàng đã lọc. |
+
+**Luồng chính:**
+
+1. Người dùng chọn **phân khúc/tệp** và **các trường** cần xuất (trong giới hạn quyền của vai trò).
+2. Hệ thống áp **che dữ liệu nhạy cảm** theo vai trò (tham chiếu bảng masking Lô 1 — III.C360/BR-C360-03, bảng 6.2); trường ngoài quyền không được chọn.
+3. Hệ thống đếm số bản ghi và **kiểm tra ngưỡng xuất** (BR-ACT-05): ≤1.000 → xuất trực tiếp; 1.001–10.000 → phê duyệt quản lý trực tiếp; >10.000 → phê duyệt quản trị dữ liệu + tuân thủ; >100.000 → chặn.
+4. Nếu cần phê duyệt: hiển thị "Tệp {N} bản ghi vượt mức được xuất trực tiếp. Yêu cầu đã gửi tới {người duyệt} chờ phê duyệt." (7.3); người duyệt phê duyệt/từ chối.
+5. Sau khi đủ điều kiện, hệ thống tạo tệp xuất (đã che dữ liệu), **ghi nhật ký xuất** (người xuất, số bản ghi, trường, thời điểm — thao tác thường 2 năm, BR-GOV-06).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Tệp **>100.000 bản ghi** | Chặn; "Không thể xuất quá 100.000 bản ghi trong một lần. Vui lòng thu hẹp điều kiện lọc." (7.3) — không cho vượt kể cả khi có phê duyệt |
+| A2 | Người dùng có **quyền đặc biệt** muốn xuất **không che** | Cho phép nhưng **bắt buộc ghi lý do vào nhật ký** (BR-ACT-05, II.4.4 mục 7); quyền đặc biệt có thời hạn (II.4.4 mục 6) |
+| A3 | Người duyệt từ chối | Không tạo tệp; ghi lý do từ chối; thông báo người xuất |
+| E1 | Không có quyền xuất | "Bạn không có quyền truy cập chức năng này." (7.3) |
+
+**Hậu điều kiện:** Tệp xuất (đã che theo quyền) được tạo; thao tác xuất ghi nhật ký. Nếu vượt ngưỡng, có bản ghi phê duyệt tương ứng.
+
+**Business Rule liên quan:** BR-ACT-05 (đồng bộ BR-GOV-05 kiểm soát xuất).
+**FR gốc:** FR-ACT-05, FR-GOV-09.
+**Giai đoạn:** P2.
+
+---
+
+### III.6.4. UC-ACT-04 — Giám sát đồng bộ sang hệ thống đích và nhận phản hồi từ kênh
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ACT-04 |
+| **Tên** | Theo dõi trạng thái đồng bộ dữ liệu sang các hệ thống đích, cảnh báo khi đồng bộ lỗi, và nhận phản hồi kết quả gửi từ kênh |
+| **Actor chính** | Quản trị hệ thống (SYS-ADMIN) |
+| **Actor phụ** | Tiếp thị và CRM (MARKETING) — xem kết quả chiến dịch; Hệ thống — nhận phản hồi tự động |
+| **Mô tả** | Người dùng theo dõi trạng thái đồng bộ tệp/dữ liệu sang CRM/SMS/Email/Zalo/app/portal/CSKH; hệ thống cảnh báo khi đồng bộ lỗi; kết quả phản hồi từ kênh (gửi thành công/mở/click/phản hồi/chuyển đổi) được nhận về cập nhật hồ sơ. |
+| **Tiền điều kiện** | Đã có ít nhất một lần kích hoạt/đồng bộ. Người dùng có quyền giám sát đồng bộ đích. |
+| **Kích hoạt** | Người dùng mở màn Giám sát đồng bộ đích (SCR-ACT-04); hoặc hệ thống nhận phản hồi tự động từ kênh. |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị trạng thái đồng bộ theo hệ thống đích: tên đích (CRM/SMS/Email/Zalo/CSKH/BSS), số bản ghi đã đồng bộ, thành công/lỗi, thời điểm gần nhất (FR-ACT-13).
+2. Người dùng bấm vào một đích để xem **chi tiết bản ghi lỗi** và lý do đồng bộ lỗi.
+3. Người dùng **thử đồng bộ lại** các bản ghi lỗi (cơ chế thử lại tương tự inbound — thử lại rồi báo động nếu vẫn lỗi).
+4. (Nền) Hệ thống nhận **phản hồi kết quả gửi** từ kênh (gửi thành công/mở/click/phản hồi/chuyển đổi) và **cập nhật Customer 360** (BR-ACT-09) + phục vụ phân tích hiệu quả chiến dịch (SCR-ANA-06).
+5. (Nền) Khi cảnh báo rủi ro vượt ngưỡng, hệ thống **đẩy cảnh báo** sang CRM/CSKH/vận hành/dashboard (FR-ACT-09, BR-ACT-10).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Chưa có dữ liệu đồng bộ | "Chưa có dữ liệu đồng bộ để hiển thị." (7.3) |
+| A2 | Đồng bộ **lỗi kéo dài** sang một đích | Báo động "Đồng bộ sang {tên đích} đang lỗi — {N} bản ghi chưa đồng bộ." — câu chữ đề xuất, **[Cần xác nhận]** OQ-ACT-05 |
+| A3 | Kênh không trả phản hồi (không hỗ trợ feedback) | Hiển thị "Kênh {tên} không cung cấp phản hồi kết quả gửi." — bỏ qua bước cập nhật phản hồi cho kênh đó |
+
+**Hậu điều kiện:** Trạng thái đồng bộ hiển thị đúng thực tế; bản ghi lỗi có cơ chế thử lại; phản hồi từ kênh cập nhật vào Customer 360 và lịch sử kích hoạt.
+
+**Business Rule liên quan:** BR-ACT-09, BR-ACT-10.
+**FR gốc:** FR-ACT-09, 13, 14.
+**Giai đoạn:** P2.
+
+> **Ghi chú ranh giới:** đây là lỗi **outbound** (CDP đẩy dữ liệu ĐI sang kênh/hệ thống đích) — chính là nhánh edge 6.4 "đồng bộ sang kênh thất bại" đã được phân định thuộc **Phân hệ 6** ở Lô 2 (III.3, ghi chú ranh giới inbound vs outbound). Lỗi **inbound** (tiếp nhận dữ liệu VÀO CDP) thuộc Phân hệ 1 (UC-ING).
+
+---
+
+### III.6.5. UC-ACT-05 — Xem lịch sử kích hoạt
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ACT-05 |
+| **Tên** | Xem lịch sử các lần kích hoạt: khách hàng thuộc tệp/chiến dịch nào, gửi qua kênh nào, thời điểm, kết quả |
+| **Actor chính** | Tiếp thị và CRM (MARKETING) |
+| **Actor phụ** | Người phụ trách dữ liệu (DATA-STEWARD); Pháp chế và tuân thủ (COMPLIANCE) — đối chiếu tuân thủ |
+| **Mô tả** | Người dùng tra cứu lịch sử kích hoạt theo chiến dịch/kênh/khoảng thời gian/khách hàng để đối chiếu và phân tích; dữ liệu lưu 3 năm. |
+| **Tiền điều kiện** | Có ít nhất một lần kích hoạt được ghi lịch sử. Người dùng có quyền xem lịch sử kích hoạt. |
+| **Kích hoạt** | Người dùng mở màn Lịch sử kích hoạt (SCR-ACT-03). |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị danh sách lịch sử kích hoạt: chiến dịch, phân khúc/tệp, kênh, thời điểm gửi, số khách gửi, kết quả tổng hợp (thành công/mở/phản hồi/chuyển đổi) — FR-ACT-10.
+2. Người dùng **lọc** theo chiến dịch, kênh, khoảng thời gian.
+3. Người dùng bấm một lần kích hoạt để xem **chi tiết**: số bị loại theo lý do (đồng ý/loại trừ/tần suất), số đã gửi, kết quả.
+4. Người dùng có thể mở lịch sử kích hoạt của **một khách hàng cụ thể** (khách này đã nhận chiến dịch nào, khi nào — liên kết Customer 360).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Chưa có lịch sử kích hoạt | "Chưa có lịch sử kích hoạt để hiển thị." (7.3) |
+| A2 | Lọc không ra kết quả | "Không tìm thấy lần kích hoạt nào khớp điều kiện lọc." (7.3) |
+
+**Hậu điều kiện:** Người dùng xem được lịch sử kích hoạt trong phạm vi phân quyền và khoảng lưu trữ 3 năm.
+
+**Business Rule liên quan:** BR-ACT-08.
+**FR gốc:** FR-ACT-10.
+**Giai đoạn:** P1.
+
+---
+
+### III.6.6. UC-ACT-06 — Xử lý rút đồng ý sau khi tệp đã đẩy sang kênh (edge 6.4)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-ACT-06 |
+| **Tên** | Xử lý tình huống khách hàng rút đồng ý khi tệp chứa khách đó đã được đẩy sang kênh: chặn chu kỳ sau, đẩy trạng thái rút đồng ý sang kênh trong 24h, không thu hồi tin đã gửi |
+| **Actor chính** | Hệ thống (xử lý tự động) |
+| **Actor phụ** | Người phụ trách dữ liệu (DATA-STEWARD) / Pháp chế (COMPLIANCE) — người tiếp nhận và ghi nhận thay đổi đồng ý (từ UC-GOV-03/04) |
+| **Mô tả** | Khi trạng thái đồng ý của khách hàng chuyển sang "đã rút" mà khách đó vừa nằm trong tệp đã đẩy, hệ thống chặn khách ở chu kỳ tiếp theo và đẩy trạng thái rút sang kênh trong 24h; tin đã gửi được ghi nhận, không thu hồi. |
+| **Tiền điều kiện** | Khách hàng có trong một tệp đã đẩy sang kênh. Có sự kiện rút đồng ý (từ nguồn hoặc UC-GOV-03/04). |
+| **Kích hoạt** | Hệ thống nhận sự kiện rút đồng ý của một khách hàng đã nằm trong tệp đã đẩy (edge 6.4). |
+
+**Luồng chính:**
+
+1. Hệ thống nhận sự kiện **rút đồng ý** của khách hàng X cho mục đích+kênh Y (từ nguồn hoặc từ xử lý yêu cầu chủ thể dữ liệu UC-GOV-04).
+2. Hệ thống kiểm tra khách X có nằm trong **tệp đã đẩy** nào chưa gửi hết không.
+3. Hệ thống **chặn khách X khỏi tệp** ở **chu kỳ gửi tiếp theo** (BR-ACT-07a).
+4. Hệ thống **đẩy trạng thái rút đồng ý sang kênh trong vòng 24 giờ** (BR-ACT-07b) để kênh tự loại khách X khỏi hàng chờ chưa gửi.
+5. Với **tin đã gửi đi** cho khách X: hệ thống **ghi nhận vào lịch sử kích hoạt**, **không thu hồi** (BR-ACT-07c) — không thể lấy lại tin đã phát.
+6. Hệ thống **ghi nhật ký bất biến** thay đổi đồng ý (5 năm — BR-GOV-06) và cập nhật trạng thái đồng ý trên Customer 360.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Khách X **không** nằm trong tệp đã đẩy nào | Chỉ cập nhật trạng thái đồng ý; chặn ở mọi tệp tương lai; không cần đẩy trạng thái khẩn |
+| A2 | Kênh **không hỗ trợ** nhận trạng thái rút đồng ý ngược | Ghi nhận không đẩy được sang kênh; báo bộ phận tuân thủ xử lý thủ công — **[Cần xác nhận]** OQ-ACT-06 (kênh nào hỗ trợ đẩy trạng thái ngược) |
+| A3 | Đã quá 24h chưa đẩy được trạng thái sang kênh (kênh lỗi) | Báo động cho SYS-ADMIN + COMPLIANCE (rủi ro tuân thủ); thử lại |
+
+**Hậu điều kiện:** Khách X bị chặn khỏi mọi tệp tương lai và tệp đang chờ gửi ở kênh; trạng thái rút đồng ý được đẩy sang kênh trong 24h; thay đổi đồng ý ghi nhật ký bất biến 5 năm. Tin đã gửi vẫn còn trong lịch sử, không thu hồi.
+
+**Business Rule liên quan:** BR-ACT-07, BR-GOV-06 (nhật ký bất biến).
+**FR gốc:** FR-ACT-03, 14, FR-GOV-16 (vòng đời consent).
+**Giai đoạn:** P1.
+
+---
+
+## III.7. Phân hệ 7 — Quản trị, bảo mật và quyền riêng tư (UC-GOV)
+
+> **Ranh giới BA vs SA/IT Security (áp dụng toàn Mục III.7):** tài liệu đặc tả ở **mức nghiệp vụ — ai làm gì, kết quả nghiệp vụ, ai được xem**. Các phần có thành phần kỹ thuật sâu — **mã hóa dữ liệu (FR-GOV-01)**, **truy vết dòng dữ liệu kỹ thuật (FR-GOV-06)**, **điều tra sự cố kỹ thuật (FR-GOV-13)** — chỉ mô tả **kết quả nghiệp vụ và quyền xem**, KHÔNG đi vào thuật toán mã hóa, kiến trúc lineage, hay quy trình forensic kỹ thuật (thuộc SA/IT Security). Việc **che PII ở mức nghiệp vụ** đã đặc tả ở masking Lô 1 (III.C360, BR-C360-03, bảng 6.2) — Mục III.7 **tham chiếu**, không lặp lại thuật toán che.
+>
+> **Giai đoạn triển khai:** **FR-GOV-01 (che/mã hóa PII), FR-GOV-02 (quản lý đồng ý), FR-GOV-03 (RBAC & Audit Trail), FR-GOV-08 (phân quyền theo vai trò)** thuộc **P1/Giai đoạn 1** (CDP.md 7.9 — nền tảng bắt buộc từ ngày đầu). Phần lớn FR-GOV-04→17 (data catalog, metadata, lineage, export control, phân loại nhạy cảm, quản trị đơn vị, báo cáo tuân thủ, vòng đời consent, kiểm soát theo mục đích) thuộc **P2/Giai đoạn 4**. Xử lý yêu cầu chủ thể dữ liệu (FR-GOV-11/12) là **P1 cho rút đồng ý**, P2 cho xem/sửa/xóa mở rộng. Mỗi UC ghi rõ giai đoạn.
+
+### III.7.0. Danh mục Use Case và Business Rule của Phân hệ 7
+
+**Danh mục Use Case (9 UC — gộp hợp lý từ 17 mã FR-GOV):**
+
+| Mã UC | Tên Use Case | Actor chính | Chức năng (Function Tree II.2) | FR-GOV gốc | Giai đoạn |
+|---|---|---|---|---|---|
+| UC-GOV-01 | Quản lý tài khoản, vai trò, phạm vi dữ liệu và quyền đặc biệt có thời hạn (RBAC) | Quản trị hệ thống (SYS-ADMIN) | Quản lý tài khoản/vai trò/phạm vi · Quyền đặc biệt có thời hạn | FR-GOV-03, 08, 14 | P1 |
+| UC-GOV-02 | Xem nhật ký kiểm toán bất biến (Audit Trail) | An toàn thông tin (SEC-OFFICER) · Quản trị hệ thống (SYS-ADMIN) · Pháp chế (COMPLIANCE) | Xem nhật ký kiểm toán | FR-GOV-03 | P1 |
+| UC-GOV-03 | Quản lý đồng ý và vòng đời consent (Consent Management + Lifecycle) | Pháp chế và tuân thủ (COMPLIANCE) · Người phụ trách dữ liệu (DATA-STEWARD) | Quản lý đồng ý · Vòng đời consent | FR-GOV-02, 16 | P1 (02) / P2 (16) |
+| UC-GOV-04 | Xử lý yêu cầu chủ thể dữ liệu (Luồng 7 — xem/sửa/rút đồng ý/ngừng/xóa-ẩn danh/giải thích) | Pháp chế và tuân thủ (COMPLIANCE) · CSKH (tiếp nhận) · Người phụ trách dữ liệu (DATA-STEWARD) | Xử lý yêu cầu chủ thể dữ liệu · Xóa/ẩn danh | FR-GOV-11, 12 | P1 (rút đồng ý) / P2 (xem/sửa/xóa) |
+| UC-GOV-05 | Kiểm soát và phê duyệt xuất dữ liệu (Export Control) | Quản trị hệ thống (SYS-ADMIN) · quản lý trực tiếp · quản trị dữ liệu + tuân thủ | Kiểm soát và phê duyệt xuất dữ liệu | FR-GOV-09 | P2 |
+| UC-GOV-06 | Xem báo cáo tuân thủ (Compliance Report) | Pháp chế và tuân thủ (COMPLIANCE) · An toàn thông tin (SEC-OFFICER) | Báo cáo tuân thủ | FR-GOV-15 | P2 |
+| UC-GOV-07 | Quản trị theo đơn vị/tỉnh và kiểm soát sử dụng theo mục đích (Unit-based + Purpose-based) | Quản trị hệ thống (SYS-ADMIN) · Lãnh đạo đơn vị (LEADER) | Phân quyền theo đơn vị/tỉnh · Kiểm soát theo mục đích | FR-GOV-14, 17 | P2 |
+| UC-GOV-08 | Che và phân loại dữ liệu nhạy cảm (mức nghiệp vụ) + hỗ trợ điều tra sự cố | An toàn thông tin (SEC-OFFICER) · Người phụ trách dữ liệu (DATA-STEWARD) | Che/mã hóa PII (mức nghiệp vụ) · Phân loại nhạy cảm · Hỗ trợ điều tra sự cố | FR-GOV-01, 10, 13 | P1 (01) / P2 (10, 13) |
+| UC-GOV-09 | Ghi nhật ký bất biến mọi thao tác quan trọng (xử lý nền) | Hệ thống | Ghi nhật ký bất biến (gộp/tách, đồng ý, thao tác) | FR-GOV-03 | P1 |
+
+> **Về cách gộp UC:** 17 mã FR-GOV gộp thành 9 UC theo actor + hành động nghiệp vụ. **FR-GOV-04 (Data Catalog), FR-GOV-05 (Metadata), FR-GOV-06 (Lineage), FR-GOV-07 (Data Quality Management)** là **danh mục/siêu dữ liệu/quản trị chất lượng** — phần lớn ở mức mô tả nghiệp vụ, **P2**, và có phần trùng chức năng đã đặc tả: FR-GOV-07 là **góc quản trị của cùng chức năng chất lượng dữ liệu FR-DPS** (Phân hệ 2, Lô 2 — UC-DPS-05/06) chứ không phải chức năng thứ hai; FR-GOV-06 (lineage) có phần **truy vết nguồn dữ liệu trong hồ sơ** đã có ở FR-C360-13 (Lô 1). Bốn mã này được mô tả ở **BR-GOV-09** (mức nghiệp vụ) và **không tách UC người dùng riêng** ở lô này vì P2 và phụ thuộc quyết định triển khai catalog/lineage của SA — ghi OQ-GOV-04. **FR-GOV-03 xuất hiện ở 2 UC:** UC-GOV-09 (ghi nhật ký — actor Hệ thống) và UC-GOV-02 (xem nhật ký — actor người dùng); đây là hai mặt ghi/đọc của cùng Audit Trail, đồng thời là góc quản trị của nhật ký merge/unmerge FR-IDR-14 (Phân hệ 3).
+
+**Danh mục Business Rule của Phân hệ 7 (BR-GOV-01→10):**
+
+| Mã BR | Nội dung | Nguồn |
+|---|---|---|
+| BR-GOV-01 | **Quản lý tài khoản qua cổng chung — không quản mật khẩu:** CDP **nhận danh tính** từ cổng đăng nhập chung của tổ chức (mã nhân sự đã cấp quyền hoặc đăng nhập một lần nội bộ); CDP **không tự quản lý** tài khoản, mật khẩu, **không có màn hình đăng nhập riêng** (GD-08, I.2.2). Quản trị trong CDP là **gán vai trò và phạm vi dữ liệu** cho danh tính đã có, không tạo/đổi mật khẩu | GD-08; baseline I.2.2, Luồng 8 mục 1 |
+| BR-GOV-02 | **Bảy nguyên tắc phân quyền (tham chiếu II.4.4):** cấp quyền tối thiểu · chỉ người có nhu cầu nghiệp vụ hợp lệ · tách quyền cấu hình khỏi quyền xem dữ liệu · phân quyền theo đơn vị và địa bàn · phân quyền gắn với mục đích sử dụng · quyền đặc biệt có thời hạn · truy cập dữ liệu nhạy cảm cần phê duyệt. Mỗi tài khoản có thể bị giới hạn theo **6 cấp phạm vi dữ liệu** (II.4.5) | II.4.4, II.4.5; baseline 8.7 |
+| BR-GOV-03 | **Quyền đặc biệt có thời hạn tự hết hạn:** các quyền nhạy cảm (xem số định danh cá nhân đầy đủ, xuất dữ liệu không che) được cấp **có thời hạn** và **tự hết hạn** khi hết hiệu lực — không cần thu hồi thủ công. Mọi lần cấp/dùng quyền đặc biệt được ghi nhật ký kèm lý do (II.4.4 mục 6, 7). Thời hạn mặc định của quyền đặc biệt — **[Cần xác nhận]** OQ-GOV-01 (baseline chưa nêu số cụ thể) | II.4.4 mục 6; II.4.6; baseline Luồng 8 mục 2 |
+| BR-GOV-04 | **Che dữ liệu theo vai trò (tham chiếu masking Lô 1 — KHÔNG lặp thuật toán):** cùng một màn hình, mỗi vai trò thấy mức chi tiết khác nhau theo bảng che dữ liệu 6.2 đã đặc tả ở Lô 1 (III.C360, BR-C360-03). Ví dụ: số điện thoại — CSKH/Vận hành/Tiếp thị che một phần, Kinh doanh/Người phụ trách dữ liệu xem đầy đủ; **số định danh cá nhân** — chỉ Quản trị xem đầy đủ theo quyền đặc biệt, các vai trò khác che hoặc không xem; **điểm rủi ro COD và gian lận** ẩn với Tiếp thị và CSKH (đồng bộ BR-ANA-11, BR-C360-03). Phần **mã hóa dữ liệu** (FR-GOV-01) ở tầng lưu trữ là **kỹ thuật thuộc SA/IT Security**, không đặc tả thuật toán ở đây | Baseline 6.2, 8.8; đồng bộ BR-C360-03, BR-ANA-11; CDP.md FR-GOV-01, 10 |
+| BR-GOV-05 | **Kiểm soát xuất dữ liệu (Export Control) — đồng bộ BR-ACT-05:** xuất dữ liệu theo 4 mức ngưỡng (≤1.000 trực tiếp / 1.001–10.000 duyệt quản lý / >10.000 duyệt quản trị dữ liệu + tuân thủ / trần cứng 100.000). Tệp xuất **luôn che dữ liệu nhạy cảm** trừ khi người xuất có **quyền đặc biệt** và **ghi rõ lý do** vào nhật ký. Mọi lần xuất được ghi nhật ký (người xuất, số bản ghi, trường, thời điểm) | Baseline 8 (ngưỡng xuất); CDP.md FR-GOV-09 |
+| BR-GOV-06 | **Nhật ký bất biến và thời hạn lưu:** nhật ký chỉ được **ghi thêm, không sửa, không xóa** (thuật ngữ I.3 số 18). Thời hạn lưu: **gộp/tách hồ sơ + thay đổi trạng thái đồng ý: 5 năm** (GD-04); **kích hoạt chiến dịch: 3 năm**; **thao tác thường (xem, tìm kiếm, xuất, đổi phân quyền): 2 năm**. Thời hạn 5 năm đang là giả định — **[Cần xác nhận]** OQ-08/OQ-GOV-02 đối chiếu quy định nội bộ và Luật 91/2025/QH15 | Baseline 7.2 (thời hạn lưu nhật ký); GD-04; CDP.md FR-GOV-03 |
+| BR-GOV-07 | **Mọi thao tác quan trọng đều ghi nhật ký:** hệ thống ghi nhật ký không thể xóa cho: **đăng nhập, tìm kiếm, xem hồ sơ, xem dữ liệu nhạy cảm, xuất dữ liệu, tạo/sửa phân khúc, kích hoạt chiến dịch, gộp/tách hồ sơ, thay đổi đồng ý, thay đổi phân quyền** (FR-GOV-03). Mỗi bản ghi nhật ký gồm: ai, làm gì, trên đối tượng nào, khi nào, kết quả, lý do (nếu là thao tác nhạy cảm) | Baseline Luồng 8 mục 3; CDP.md FR-GOV-03 |
+| BR-GOV-08 | **Thời hạn xử lý yêu cầu chủ thể dữ liệu (hạn nội bộ + trần luật):** đặt **hai mốc** — hạn nội bộ chặt hơn để có biên an toàn, trần theo luật là giới hạn tuyệt đối. **Rút lại đồng ý:** trong ngày làm việc (mục tiêu 4 giờ làm việc) / trần **2 ngày làm việc**; **xem hoặc trích xuất dữ liệu:** 7 ngày / trần 10–15 ngày; **chỉnh sửa dữ liệu:** 7 ngày / trần 10–15 ngày; **ngừng xử lý dữ liệu:** 10 ngày / trần 15–20 ngày; **xóa hoặc ẩn danh dữ liệu:** 15 ngày / trần 20–30 ngày. **Cảnh báo khi còn 1/3 hạn nội bộ**; **báo lên quản lý ngay khi quá hạn nội bộ** (vẫn còn biên trước hạn luật) | Baseline 7.2 (thời hạn xử lý yêu cầu KH), GD-03; CDP.md FR-GOV-11 |
+| BR-GOV-09 | **Danh mục dữ liệu, siêu dữ liệu, lineage, quản lý chất lượng (mức nghiệp vụ — P2):** *Danh mục dữ liệu (FR-GOV-04):* mô tả trường dữ liệu, nguồn, chủ sở hữu, mức độ nhạy cảm, mục đích sử dụng. *Siêu dữ liệu (FR-GOV-05):* định nghĩa dữ liệu, ánh xạ giữa nguồn và mô hình CDP. *Truy vết dòng dữ liệu (FR-GOV-06):* theo dõi nguồn gốc, luồng xử lý, bước biến đổi, hệ thống đích — **phần kỹ thuật thuộc SA/IT**; góc nghiệp vụ "truy vết nguồn trong hồ sơ" đã có ở FR-C360-13 (Lô 1). *Quản lý chất lượng (FR-GOV-07):* là **góc quản trị của cùng chức năng chất lượng FR-DPS** (Phân hệ 2, UC-DPS-05/06), không phải chức năng thứ hai. Bốn chức năng này **P2**, phụ thuộc quyết định triển khai của SA — **[Cần xác nhận]** OQ-GOV-04 | CDP.md FR-GOV-04, 05, 06, 07 |
+| BR-GOV-10 | **Kiểm soát sử dụng theo mục đích (Purpose-based) và theo đơn vị (Unit-based):** dữ liệu **chỉ được dùng đúng mục đích đã khai báo** (vận hành, chăm sóc, tiếp thị, phân tích, đối soát — FR-GOV-17); mỗi đơn vị/tỉnh **chỉ xem được dữ liệu trong phạm vi được phân quyền** (FR-GOV-14). Đây là hiện thực hóa nguyên tắc II.4.4 mục 4, 5 và cấp phạm vi II.4.5 mục 1, 6. Vi phạm mục đích/phạm vi bị chặn và ghi nhật ký | II.4.4 mục 4–5, II.4.5; CDP.md FR-GOV-14, 17 |
+
+---
+
+### III.7.1. UC-GOV-01 — Quản lý tài khoản, vai trò, phạm vi và quyền đặc biệt
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-GOV-01 |
+| **Tên** | Gán vai trò, phạm vi dữ liệu (đơn vị/địa bàn/nhóm KH) và quyền đặc biệt có thời hạn cho các tài khoản đã có danh tính từ cổng chung |
+| **Actor chính** | Quản trị hệ thống (SYS-ADMIN) |
+| **Actor phụ** | Chủ sở hữu dữ liệu (DATA-OWNER) — phê duyệt mục đích/phạm vi ở mức chính sách; An toàn thông tin (SEC-OFFICER) — giám sát |
+| **Mô tả** | Người quản trị gán và điều chỉnh vai trò, phạm vi dữ liệu và quyền đặc biệt cho các tài khoản; CDP không tạo/đổi mật khẩu (danh tính đến từ cổng chung). |
+| **Tiền điều kiện** | Người dùng có quyền ADMIN (II.4.3 khối Quản trị tài khoản/phân quyền). Tài khoản đích đã có danh tính hợp lệ từ cổng chung. |
+| **Kích hoạt** | Người quản trị mở màn Quản lý tài khoản/vai trò/phạm vi (SCR-GOV-01). |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị danh sách tài khoản: danh tính (mã nhân sự/tên), vai trò hiện có, phạm vi dữ liệu, trạng thái, quyền đặc biệt còn hiệu lực.
+2. Người quản trị chọn một tài khoản và **gán/thay đổi vai trò** (chọn từ 12 vai trò II.4.1).
+3. Người quản trị đặt **phạm vi dữ liệu** theo 6 cấp (II.4.5): đơn vị/tỉnh, bưu cục/vùng, khách hàng phụ trách, nhóm nghiệp vụ, mức chi tiết dữ liệu, mục đích sử dụng.
+4. Người quản trị **cấp quyền đặc biệt có thời hạn** (ví dụ xem số định danh cá nhân đầy đủ, xuất không che) kèm **thời hạn** và **lý do** (BR-GOV-03).
+5. Hệ thống **ghi nhật ký bất biến** thay đổi phân quyền (BR-GOV-07, thao tác thường 2 năm) và áp quyền mới.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Quyền đặc biệt **đến hạn** | Hệ thống **tự thu hồi** khi hết hạn (BR-GOV-03); không cần thao tác thủ công; ghi nhật ký hết hạn |
+| A2 | Gán vai trò vi phạm nguyên tắc tách quyền (ví dụ vừa cấu hình vừa xem toàn bộ dữ liệu nhạy cảm) | Cảnh báo theo nguyên tắc II.4.4 mục 3; cho phép nhưng ghi nhận — **[Cần xác nhận]** OQ-GOV-03 (có chặn cứng tổ hợp quyền xung đột không) |
+| A3 | Người quản trị cố tạo/đổi mật khẩu tài khoản | Không hỗ trợ; hiển thị "Tài khoản và mật khẩu do cổng đăng nhập chung quản lý." (BR-GOV-01) |
+| E1 | Người dùng không có quyền ADMIN | "Bạn không có quyền truy cập chức năng này." (7.3) |
+
+**Hậu điều kiện:** Vai trò/phạm vi/quyền đặc biệt của tài khoản được cập nhật; thay đổi ghi nhật ký bất biến; quyền đặc biệt có thời hạn tự hết hạn khi đến hạn.
+
+**Business Rule liên quan:** BR-GOV-01, 02, 03, 07.
+**FR gốc:** FR-GOV-03, 08, 14.
+**Giai đoạn:** P1.
+
+---
+
+### III.7.2. UC-GOV-02 — Xem nhật ký kiểm toán bất biến (Audit Trail)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-GOV-02 |
+| **Tên** | Tra cứu nhật ký kiểm toán bất biến của mọi thao tác quan trọng để giải trình, kiểm tra truy cập và phát hiện bất thường |
+| **Actor chính** | An toàn thông tin (SEC-OFFICER) |
+| **Actor phụ** | Quản trị hệ thống (SYS-ADMIN); Pháp chế và tuân thủ (COMPLIANCE) — phục vụ báo cáo tuân thủ |
+| **Mô tả** | Người dùng tra cứu và lọc nhật ký kiểm toán (ai, làm gì, đối tượng, thời điểm, kết quả, lý do) theo loại thao tác/người dùng/khoảng thời gian; nhật ký chỉ đọc, không sửa/xóa. |
+| **Tiền điều kiện** | Người dùng có quyền xem nhật ký kiểm toán (SEC-OFFICER/SYS-ADMIN/COMPLIANCE). |
+| **Kích hoạt** | Người dùng mở màn Nhật ký kiểm toán (SCR-GOV-02). |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị nhật ký kiểm toán: người thao tác, loại thao tác (đăng nhập/tìm kiếm/xem hồ sơ/xem dữ liệu nhạy cảm/xuất/gộp/tách/kích hoạt/thay đổi đồng ý/thay đổi phân quyền), đối tượng, thời điểm, kết quả, lý do (BR-GOV-07).
+2. Người dùng **lọc** theo loại thao tác, người dùng, đối tượng, khoảng thời gian.
+3. Người dùng phát hiện **truy cập bất thường** (truy cập ngoài giờ, tải dữ liệu lớn, tra cứu nhiều lần dữ liệu định danh — Luồng 8 mục 5) và đánh dấu để điều tra (chuyển UC-GOV-08).
+4. Người dùng **xuất nhật ký** phục vụ điều tra/báo cáo (áp kiểm soát xuất BR-GOV-05).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Lọc không ra kết quả | "Không tìm thấy bản ghi nhật ký nào khớp điều kiện lọc." (7.3) |
+| A2 | Người dùng cố **sửa/xóa** một dòng nhật ký | Không hỗ trợ; nhật ký bất biến (BR-GOV-06) — chỉ đọc |
+| A3 | Nhật ký quá hạn lưu trữ (ngoài 5/3/2 năm) | Không hiển thị; nếu cần thì tra ở lưu trữ dài hạn — [Cần xác nhận] OQ-GOV-02 chính sách lưu trữ sau hạn |
+| E1 | Không có quyền xem nhật ký | "Bạn không có quyền truy cập chức năng này." (7.3) |
+
+**Hậu điều kiện:** Người dùng xem/lọc/xuất được nhật ký trong phạm vi quyền; việc xem/xuất nhật ký cũng được ghi nhật ký.
+
+**Business Rule liên quan:** BR-GOV-06, 07.
+**FR gốc:** FR-GOV-03.
+**Giai đoạn:** P1.
+
+> **Ghi chú:** đây là **góc đọc** của cùng Audit Trail mà UC-GOV-09 ghi (góc ghi, actor Hệ thống). Nhật ký merge/unmerge cụ thể có màn xem riêng ở Lô 1 (UC-IDR-06, SCR-IDR-03) — FR-GOV-03 là góc quản trị của cùng nhật ký FR-IDR-14.
+
+---
+
+### III.7.3. UC-GOV-03 — Quản lý đồng ý và vòng đời consent
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-GOV-03 |
+| **Tên** | Ghi nhận, cập nhật, đồng bộ trạng thái đồng ý/từ chối theo từng mục đích và kênh; quản lý vòng đời consent (cấp, hết hạn, rút, gia hạn, lịch sử) |
+| **Actor chính** | Pháp chế và tuân thủ (COMPLIANCE) |
+| **Actor phụ** | Người phụ trách dữ liệu (DATA-STEWARD); CSKH — cập nhật đồng ý khi khách yêu cầu; Hệ thống — nhận trạng thái đồng ý từ nguồn |
+| **Mô tả** | Người dùng xem và quản lý trạng thái đồng ý của khách hàng theo từng mục đích+kênh, và vòng đời consent (thời điểm cấp/hết hạn/rút/gia hạn kèm lịch sử thay đổi). CDP **chỉ nhận** đồng ý từ nguồn, không tự thu từ khách hàng (I.2.2). |
+| **Tiền điều kiện** | Người dùng có quyền quản lý đồng ý (II.3 — COMPLIANCE/DATA-STEWARD/CSKH/SYS-ADMIN). |
+| **Kích hoạt** | Người dùng mở màn Quản lý consent (SCR-GOV-03); hoặc hệ thống nhận cập nhật đồng ý từ nguồn. |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị trạng thái đồng ý của khách hàng theo **ma trận mục đích × kênh** (vận hành/tiếp thị/phân tích × SMS/Zalo/email/push): đồng ý / từ chối / chưa xác định, kèm thời điểm và nguồn.
+2. Người dùng xem **vòng đời consent** của một khách: thời điểm cấp, thời điểm hết hạn (nếu có), lịch sử rút/gia hạn (FR-GOV-16).
+3. Người dùng **cập nhật** trạng thái đồng ý khi khách hàng yêu cầu (qua CSKH/Pháp chế) — ví dụ rút đồng ý cho một mục đích+kênh.
+4. Hệ thống **ghi nhật ký bất biến** thay đổi đồng ý (5 năm — BR-GOV-06); nếu rút đồng ý ảnh hưởng tệp đã đẩy thì kích hoạt UC-ACT-06 (edge 6.4).
+5. Hệ thống **đồng bộ** thay đổi đồng ý sang các hệ thống nhận dữ liệu nếu ảnh hưởng kích hoạt (Luồng 7 mục 7).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Consent **hết hạn** (vòng đời) | Hệ thống tự chuyển trạng thái sang "hết hạn"; khách bị loại khỏi tệp cho mục đích+kênh đó cho tới khi gia hạn (FR-GOV-16) |
+| A2 | Rút đồng ý khi khách **đã trong tệp đã đẩy** | Chuyển UC-ACT-06 (BR-ACT-07): chặn chu kỳ sau + đẩy trạng thái sang kênh 24h |
+| A3 | Nguồn không cung cấp bằng chứng đồng ý rõ ràng | Đánh dấu "chưa xác định"; không dùng cho tiếp thị/phân tích cho tới khi có bằng chứng (liên quan OQ-06) |
+| E1 | Không có quyền cập nhật đồng ý | "Bạn không có quyền truy cập chức năng này." (7.3) |
+
+**Hậu điều kiện:** Trạng thái đồng ý và vòng đời consent được cập nhật; thay đổi ghi nhật ký bất biến 5 năm; đồng bộ sang hệ thống liên quan.
+
+**Business Rule liên quan:** BR-GOV-06, 07; BR-ACT-01, 07.
+**FR gốc:** FR-GOV-02, 16.
+**Giai đoạn:** P1 (quản lý đồng ý FR-GOV-02); P2 (vòng đời consent nâng cao FR-GOV-16).
+
+---
+
+### III.7.4. UC-GOV-04 — Xử lý yêu cầu chủ thể dữ liệu (Luồng 7)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-GOV-04 |
+| **Tên** | Tiếp nhận, xác thực và xử lý các loại yêu cầu của chủ thể dữ liệu: xem, chỉnh sửa, rút đồng ý, ngừng xử lý, xóa/ẩn danh, yêu cầu giải thích — theo thời hạn nội bộ và trần luật |
+| **Actor chính** | Pháp chế và tuân thủ (COMPLIANCE) |
+| **Actor phụ** | CSKH và tổng đài (CSKH) — **tiếp nhận** yêu cầu; Người phụ trách dữ liệu (DATA-STEWARD) — xử lý trong CDP; Hệ thống — theo dõi thời hạn |
+| **Mô tả** | Bộ phận tiếp nhận yêu cầu của khách hàng (qua ứng dụng/website/bưu cục/tổng đài/CSKH), xác thực danh tính, phân loại, kiểm tra phạm vi và xử lý hoặc chuyển nguồn; cập nhật, ghi nhật ký, thông báo và đồng bộ. CDP không có kênh tự phục vụ cho khách hàng (I.2.2). |
+| **Tiền điều kiện** | Có yêu cầu của chủ thể dữ liệu được tiếp nhận. Người xử lý có quyền xử lý yêu cầu chủ thể dữ liệu (II.3). |
+| **Kích hoạt** | Nhân viên tiếp nhận nhập yêu cầu vào màn Xử lý yêu cầu chủ thể dữ liệu (SCR-GOV-04). |
+
+**Luồng chính:**
+
+1. Bộ phận tiếp nhận **nhập yêu cầu** và **xác thực danh tính** người yêu cầu (tránh trả dữ liệu cho sai người — DP-12).
+2. Hệ thống/người dùng **phân loại yêu cầu**: xem dữ liệu · chỉnh sửa · rút đồng ý · ngừng xử lý · xóa hoặc ẩn danh · yêu cầu giải thích (Luồng 7 mục 3).
+3. Hệ thống gán **thời hạn nội bộ + trần luật** theo loại yêu cầu (BR-GOV-08) và bắt đầu đếm ngược.
+4. Người phụ trách dữ liệu **kiểm tra phạm vi** dữ liệu trong CDP và các hệ thống nguồn liên quan.
+5. **Xử lý** trong CDP (ví dụ rút đồng ý, ẩn danh) hoặc **chuyển yêu cầu sang hệ thống nguồn** nếu dữ liệu gốc nằm ở đó.
+6. Hệ thống **cập nhật trạng thái, ghi nhật ký bất biến, thông báo kết quả** cho khách hàng (qua bộ phận tiếp nhận).
+7. Hệ thống **đồng bộ** thay đổi sang các hệ thống nhận dữ liệu nếu ảnh hưởng đồng ý/kích hoạt (Luồng 7 mục 7); nếu là rút đồng ý ảnh hưởng tệp đã đẩy → UC-ACT-06.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | **Không xác thực được** danh tính người yêu cầu | Từ chối yêu cầu, ghi lý do (DP-12); thông báo bộ phận tiếp nhận |
+| A2 | Yêu cầu **xóa/ẩn danh** dữ liệu còn nghĩa vụ lưu trữ pháp lý | Ẩn danh thay vì xóa cứng phần còn nghĩa vụ lưu; giữ vết xử lý (FR-GOV-12); dữ liệu thiếu đồng ý **không bị xóa** nhưng giới hạn mục đích (baseline mục 5) |
+| A3 | Còn **1/3 hạn nội bộ** mà chưa xử lý xong | Hệ thống **cảnh báo**; quá hạn nội bộ → **báo lên quản lý** (vẫn còn biên trước hạn luật — BR-GOV-08) |
+| A4 | Dữ liệu gốc nằm ở **hệ thống nguồn** | Chuyển yêu cầu sang nguồn; theo dõi tới khi nguồn xác nhận xử lý; CDP cập nhật trạng thái |
+| E1 | Không có quyền xử lý yêu cầu | "Bạn không có quyền truy cập chức năng này." (7.3) |
+
+**Hậu điều kiện:** Yêu cầu được xử lý trong hạn nội bộ (hoặc báo lên khi quá hạn); thay đổi ghi nhật ký bất biến; kết quả thông báo cho khách hàng; đồng bộ sang hệ thống liên quan.
+
+**Business Rule liên quan:** BR-GOV-06, 07, 08; BR-ACT-07.
+**FR gốc:** FR-GOV-11, 12.
+**Giai đoạn:** P1 (rút đồng ý — hạn trong ngày); P2 (xem/sửa/xóa/ẩn danh mở rộng).
+
+---
+
+### III.7.5. UC-GOV-05 — Kiểm soát và phê duyệt xuất dữ liệu (Export Control)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-GOV-05 |
+| **Tên** | Kiểm soát quyền xuất dữ liệu và phê duyệt các yêu cầu xuất vượt ngưỡng hoặc chứa dữ liệu nhạy cảm |
+| **Actor chính** | Quản trị hệ thống (SYS-ADMIN) — và theo cấp: quản lý trực tiếp / quản trị dữ liệu + tuân thủ |
+| **Actor phụ** | Người phụ trách dữ liệu (DATA-STEWARD); Pháp chế (COMPLIANCE) — duyệt xuất >10.000 |
+| **Mô tả** | Người phê duyệt xem hàng đợi yêu cầu xuất vượt ngưỡng, kiểm tra che dữ liệu và lý do, rồi phê duyệt hoặc từ chối theo cấp ngưỡng. |
+| **Tiền điều kiện** | Có yêu cầu xuất vượt ngưỡng chờ duyệt (từ UC-ACT-03/các màn xuất). Người dùng có quyền APPROVE tương ứng cấp. |
+| **Kích hoạt** | Người phê duyệt mở màn Kiểm soát xuất dữ liệu (SCR-GOV-05). |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị hàng đợi yêu cầu xuất chờ duyệt: người yêu cầu, phân khúc/tệp, số bản ghi, các trường, có che hay không, lý do, cấp phê duyệt cần (BR-GOV-05).
+2. Người phê duyệt xem chi tiết và **kiểm tra** che dữ liệu, giới hạn trường, tính hợp lệ của lý do.
+3. Người phê duyệt **phê duyệt** (đúng cấp: 1.001–10.000 quản lý; >10.000 quản trị dữ liệu + tuân thủ) hoặc **từ chối** kèm lý do.
+4. Hệ thống ghi nhật ký phê duyệt/từ chối; nếu phê duyệt → cho tạo tệp xuất; nếu từ chối → thông báo người yêu cầu.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Yêu cầu xuất **>100.000** (trần cứng) | Không đưa vào hàng đợi duyệt; đã bị chặn ở bước tạo (BR-GOV-05) |
+| A2 | Xuất **không che** (quyền đặc biệt) | Yêu cầu ghi lý do; chỉ vai trò có quyền đặc biệt còn hiệu lực mới duyệt được (BR-GOV-03, 05) |
+| A3 | Người duyệt không đúng cấp cho ngưỡng | Chuyển yêu cầu lên đúng cấp phê duyệt |
+| E1 | Không có quyền phê duyệt | "Bạn không có quyền truy cập chức năng này." (7.3) |
+
+**Hậu điều kiện:** Yêu cầu xuất được phê duyệt/từ chối đúng cấp; quyết định ghi nhật ký; tệp xuất (nếu duyệt) áp che dữ liệu theo quyền.
+
+**Business Rule liên quan:** BR-GOV-05, 03, 07.
+**FR gốc:** FR-GOV-09.
+**Giai đoạn:** P2.
+
+---
+
+### III.7.6. UC-GOV-06 — Xem báo cáo tuân thủ
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-GOV-06 |
+| **Tên** | Xem các báo cáo định kỳ phục vụ kiểm toán và tuân thủ: đồng ý, truy cập, xuất dữ liệu, xử lý yêu cầu khách hàng, chất lượng dữ liệu |
+| **Actor chính** | Pháp chế và tuân thủ (COMPLIANCE) |
+| **Actor phụ** | An toàn thông tin (SEC-OFFICER); Lãnh đạo đơn vị (LEADER) — theo phạm vi |
+| **Mô tả** | Người dùng xem báo cáo tổng hợp định kỳ về tuân thủ dữ liệu cá nhân, phục vụ kiểm toán nội bộ và cơ quan quản lý. |
+| **Tiền điều kiện** | Người dùng có quyền xem báo cáo tuân thủ (II.3). |
+| **Kích hoạt** | Người dùng mở màn Báo cáo tuân thủ (SCR-GOV-06). |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị các nhóm báo cáo tuân thủ (FR-GOV-15): tỷ lệ hồ sơ có đồng ý rõ ràng, thống kê truy cập/xem dữ liệu nhạy cảm, thống kê xuất dữ liệu, tình hình xử lý yêu cầu chủ thể dữ liệu (trong hạn/quá hạn), chất lượng dữ liệu.
+2. Người dùng chọn **kỳ báo cáo** và **phạm vi** (đơn vị/địa bàn theo quyền).
+3. Người dùng **xuất báo cáo** phục vụ kiểm toán (áp kiểm soát xuất BR-GOV-05).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Chưa đủ dữ liệu cho kỳ báo cáo | "Chưa có dữ liệu cho kỳ báo cáo đã chọn." (7.3) |
+| A2 | Ngoài phạm vi phân quyền | Chỉ hiển thị dữ liệu trong đơn vị/vùng được giao (BR-GOV-10) |
+| E1 | Không có quyền xem báo cáo tuân thủ | "Bạn không có quyền truy cập chức năng này." (7.3) |
+
+**Hậu điều kiện:** Người dùng xem/xuất được báo cáo tuân thủ trong phạm vi quyền; việc xuất ghi nhật ký.
+
+**Business Rule liên quan:** BR-GOV-05, 07, 10.
+**FR gốc:** FR-GOV-15.
+**Giai đoạn:** P2.
+
+---
+
+### III.7.7. UC-GOV-07 — Quản trị theo đơn vị và kiểm soát theo mục đích
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-GOV-07 |
+| **Tên** | Phân quyền và báo cáo theo đơn vị/tỉnh/thành (Unit-based), và kiểm soát dữ liệu chỉ dùng đúng mục đích đã khai báo (Purpose-based) |
+| **Actor chính** | Quản trị hệ thống (SYS-ADMIN) |
+| **Actor phụ** | Lãnh đạo và quản lý đơn vị (LEADER) — xem theo phạm vi; Chủ sở hữu dữ liệu (DATA-OWNER) — phê duyệt mục đích |
+| **Mô tả** | Người quản trị thiết lập phạm vi đơn vị/tỉnh cho tài khoản và cấu hình mục đích sử dụng hợp lệ cho từng nhóm dữ liệu; hệ thống chặn truy cập/dùng dữ liệu ngoài phạm vi/mục đích. |
+| **Tiền điều kiện** | Người dùng có quyền ADMIN/CONFIG khối Quản trị. Có cơ cấu đơn vị/tỉnh và danh mục mục đích. |
+| **Kích hoạt** | Người quản trị mở màn Quản trị theo đơn vị (SCR-GOV-07). |
+
+**Luồng chính:**
+
+1. Hệ thống hiển thị cơ cấu đơn vị/tỉnh và phạm vi dữ liệu tương ứng mỗi đơn vị (BR-GOV-10, II.4.5 mục 1).
+2. Người quản trị **gán phạm vi đơn vị/tỉnh** cho tài khoản/nhóm tài khoản (đảm bảo đơn vị chỉ xem dữ liệu trong phạm vi — FR-GOV-14).
+3. Người quản trị cấu hình **mục đích sử dụng hợp lệ** cho từng nhóm dữ liệu (vận hành/chăm sóc/tiếp thị/phân tích/đối soát — FR-GOV-17).
+4. Hệ thống **chặn** truy cập/dùng dữ liệu ngoài phạm vi đơn vị hoặc sai mục đích, ghi nhật ký vi phạm (BR-GOV-10).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Tài khoản thuộc nhiều đơn vị | Cho gán nhiều phạm vi; hợp nhất theo quyền rộng nhất trong giới hạn — [Cần xác nhận] OQ-GOV-05 (quy tắc hợp nhất phạm vi đa đơn vị) |
+| A2 | Dữ liệu dùng sai mục đích khai báo | Chặn và cảnh báo "Dữ liệu này chỉ được dùng cho mục đích {đã khai báo}."; ghi nhật ký (BR-GOV-10) |
+| E1 | Không có quyền quản trị đơn vị | "Bạn không có quyền truy cập chức năng này." (7.3) |
+
+**Hậu điều kiện:** Phạm vi đơn vị và mục đích sử dụng được thiết lập; truy cập/dùng dữ liệu ngoài phạm vi/mục đích bị chặn và ghi nhật ký.
+
+**Business Rule liên quan:** BR-GOV-10, 02.
+**FR gốc:** FR-GOV-14, 17.
+**Giai đoạn:** P2.
+
+---
+
+### III.7.8. UC-GOV-08 — Che và phân loại dữ liệu nhạy cảm; hỗ trợ điều tra sự cố
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-GOV-08 |
+| **Tên** | Phân loại mức độ nhạy cảm của dữ liệu và áp che theo vai trò (mức nghiệp vụ); cung cấp nhật ký/lịch sử truy cập/xuất/kích hoạt để hỗ trợ điều tra sự cố |
+| **Actor chính** | An toàn thông tin (SEC-OFFICER) |
+| **Actor phụ** | Người phụ trách dữ liệu (DATA-STEWARD) — phân loại nhạy cảm; Quản trị hệ thống (SYS-ADMIN) |
+| **Mô tả** | Người dùng phân loại dữ liệu theo mức nhạy cảm (thường/cá nhân/nhạy cảm/vị trí/COD-tài chính/hành vi) làm căn cứ che theo vai trò; khi có sự cố, cung cấp log/lịch sử truy cập, xuất, kích hoạt để điều tra. |
+| **Tiền điều kiện** | Người dùng có quyền phân loại nhạy cảm/điều tra (SEC-OFFICER/DATA-STEWARD). |
+| **Kích hoạt** | Người dùng mở màn phân loại nhạy cảm; hoặc khởi tạo điều tra sự cố từ nhật ký kiểm toán (UC-GOV-02). |
+
+**Luồng chính:**
+
+1. Người dùng xem **phân loại mức nhạy cảm** của các nhóm dữ liệu (thường/cá nhân/nhạy cảm/vị trí/COD-tài chính/hành vi — FR-GOV-10) và điều chỉnh phân loại.
+2. Hệ thống áp **che theo vai trò** dựa trên phân loại (tham chiếu masking Lô 1 — BR-GOV-04, không lặp thuật toán). **Mã hóa dữ liệu ở tầng lưu trữ (FR-GOV-01)** là kỹ thuật thuộc SA/IT Security — UC này chỉ nêu **kết quả nghiệp vụ** (dữ liệu nhạy cảm được bảo vệ, hiển thị che theo quyền).
+3. Khi có **sự cố dữ liệu**, người dùng truy xuất **log, lịch sử truy cập, lịch sử xuất, lịch sử kích hoạt** liên quan (FR-GOV-13) để phục vụ điều tra.
+4. Người dùng lập **hồ sơ điều tra** (ai truy cập gì, khi nào, có bất thường không) — mức nghiệp vụ; **quy trình forensic kỹ thuật thuộc SA/IT Security**, không đặc tả ở đây.
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Phân loại lại nhóm dữ liệu sang mức nhạy cảm cao hơn | Áp che chặt hơn ngay; cảnh báo các vai trò đang xem đầy đủ sẽ bị che — ghi nhật ký |
+| A2 | Điều tra cần **xem dữ liệu không che** | Cấp quyền đặc biệt có thời hạn kèm lý do (BR-GOV-03); mọi truy cập ghi nhật ký |
+| E1 | Không có quyền phân loại/điều tra | "Bạn không có quyền truy cập chức năng này." (7.3) |
+
+**Hậu điều kiện:** Phân loại nhạy cảm được cập nhật và áp che theo vai trò; hồ sơ điều tra sự cố (mức nghiệp vụ) được lập từ nhật ký/lịch sử.
+
+**Business Rule liên quan:** BR-GOV-04, 06, 07.
+**FR gốc:** FR-GOV-01 (kết quả nghiệp vụ), 10, 13.
+**Giai đoạn:** P1 (che PII FR-GOV-01); P2 (phân loại FR-GOV-10, điều tra FR-GOV-13).
+
+> **Ghi chú ranh giới:** FR-GOV-01 (mã hóa), FR-GOV-13 (điều tra sự cố kỹ thuật) có phần kỹ thuật thuộc **SA/IT Security** — tài liệu chỉ đặc tả mức nghiệp vụ (ai làm gì, kết quả, quyền xem), KHÔNG đi vào thuật toán mã hóa/quy trình forensic. Che PII mức nghiệp vụ tham chiếu masking Lô 1 (BR-C360-03), không lặp.
+
+---
+
+### III.7.9. UC-GOV-09 — Ghi nhật ký bất biến mọi thao tác quan trọng (nền)
+
+| Mục | Nội dung |
+|---|---|
+| **Mã Use Case** | UC-GOV-09 |
+| **Tên** | Hệ thống ghi nhật ký bất biến cho mọi thao tác quan trọng để giải trình và điều tra (góc ghi của Audit Trail) |
+| **Actor chính** | Hệ thống (xử lý nền) |
+| **Actor phụ** | — (mọi vai trò tạo ra thao tác được ghi) |
+| **Mô tả** | Mỗi khi có thao tác quan trọng, hệ thống tự động ghi một bản ghi nhật ký bất biến (chỉ ghi thêm, không sửa/xóa) kèm đầy đủ thông tin giải trình. |
+| **Tiền điều kiện** | Có thao tác quan trọng xảy ra (đăng nhập/tìm kiếm/xem/xuất/gộp/tách/kích hoạt/thay đổi đồng ý/thay đổi phân quyền). |
+| **Kích hoạt** | Bất kỳ thao tác quan trọng nào được thực hiện trong hệ thống. |
+
+**Luồng chính:**
+
+1. Hệ thống phát hiện một **thao tác quan trọng** (BR-GOV-07).
+2. Hệ thống ghi **bản ghi nhật ký bất biến**: ai, làm gì, trên đối tượng nào, khi nào, kết quả, lý do (nếu nhạy cảm) — chỉ ghi thêm, không sửa/xóa (BR-GOV-06).
+3. Hệ thống áp **thời hạn lưu** theo loại (gộp/tách + đồng ý 5 năm; kích hoạt 3 năm; thao tác thường 2 năm — BR-GOV-06).
+
+**Luồng thay thế / ngoại lệ:**
+
+| Mã | Điều kiện | Xử lý |
+|---|---|---|
+| A1 | Ghi nhật ký thất bại (lỗi hạ tầng) | Thao tác nhạy cảm không hoàn tất nếu không ghi được nhật ký (fail-safe nghiệp vụ) — [Cần xác nhận] OQ-GOV-06 (thao tác nào bắt buộc chặn khi không ghi được nhật ký) |
+
+**Hậu điều kiện:** Mọi thao tác quan trọng có bản ghi nhật ký bất biến với thời hạn lưu tương ứng, sẵn sàng cho UC-GOV-02 (xem) và UC-GOV-06/08 (báo cáo/điều tra).
+
+**Business Rule liên quan:** BR-GOV-06, 07.
+**FR gốc:** FR-GOV-03.
+**Giai đoạn:** P1.
+
+> **Ghi chú:** UC-GOV-09 là **góc ghi** (actor Hệ thống, nền, không có màn người dùng); UC-GOV-02 là **góc đọc** (actor người dùng, màn SCR-GOV-02). Hai UC cùng một Audit Trail FR-GOV-03.
+
+---
+
 # IV. GIAO DIỆN CHỨC NĂNG (PROTOTYPE CHÍNH)
 
-> **Nguồn giao diện chuẩn:** prototype v3 (`wireframe/prototype-v3.html`, bản chốt 24/07/2026). Bảy màn ở Mục IV.1–IV.7 thuộc Lô 1; tám màn ở IV.8 thuộc Lô 2; bảy màn ở IV.9 thuộc Lô 3. Khi prototype khác tài liệu gốc CDP.md/solution về **nghiệp vụ** (ngưỡng, mô hình phê duyệt), tài liệu gốc/solution là chuẩn — điểm lệch được ghi rõ ngay tại màn liên quan.
+> **Nguồn giao diện chuẩn:** prototype v3 (`wireframe/prototype-v3.html`, bản chốt 24/07/2026). Bảy màn ở Mục IV.1–IV.7 thuộc Lô 1; tám màn ở IV.8 thuộc Lô 2; bảy màn ở IV.9 thuộc Lô 3; **mười hai màn ở IV.10 thuộc Lô 4 (Kích hoạt SCR-ACT + Quản trị SCR-GOV) — tất cả CẦN BỔ SUNG vì prototype v3 chưa phủ Phân hệ 6/7**. Khi prototype khác tài liệu gốc CDP.md/solution về **nghiệp vụ** (ngưỡng, mô hình phê duyệt), tài liệu gốc/solution là chuẩn — điểm lệch được ghi rõ ngay tại màn liên quan.
 >
 > **Quy ước cột "Bắt buộc" và "Mặc định":** ghi `N/A` cho thành phần chỉ hiển thị (Label, nút thao tác, badge, bảng đọc). Cột "Quyền hiển thị" mô tả che/ẩn theo vai trò (masking).
 
@@ -3223,6 +3936,395 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 
 ---
 
+## IV.10. Giao diện Lô 4 — Kích hoạt (SCR-ACT) và Quản trị (SCR-GOV)
+
+> **Trạng thái chung:** prototype v3 **chưa phủ** Phân hệ 6 (Kích hoạt) và Phân hệ 7 (Quản trị). Toàn bộ **12 màn ở IV.10 là CẦN BỔ SUNG** — layout mô tả theo mô tả FR gốc (CDP.md 7.7, 7.8) + baseline Luồng 6/7/8, đánh dấu rõ như SCR-IDR-05/SCR-ANA-04→07. Các **chức năng chạy nền** (kiểm tra consent tự động, đồng bộ kênh, ghi nhật ký bất biến, chấm điểm/cảnh báo) **không có màn riêng**. Tab Đồng ý trong Customer 360 (Lô 1, SCR-C360-02) chỉ **tham chiếu**, không đặc tả lại ở đây.
+
+### IV.10.1. SCR-ACT-01 — Tạo/chạy kích hoạt chiến dịch (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo Luồng 6 + FR-ACT-01/02/03/04/11/12; là màn xương sống thực thi UC-ACT-01. **Giai đoạn P1.**
+
+**Mục tiêu:** Cho Tiếp thị chọn phân khúc + kênh, xem số khách bị loại do consent/loại trừ/tần suất, và đẩy tệp (qua phê duyệt nếu vượt ngưỡng).
+**Ánh xạ Use Case:** UC-ACT-01.
+**Layout (đề xuất):** (1) Khối chọn phân khúc + kênh + mục đích + tên chiến dịch; (2) Khối tóm tắt tệp sau kiểm tra (tổng KH · đủ điều kiện · bị loại theo lý do · giữ lại chu kỳ sau); (3) Khối trạng thái phê duyệt; (4) Nút Kích hoạt.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Chọn phân khúc | Danh sách chọn | Có | Chưa chọn | Phân khúc cần kích hoạt (UC-ACT-01 bước 1) |
+| 2 | Chọn kênh gửi | Nhóm chọn | Có | Chưa chọn | SMS/Zalo/Email/Push/CRM/CSKH — danh sách kênh thực tế **[Cần xác nhận]** OQ-ACT-01 |
+| 3 | Chọn mục đích | Danh sách chọn | Có | Tiếp thị | Mục đích kích hoạt (tiếp thị/phân tích) — quyết định kiểm tra consent (BR-ACT-01) |
+| 4 | Tên chiến dịch | Ô nhập | Có | Trống | Bắt buộc; dùng cho lịch sử kích hoạt |
+| 5 | Ô tổng khách phân khúc | Nhãn số | N/A | N/A | Tổng khách trong phân khúc trước lọc |
+| 6 | Ô số đủ điều kiện gửi | Nhãn số | N/A | N/A | Số khách qua đủ consent + loại trừ + tần suất (BR-ACT-06) |
+| 7 | Ô số bị loại do đồng ý/loại trừ | Nhãn số | N/A | N/A | Kèm câu chữ "Vướng đồng ý dữ liệu" 7.3 (BR-ACT-01/02) |
+| 8 | Ô số giữ lại chu kỳ sau | Nhãn số | N/A | N/A | Khách vượt tần suất/ngoài khung giờ (BR-ACT-03) |
+| 9 | Trạng thái phê duyệt | Nhãn trạng thái | N/A | N/A | "Gửi trực tiếp" (≤1.000) / "Chờ phê duyệt" (>1.000) / "Bị chặn" (>100.000) — BR-ACT-04 |
+| 10 | Nút Kích hoạt | Nút | N/A | N/A | Đẩy tệp; vô hiệu khi tệp trống hoặc >100.000. **Yêu cầu quyền "Kích hoạt chiến dịch"** (II.3 — MARKETING/SYS-ADMIN) |
+| 11 | Nút Gửi duyệt | Nút | N/A | N/A | Hiện khi tệp >1.000; gửi tới người duyệt (7.3 "Cần phê duyệt") |
+
+**Trạng thái đặc biệt:**
+- **Tệp trống (toàn bộ bị loại):** "Không có khách hàng nào trong phân khúc này đủ điều kiện nhận {kênh}. Tệp gửi trống." (UC-ACT-01 A1) — vô hiệu nút Kích hoạt.
+- **Vượt trần cứng 100.000:** "Không thể gửi quá 100.000 bản ghi trong một lần. Vui lòng thu hẹp điều kiện phân khúc." (UC-ACT-01 A2).
+- **Kênh chưa sẵn sàng:** "Kênh {tên} chưa sẵn sàng." (UC-ACT-01 A4).
+- **Đang kiểm tra tệp:** khung chờ ở khối tóm tắt.
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này." (UC-ACT-01 E1).
+
+> **[Cần xác nhận: danh sách kênh kích hoạt thực tế + người phê duyệt theo cấp]** (OQ-ACT-01, OQ-ACT-02) — Baseline chưa chốt kênh thực tế VNPost dùng và ai duyệt tệp vượt ngưỡng.
+
+---
+
+### IV.10.2. SCR-ACT-02 — Quản lý danh sách loại trừ (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-ACT-04 + baseline; phục vụ UC-ACT-02. **Giai đoạn P1.**
+
+**Mục tiêu:** Cho Tiếp thị/Pháp chế quản lý danh sách khách bị loại khỏi mọi chiến dịch tiếp thị.
+**Ánh xạ Use Case:** UC-ACT-02.
+**Layout (đề xuất):** (1) Thanh tìm kiếm/lọc; (2) Bảng danh sách loại trừ; (3) Nút Thêm + biểu mẫu thêm.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Thanh tìm kiếm/lọc | Ô nhập + chọn | Không | Trống | Lọc theo lý do, nguồn, khoảng thời gian |
+| 2 | Bảng danh sách loại trừ | Bảng | N/A | N/A | Định danh/số/email, lý do, nguồn, thời điểm thêm, người thêm |
+| 3 | Nút Thêm vào danh sách | Nút | N/A | N/A | Mở biểu mẫu thêm |
+| 4 | Ô nhập khách hàng/số/email | Ô nhập | Có | Trống | Đối tượng cần loại trừ |
+| 5 | Ô lý do loại trừ | Ô nhập | Có | Trống | Bắt buộc (UC-ACT-02 E2) |
+| 6 | Chọn nguồn | Danh sách chọn | Có | Thủ công | Thủ công / opt-out / không hợp lệ / tuân thủ |
+| 7 | Nút Gỡ khỏi danh sách | Nút | N/A | N/A | Xác nhận + ghi nhật ký; mục do tuân thủ chỉ COMPLIANCE gỡ (UC-ACT-02 E1) |
+
+**Trạng thái đặc biệt:**
+- **Danh sách rỗng:** "Chưa có khách hàng nào trong danh sách loại trừ." (UC-ACT-02 A1).
+- **Thêm trùng:** "Khách hàng này đã có trong danh sách loại trừ." (UC-ACT-02 A2).
+- **Thiếu lý do:** "Vui lòng nhập lý do loại trừ." (UC-ACT-02 E2).
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này." (7.3).
+
+---
+
+### IV.10.3. SCR-ACT-03 — Lịch sử kích hoạt (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-ACT-10 + baseline; phục vụ UC-ACT-05. **Giai đoạn P1.**
+
+**Mục tiêu:** Cho Tiếp thị/Người phụ trách dữ liệu tra cứu lịch sử các lần kích hoạt (lưu 3 năm).
+**Ánh xạ Use Case:** UC-ACT-05.
+**Layout (đề xuất):** (1) Bộ lọc chiến dịch/kênh/thời gian; (2) Bảng lịch sử kích hoạt; (3) Panel chi tiết một lần kích hoạt.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Bộ lọc Chiến dịch/Kênh/Thời gian | Danh sách chọn + ngày | Không | 90 ngày gần nhất | Lọc lịch sử kích hoạt |
+| 2 | Bảng lịch sử kích hoạt | Bảng | N/A | N/A | Chiến dịch, phân khúc/tệp, kênh, thời điểm gửi, số khách gửi, kết quả tổng hợp (FR-ACT-10) |
+| 3 | Panel chi tiết lần kích hoạt | Khối | N/A | N/A | Số bị loại theo lý do (đồng ý/loại trừ/tần suất), số đã gửi, kết quả (thành công/mở/phản hồi/chuyển đổi) |
+| 4 | Liên kết lịch sử theo khách hàng | Liên kết | N/A | N/A | Mở lịch sử kích hoạt của một khách (liên kết Customer 360) |
+
+**Trạng thái đặc biệt:**
+- **Chưa có lịch sử:** "Chưa có lịch sử kích hoạt để hiển thị." (UC-ACT-05 A1).
+- **Lọc không ra kết quả:** "Không tìm thấy lần kích hoạt nào khớp điều kiện lọc." (UC-ACT-05 A2).
+- **Đang tải:** khung chờ ở bảng.
+
+---
+
+### IV.10.4. SCR-ACT-04 — Giám sát đồng bộ sang hệ thống đích (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-ACT-13/14/09 + baseline; phục vụ UC-ACT-04. **Giai đoạn P2.**
+
+**Mục tiêu:** Cho Quản trị/Tiếp thị theo dõi trạng thái đồng bộ tệp sang các hệ thống đích và nhận phản hồi từ kênh.
+**Ánh xạ Use Case:** UC-ACT-04.
+**Layout (đề xuất):** (1) Bảng trạng thái đồng bộ theo hệ thống đích; (2) Panel chi tiết bản ghi lỗi + nút thử lại; (3) Khối phản hồi kết quả gửi.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Bảng trạng thái đồng bộ | Bảng | N/A | N/A | Hệ thống đích (CRM/SMS/Email/Zalo/CSKH/BSS), số đồng bộ, thành công/lỗi, thời điểm gần nhất (FR-ACT-13) |
+| 2 | Panel chi tiết bản ghi lỗi | Khối | N/A | N/A | Bản ghi lỗi + lý do đồng bộ lỗi |
+| 3 | Nút Thử đồng bộ lại | Nút | N/A | N/A | Thử lại bản ghi lỗi; báo động nếu vẫn lỗi (UC-ACT-04 A2) |
+| 4 | Khối phản hồi kết quả gửi | Khối | N/A | N/A | Gửi thành công/mở/click/phản hồi/chuyển đổi từ kênh (FR-ACT-14) — cập nhật Customer 360 (BR-ACT-09) |
+
+**Trạng thái đặc biệt:**
+- **Chưa có dữ liệu đồng bộ:** "Chưa có dữ liệu đồng bộ để hiển thị." (UC-ACT-04 A1).
+- **Đồng bộ lỗi kéo dài:** "Đồng bộ sang {tên đích} đang lỗi — {N} bản ghi chưa đồng bộ." — câu chữ đề xuất **[Cần xác nhận]** OQ-ACT-05 (UC-ACT-04 A2).
+- **Kênh không trả phản hồi:** "Kênh {tên} không cung cấp phản hồi kết quả gửi." (UC-ACT-04 A3).
+
+> **Ghi chú ranh giới:** đây là lỗi **outbound** (edge 6.4) đã phân định thuộc Phân hệ 6 ở Lô 2. Lỗi inbound thuộc Phân hệ 1 (SCR-ING-01).
+
+---
+
+### IV.10.5. SCR-ACT-05 — Xuất tệp khách hàng phục vụ chiến dịch (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-ACT-05 + FR-GOV-09 + baseline; phục vụ UC-ACT-03. **Giai đoạn P2.**
+
+**Mục tiêu:** Cho Tiếp thị xuất tệp khách hàng theo phân khúc, có che dữ liệu, giới hạn trường và phê duyệt theo ngưỡng.
+**Ánh xạ Use Case:** UC-ACT-03.
+**Layout (đề xuất):** (1) Chọn phân khúc/tệp; (2) Chọn trường xuất (giới hạn theo quyền); (3) Khối thông tin ngưỡng + trạng thái phê duyệt; (4) Nút Xuất.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Chọn phân khúc/tệp | Danh sách chọn | Có | Chưa chọn | Nguồn dữ liệu cần xuất |
+| 2 | Chọn trường xuất | Nhóm chọn | Có | Trường cơ bản | Chỉ hiện trường trong quyền của vai trò; trường nhạy cảm bị che (BR-ACT-05) |
+| 3 | Công tắc Xuất không che | Công tắc | Không | Tắt (luôn che) | Chỉ vai trò có **quyền đặc biệt** bật được; bật thì bắt buộc ghi lý do (UC-ACT-03 A2) |
+| 4 | Ô lý do (khi xuất không che) | Ô nhập | Có nếu bật (3) | Trống | Bắt buộc khi xuất không che (BR-ACT-05, II.4.4 mục 7) |
+| 5 | Nhãn số bản ghi + cấp phê duyệt | Nhãn | N/A | N/A | ≤1.000 trực tiếp / 1.001–10.000 duyệt quản lý / >10.000 duyệt quản trị+tuân thủ / >100.000 chặn (BR-ACT-05) |
+| 6 | Nút Xuất tệp | Nút | N/A | N/A | Xuất; vô hiệu khi >100.000. **Yêu cầu quyền "Xuất danh sách khách hàng"** (II.3) |
+
+**Trạng thái đặc biệt:**
+- **Vượt trần cứng 100.000:** "Không thể xuất quá 100.000 bản ghi trong một lần. Vui lòng thu hẹp điều kiện lọc." (UC-ACT-03 A1, 7.3).
+- **Vượt ngưỡng xuất trực tiếp:** "Tệp {N} bản ghi vượt mức được xuất trực tiếp. Yêu cầu đã gửi tới {người duyệt} chờ phê duyệt." (7.3).
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này." (7.3).
+
+---
+
+### IV.10.6. SCR-GOV-01 — Quản lý tài khoản, vai trò, phạm vi (RBAC) (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-GOV-03/08/14 + baseline Luồng 8; phục vụ UC-GOV-01. **Giai đoạn P1.**
+
+**Mục tiêu:** Cho Quản trị gán vai trò, phạm vi dữ liệu và quyền đặc biệt có thời hạn cho tài khoản đã có danh tính từ cổng chung.
+**Ánh xạ Use Case:** UC-GOV-01.
+**Layout (đề xuất):** (1) Danh sách tài khoản; (2) Panel chi tiết tài khoản (vai trò, phạm vi 6 cấp, quyền đặc biệt còn hiệu lực).
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Danh sách tài khoản | Bảng | N/A | N/A | Danh tính (mã nhân sự/tên), vai trò, phạm vi, trạng thái, quyền đặc biệt còn hiệu lực |
+| 2 | Chọn vai trò | Danh sách chọn | Có | Giữ hiện tại | Chọn từ 12 vai trò (II.4.1) |
+| 3 | Thiết lập phạm vi dữ liệu | Nhóm chọn | Không | Theo đơn vị | 6 cấp phạm vi (II.4.5): đơn vị/tỉnh, bưu cục/vùng, KH phụ trách, nhóm nghiệp vụ, mức chi tiết, mục đích |
+| 4 | Cấp quyền đặc biệt | Nhóm chọn | Không | Không cấp | Xem định danh cá nhân đầy đủ / xuất không che (BR-GOV-03) |
+| 5 | Ô thời hạn quyền đặc biệt | Bộ chọn ngày | Có nếu cấp (4) | **[Cần xác nhận]** | Thời hạn tự hết hạn — mặc định chưa có, **OQ-GOV-01** |
+| 6 | Ô lý do cấp quyền đặc biệt | Ô nhập | Có nếu cấp (4) | Trống | Bắt buộc; ghi nhật ký (II.4.4 mục 7) |
+| 7 | Nút Lưu phân quyền | Nút | N/A | N/A | Áp quyền + ghi nhật ký bất biến. **Yêu cầu quyền ADMIN** (II.4.3) |
+| 8 | Khối thông báo cổng chung | Nhãn | N/A | N/A | "Tài khoản và mật khẩu do cổng đăng nhập chung quản lý." (BR-GOV-01, UC-GOV-01 A3) |
+
+**Trạng thái đặc biệt:**
+- **Quyền đặc biệt đến hạn:** hiển thị "Đã hết hạn — tự thu hồi" (BR-GOV-03, UC-GOV-01 A1).
+- **Tổ hợp quyền xung đột:** cảnh báo theo nguyên tắc tách quyền (UC-GOV-01 A2) — chặn cứng hay chỉ cảnh báo **[Cần xác nhận]** OQ-GOV-03.
+- **Không đủ quyền (không phải ADMIN):** "Bạn không có quyền truy cập chức năng này." (7.3).
+
+---
+
+### IV.10.7. SCR-GOV-02 — Nhật ký kiểm toán (Audit Trail) (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-GOV-03 + baseline Luồng 8; phục vụ UC-GOV-02. **Giai đoạn P1.**
+
+**Mục tiêu:** Cho An toàn thông tin/Quản trị/Pháp chế tra cứu nhật ký bất biến của mọi thao tác quan trọng.
+**Ánh xạ Use Case:** UC-GOV-02.
+**Layout (đề xuất):** (1) Bộ lọc loại thao tác/người dùng/đối tượng/thời gian; (2) Bảng nhật ký; (3) Nút Xuất nhật ký + nút Đánh dấu điều tra.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Bộ lọc loại thao tác | Danh sách chọn | Không | Tất cả | Đăng nhập/tìm kiếm/xem/xuất/gộp/tách/kích hoạt/thay đổi đồng ý/phân quyền (BR-GOV-07) |
+| 2 | Bộ lọc người dùng/đối tượng/thời gian | Ô nhập + ngày | Không | 30 ngày gần nhất | Lọc theo người thao tác, đối tượng, khoảng thời gian |
+| 3 | Bảng nhật ký | Bảng | N/A | N/A | Ai, làm gì, đối tượng, thời điểm, kết quả, lý do (chỉ đọc — BR-GOV-06) |
+| 4 | Nút Đánh dấu điều tra | Nút | N/A | N/A | Đánh dấu bản ghi bất thường để điều tra (chuyển UC-GOV-08) |
+| 5 | Nút Xuất nhật ký | Nút | N/A | N/A | Xuất phục vụ điều tra/báo cáo (áp kiểm soát xuất BR-GOV-05) |
+
+**Trạng thái đặc biệt:**
+- **Lọc không ra kết quả:** "Không tìm thấy bản ghi nhật ký nào khớp điều kiện lọc." (UC-GOV-02 A1).
+- **Nhật ký chỉ đọc:** không có nút sửa/xóa (bất biến — UC-GOV-02 A2).
+- **Ngoài hạn lưu trữ:** không hiển thị; **[Cần xác nhận]** OQ-GOV-02 chính sách sau hạn (UC-GOV-02 A3).
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này." (7.3).
+
+---
+
+### IV.10.8. SCR-GOV-03 — Quản lý consent và vòng đời (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3** (tab Đồng ý trong C360 Lô 1 chỉ **xem** trạng thái một khách; màn này là góc **quản trị** consent). Đặc tả theo FR-GOV-02/16 + baseline Luồng 7; phục vụ UC-GOV-03. **Giai đoạn P1 (02) / P2 (16).**
+
+**Mục tiêu:** Cho Pháp chế/Người phụ trách dữ liệu quản lý trạng thái đồng ý theo mục đích×kênh và vòng đời consent.
+**Ánh xạ Use Case:** UC-GOV-03.
+**Layout (đề xuất):** (1) Tìm khách hàng; (2) Ma trận mục đích × kênh; (3) Panel vòng đời consent (cấp/hết hạn/rút/gia hạn + lịch sử).
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Tìm khách hàng | Ô tìm kiếm | Có | Trống | Tìm khách để xem/quản lý consent |
+| 2 | Ma trận mục đích × kênh | Bảng | N/A | N/A | Vận hành/tiếp thị/phân tích × SMS/Zalo/email/push: đồng ý/từ chối/chưa xác định + thời điểm + nguồn (BR-ACT-01) |
+| 3 | Panel vòng đời consent | Khối | N/A | N/A | Thời điểm cấp, hết hạn, lịch sử rút/gia hạn (FR-GOV-16) |
+| 4 | Nút Cập nhật đồng ý | Nút | N/A | N/A | Cập nhật khi khách yêu cầu (qua CSKH/Pháp chế); ghi nhật ký bất biến 5 năm (BR-GOV-06). **Yêu cầu quyền quản lý đồng ý** (II.3) |
+
+**Trạng thái đặc biệt:**
+- **Consent hết hạn:** hiển thị "Hết hạn" cho mục đích+kênh; khách bị loại khỏi tệp tới khi gia hạn (UC-GOV-03 A1).
+- **Rút đồng ý khi đã trong tệp đã đẩy:** cảnh báo và kích hoạt UC-ACT-06 (edge 6.4 — BR-ACT-07).
+- **Chưa có bằng chứng đồng ý:** đánh dấu "chưa xác định"; không dùng tiếp thị/phân tích (UC-GOV-03 A3, liên quan OQ-06).
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này." (7.3).
+
+---
+
+### IV.10.9. SCR-GOV-04 — Xử lý yêu cầu chủ thể dữ liệu (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-GOV-11/12 + baseline Luồng 7 + thời hạn 7.2; phục vụ UC-GOV-04. **Giai đoạn P1 (rút đồng ý) / P2 (mở rộng).**
+
+**Mục tiêu:** Cho Pháp chế/CSKH/Người phụ trách dữ liệu tiếp nhận, xác thực, phân loại và xử lý yêu cầu của khách hàng theo thời hạn nội bộ + trần luật.
+**Ánh xạ Use Case:** UC-GOV-04.
+**Layout (đề xuất):** (1) Danh sách yêu cầu + trạng thái/thời hạn; (2) Biểu mẫu tiếp nhận (xác thực + phân loại); (3) Panel xử lý + đồng hồ đếm ngược hạn.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Danh sách yêu cầu | Bảng | N/A | N/A | Khách, loại yêu cầu, trạng thái, hạn nội bộ còn lại, trần luật |
+| 2 | Xác thực danh tính | Nhóm nhập | Có | Trống | Bắt buộc trước khi xử lý (DP-12, UC-GOV-04 bước 1) |
+| 3 | Phân loại yêu cầu | Danh sách chọn | Có | Chưa chọn | Xem/chỉnh sửa/rút đồng ý/ngừng xử lý/xóa-ẩn danh/giải thích (Luồng 7) |
+| 4 | Nhãn thời hạn (nội bộ + trần luật) | Nhãn | N/A | N/A | Theo loại yêu cầu (BR-GOV-08): rút đồng ý trong ngày/trần 2 ngày; xem-sửa 7 ngày; ngừng 10 ngày; xóa-ẩn danh 15 ngày |
+| 5 | Đồng hồ đếm ngược hạn | Nhãn động | N/A | N/A | Cảnh báo khi còn 1/3 hạn; đỏ khi quá hạn nội bộ (BR-GOV-08) |
+| 6 | Nút Xử lý trong CDP / Chuyển nguồn | Nút | N/A | N/A | Xử lý tại CDP hoặc chuyển sang hệ thống nguồn (UC-GOV-04 bước 5) |
+| 7 | Nút Hoàn tất + thông báo KH | Nút | N/A | N/A | Cập nhật trạng thái, ghi nhật ký bất biến, thông báo KH, đồng bộ (UC-GOV-04 bước 6-7) |
+
+**Trạng thái đặc biệt:**
+- **Không xác thực được danh tính:** từ chối yêu cầu, ghi lý do (UC-GOV-04 A1, DP-12).
+- **Xóa/ẩn danh còn nghĩa vụ lưu:** ẩn danh thay vì xóa cứng phần còn nghĩa vụ; giữ vết (UC-GOV-04 A2).
+- **Còn 1/3 hạn nội bộ:** cảnh báo; quá hạn nội bộ báo lên quản lý (UC-GOV-04 A3).
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này." (7.3).
+
+---
+
+### IV.10.10. SCR-GOV-05 — Kiểm soát xuất dữ liệu (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-GOV-09 + baseline ngưỡng xuất; phục vụ UC-GOV-05. **Giai đoạn P2.**
+
+**Mục tiêu:** Cho người phê duyệt (theo cấp) xem hàng đợi yêu cầu xuất vượt ngưỡng và phê duyệt/từ chối.
+**Ánh xạ Use Case:** UC-GOV-05.
+**Layout (đề xuất):** (1) Hàng đợi yêu cầu xuất chờ duyệt; (2) Panel chi tiết yêu cầu; (3) Nút Phê duyệt/Từ chối.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Hàng đợi yêu cầu xuất | Bảng | N/A | N/A | Người yêu cầu, phân khúc/tệp, số bản ghi, trường, có che hay không, lý do, cấp duyệt cần (BR-GOV-05) |
+| 2 | Panel chi tiết yêu cầu | Khối | N/A | N/A | Kiểm tra che dữ liệu, giới hạn trường, tính hợp lệ của lý do |
+| 3 | Nút Phê duyệt | Nút | N/A | N/A | Đúng cấp: 1.001–10.000 quản lý; >10.000 quản trị dữ liệu + tuân thủ. **Yêu cầu quyền APPROVE** (II.4.3) |
+| 4 | Nút Từ chối | Nút | N/A | N/A | Kèm lý do; thông báo người yêu cầu; ghi nhật ký |
+
+**Trạng thái đặc biệt:**
+- **Hàng đợi trống:** "Chưa có yêu cầu xuất nào chờ phê duyệt." (7.3 biến thể).
+- **Xuất không che (quyền đặc biệt):** yêu cầu có lý do + quyền đặc biệt còn hiệu lực (UC-GOV-05 A2).
+- **Sai cấp phê duyệt:** chuyển yêu cầu lên đúng cấp (UC-GOV-05 A3).
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này." (7.3).
+
+---
+
+### IV.10.11. SCR-GOV-06 — Báo cáo tuân thủ (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-GOV-15 + baseline Luồng 8; phục vụ UC-GOV-06. **Giai đoạn P2.**
+
+**Mục tiêu:** Cho Pháp chế/An toàn thông tin xem báo cáo định kỳ phục vụ kiểm toán và tuân thủ dữ liệu cá nhân.
+**Ánh xạ Use Case:** UC-GOV-06.
+**Layout (đề xuất):** (1) Chọn kỳ + phạm vi; (2) Lưới nhóm báo cáo tuân thủ; (3) Nút Xuất báo cáo.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Chọn kỳ báo cáo | Bộ chọn ngày | Không | Tháng gần nhất | Kỳ báo cáo tuân thủ |
+| 2 | Chọn phạm vi | Danh sách chọn | Không | Theo phân quyền | Đơn vị/địa bàn theo quyền (BR-GOV-10) |
+| 3 | Lưới nhóm báo cáo | Khối | N/A | N/A | Tỷ lệ hồ sơ có đồng ý rõ ràng, thống kê truy cập/xem nhạy cảm, thống kê xuất, tình hình xử lý yêu cầu KH (trong hạn/quá hạn), chất lượng dữ liệu (FR-GOV-15) |
+| 4 | Nút Xuất báo cáo | Nút | N/A | N/A | Xuất phục vụ kiểm toán (áp kiểm soát xuất BR-GOV-05); ghi nhật ký |
+
+**Trạng thái đặc biệt:**
+- **Chưa đủ dữ liệu cho kỳ:** "Chưa có dữ liệu cho kỳ báo cáo đã chọn." (UC-GOV-06 A1).
+- **Ngoài phạm vi phân quyền:** chỉ hiển thị dữ liệu trong đơn vị/vùng được giao (UC-GOV-06 A2).
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này." (7.3).
+
+---
+
+### IV.10.12. SCR-GOV-07 — Quản trị theo đơn vị và kiểm soát theo mục đích (CẦN BỔ SUNG)
+
+> **Trạng thái:** Màn này **chưa có trong prototype v3**. Đặc tả theo FR-GOV-14/17 + II.4.4/II.4.5; phục vụ UC-GOV-07. **Giai đoạn P2.**
+
+**Mục tiêu:** Cho Quản trị thiết lập phạm vi đơn vị/tỉnh cho tài khoản và cấu hình mục đích sử dụng hợp lệ cho từng nhóm dữ liệu.
+**Ánh xạ Use Case:** UC-GOV-07.
+**Layout (đề xuất):** (1) Cây cơ cấu đơn vị/tỉnh; (2) Bảng gán phạm vi cho tài khoản/nhóm; (3) Bảng cấu hình mục đích hợp lệ theo nhóm dữ liệu.
+
+**Bảng thành phần:**
+
+| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+|---|---|---|---|---|---|
+| 1 | Cây cơ cấu đơn vị/tỉnh | Cây | N/A | N/A | Cơ cấu đơn vị/tỉnh và phạm vi dữ liệu tương ứng (BR-GOV-10, II.4.5 mục 1) |
+| 2 | Bảng gán phạm vi | Bảng | Có | Theo đơn vị | Gán phạm vi đơn vị/tỉnh cho tài khoản/nhóm (FR-GOV-14) |
+| 3 | Bảng cấu hình mục đích hợp lệ | Bảng | Có | Theo khai báo | Mục đích hợp lệ cho từng nhóm dữ liệu: vận hành/chăm sóc/tiếp thị/phân tích/đối soát (FR-GOV-17) |
+| 4 | Nút Lưu | Nút | N/A | N/A | Áp phạm vi/mục đích + ghi nhật ký. **Yêu cầu quyền ADMIN/CONFIG** khối Quản trị (II.4.3) |
+
+**Trạng thái đặc biệt:**
+- **Tài khoản đa đơn vị:** hợp nhất phạm vi theo quyền rộng nhất trong giới hạn — **[Cần xác nhận]** OQ-GOV-05 (UC-GOV-07 A1).
+- **Dùng dữ liệu sai mục đích:** chặn + "Dữ liệu này chỉ được dùng cho mục đích {đã khai báo}." (UC-GOV-07 A2, BR-GOV-10).
+- **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này." (7.3).
+
+---
+
+# C. YÊU CẦU PHI CHỨC NĂNG (NON-FUNCTIONAL REQUIREMENTS)
+
+> **Nguồn và nguyên tắc:** Mục C tổng hợp yêu cầu phi chức năng từ **baseline** (GD-01→09, mục 7.2, 8.7, 8.8) và **CDP.md** (7.8, 7.9). **Không tự chế chỉ tiêu hiệu năng** (số RPS, uptime %, response time cụ thể) không có trong nguồn — chỗ nào nguồn chưa nêu con số được đánh dấu `[Cần xác nhận]` kèm OQ, để VNPost/SA chốt. Con số nào đang là giả định (chưa được VNPost duyệt) được gắn mã GD tương ứng.
+
+## C.1. Hiệu năng và quy mô
+
+| Mã | Yêu cầu | Nguồn |
+|---|---|---|
+| NFR-PERF-01 | **Quy mô người dùng nội bộ:** 200–500 tài khoản; **50–100 người dùng đồng thời** lúc cao điểm | GD-01 (đang giả định, chưa VNPost duyệt — nối OQ-07) |
+| NFR-PERF-02 | **Thông lượng tiếp nhận:** khoảng **1,7 triệu bản ghi/ngày** qua hơn 8 luồng dữ liệu. Nút thắt hiệu năng nằm ở **thông lượng sự kiện tiếp nhận** (event throughput), không phải ở số lượng hồ sơ khách hàng (~600.000 hồ sơ hiện có) | Baseline mục 1, I.1; đã nêu ở II.2 Phân hệ 1 |
+| NFR-PERF-03 | **Độ trễ dữ liệu theo nhóm nguồn:** nhóm thời gian thực ≤5 phút; nhóm gần thời gian thực ≤15 phút; nhóm theo lô chạy 01:00–05:00; giờ cao điểm cho phép ≤30 phút (đã đặc tả chi tiết ở BR-ING-01, Lô 2) | Baseline 7.2; BR-ING-01 |
+| NFR-PERF-04 | **Chỉ tiêu hiệu năng chi tiết** (thời gian phản hồi màn hình, số truy vấn đồng thời, RPS của API cá nhân hóa FR-ACT-06) | **[Cần xác nhận]** OQ-GOV-07 — baseline/CDP.md không nêu con số; cần VNPost/SA chốt, **không tự chế** |
+
+## C.2. Bảo mật và quyền riêng tư
+
+| Mã | Yêu cầu | Nguồn |
+|---|---|---|
+| NFR-SEC-01 | **Che dữ liệu cá nhân (PII Masking) theo vai trò:** hiển thị che theo bảng masking 6.2 đã đặc tả Lô 1 (BR-C360-03, BR-GOV-04); số điện thoại/định danh cá nhân/điểm nhạy cảm che theo quyền vai trò | Baseline 6.2, 8.8; FR-GOV-01; BR-C360-03, BR-GOV-04 |
+| NFR-SEC-02 | **Mã hóa dữ liệu nhạy cảm ở tầng lưu trữ** (FR-GOV-01) — yêu cầu nghiệp vụ: dữ liệu định danh/COD-tài chính phải được bảo vệ. **Thuật toán/kiến trúc mã hóa thuộc SA/IT Security**, không đặc tả trong tài liệu BA | CDP.md FR-GOV-01; ranh giới III.7 |
+| NFR-SEC-03 | **Phân quyền tối thiểu (7 nguyên tắc):** cấp quyền tối thiểu, chỉ người có nhu cầu nghiệp vụ hợp lệ, tách quyền cấu hình khỏi quyền xem, phân quyền theo đơn vị/địa bàn, gắn mục đích sử dụng, quyền đặc biệt có thời hạn, truy cập nhạy cảm cần phê duyệt (II.4.4) | II.4.4; baseline 8.7 |
+| NFR-SEC-04 | **Nhật ký bất biến (Immutable Audit Trail):** mọi thao tác quan trọng ghi nhật ký chỉ ghi thêm, không sửa/xóa (BR-GOV-06, 07) | Baseline Luồng 8; FR-GOV-03 |
+| NFR-SEC-05 | **Tuân thủ pháp lý:** đáp ứng **Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15** (hiệu lực 01/01/2026) và **Nghị định 356/2025/NĐ-CP** — quản lý đồng ý, quyền được lãng quên, nhật ký kiểm toán từ ngày đầu. Chế tài: vi phạm thông thường tối đa 3 tỷ VND; chuyển dữ liệu xuyên biên giới tối đa 5% doanh thu năm liền trước (I.3 số 36) | Luật 91/2025/QH15; NĐ 356/2025/NĐ-CP; I.3 số 36 |
+| NFR-SEC-06 | **Theo dõi truy cập bất thường:** phát hiện truy cập ngoài giờ, tải dữ liệu lớn, tra cứu nhiều lần dữ liệu định danh (Luồng 8 mục 5, UC-GOV-02/08) | Baseline Luồng 8 mục 5 |
+
+## C.3. Lưu trữ dữ liệu và nhật ký
+
+| Mã | Yêu cầu | Nguồn |
+|---|---|---|
+| NFR-STOR-01 | **Nhật ký gộp/tách hồ sơ và thay đổi trạng thái đồng ý: lưu 5 năm** | Baseline 7.2; GD-04 (đang giả định — nối OQ-08/OQ-GOV-02) |
+| NFR-STOR-02 | **Nhật ký kích hoạt chiến dịch: lưu 3 năm** | Baseline 7.2; BR-ACT-08 |
+| NFR-STOR-03 | **Nhật ký thao tác thường (xem, tìm kiếm, xuất, đổi phân quyền): lưu 2 năm** | Baseline 7.2; BR-GOV-06 |
+| NFR-STOR-04 | **Bản ghi trong hàng đợi lỗi tiếp nhận: giữ 30 ngày**, sau đó chuyển lưu trữ, **không xóa** (đã nêu Lô 2 — FR-ING-09) | Baseline 6.4; FR-ING-09 |
+| NFR-STOR-05 | **Mã nguồn cũ không bao giờ bị xóa** sau khi gộp (để truy vết và đồng bộ ngược); hồ sơ thiếu đồng ý **không bị xóa** nhưng giới hạn mục đích sử dụng | Baseline mục 5; I.3 số 10 |
+
+## C.4. Độ tin cậy và sẵn sàng
+
+| Mã | Yêu cầu | Nguồn |
+|---|---|---|
+| NFR-REL-01 | **Ngưỡng cảnh báo/báo động luồng dữ liệu (inbound):** cảnh báo (vàng) khi luồng chậm >15 phút hoặc tỷ lệ lỗi >1%; báo động (đỏ) khi ngừng >15 phút, lỗi >5%, hoặc tồn đọng >60 phút (đã đặc tả BR-ING-06/07, Lô 2) | Baseline 7.2; BR-ING-06/07 |
+| NFR-REL-02 | **Tự động thử lại lỗi tiếp nhận:** thử lại 3 lần theo nhịp 1–5–15 phút; sau đó vào hàng đợi lỗi (FR-ING-09, DP-02) | Baseline 7.2; DP-02 |
+| NFR-REL-03 | **Xử lý lỗi đồng bộ đích (outbound):** cảnh báo + thử lại khi đồng bộ sang kênh thất bại; báo động nếu lỗi kéo dài (UC-ACT-04, edge 6.4) | Baseline 6.4; UC-ACT-04 |
+| NFR-REL-04 | **Chỉ tiêu sẵn sàng (uptime %, thời gian khôi phục sự cố, cửa sổ bảo trì)** | **[Cần xác nhận]** OQ-GOV-07 — baseline không nêu; cần VNPost/SA chốt, **không tự chế** |
+
+## C.5. Chất lượng dữ liệu (mục tiêu theo mốc)
+
+| Chỉ tiêu | Sau 6 tháng | Sau 12 tháng | Nguồn |
+|---|---|---|---|
+| Hồ sơ có số điện thoại hợp lệ | ≥ 90% | ≥ 95% | Baseline 7.2 (GD-06) |
+| Địa chỉ chuẩn hóa được | ≥ 75% | ≥ 85% | Baseline 7.2 |
+| Hồ sơ trùng còn sót sau hợp nhất | ≤ 5% | ≤ 2% | Baseline 7.2 |
+| Hồ sơ KHL có đủ mã số thuế và mã khách hàng lớn | ≥ 95% | ≥ 98% | Baseline 7.2 |
+| Hồ sơ có trạng thái đồng ý rõ ràng | ≥ 60% | ≥ 80% | Baseline 7.2 |
+
+> Các mốc chất lượng theo hai mốc 6/12 tháng đang là giả định (GD-06 — chưa VNPost duyệt). Địa chỉ đặt thấp hơn vì địa chỉ Việt Nam vốn viết tắt/không chuẩn; nhóm KHL đặt cao nhất vì có hợp đồng nên dữ liệu bắt buộc đủ. Đã theo dõi qua Bảng điều khiển chất lượng dữ liệu (SCR-DPS, Lô 2).
+
+## C.6. Tương thích, truy cập và tích hợp
+
+| Mã | Yêu cầu | Nguồn |
+|---|---|---|
+| NFR-COMP-01 | **Nền tảng truy cập:** trang web nội bộ độc lập trên trình duyệt; **tối ưu hiển thị cho máy tính (desktop-first)**. Mở được trên điện thoại qua đường dẫn nhưng **tối ưu điện thoại chưa phải ưu tiên giai đoạn này** | GD-09; I.2.2 |
+| NFR-COMP-02 | **Đăng nhập và danh tính:** CDP **nhận danh tính từ cổng đăng nhập chung** của tổ chức (mã nhân sự đã cấp quyền hoặc đăng nhập một lần nội bộ); **không tự quản lý** tài khoản/mật khẩu, **không có màn hình đăng nhập riêng** | GD-08; I.2.2; BR-GOV-01 |
+| NFR-COMP-03 | **Khách hàng cuối không truy cập CDP:** không có màn hình dành cho khách hàng của VNPost; CDP là công cụ nội bộ. Yêu cầu xem/xóa dữ liệu của khách hàng đến qua CSKH tiếp nhận rồi nhập vào CDP (UC-GOV-04) | I.2.2 |
+| NFR-COMP-04 | **Tích hợp nguồn theo năng lực kết nối:** nguồn thời gian thực qua API/sự kiện; nguồn cũ (BCCP/TMS/WMS) không có REST API — dùng xuất theo lô hàng ngày (A4); dữ liệu định vị là địa chỉ text, không GPS real-time (A7) | A4, A7; đã nêu Lô 2 |
+
+---
+
 ## Phụ lục — Giả định và câu hỏi mở áp dụng cho tài liệu này
 
 ### Giả định đang áp dụng
@@ -3306,6 +4408,25 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 - [ ] OQ-ANA-06: Tên phân khúc có **bắt buộc** không? Prototype cho lưu khi rỗng (nhãn "Không có tên"); đề xuất đặt bắt buộc. (áp dụng UC-ANA-01 E1, SCR-ANA-02 item 1) (PO / Tiếp thị VNPost)
 - [ ] OQ-ANA-07: Ranh giới thao tác giữa **Chuyên viên phân tích dữ liệu (DATA-ANALYST)** và **Data Scientist** ở màn Quản lý mô hình AI — ai được bật/tắt mô hình ở mức nghiệp vụ? FR-ANA-14 gốc ghi "Data Scientist/IT Admin". (áp dụng UC-ANA-09, SCR-ANA-07) (VNPost / CNTT)
 
+### Câu hỏi mở riêng Lô 4 — Kích hoạt (OQ-ACT) và Quản trị (OQ-GOV)
+
+Đánh số theo namespace `OQ-ACT-` / `OQ-GOV-` để không trùng các dải OQ trước. Không có OQ critical chặn — actor, phân quyền, quy trình chính (Luồng 6/7/8), thời hạn và ngưỡng đã rõ từ baseline mục 7.2 và II.4.
+
+- [ ] OQ-ACT-01: **Danh sách kênh kích hoạt thực tế** VNPost đang dùng (SMS Gateway, Zalo OA, Email, Push MyVNPost, CRM, CSKH, BSS…) và công cụ Marketing Automation nào có sẵn? (nối `[Cần xác nhận]` ở II.1) (áp dụng UC-ACT-01, SCR-ACT-01) (CNTT / Tiếp thị VNPost)
+- [ ] OQ-ACT-02: **Người phê duyệt kích hoạt theo cấp** — tệp >1.000 chờ duyệt thì ai duyệt (quản lý trực tiếp Tiếp thị, hay Quản trị)? Baseline chỉ nêu ngưỡng, chưa nêu vai trò duyệt. (áp dụng BR-ACT-04, UC-ACT-01) (PO / Tiếp thị VNPost)
+- [ ] OQ-ACT-03: **Ai được gỡ mục khỏi danh sách loại trừ** do nguồn tuân thủ/pháp chế đưa vào — chỉ COMPLIANCE, hay cả MARKETING? (áp dụng UC-ACT-02 E1) (Pháp chế / VNPost)
+- [ ] OQ-ACT-04: **Câu chữ chuẩn** cho tình huống rút đồng ý sau khi tệp đã đẩy (thông báo cho người vận hành chiến dịch) chưa có trong bộ câu chữ 7.3 — cần PO duyệt. (áp dụng BR-ACT-07, UC-ACT-06) (PO / Tiếp thị VNPost)
+- [ ] OQ-ACT-05: **Câu chữ chuẩn** cho cảnh báo đồng bộ đích lỗi (outbound) — 7.3 mới có câu cho luồng inbound. (áp dụng UC-ACT-04 A2, SCR-ACT-04) (PO / Tiếp thị VNPost)
+- [ ] OQ-ACT-06: **Kênh nào hỗ trợ nhận trạng thái rút đồng ý ngược** để tự loại khách khỏi hàng chờ chưa gửi trong 24h (edge 6.4)? Kênh không hỗ trợ thì xử lý thủ công. (áp dụng BR-ACT-07, UC-ACT-06 A2) (CNTT VNPost)
+- [ ] OQ-GOV-01: **Thời hạn mặc định của quyền đặc biệt có thời hạn** (xem định danh cá nhân đầy đủ, xuất không che) là bao nhiêu? Baseline nêu nguyên tắc "có thời hạn, tự hết hạn" nhưng chưa nêu số. (áp dụng BR-GOV-03, UC-GOV-01, SCR-GOV-01 item 5) (Pháp chế / An toàn thông tin VNPost)
+- [ ] OQ-GOV-02: **Thời hạn lưu nhật ký 5/3/2 năm** có đúng quy định nội bộ VNPost và Luật 91/2025/QH15 không, và chính sách sau khi hết hạn (chuyển lưu trữ dài hạn hay xóa)? *(đồng bộ OQ-08, OQ-IDR-01)* (áp dụng BR-GOV-06, UC-GOV-02 A3) (Pháp chế)
+- [ ] OQ-GOV-03: Có **chặn cứng tổ hợp quyền xung đột** khi gán vai trò (ví dụ vừa cấu hình vừa xem toàn bộ dữ liệu nhạy cảm) không, hay chỉ cảnh báo? (áp dụng UC-GOV-01 A2, SCR-GOV-01) (An toàn thông tin / VNPost)
+- [ ] OQ-GOV-04: **Phạm vi triển khai của Data Catalog (FR-GOV-04), Metadata (FR-GOV-05), Lineage (FR-GOV-06)** — có làm màn người dùng riêng ở giai đoạn nào, hay chỉ ở mức nghiệp vụ/quản trị nội bộ SA? Bốn mã này P2, phụ thuộc quyết định kiến trúc. (áp dụng BR-GOV-09, III.7.0) (SA / VNPost)
+- [ ] OQ-GOV-05: **Quy tắc hợp nhất phạm vi khi tài khoản thuộc nhiều đơn vị** — lấy quyền rộng nhất, hay giao nhau, hay cấu hình riêng? (áp dụng UC-GOV-07 A1, SCR-GOV-07) (VNPost)
+- [ ] OQ-GOV-06: **Thao tác nào bắt buộc chặn khi không ghi được nhật ký bất biến** (fail-safe) — gộp/tách/xuất/thay đổi đồng ý có phải dừng nếu nhật ký lỗi không? (áp dụng UC-GOV-09 A1) (An toàn thông tin / SA)
+- [ ] OQ-GOV-07: **Chỉ tiêu hiệu năng và sẵn sàng cụ thể** (thời gian phản hồi màn hình, RPS của API cá nhân hóa FR-ACT-06, uptime %, thời gian khôi phục sự cố, cửa sổ bảo trì) — baseline/CDP.md không nêu con số; cần VNPost/SA chốt. (áp dụng NFR-PERF-04, NFR-REL-04) (VNPost / SA)
+- [ ] OQ-GOV-08: **Các ngưỡng xuất dữ liệu theo cấp phê duyệt** (`{NG_XUAT_1}` 1.001–10.000 duyệt quản lý trực tiếp · `{NG_XUAT_2}` trên 10.000 duyệt quản trị dữ liệu và tuân thủ · `{NG_XUAT_TRAN}` trần cứng 100.000/lần) — CDP.md 8.8 chỉ nêu định tính "phê duyệt tệp lớn", các con số là giả định (GD-02). Cần VNPost chốt ngưỡng và cấp duyệt tương ứng. (áp dụng Quy trình 8, bảng tham số II.1) (Pháp chế / An toàn thông tin VNPost)
+
 ### Ghi chú xử lý MINOR
 
 **Từ QA review v1.1 (khung tổng thể):**
@@ -3315,7 +4436,7 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 | MI-01 | Câu chữ "hơn 8 luồng" (I.1) | Chưa chỉnh — thuần câu chữ khung, gom lô sau |
 | MI-02 | Câu nối 5 lớp ↔ 7 phân hệ (I.4) | Chưa chỉnh — như trên |
 | MI-03/04 | Bổ sung nhánh edge case swimlane (Quy trình 2) | **Đã bù ở tầng Use Case** — các edge case (hai người cùng xử lý, mất kết nối khi đối soát, tách giữa chuỗi gộp phức tạp) đã được đặc tả đầy đủ trong UC-IDR-02/03/04 (luồng ngoại lệ) và BR-IDR-09/10 |
-| MI-05 | Sequence luồng rút đồng ý khi tệp đã đẩy (Quy trình B) | Chưa chỉnh — thuộc Phân hệ 6 (Kích hoạt), xử lý ở lô Kích hoạt |
+| MI-05 | Sequence luồng rút đồng ý khi tệp đã đẩy (Quy trình B) | **Đã bù ở tầng Use Case (Lô 4)** — luồng rút đồng ý sau khi tệp đã đẩy được đặc tả đầy đủ ở **UC-ACT-06** (edge 6.4: chặn chu kỳ sau + đẩy trạng thái sang kênh 24h + tin đã gửi không thu hồi) và **BR-ACT-07**; góc quản lý đồng ý ở UC-GOV-03/04 |
 
 **Từ QA review Lô 1 (5 MINOR — gom lô sau, không sửa nội dung vòng v1.3):**
 
@@ -3327,6 +4448,16 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 | MI-L1-04 | Validate ghi chú/gắn nhãn (UC-C360-03) mới ở mức "rỗng chặn lưu" | Chấp nhận cho MVP — độ dài tối đa/ký tự đặc biệt để lô sau nếu cần |
 | MI-L1-05 | Câu chữ tra vận đơn chỉ có dữ liệu người nhận chưa chuẩn hóa | Đã đưa vào **OQ-IDR-11** |
 
+**Từ review 10 quy trình v1.9 (5 MINOR — ghi nhận, gom lô sau; vòng v1.9 chỉ xử lý CR-01 + 3 MAJOR + biến hóa tham số theo phạm vi đã chốt):**
+
+| Mã | Nội dung | Trạng thái |
+|---|---|---|
+| MI-P-01 | CCCD chưa xuất hiện trong danh sách trường chuẩn hóa ở swimlane Quy trình 1 | Ghi nhận — CCCD đã có ở FR-DPS-06 (II.2) và UC-DPS-01 (Lô 2); swimlane QT1 liệt kê rút gọn. Bổ sung vào swimlane khi rà Lô 2 lô sau |
+| MI-P-02 | Trạng thái "tạm dừng" của phân khúc (GD-05) chưa thể hiện trong swimlane Quy trình 4 | Ghi nhận — vòng đời phân khúc (đang hoạt động/tạm dừng) đã ở UC-ANA-02 (Lô 3); swimlane QT4 vẽ luồng tạo/sửa chính. Gom lô sau |
+| MI-P-03 | Thứ tự nhánh trong Sequence B (kiểm tần suất trước hay ngưỡng trước) nên khớp thứ tự UC-ACT-01 | Ghi nhận — đối chiếu và thống nhất thứ tự khi rà Lô 4 lô sau |
+| MI-P-04 | Trần luật (mốc pháp lý) cho SLA yêu cầu khách hàng QT7 chưa nêu tường minh bên cạnh hạn nội bộ | Ghi nhận — hạn nội bộ đã biến hóa (`{SLA_*}`) + ghi rõ đặt chặt hơn trần luật (GD-03); trần luật cụ thể theo Luật 91/2025/QH15 đưa vào khi rà Lô 4 |
+| MI-P-05 | Ngưỡng cảnh báo điểm số ở Quy trình 5 để trừu tượng ("vượt ngưỡng") | Chấp nhận — giá trị ngưỡng cụ thể theo từng loại điểm đã ở **OQ-ANA-02** (không tự chế số); swimlane giữ mức trừu tượng là đúng |
+
 ---
 
-*Kết thúc phiên bản v1.7 — Khung tổng thể (Mục I + Mục II) + Lô 1 (Phân hệ 3 Hợp nhất định danh, Phân hệ 4 Customer 360) + Lô 2 (Phân hệ 1 Tiếp nhận FR-ING, Phân hệ 2 Chuẩn hóa FR-DPS) + Lô 3 (Phân hệ 5 Phân khúc, phân tích và AI FR-ANA): Mục III bổ sung III.5 (10 UC-ANA); Mục IV bổ sung IV.9 (7 màn — 3 từ prototype, 4 CẦN BỔ SUNG); đã gắn mã FR-ANA-01→15 với độ ưu tiên P1/P2 vào cây chức năng II.2 (FR-ANA ≡ FR-SEG/FR-ANALYTICS); đã xử lý QA Lô 3 (3 MAJOR + 2 MINOR — thêm UC-ANA-10, mở II.3/II.4 bổ sung quyền cấu hình ngưỡng + mô hình AI, ghi chú FR-ANA-07 ô dù); giữ ranh giới BA vs Data Science, che điểm số nhất quán với III.C360 Lô 1. Mục C (Yêu cầu phi chức năng) và hai phân hệ còn lại của Mục III/IV (Phân hệ 6 Kích hoạt, Phân hệ 7 Quản trị) sẽ được bổ sung theo lô ở các vòng sau.*
+*Kết thúc phiên bản v1.8 — **KHUNG URD/SRS ĐẦY ĐỦ: Mục I → IV + C, cả 7 phân hệ**. Lô 4 (lô cuối) bổ sung: Mục III — III.6 (6 UC-ACT) + III.7 (9 UC-GOV); Mục IV — IV.10 (12 màn SCR-ACT/SCR-GOV, tất cả CẦN BỔ SUNG vì prototype v3 chưa phủ Phân hệ 6/7); **Mục C — Yêu cầu phi chức năng** (6 nhóm: hiệu năng/quy mô, bảo mật/quyền riêng tư, lưu trữ, độ tin cậy, chất lượng dữ liệu, tương thích/truy cập). Đã gắn đủ 14 mã FR-ACT-01→14 (CDP.md 7.7) + 17 mã FR-GOV-01→17 (CDP.md 7.8) với độ ưu tiên P1/P2 vào cây chức năng II.2 — II.2 không còn `[Cần xác nhận: mã FR]` nào. **Đã sửa tham chiếu pháp lý lỗi thời:** Nghị định 13/2023/NĐ-CP (hết hiệu lực 01/01/2026) → **Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15 + Nghị định 356/2025/NĐ-CP** (2 chỗ: thuật ngữ I.3 số 36, mục đích Phân hệ 7 ở II.2). Giữ ranh giới BA vs SA/IT Security (mã hóa FR-GOV-01, lineage FR-GOV-06, điều tra sự cố FR-GOV-13 chỉ đặc tả mức nghiệp vụ); masking tham chiếu Lô 1, không lặp; các con số ngưỡng/tần suất/thời hạn lấy đúng baseline 7.2, không tự chế. Thêm 13 OQ Lô 4 (OQ-ACT-01→06, OQ-GOV-01→07) — không có OQ critical chặn.*
