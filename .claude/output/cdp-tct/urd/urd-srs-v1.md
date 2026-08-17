@@ -3505,27 +3505,30 @@ Cho phép người dùng ghi chú và gắn nhãn khách hàng cần chăm sóc 
 **Ánh xạ Use Case:** UC-IDR-02 (→ SCR-IDR-02 khi bấm "Xử lý").
 **Layout (theo prototype v3):** Khối giải thích ngắn + ô tìm kiếm trên cùng; bảng danh sách hồ sơ nghi trùng (cuộn ngang); chân bảng đếm số lượng.
 
+**Bối cảnh nghiệp vụ (đọc để hiểu màn này):** Hệ thống hợp nhất định danh chạy **hai tầng nối tiếp**. **Tầng 1 — đối sánh tuyệt đối:** khi hai bản ghi trùng khóa định danh mạnh (mã số thuế, căn cước, mã định danh VNPost/PostID, mã khách hàng CRM, hoặc số điện thoại kèm email — đã chuẩn hóa, không phải số/email dùng chung) thì hệ thống **gộp thẳng, không chấm điểm** — các cặp này KHÔNG xuất hiện ở màn này. **Tầng 2 — đối sánh xác suất:** khi không đủ khóa mạnh, hệ thống tính **điểm tin cậy** (phần trăm khả năng là cùng một khách) rồi phân theo bốn vùng: **từ 95% trở lên** tự gộp · **85–94%** đưa vào hàng đợi chờ người xác nhận · **70–84%** chỉ lưu quan hệ nghi vấn, không gộp · **dưới 70%** bỏ qua. Màn này là **hàng đợi chờ người phụ trách dữ liệu xác nhận**, gồm: cặp thuộc vùng 85–94%, và cặp tuy trùng khóa mạnh/điểm cao nhưng bị chặn gộp tự động vì thuộc trường hợp rủi ro (chỉ trùng vận đơn/địa chỉ/IP/thiết bị; số điện thoại hoặc email dùng chung; người gửi và người nhận chỉ trùng một thông tin phụ).
+
 **Bảng thành phần:**
 
-| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| 1 | Khối giải thích ngưỡng | Nhãn mô tả | N/A | N/A | Nêu 4 vùng tin cậy (≥95% tự gộp · 85–94% chờ xác nhận · 70–84% quan hệ nghi vấn · <70% không gộp) — **theo BR-IDR-01** |
-| 2 | Ô tìm kiếm | Ô nhập text | Không | Rỗng | Tìm mã hồ sơ gốc, tên, SĐT |
-| 3 | Cột Hồ sơ gốc (mã nguồn) | Cột bảng (mono) | N/A | N/A | Mã nguồn neo + tên nguồn; nhắc "mã định danh CDP chỉ sinh sau khi gộp" |
-| 4 | Cột Tên / Công ty | Cột bảng (liên kết) | N/A | N/A | Tên khách hàng |
-| 5 | Cột Loại | Nhãn màu | N/A | N/A | Cá nhân / Doanh nghiệp |
-| 6 | Cột Số mã chờ | Nhãn đếm | N/A | N/A | Số mã chờ xác nhận + số mã tin cậy thấp |
-| 7 | Cột Tin cậy cao nhất | Nhãn phần trăm | N/A | N/A | Điểm tin cậy cao nhất trong nhóm |
-| 8 | Cột Khóa khớp nổi bật | Cột bảng | N/A | N/A | Các khóa khớp chính (MST, SĐT…) |
-| 9 | Nút Xử lý | Nút | N/A | N/A | Mở màn Đối chiếu hồ sơ nghi trùng (SCR-IDR-02) |
-| 10 | Dòng đếm | Nhãn | N/A | N/A | "{N} khách hàng đang có mã định danh nghi trùng" |
+| 1 | Khối giải thích ngưỡng tin cậy | Nhãn mô tả | N/A | N/A | Khối văn bản cố định đầu màn, giải thích cho người dùng bốn vùng điểm tin cậy của Tầng 2: **từ 95% trở lên — hệ thống tự gộp** (không nằm trong hàng đợi này) · **85–94% — chờ người xác nhận** (các cặp trong danh sách bên dưới) · **70–84% — chỉ lưu quan hệ nghi vấn, chưa gộp** · **dưới 70% — không gộp**. Nhắc thêm: cặp trùng khóa định danh mạnh đã được gộp tự động ở Tầng 1, chỉ những cặp bị chặn do trường hợp rủi ro mới rơi vào danh sách này dù điểm cao |
+| 2 | Ô tìm kiếm | Ô nhập text | Không | Rỗng | Tìm nhanh trong hàng đợi theo mã hồ sơ gốc, tên khách, hoặc số điện thoại (khớp gần đúng). Kết quả lọc lại danh sách ngay sau khi người dùng dừng gõ. Placeholder "Tìm mã hồ sơ, tên, SĐT..." |
+| 3 | Cột Hồ sơ gốc (mã nguồn) | Cột bảng (chữ mono) | N/A | N/A | Mã định danh nguồn dùng làm mã neo của nhóm nghi trùng + tên hệ thống nguồn phát sinh. Kèm chú thích "mã định danh CDP chỉ được sinh ra sau khi gộp" — trước khi gộp, nhóm chỉ có các mã nguồn rời |
+| 4 | Cột Tên / Công ty | Cột bảng (liên kết) | N/A | N/A | Tên khách hàng (cá nhân) hoặc tên công ty (doanh nghiệp) của hồ sơ gốc. Bấm để mở màn Đối chiếu (SCR-IDR-02) |
+| 5 | Cột Loại | Nhãn màu | N/A | N/A | Phân loại khách: Cá nhân / Doanh nghiệp — giúp người xử lý lưu ý rủi ro gộp nhầm cá nhân với doanh nghiệp |
+| 6 | Cột Số mã chờ | Nhãn đếm | N/A | N/A | Hai số: (a) **số mã chờ xác nhận** — các mã có điểm tin cậy vùng 85–94% cần người quyết định gộp; (b) **số mã tin cậy thấp** — các mã có điểm **dưới 85%** (chưa đủ để tự gộp), hiển thị làm mờ để tham khảo, người dùng cân nhắc thận trọng trước khi chọn |
+| 7 | Cột Tin cậy cao nhất | Nhãn phần trăm | N/A | N/A | Điểm tin cậy cao nhất trong nhóm — là phần trăm khả năng các mã trong nhóm thuộc cùng một khách, do Tầng 2 tính từ các tín hiệu (địa chỉ, thiết bị, hành vi, tên gần giống…). Dùng để sắp xếp mức độ ưu tiên xử lý |
+| 8 | Cột Khóa khớp nổi bật | Cột bảng | N/A | N/A | Các khóa trùng chính khiến nhóm bị nghi trùng, ví dụ trùng số điện thoại, trùng mã số thuế. Phân biệt khóa mạnh (MST/CCCD/PostID/CRM ID) với tín hiệu phụ (địa chỉ/thiết bị/tên gần giống) để người xử lý đánh giá độ chắc chắn |
+| 9 | Nút Xử lý | Nút | N/A | N/A | Mở màn Đối chiếu hồ sơ nghi trùng (SCR-IDR-02) để so sánh từng trường và quyết định gộp hay đánh dấu khác người |
+| 10 | Dòng đếm | Nhãn | N/A | N/A | Tổng số nhóm đang chờ: "{N} khách hàng đang có mã định danh nghi trùng" |
 
 **Trạng thái đặc biệt:**
-- **Empty:** "Không có khách hàng nào đang nghi trùng." / khi hết hàng đợi: "Chưa có dữ liệu để hiển thị."
-- **Bị người khác xử lý trước (BR-IDR-10):** "Hồ sơ này vừa được {tên người} xử lý lúc {giờ}. Danh sách đã được cập nhật."
-- **Không đủ quyền:** màn không hiện trên điều hướng; truy cập trực tiếp → "Bạn không có quyền truy cập chức năng này."
+- **Hàng đợi trống:** "Không có khách hàng nào đang nghi trùng."; khi vừa xử lý hết hàng đợi: "Chưa có dữ liệu để hiển thị."
+- **Hồ sơ vừa bị người khác xử lý trước:** hệ thống **không khóa hồ sơ** khi hai người cùng mở một nhóm — ai bấm xác nhận trước thì kết quả người đó thắng. Người bấm sau nhận thông báo ngay trên màn hình: "Hồ sơ này vừa được {tên người} xử lý lúc {giờ}. Danh sách đã được cập nhật." và danh sách tự làm mới, loại bỏ nhóm đã xử lý.
+- **Hàng đợi tồn đọng lớn:** khi số nhóm chờ vượt ngưỡng hoặc có nhóm chờ quá lâu, hệ thống phát cảnh báo tồn đọng cho người phụ trách và quản lý (ngưỡng tồn đọng và thời gian chờ là tham số cấu hình — xem Bảng tham số Mục II.1).
+- **Không đủ quyền:** màn không hiện trên thanh điều hướng; nếu truy cập trực tiếp → "Bạn không có quyền truy cập chức năng này."
 
-> **Điểm lệch prototype:** khối giải thích trong prototype ghi ngưỡng "60–89%" và "≥90%". Bản thật phải sửa theo 4 vùng 95/85/70 (BR-IDR-01). Danh sách sắp theo điểm giảm dần, 25 dòng/trang (baseline 7.2).
+> **Điểm lệch prototype (bắt buộc sửa khi triển khai):** khối giải thích trong prototype đang hiển thị ngưỡng cũ "60–89%" và "≥90%" — bản thật phải theo **bốn vùng 95/85/70** như mô tả TT1. Danh sách sắp theo điểm tin cậy giảm dần và phân trang **25 dòng mỗi trang** (giá trị đề xuất, xem Bảng tham số Mục II.1).
 
 ---
 
