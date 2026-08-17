@@ -59,14 +59,23 @@ Hệ thống tự động gộp các mã nguồn khớp bằng khóa mạnh. Cá
 
 ## BL-01 — Luật hợp nhất định danh
 
-### Bốn vùng tin cậy (theo mục 6.6.2)
+### Hai tầng hợp nhất định danh
+
+Hệ thống chạy **hai tầng nối tiếp**, không phải một thang điểm duy nhất (mục 6.6.1 và 6.6.2):
+
+- **Tầng 1 — Đối sánh tuyệt đối (Deterministic):** khi hai bản ghi trùng khóa định danh mạnh (mã số thuế, căn cước, PostID, mã khách hàng CRM, hoặc số điện thoại kèm email — đã chuẩn hóa, không thuộc danh sách dùng chung) thì **gộp thẳng, KHÔNG chấm điểm phần trăm** (vẫn qua kiểm trường hợp cấm gộp tự động ở mục dưới).
+- **Tầng 2 — Đối sánh xác suất (Probabilistic):** **chỉ khi không đủ khóa mạnh ở Tầng 1**, hệ thống mới tính điểm tin cậy theo tín hiệu hỗ trợ rồi áp bốn vùng dưới đây.
+
+### Bốn vùng tin cậy — chỉ áp dụng cho Tầng 2 (theo mục 6.6.2)
 
 | Điểm tin cậy | Ý nghĩa | Hành vi hệ thống |
 |---|---|---|
-| **Từ 95% trở lên** | Gần như chắc chắn cùng khách hàng | Tự động gộp, với điều kiện không có xung đột dữ liệu và không vi phạm consent |
+| **Từ 95% trở lên** | Gần như chắc chắn cùng khách hàng | Tự động gộp, với điều kiện không có xung đột dữ liệu nghiêm trọng. *(Thiếu consent KHÔNG chặn gộp — chỉ đánh dấu giới hạn mục đích, chặn ở bước kích hoạt; xem mục cấm gộp bên dưới)* |
 | **85% đến dưới 95%** | Khả năng cao là cùng khách hàng | Đưa vào danh sách chờ duyệt để Data Steward/Admin xác nhận |
 | **70% đến dưới 85%** | Có liên quan nhưng chưa đủ chắc chắn | Lưu quan hệ nghi vấn trong Identity Graph, **không gộp**, không đưa vào hàng đợi duyệt |
 | **Dưới 70%** | Không đủ căn cứ | Không gộp; chỉ dùng làm tín hiệu phân tích nếu phù hợp |
+
+> Bốn vùng phần trăm **không áp dụng cho cặp trùng khóa mạnh** — cặp đó đã gộp ở Tầng 1, không đi qua chấm điểm.
 
 ### Luật đối sánh tuyệt đối (theo mục 6.6.1)
 
@@ -85,7 +94,9 @@ Hệ thống tự động gộp các mã nguồn khớp bằng khóa mạnh. Cá
 
 ### Trường hợp cấm gộp tự động (theo mục 6.8.2)
 
-Không được gộp tự động khi chỉ trùng: mã vận đơn · địa chỉ · địa chỉ IP · Device ID. Cũng không gộp tự động khi số điện thoại là hotline/tổng đài/số doanh nghiệp, khi người gửi và người nhận chỉ trùng một thông tin phụ, hoặc khi thiếu consent cho mục đích kích hoạt.
+Không được gộp tự động khi chỉ trùng: mã vận đơn · địa chỉ · địa chỉ IP · Device ID. Cũng không gộp tự động khi số điện thoại là hotline/tổng đài/số doanh nghiệp, khi email dùng chung/email doanh nghiệp (suy từ mục 6.6.1 case 2 và 6.8.3 case 5 — email dùng chung không được làm khóa gộp mạnh), hoặc khi người gửi và người nhận chỉ trùng một thông tin phụ.
+
+> **Consent KHÔNG thuộc nhóm cấm gộp.** Thiếu consent không chặn việc hợp nhất định danh — cặp vẫn được gộp để phục vụ hồ sơ 360 và vận hành; hệ thống chỉ đánh dấu **giới hạn mục đích**, hệ quả là không đưa khách vào tệp kích hoạt (xử lý ở Phân hệ 6 — Kích hoạt dữ liệu). Consent là ràng buộc của **activation**, không phải của **merge** (mục 6.8.2 case 7).
 
 Riêng tên: **không dùng tên làm khóa gộp độc lập** trong mọi trường hợp (mục 6.9 case 11); tên chỉ là tín hiệu hỗ trợ đi kèm định danh khác.
 
@@ -99,7 +110,7 @@ Không tín hiệu nào trong nhóm này được dùng làm khóa gộp độc 
 
 | Trạng thái | Ai tạo | Hành vi hiển thị |
 |---|---|---|
-| Đã hợp nhất | Hệ thống (từ 95%) hoặc người dùng xác nhận (85–94%) | Hiện trong tab "Hồ sơ đa nguồn" của Customer 360 |
+| Đã hợp nhất | Hệ thống (Tầng 1 trùng khóa mạnh — không chấm điểm; hoặc Tầng 2 từ 95%) hoặc người dùng xác nhận (Tầng 2 vùng 85–94%) | Hiện trong tab "Hồ sơ đa nguồn" của Customer 360 |
 | Chờ duyệt | Hệ thống (85–94%) | Hiện trong danh sách đối soát, có nhãn số lượng chờ xử lý |
 | Quan hệ nghi vấn | Hệ thống (70–84%) | Chỉ lưu trong Identity Graph, không đưa vào hàng đợi duyệt |
 | Không phải cùng người | Người dùng xác nhận | Gỡ cờ nghi trùng, không hiện lại trong danh sách |
