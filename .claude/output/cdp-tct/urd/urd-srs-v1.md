@@ -3283,13 +3283,33 @@ Phần đầu màn, luôn hiển thị bất kể đang ở tab nào.
 
 ### Bảng B1 — Tab Tổng quan
 
-Tab mặc định khi mở hồ sơ. Tóm tắt nhanh định danh, vai trò giao dịch và phân khúc của khách.
+Tab mặc định khi mở hồ sơ. Gồm 3 khối: **Thông tin định danh**, **Vai trò giao dịch**, **Phân khúc hiện tại**. Mỗi trường trong khối được đặc tả một dòng riêng bên dưới.
 
-| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+**Bảng B1a — Khối Thông tin định danh** *(mỗi trường một dòng)*
+
+| TT | Trường | Định dạng | Bắt buộc | Mặc định | Mô tả (ý nghĩa · giá trị mẫu · masking theo III.C360 · nguồn · rỗng) |
 |---|---|---|---|---|---|
-| B1.1 | Khối Thông tin định danh | Danh sách trường | N/A | N/A | Nhóm trường định danh: giới tính, ngày sinh, số điện thoại, email, CCCD, PostID, bưu cục quản lý. **Che theo vai trò (bảng III.C360):** **SĐT/email** — che một phần (VD `0912***678`) với CSKH/Tiếp thị/Vận hành; đầy đủ với Kinh doanh/Phụ trách dữ liệu/Quản trị. **CCCD** — CSKH và Phụ trách dữ liệu thấy dạng **che**; Tiếp thị/Kinh doanh/Vận hành **KHÔNG xem** (ẩn hẳn); chỉ Quản trị xem đầy đủ theo quyền đặc biệt. Trường không có giá trị → "Chưa có dữ liệu" |
-| B1.2 | Khối Vai trò giao dịch | Nhãn + ô số | N/A | N/A | Số lần khách đóng vai **Người gửi** và số lần đóng vai **Người nhận**, kèm nhãn vai trò chính. Lưu ý: người nhận **không có hồ sơ riêng** trong CDP giai đoạn này (giả định A2) — chỉ đếm số lần |
-| B1.3 | Khối Phân khúc hiện tại | Nhãn màu | N/A | N/A | Các phân khúc động mà khách đang thuộc về, hiển thị dạng nhãn. Rỗng → "Chưa thuộc phân khúc nào" |
+| B1a.1 | Giới tính | Nhãn | N/A | N/A | **Ý nghĩa:** giới tính khách hàng cá nhân. **Giá trị mẫu:** Nam / Nữ / Khác. **Masking:** mọi vai trò xem được. **Nguồn:** PostID/MyVNPost, CRM. **Rỗng:** "Chưa có dữ liệu" |
+| B1a.2 | Ngày sinh | Ngày | N/A | N/A | **Ý nghĩa:** ngày sinh khách cá nhân. **Giá trị mẫu:** 12/05/1988. **Masking:** mọi vai trò xem được. **Nguồn:** PostID/MyVNPost, CRM. **Rỗng:** "Chưa có dữ liệu" |
+| B1a.3 | Số điện thoại | Text | N/A | N/A | **Ý nghĩa:** số điện thoại liên hệ chính (đã chuẩn hóa một dạng). **Giá trị mẫu:** 0912345678. **Masking (bảng III.C360 — SĐT/email):** che một phần (0912***678) với CSKH/Tiếp thị/Vận hành; đầy đủ với Kinh doanh/Phụ trách dữ liệu/Quản trị. **Nguồn:** ưu tiên nguồn đã xác thực (PostID/MyVNPost) rồi CRM/CAS/Portal KHL (BR-IDR-12). **Rỗng:** "Chưa có dữ liệu" |
+| B1a.4 | Email | Text | N/A | N/A | **Ý nghĩa:** email liên hệ (đã chuẩn hóa chữ thường). **Giá trị mẫu:** khach***@email.com. **Masking (SĐT/email):** che một phần với CSKH/Tiếp thị/Vận hành; đầy đủ với Kinh doanh/Phụ trách dữ liệu/Quản trị. **Nguồn:** CRM, Portal KHL, MyVNPost. **Rỗng:** "Chưa có dữ liệu" |
+| B1a.5 | Số định danh cá nhân (CCCD) | Text | N/A | N/A | **Ý nghĩa:** số căn cước công dân — dữ liệu định danh nhạy cảm. **Giá trị mẫu:** 001***********999. **Masking (bảng III.C360 — CCCD):** CSKH và Phụ trách dữ liệu thấy dạng **che**; Tiếp thị/Kinh doanh/Vận hành **KHÔNG xem** (ẩn hẳn); chỉ Quản trị xem đầy đủ **theo quyền đặc biệt kèm ghi nhật ký**. **Nguồn:** CRM/hợp đồng KHL. **Rỗng:** "Chưa có dữ liệu" |
+| B1a.6 | Mã định danh VNPost (PostID) | Text (mono) | N/A | N/A | **Ý nghĩa:** mã định danh tài khoản số VNPost của khách. **Giá trị mẫu:** PID-8842019. **Masking:** mọi vai trò xem được. **Nguồn:** PostID/MyVNPost. **Rỗng:** "Chưa có dữ liệu" |
+| B1a.7 | Bưu cục quản lý gốc | Text | N/A | N/A | **Ý nghĩa:** bưu cục/điểm phục vụ quản lý khách. **Giá trị mẫu:** BC Cầu Giấy — Hà Nội. **Masking:** mọi vai trò xem được. **Nguồn:** CAS/BCCP. **Rỗng:** "Chưa có dữ liệu" |
+
+**Bảng B1b — Khối Vai trò giao dịch**
+
+| TT | Trường | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B1b.1 | Số lần là Người gửi | Ô số | N/A | N/A | **Ý nghĩa:** số giao dịch khách đóng vai người gửi. **Giá trị mẫu:** 142. **Nguồn:** CAS/MPITS (gắn vai trò theo từng vận đơn — FR-IDR-09). **Rỗng:** 0 |
+| B1b.2 | Số lần là Người nhận | Ô số | N/A | N/A | **Ý nghĩa:** số giao dịch khách đóng vai người nhận. **Giá trị mẫu:** 37. **Lưu ý:** người nhận **không có hồ sơ riêng** trong CDP giai đoạn này (giả định A2) — chỉ đếm số lần trên hồ sơ người gửi. **Rỗng:** 0 |
+| B1b.3 | Nhãn vai trò chính | Nhãn màu | N/A | N/A | **Ý nghĩa:** vai trò khách đóng nhiều nhất. **Giá trị mẫu:** "Chủ yếu là Người gửi". **Masking:** mọi vai trò xem được |
+
+**Bảng B1c — Khối Phân khúc hiện tại**
+
+| TT | Trường | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B1c.1 | Danh sách phân khúc | Nhãn màu | N/A | N/A | **Ý nghĩa:** các phân khúc động khách đang thuộc về. **Giá trị mẫu:** "KH giá trị cao", "Nguy cơ rời bỏ". **Nguồn:** CDP Analytics (Phân hệ 5). **Rỗng:** "Chưa thuộc phân khúc nào" |
 
 ---
 
@@ -3297,12 +3317,24 @@ Tab mặc định khi mở hồ sơ. Tóm tắt nhanh định danh, vai trò gia
 
 Cho biết hồ sơ chuẩn này được hợp nhất từ những mã định danh nguồn nào, và cho phép báo cáo/tách khi nghi gộp sai. **Ẩn toàn bộ tab với Tiếp thị** (bảng III.C360 — nhóm Hồ sơ liên kết: Tiếp thị không xem).
 
+**Bảng B2a — Bảng định danh liên kết** *(mỗi cột một dòng — bảng có nhiều dòng dữ liệu, mỗi dòng là một mã nguồn đã gộp)*
+
+| TT | Cột | Định dạng | Bắt buộc | Mặc định | Mô tả (ý nghĩa · giá trị mẫu · masking · nguồn · rỗng) |
+|---|---|---|---|---|---|
+| B2a.1 | Loại ID | Nhãn | N/A | N/A | **Ý nghĩa:** loại định danh của mã nguồn. **Giá trị mẫu:** SĐT / email / PostID / CRM ID / mã KHL / user ID app. **Masking:** cả tab ẩn với Tiếp thị; các vai trò còn lại xem được |
+| B2a.2 | Giá trị | Text | N/A | N/A | **Ý nghĩa:** giá trị của mã định danh. **Giá trị mẫu:** 0912345678 / PID-8842019. **Masking:** giá trị nhạy cảm (SĐT/email/CCCD) che theo cùng quy tắc trường tương ứng ở bảng III.C360. **Rỗng:** không hiển thị dòng nếu không có mã |
+| B2a.3 | Nguồn | Text | N/A | N/A | **Ý nghĩa:** hệ thống phát sinh mã này. **Giá trị mẫu:** CRM, CAS, MyVNPost, Portal KHL |
+| B2a.4 | Độ tin cậy | Nhãn phần trăm | N/A | N/A | **Ý nghĩa:** điểm khớp khi gộp mã này vào hồ sơ chuẩn (Tầng 2); mã gộp Tầng 1 hiển thị "khóa mạnh". **Giá trị mẫu:** 98% / "Khóa mạnh (MST)" |
+| B2a.5 | Cờ mã chính | Biểu tượng/nhãn | N/A | N/A | **Ý nghĩa:** đánh dấu mã neo (mã gốc của hồ sơ chuẩn). **Giá trị mẫu:** ★ (mã chính) / trống |
+| B2a.6 | Trạng thái | Nhãn màu | N/A | N/A | **Ý nghĩa:** trạng thái liên kết của mã. **Giá trị mẫu:** *đã gộp* / *đã tách*. **Hành vi:** tự chuyển thành "đã tách" sau khi tách hồ sơ — khớp hậu điều kiện UC-IDR-04 và SCR-IDR-05 |
+
+**Bảng B2b — Khối báo cáo/tách**
+
 | TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| B2.1 | Bảng định danh liên kết | Bảng | N/A | N/A | Mỗi dòng là một mã nguồn đã gộp vào hồ sơ chuẩn. Cột: **Loại ID** (SĐT/email/PostID/CRM ID/mã KHL…) · **Giá trị** · **Nguồn** (hệ thống phát sinh) · **Độ tin cậy** (điểm khớp) · **Cờ mã chính** (đánh dấu mã neo) · **Trạng thái** (giá trị *đã gộp* / *đã tách*). Cột Trạng thái tự chuyển thành "đã tách" sau khi tách hồ sơ — khớp hậu điều kiện UC-IDR-04 và SCR-IDR-05 |
-| B2.2 | Khối "Nghi ngờ gộp sai" | Khối cảnh báo | N/A | N/A | Vùng thông báo xuất hiện khi hệ thống hoặc người dùng nghi hồ sơ bị gộp nhầm; dẫn tới nút Báo cáo/Tách bên dưới |
-| B2.3 | Nút Báo cáo nghi gộp sai | Nút | N/A | N/A | Hiện với **CSKH/Kinh doanh/Vận hành** (UC-IDR-05) — các vai trò không có quyền tách; **ẩn với Tiếp thị**. Bấm để gửi đề xuất tách kèm lý do. Xác nhận: "Yêu cầu báo cáo đã được ghi nhận. Người phụ trách dữ liệu sẽ xem xét trong 1–2 ngày làm việc." |
-| B2.4 | Nút Tách hồ sơ | Nút | N/A | N/A | **Chỉ Người phụ trách dữ liệu** thấy (UC-IDR-04). Bấm mở màn Tách hồ sơ (SCR-IDR-05) để tách trực tiếp |
+| B2b.1 | Khối "Nghi ngờ gộp sai" | Khối cảnh báo | N/A | N/A | Vùng thông báo xuất hiện khi hệ thống hoặc người dùng nghi hồ sơ bị gộp nhầm; dẫn tới nút Báo cáo/Tách bên dưới |
+| B2b.2 | Nút Báo cáo nghi gộp sai | Nút | N/A | N/A | Hiện với **CSKH/Kinh doanh/Vận hành** (UC-IDR-05) — các vai trò không có quyền tách; **ẩn với Tiếp thị**. Bấm để gửi đề xuất tách kèm lý do. Xác nhận: "Yêu cầu báo cáo đã được ghi nhận. Người phụ trách dữ liệu sẽ xem xét trong 1–2 ngày làm việc." |
+| B2b.3 | Nút Tách hồ sơ | Nút | N/A | N/A | **Chỉ Người phụ trách dữ liệu** thấy (UC-IDR-04). Bấm mở màn Tách hồ sơ (SCR-IDR-05) để tách trực tiếp |
 
 ---
 
@@ -3310,61 +3342,86 @@ Cho biết hồ sơ chuẩn này được hợp nhất từ những mã định 
 
 So sánh giá trị từng trường giữa các hệ thống nguồn, cho thấy giá trị nào được chọn làm chuẩn (golden) và trường nào đang xung đột.
 
+**Bảng B3a — Bảng so sánh trường theo nguồn** *(mỗi cột một dòng — bảng có nhiều dòng dữ liệu, mỗi dòng là một trường so sánh)*
+
+| TT | Cột | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B3a.1 | Tên trường | Text | N/A | N/A | **Ý nghĩa:** tên trường dữ liệu đang so sánh. **Giá trị mẫu:** Số điện thoại, Địa chỉ, Tên |
+| B3a.2 | Giá trị hồ sơ chuẩn (golden) | Text | N/A | N/A | **Ý nghĩa:** giá trị được chọn làm chuẩn, lấy theo nguồn ưu tiên (BR-IDR-12). **Giá trị mẫu:** 0912345678 (từ PostID). **Masking:** trường nhạy cảm che theo bảng III.C360 |
+| B3a.3 | Giá trị theo từng nguồn | Text (nhiều cột) | N/A | N/A | **Ý nghĩa:** mỗi hệ thống nguồn một cột, hiển thị giá trị nguồn đó cung cấp cho trường. **Giá trị mẫu:** CRM: 0912345678 · CAS: 0912345679 |
+| B3a.4 | Cờ xung đột | Biểu tượng | N/A | N/A | **Ý nghĩa:** đánh dấu trường có giá trị khác nhau giữa các nguồn. **Giá trị mẫu:** ⚠. **Rỗng:** không hiển thị nếu các nguồn nhất quán. Toàn bảng rỗng → "Chưa có dữ liệu nguồn" |
+
+**Bảng B3b — Chế độ Dòng thời gian gộp**
+
 | TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| B3.1 | Bảng so sánh trường theo nguồn | Bảng (cuộn ngang) | N/A | N/A | Mỗi dòng là một trường dữ liệu; cột đầu là **giá trị hồ sơ chuẩn (golden)**, các cột sau là giá trị từ từng hệ thống nguồn. Trường có giá trị khác nhau giữa các nguồn được đánh dấu **⚠ xung đột**. Giá trị golden lấy theo nguồn ưu tiên (BR-IDR-12). Rỗng → "Chưa có dữ liệu nguồn" |
-| B3.2 | Nút chuyển chế độ Dòng thời gian gộp | Nút chuyển | Không | Chế độ So sánh | Chuyển giữa chế độ **So sánh** (bảng trên) và chế độ **Dòng thời gian gộp** (timeline) |
-| B3.3 | Dòng thời gian gộp | Timeline | N/A | N/A | Trục thời gian các lần hồ sơ được gộp: thời điểm, mã nguồn gộp vào, tự động hay thủ công, người quyết định |
+| B3b.1 | Nút chuyển chế độ | Nút chuyển | Không | Chế độ So sánh | Chuyển giữa chế độ **So sánh** (Bảng B3a) và chế độ **Dòng thời gian gộp** (timeline B3b.2) |
+| B3b.2 | Dòng thời gian gộp | Timeline | N/A | N/A | Trục thời gian các lần hồ sơ được gộp: thời điểm, mã nguồn gộp vào, tự động (Tầng 1/Tầng 2) hay thủ công, người quyết định |
 
 ---
 
 ### Bảng B4 — Tab Địa chỉ
 
-Địa chỉ gửi/nhận của khách, che chi tiết theo vai trò.
+Địa chỉ của khách; địa chỉ chi tiết che theo vai trò. Bảng có nhiều dòng, mỗi dòng là một địa chỉ.
 
-| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+| TT | Cột | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| B4.1 | Danh sách địa chỉ | Danh sách/bảng | N/A | N/A | Các địa chỉ của khách kèm loại (gửi/nhận/thường dùng) và mã địa chỉ số. **Che theo vai trò (bảng III.C360 — Địa chỉ chi tiết):** CSKH/Tiếp thị chỉ thấy **đến phường/quận/tỉnh**; Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị thấy **đầy đủ** (gồm số nhà, ngõ) |
+| B4.1 | Loại địa chỉ | Nhãn | N/A | N/A | **Ý nghĩa:** vai trò của địa chỉ với khách. **Giá trị mẫu:** Địa chỉ gửi / Địa chỉ nhận / Thường dùng |
+| B4.2 | Địa chỉ chi tiết | Text | N/A | N/A | **Ý nghĩa:** địa chỉ đã chuẩn hóa. **Giá trị mẫu:** Số 5, ngõ 12, P. Dịch Vọng, Q. Cầu Giấy, Hà Nội. **Masking (bảng III.C360 — Địa chỉ chi tiết):** CSKH/Tiếp thị chỉ thấy **đến phường/quận/tỉnh** (ẩn số nhà, ngõ); Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị thấy **đầy đủ**. **Rỗng:** "Chưa có dữ liệu" |
+| B4.3 | Mã địa chỉ số | Text (mono) | N/A | N/A | **Ý nghĩa:** mã địa chỉ số (VPostCode/Vmap) gắn sau chuẩn hóa. **Giá trị mẫu:** VPC-1000-2345. **Rỗng:** "Chưa chuẩn hóa" (nếu địa chỉ chưa ánh xạ được — DP-03) |
+| B4.4 | Vùng phục vụ | Text | N/A | N/A | **Ý nghĩa:** vùng/bưu cục phục vụ tương ứng địa chỉ. **Giá trị mẫu:** Vùng CG-02 |
 
 ---
 
 ### Bảng B5 — Tab Doanh nghiệp *(tab điều kiện — chỉ hiện với khách hàng doanh nghiệp)*
 
-Thông tin pháp nhân, chỉ áp dụng cho khách doanh nghiệp/KHL. Khách cá nhân **không thấy tab này**.
+Thông tin pháp nhân, chỉ áp dụng cho khách doanh nghiệp/KHL. Khách cá nhân **không thấy tab này** (tab ẩn hẳn khỏi thanh tab). Mỗi trường một dòng.
 
-| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+| TT | Trường | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| B5.1 | Khối thông tin doanh nghiệp | Danh sách trường | N/A | N/A | Mã số thuế (MST), thông tin hợp đồng, công nợ. Chỉ hiển thị khi Loại khách hàng = Doanh nghiệp; nếu cá nhân thì tab ẩn hẳn khỏi thanh tab |
+| B5.1 | Mã số thuế (MST) | Text | N/A | N/A | **Ý nghĩa:** mã số thuế doanh nghiệp/KHL (10 hoặc 13 số). **Giá trị mẫu:** 0101234567. **Nguồn:** Portal KHL, CRM, hợp đồng. **Rỗng:** "Chưa có dữ liệu" |
+| B5.2 | Thông tin hợp đồng | Text/danh sách | N/A | N/A | **Ý nghĩa:** hợp đồng dịch vụ đang hiệu lực (số hợp đồng, hiệu lực). **Giá trị mẫu:** HĐ-2026-0142, hiệu lực đến 31/12/2026. **Nguồn:** Portal KHL. **Rỗng:** "Chưa có dữ liệu" |
+| B5.3 | Công nợ | Ô số | N/A | N/A | **Ý nghĩa:** công nợ hiện tại của khách doanh nghiệp. **Giá trị mẫu:** 12.500.000 đ. **Masking:** thuộc dữ liệu tài chính — Tiếp thị không xem chi tiết; các vai trò nghiệp vụ liên quan xem theo phân quyền. **Rỗng:** 0 |
 
 ---
 
 ### Bảng B6 — Tab Hoạt động theo mảng dịch vụ
 
-Lịch sử giao dịch của khách, bóc tách theo từng mảng dịch vụ.
+Lịch sử giao dịch của khách, bóc tách theo từng mảng dịch vụ. Bảng có nhiều dòng, mỗi dòng một mảng dịch vụ. **Che theo vai trò (nhóm Lịch sử giao dịch, bảng III.C360):** Tiếp thị xem **tổng hợp**; các vai trò khác xem **đầy đủ**. *(Dữ liệu thu hộ/COD nếu hiển thị ở đây áp masking riêng của nhóm COD, không nới lỏng ở tab này.)*
 
-| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+| TT | Cột | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| B6.1 | Khối hoạt động theo mảng | Bảng/khối theo mảng | N/A | N/A | Lịch sử giao dịch, sản lượng, doanh thu theo từng mảng dịch vụ. **Che theo vai trò (nhóm Lịch sử giao dịch, bảng III.C360):** Tiếp thị xem **tổng hợp**; các vai trò khác xem **đầy đủ**. *(Dữ liệu thu hộ/COD nếu hiển thị ở đây áp masking riêng của nhóm COD — xem tab liên quan, không nới lỏng ở tab này)* |
+| B6.1 | Mảng dịch vụ | Nhãn | N/A | N/A | **Ý nghĩa:** tên mảng dịch vụ. **Giá trị mẫu:** Bưu phẩm, Chuyển phát nhanh, Logistics, COD |
+| B6.2 | Sản lượng | Ô số | N/A | N/A | **Ý nghĩa:** số đơn/khối lượng trong mảng đó. **Giá trị mẫu:** 87 đơn. **Masking:** Tiếp thị xem dạng tổng hợp |
+| B6.3 | Doanh thu | Ô số | N/A | N/A | **Ý nghĩa:** doanh thu khách mang lại trong mảng. **Giá trị mẫu:** 45.200.000 đ. **Masking:** Tiếp thị xem tổng hợp; còn lại đầy đủ |
+| B6.4 | Giao dịch gần nhất | Ngày | N/A | N/A | **Ý nghĩa:** ngày giao dịch gần nhất trong mảng. **Giá trị mẫu:** 12/08/2026 |
 
 ---
 
 ### Bảng B7 — Tab Hành vi số
 
-Hành vi của khách trên kênh số (app/web): đăng nhập, tra cứu, tương tác chiến dịch.
+Hành vi của khách trên kênh số (app/web). Bảng có nhiều dòng, mỗi dòng một loại/lượt hành vi. **Che theo vai trò (bảng III.C360 — Hành vi số):** **Vận hành KHÔNG xem**; Kinh doanh xem **tổng hợp**; CSKH/Tiếp thị/Phụ trách dữ liệu/Quản trị xem **đầy đủ**.
 
-| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+| TT | Cột | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| B7.1 | Khối hành vi số | Khối/bảng | N/A | N/A | Lịch sử hành vi trên app/web (mở app, tra cước, click chiến dịch…). **Che theo vai trò (bảng III.C360 — Hành vi số):** **Vận hành KHÔNG xem**; Kinh doanh xem **tổng hợp**; CSKH/Tiếp thị/Phụ trách dữ liệu/Quản trị xem **đầy đủ** |
+| B7.1 | Loại hành vi | Nhãn | N/A | N/A | **Ý nghĩa:** loại tương tác số. **Giá trị mẫu:** Mở app, Tra cứu cước, Tạo đơn online, Click chiến dịch |
+| B7.2 | Kênh | Nhãn | N/A | N/A | **Ý nghĩa:** kênh phát sinh hành vi. **Giá trị mẫu:** MyVNPost App, Website, Zalo OA |
+| B7.3 | Thời điểm | Ngày giờ | N/A | N/A | **Ý nghĩa:** thời điểm hành vi xảy ra. **Giá trị mẫu:** 14/08/2026 08:15 |
+| B7.4 | Chi tiết/kết quả | Text | N/A | N/A | **Ý nghĩa:** mô tả ngắn hành vi hoặc kết quả. **Giá trị mẫu:** "Tra cước tuyến HN-HCM", "Mở email chiến dịch Q3" |
 
 ---
 
 ### Bảng B8 — Tab CSKH
 
-Lịch sử chăm sóc và khiếu nại của khách.
+Lịch sử chăm sóc và khiếu nại của khách. Bảng có nhiều dòng, sắp theo thời gian giảm dần.
 
-| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+| TT | Cột | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| B8.1 | Bảng lịch sử CSKH | Bảng lịch sử | N/A | N/A | Danh sách khiếu nại, phản ánh, lượt chăm sóc: thời điểm, kênh, nội dung tóm tắt, kết quả xử lý, trạng thái. Sắp theo thời gian giảm dần |
+| B8.1 | Thời điểm | Ngày giờ | N/A | N/A | **Ý nghĩa:** thời điểm phát sinh vụ việc CSKH. **Giá trị mẫu:** 10/08/2026 16:30 |
+| B8.2 | Kênh tiếp nhận | Nhãn | N/A | N/A | **Ý nghĩa:** kênh khách liên hệ. **Giá trị mẫu:** Call Center, App, Bưu cục |
+| B8.3 | Nội dung tóm tắt | Text | N/A | N/A | **Ý nghĩa:** mô tả ngắn khiếu nại/phản ánh/yêu cầu. **Giá trị mẫu:** "Khiếu nại giao hàng chậm đơn EMS123" |
+| B8.4 | Kết quả xử lý | Text | N/A | N/A | **Ý nghĩa:** kết quả giải quyết. **Giá trị mẫu:** "Đã bồi thường", "Đang xử lý" |
+| B8.5 | Trạng thái | Nhãn màu | N/A | N/A | **Ý nghĩa:** trạng thái vụ việc. **Giá trị mẫu:** Mới / Đang xử lý / Đã đóng |
 
 ---
 
@@ -3385,22 +3442,42 @@ Các điểm số phân tích của khách. **Tab nhạy cảm nhất về quy�
 
 ### Bảng B10 — Tab Đồng ý dữ liệu
 
-Trạng thái đồng ý nhận thông tin của khách, theo từng mục đích và kênh.
+Trạng thái đồng ý nhận thông tin của khách, trình bày dạng ma trận **mục đích × kênh**. **Che theo vai trò (bảng III.C360 — Trạng thái đồng ý):** CSKH/Tiếp thị/Kinh doanh/Phụ trách dữ liệu/Quản trị **xem**; **Vận hành/Thu hộ không xem**. Đây là tab **chỉ xem** trong Customer 360 — thao tác quản lý consent ở màn SCR-GOV-03.
+
+**Cấu trúc ma trận:** hàng = **mục đích** (Vận hành dịch vụ · Tiếp thị · Phân tích); cột = **kênh** (SMS · Zalo · Email · Push). Mỗi giao điểm là một ô trạng thái đồng ý.
 
 | TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| B10.1 | Bảng trạng thái đồng ý | Bảng ma trận | N/A | N/A | Ma trận **mục đích × kênh** (vận hành/tiếp thị/phân tích × SMS/Zalo/email/push): mỗi ô là trạng thái opt-in/opt-out/chưa xác định, kèm thời điểm và nguồn ghi nhận. **Che theo vai trò (bảng III.C360 — Trạng thái đồng ý):** CSKH/Tiếp thị/Kinh doanh/Phụ trách dữ liệu/Quản trị **xem**; **Vận hành/Thu hộ không xem**. Đây là tab **chỉ xem** trong Customer 360 — thao tác quản lý consent ở màn SCR-GOV-03 |
+| B10.1 | Cột tiêu đề Mục đích (hàng) | Nhãn | N/A | N/A | **Ý nghĩa:** mục đích xử lý dữ liệu. **Giá trị:** Vận hành dịch vụ / Tiếp thị / Phân tích. Consent xét riêng từng mục đích — đồng ý vận hành không tự dùng cho tiếp thị (thuật ngữ I.3 số 14) |
+| B10.2 | Hàng tiêu đề Kênh (cột) | Nhãn | N/A | N/A | **Ý nghĩa:** kênh gửi thông tin. **Giá trị:** SMS / Zalo / Email / Push. Consent xét riêng từng kênh |
+| B10.3 | Ô trạng thái đồng ý (mỗi giao điểm) | Nhãn màu | N/A | N/A | **Ý nghĩa:** trạng thái đồng ý cho một cặp mục đích×kênh. **Giá trị mẫu:** Đồng ý (opt-in) / Từ chối (opt-out) / Chưa xác định. **Nguồn:** CDP Consent Store, CRM, app/web |
+| B10.4 | Thời điểm ghi nhận | Ngày giờ | N/A | N/A | **Ý nghĩa:** thời điểm ghi nhận trạng thái đồng ý của ô. **Giá trị mẫu:** 10/03/2026 14:22. Hiển thị khi trỏ/mở chi tiết ô |
+| B10.5 | Nguồn ghi nhận | Text | N/A | N/A | **Ý nghĩa:** kênh/hệ thống nơi khách xác nhận đồng ý. **Giá trị mẫu:** App MyVNPost / Bưu cục / Call Center |
 
 ---
 
 ### Bảng B11 — Tab Nhật ký
 
-Nguồn dữ liệu đóng góp vào hồ sơ và tóm tắt nhật ký gộp.
+Gồm 2 bảng: nguồn dữ liệu đóng góp vào hồ sơ, và tóm tắt nhật ký gộp.
 
-| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+**Bảng B11a — Nguồn dữ liệu đóng góp** *(mỗi cột một dòng)*
+
+| TT | Cột | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| B11.1 | Bảng nguồn dữ liệu đóng góp | Bảng | N/A | N/A | Các hệ thống nguồn đã đóng góp dữ liệu vào hồ sơ, kèm nhóm dữ liệu và thời điểm cập nhật gần nhất |
-| B11.2 | Tóm tắt nhật ký gộp | Bảng | N/A | N/A | Lịch sử gộp của khách đang mở. **Che theo vai trò (bảng III.C360 — Nhật ký gộp):** CSKH thấy **tóm tắt của khách đang mở**; Phụ trách dữ liệu/Quản trị xem **đầy đủ** (UC-IDR-06); Tiếp thị/Kinh doanh/Vận hành **không xem** |
+| B11a.1 | Hệ thống nguồn | Text | N/A | N/A | **Ý nghĩa:** hệ thống đã đóng góp dữ liệu vào hồ sơ. **Giá trị mẫu:** CAS, CRM, MyVNPost, PayPost |
+| B11a.2 | Nhóm dữ liệu đóng góp | Nhãn | N/A | N/A | **Ý nghĩa:** nhóm dữ liệu nguồn đó cung cấp. **Giá trị mẫu:** Định danh, Giao dịch, COD, Hành vi số |
+| B11a.3 | Thời điểm cập nhật gần nhất | Ngày giờ | N/A | N/A | **Ý nghĩa:** lần nguồn cập nhật dữ liệu gần nhất. **Giá trị mẫu:** 15/08/2026 03:12 |
+
+**Bảng B11b — Tóm tắt nhật ký gộp** *(mỗi cột một dòng)*
+
+Che theo vai trò (bảng III.C360 — Nhật ký gộp): CSKH thấy **tóm tắt của khách đang mở**; Phụ trách dữ liệu/Quản trị xem **đầy đủ** (UC-IDR-06); Tiếp thị/Kinh doanh/Vận hành **không xem**.
+
+| TT | Cột | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B11b.1 | Thời điểm gộp | Ngày giờ | N/A | N/A | **Ý nghĩa:** thời điểm lần gộp. **Giá trị mẫu:** 02/07/2026 09:40 |
+| B11b.2 | Loại gộp | Nhãn | N/A | N/A | **Ý nghĩa:** cơ chế gộp. **Giá trị mẫu:** Tự động (khóa mạnh Tầng 1) / Tự động (≥95% Tầng 2) / Thủ công |
+| B11b.3 | Mã nguồn gộp vào | Text (mono) | N/A | N/A | **Ý nghĩa:** mã định danh nguồn được gộp vào hồ sơ chuẩn ở lần đó |
+| B11b.4 | Người quyết định | Text | N/A | N/A | **Ý nghĩa:** người xác nhận (với gộp thủ công) hoặc "Hệ thống" (với gộp tự động). **Giá trị mẫu:** Nguyễn Văn A / Hệ thống |
 
 ---
 
