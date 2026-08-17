@@ -1507,7 +1507,7 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 
 **Luồng chính:**
 
-1. Người dùng nhập từ khóa (mã KH / tên / SĐT) hoặc chọn bộ lọc (loại, nhóm, mảng dịch vụ, trạng thái, phân khúc).
+1. Người dùng nhập từ khóa — một trong **7 khóa định danh** (SĐT, email, mã KH, mã KHL, PostID, mã vận đơn, MST) hoặc **tên** (khớp gần đúng) — hoặc chọn bộ lọc (loại, nhóm, mảng dịch vụ, trạng thái, phân khúc).
 2. Hệ thống trả danh sách kết quả khớp; số điện thoại và dữ liệu nhạy cảm được **che theo vai trò người tìm** (bảng III.C360).
 3. Người dùng chọn một khách hàng để mở hồ sơ đầy đủ (chuyển UC-C360-02).
 
@@ -3223,7 +3223,7 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 
 | TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
 |---|---|---|---|---|---|
-| 1 | Ô tìm kiếm | Ô nhập text | Không | Rỗng | Tìm theo mã KH, tên, SĐT; kết quả cập nhật sau khi dừng gõ. Placeholder "Tìm mã KH, tên, SĐT..." |
+| 1 | Ô tìm kiếm | Ô nhập text | Không | Rỗng | Tìm theo **7 khóa định danh** (SĐT · email · mã KH · mã KHL · PostID · mã vận đơn · MST) và **tên** (khớp gần đúng); kết quả cập nhật sau khi dừng gõ. Placeholder "Tìm SĐT, email, mã KH, mã KHL, PostID, mã vận đơn, MST hoặc tên...". **Khóa tìm là mã vận đơn:** trả hồ sơ người gửi gắn với vận đơn đó (người nhận không có hồ sơ riêng — A2); vận đơn chỉ có dữ liệu người nhận → chỉ dẫn không có hồ sơ người gửi tương ứng (UC-C360-01 A2). Đồng bộ 7 khóa với UC-C360-01 và baseline Luồng 3 |
 | 2 | Bộ lọc Loại | Danh sách chọn | Không | Tất cả loại | Cá nhân / Doanh nghiệp |
 | 3 | Bộ lọc Nhóm | Danh sách chọn | Không | Tất cả nhóm | Nhóm khách hàng |
 | 4 | Bộ lọc Mảng dịch vụ | Danh sách chọn | Không | Tất cả mảng dịch vụ | Mảng dịch vụ chính |
@@ -3236,7 +3236,7 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 | 11 | Cột Mảng dịch vụ chính | Cột bảng | N/A | N/A | Mảng dịch vụ |
 | 12 | Cột SĐT | Cột bảng | N/A | N/A | **Che theo vai trò**: CSKH/Tiếp thị/Vận hành thấy `0912***678`; Kinh doanh/Phụ trách dữ liệu/Quản trị thấy đầy đủ (BR-C360-01) |
 | 13 | Cột Tổng đơn | Cột bảng (số) | N/A | N/A | Số đơn |
-| 14 | Cột Doanh thu 12 tháng | Cột bảng (số) | N/A | N/A | Doanh thu; với Tiếp thị hiển thị dạng tổng hợp |
+| 14 | Cột Doanh thu 12 tháng | Cột bảng (số) | N/A | N/A | Doanh thu 12 tháng gần nhất (khoảng thời gian cố định). **Che theo vai trò (nhóm Lịch sử giao dịch, bảng III.C360):** Tiếp thị hiển thị dạng **tổng hợp**; CSKH/Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị xem **đầy đủ** |
 | 15 | Cột Phân khúc | Nhãn màu | N/A | N/A | Phân khúc hiện tại |
 | 16 | Cột Trạng thái | Nhãn màu | N/A | N/A | Đang/không hoạt động |
 | 17 | Cột Cập nhật | Cột bảng (ngày) | N/A | N/A | Lần cập nhật gần nhất |
