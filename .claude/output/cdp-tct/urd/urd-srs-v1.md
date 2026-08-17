@@ -3268,7 +3268,7 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 | 6 | Dải hệ thống nguồn | Nhãn màu | N/A | N/A | Hệ thống có dữ liệu đóng góp |
 | 7 | Tương tác gần nhất | Hiển thị | N/A | N/A | Ngày tương tác gần nhất; rỗng "Chưa có dữ liệu" |
 | 8 | Chỉ số Tổng đơn | Ô số | N/A | N/A | Tổng số đơn |
-| 9 | Chỉ số Doanh thu 12 tháng | Ô số | N/A | N/A | Doanh thu; Tiếp thị xem tổng hợp |
+| 9 | Chỉ số Doanh thu 12 tháng | Ô số | N/A | N/A | Doanh thu 12 tháng gần nhất (khoảng thời gian cố định). **Che theo vai trò (nhóm Lịch sử giao dịch, bảng III.C360):** Tiếp thị xem **tổng hợp**; CSKH/Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị xem **đầy đủ** |
 | 10 | Chỉ số Điểm tích lũy | Ô số | N/A | N/A | Điểm loyalty; rỗng "—" |
 | 11 | Chỉ số Độ đầy đủ hồ sơ | Ô số + thanh | N/A | N/A | Phần trăm đầy đủ dữ liệu, có thanh tiến độ |
 | 12 | Thanh tab (10 nhóm / 11 tab) | Thanh tab | N/A | Tab Tổng quan | Tổng quan · Hồ sơ liên kết · Hồ sơ đa nguồn · Địa chỉ · Doanh nghiệp (tab điều kiện — chỉ khi KH doanh nghiệp) · Hoạt động theo mảng dịch vụ · Hành vi số · CSKH · Điểm số & Phân khúc · Đồng ý dữ liệu · Nhật ký. KH cá nhân thấy 10 tab (ẩn tab Doanh nghiệp) |
@@ -3279,7 +3279,7 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 
 | TT | Tab / Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị (masking theo III.C360) |
 |---|---|---|---|---|---|
-| 13 | Tab Tổng quan — Thông tin định danh | Danh sách trường | N/A | N/A | Giới tính, ngày sinh, SĐT, email, CCCD, PostID, bưu cục. **SĐT/email che một phần với CSKH/Tiếp thị/Vận hành; CCCD che với CSKH/Phụ trách dữ liệu, chỉ Quản trị xem đầy đủ theo quyền đặc biệt**; trường rỗng "Chưa có dữ liệu" |
+| 13 | Tab Tổng quan — Thông tin định danh | Danh sách trường | N/A | N/A | Giới tính, ngày sinh, SĐT, email, CCCD, PostID, bưu cục. **Che theo vai trò (bảng III.C360):** **SĐT/email** — che một phần với CSKH/Tiếp thị/Vận hành; đầy đủ với Kinh doanh/Phụ trách dữ liệu/Quản trị. **CCCD** — CSKH và Phụ trách dữ liệu **che**; Tiếp thị/Kinh doanh/Vận hành **KHÔNG xem** (ẩn hẳn); chỉ Quản trị xem đầy đủ theo quyền đặc biệt. Trường rỗng "Chưa có dữ liệu" |
 | 14 | Tab Tổng quan — Vai trò giao dịch | Nhãn + ô số | N/A | N/A | Số lần là Người gửi / Người nhận; nhãn vai trò chính. Người nhận **không có hồ sơ riêng** (A2) |
 | 15 | Tab Tổng quan — Phân khúc hiện tại | Nhãn màu | N/A | N/A | Các phân khúc khách hàng thuộc về |
 | 16 | Tab Hồ sơ liên kết — Bảng định danh liên kết | Bảng | N/A | N/A | Cột: Loại ID · Giá trị · Nguồn · Độ tin cậy · Cờ mã chính · **Trạng thái** (giá trị: *đã gộp* / *đã tách*) (UC-C360-04). Cột Trạng thái cập nhật thành "đã tách" sau khi tách hồ sơ — khớp hậu điều kiện UC-IDR-04 và SCR-IDR-05. Ẩn tab với Tiếp thị (bảng III.C360 dòng Hồ sơ liên kết) |
@@ -3292,7 +3292,7 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 | 23 | Tab Hành vi số | Khối/bảng | N/A | N/A | **Vận hành: không xem; Kinh doanh: tổng hợp; còn lại: đầy đủ** |
 | 24 | Tab CSKH | Bảng lịch sử | N/A | N/A | Lịch sử khiếu nại, chăm sóc |
 | 25 | Tab Điểm số & Phân khúc | Khối điểm số | N/A | N/A | RFM/CLV/rời bỏ: Vận hành không xem, còn lại xem. **Điểm rủi ro thu hộ (COD Risk) và gian lận (Fraud): ẩn với CSKH và Tiếp thị**, chỉ Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị xem (BR-C360-03) |
-| 26 | Tab Đồng ý dữ liệu | Bảng trạng thái đồng ý | N/A | N/A | Opt-in/opt-out theo mục đích + kênh; **Vận hành không xem** |
+| 26 | Tab Đồng ý dữ liệu | Bảng trạng thái đồng ý | N/A | N/A | Opt-in/opt-out theo mục đích + kênh. **Che theo vai trò (bảng III.C360 — Trạng thái đồng ý):** CSKH/Tiếp thị/Kinh doanh/Phụ trách dữ liệu/Quản trị **xem**; **Vận hành/Thu hộ không xem** |
 | 27 | Tab Nhật ký | Bảng | N/A | N/A | Nguồn dữ liệu đóng góp + **tóm tắt nhật ký gộp của KH đang mở với CSKH**; Phụ trách dữ liệu/Quản trị xem đầy đủ (UC-IDR-06). Tiếp thị/Kinh doanh/Vận hành: không xem nhật ký gộp |
 | 28 | Khu vực Ghi chú / Gắn nhãn | Ô nhập + nút | Có (khi thêm) | Rỗng | Thêm ghi chú/nhãn (UC-C360-03); nội dung rỗng chặn lưu |
 
