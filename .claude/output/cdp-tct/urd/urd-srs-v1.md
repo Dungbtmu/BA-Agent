@@ -3458,24 +3458,46 @@ Cho phép người dùng ghi chú và gắn nhãn khách hàng cần chăm sóc 
 **Ánh xạ Use Case:** UC-IDR-03.
 **Layout (theo prototype v3):** (1) Nút quay lại; (2) Panel hồ sơ chuẩn + danh sách mã đã tự gộp từ khóa mạnh; (3) Bảng đối chiếu cột (`CompareTable`) — mỗi mã một cột, có checkbox chọn gộp, mã tin cậy thấp làm mờ; (4) Thanh hành động dính đáy (đếm số mã chọn, nút Không phải cùng người, nút Xem trước hồ sơ chuẩn); (5) Modal xem trước hồ sơ chuẩn dự kiến.
 
-**Bảng thành phần:**
+> **Cách trình bày:** đặc tả tách theo **Bảng A** (khu vực đối chiếu chính) + **Bảng B** (bảng so sánh cột + thanh hành động) + **Bảng C** (modal Xem trước hồ sơ chuẩn). Mã component đánh theo bảng (A1, B2, C4…).
 
-| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+### Bảng A — Khu vực đối chiếu chính
+
+Phần đầu màn: điều hướng và bối cảnh hồ sơ đang đối chiếu.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| 1 | Nút Quay lại đối soát định danh | Nút | N/A | N/A | Về SCR-IDR-01 |
-| 2 | Panel hồ sơ chuẩn (neo) | Khối | N/A | N/A | Tên KH, mã hồ sơ gốc + nguồn; hướng dẫn đối chiếu |
-| 3 | Khối "Đã tự động gộp từ khóa mạnh ≥95%" | Nhãn danh sách | N/A | N/A | Các mã đã tự gộp (chỉ hiển thị, không hỏi lại) |
-| 4 | Cảnh báo cặp rủi ro | Khối cảnh báo | N/A | N/A | Hiển thị nổi bật với cặp người gửi/người nhận, SĐT dùng chung, xung đột loại KH (BR-IDR-06) |
-| 5 | Checkbox "Gộp mã này?" mỗi cột | Ô chọn | Không | Tick sẵn mã 85–94%; **không** tick mã <85% | Chọn mã thuộc cùng khách hàng |
-| 6 | Hàng dữ liệu so sánh | Bảng cột | N/A | N/A | Độ tin cậy, nguồn, mã KH nguồn, tên, SĐT, email, CCCD/MST, khóa khớp, đóng góp thêm |
-| 7 | Nhãn "tin cậy thấp" + làm mờ | Nhãn | N/A | N/A | Mã <85% làm mờ, gắn nhãn cảnh báo |
-| 8 | Đếm số mã đã chọn | Nhãn | N/A | N/A | "Đã chọn {N} / {tổng} mã để hợp nhất" |
-| 9 | Nút Không phải cùng người | Nút | N/A | N/A | Gỡ cờ nghi trùng (A1). Thông báo: "Đã ghi nhận đây là các khách hàng khác nhau..." |
-| 10 | Nút Xem trước hồ sơ chuẩn | Nút | N/A | N/A | Mở modal xem trước; vô hiệu khi 0 mã chọn (E4) |
-| 11 | Modal — Bảng trường sau gộp | Bảng | N/A | N/A | Trường / Giá trị sau gộp / Lấy từ nguồn / cờ Xung đột (BR-IDR-05, BR-IDR-12) |
-| 12 | Modal — Bảng số liệu cộng dồn | Bảng | N/A | N/A | Tổng đơn, doanh thu, COD, công nợ — cộng dồn từ các nguồn |
-| 13 | Modal — Nút Quay lại chỉnh | Nút | N/A | N/A | Đóng modal, sửa lựa chọn |
-| 14 | Modal — Nút Xác nhận hợp nhất | Nút | N/A | N/A | Hợp nhất; thông báo "Đã hợp nhất {N} mã định danh vào hồ sơ {mã}. Lịch sử giao dịch và điểm số đã được tính lại." |
+| A1 | Nút Quay lại đối soát định danh | Nút | N/A | N/A | Trở về màn danh sách hồ sơ nghi trùng (SCR-IDR-01). Đặt góc trên trái |
+| A2 | Panel hồ sơ chuẩn (neo) | Khối | N/A | N/A | Thông tin hồ sơ gốc đang được đối chiếu: tên khách, mã hồ sơ gốc + nguồn, kèm câu hướng dẫn đối chiếu. Đây là "mã neo" — các mã khác được so với mã này |
+| A3 | Khối "Đã tự động gộp từ khóa mạnh" | Nhãn danh sách | N/A | N/A | Liệt kê các mã đã được **gộp deterministic ở Tầng 1** (trùng khóa mạnh) và các mã tự gộp Tầng 2 (≥95%) — **chỉ hiển thị để người dùng biết, không hỏi lại** (BR-IDR-00) |
+| A4 | Cảnh báo cặp rủi ro | Khối cảnh báo | N/A | N/A | Hiển thị nổi bật khi cặp thuộc trường hợp rủi ro: một bên người gửi/một bên người nhận, SĐT dùng chung, xung đột loại khách cá nhân/doanh nghiệp (BR-IDR-06). Đặt trên đầu bảng so sánh |
+
+---
+
+### Bảng B — Bảng so sánh cột và thanh hành động
+
+Bảng đối chiếu từng trường giữa các mã nguồn nghi trùng (`CompareTable`) — mỗi mã một cột, mỗi trường một hàng — cùng thanh hành động dính đáy.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B1 | Checkbox "Gộp mã này?" trên mỗi cột | Ô chọn | Không | **Tick sẵn** mã vùng 85–94%; **không** tick mã <85% | Người dùng chọn mã thuộc cùng khách hàng để đưa vào hợp nhất (BR-IDR-01) |
+| B2 | Hàng dữ liệu so sánh | Bảng nhiều cột | N/A | N/A | Mỗi hàng một trường so sánh giữa các cột mã: độ tin cậy, nguồn, mã KH nguồn, tên, SĐT, email, CCCD/MST, khóa khớp, đóng góp thêm. *(Lưu ý: CCCD che theo vai trò như bảng III.C360; MST hiển thị bình thường — cân nhắc tách hai trường, xem ghi chú S-02)* |
+| B3 | Nhãn "tin cậy thấp" + làm mờ | Nhãn | N/A | N/A | Cột mã <85% được làm mờ và gắn nhãn cảnh báo tin cậy thấp, để người dùng thận trọng trước khi tick |
+| B4 | Bộ đếm số mã đã chọn | Nhãn | N/A | N/A | Hiển thị "Đã chọn {N} / {tổng} mã để hợp nhất". Cập nhật theo thời gian thực khi tick/bỏ tick |
+| B5 | Nút Không phải cùng người | Nút | N/A | N/A | Kết luận các mã là khách khác nhau → gỡ cờ nghi trùng (A1). Thông báo: "Đã ghi nhận đây là các khách hàng khác nhau. Hệ thống sẽ không đề xuất hợp nhất các mã này nữa." |
+| B6 | Nút Xem trước hồ sơ chuẩn | Nút | N/A | N/A | Mở modal xem trước hồ sơ chuẩn dự kiến (Bảng C). **Vô hiệu khi chưa chọn mã nào** (0 mã tick — E4) |
+
+---
+
+### Bảng C — Modal Xem trước hồ sơ chuẩn
+
+Cửa sổ bật lên khi bấm "Xem trước hồ sơ chuẩn": cho người dùng thấy hồ sơ chuẩn dự kiến trước khi xác nhận gộp (BR-IDR-05).
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| C1 | Bảng trường sau gộp | Bảng | N/A | N/A | Mỗi hàng một trường của hồ sơ chuẩn dự kiến. Cột: **Trường** · **Giá trị sau gộp** · **Lấy từ nguồn** (nguồn ưu tiên nào cung cấp) · cờ **Xung đột** khi các nguồn khác nhau (BR-IDR-05, BR-IDR-12) |
+| C2 | Bảng số liệu cộng dồn | Bảng | N/A | N/A | Số liệu định lượng cộng dồn từ các mã nguồn: tổng đơn, doanh thu, COD, công nợ |
+| C3 | Nút Quay lại chỉnh | Nút | N/A | N/A | Đóng modal, quay lại bảng so sánh để sửa lựa chọn mã |
+| C4 | Nút Xác nhận hợp nhất | Nút | N/A | N/A | Thực hiện hợp nhất các mã đã chọn. Thông báo: "Đã hợp nhất {N} mã định danh vào hồ sơ {mã}. Lịch sử giao dịch và điểm số đã được tính lại." Ghi nhật ký gộp thủ công (BR-IDR-07) |
 
 **Trạng thái đặc biệt:**
 - **Không còn mã nghi trùng:** "Không còn mã KH nào nghi trùng cho khách hàng này."
@@ -3493,21 +3515,50 @@ Cho phép người dùng ghi chú và gắn nhãn khách hàng cần chăm sóc 
 **Ánh xạ Use Case:** UC-IDR-02 (tab Chờ xem xét), UC-IDR-06 (tab Lịch sử gộp), UC-IDR-05 (tab Yêu cầu tách hồ sơ).
 **Layout (theo prototype v3):** 3 tab trên cùng — Chờ xem xét / Lịch sử gộp / Yêu cầu tách hồ sơ. Tab Chờ xem xét: các thẻ nhóm hồ sơ nghi trùng, bấm mở chi tiết đối chiếu. Tab Lịch sử gộp: bảng nhật ký gộp. Tab Yêu cầu tách: bảng đề xuất tách.
 
-**Bảng thành phần:**
+> **Cách trình bày:** đặc tả tách theo **Bảng A** (thanh tab) + **Bảng B1–B3** (nội dung từng tab). Mã component đánh theo bảng (A1, B2.1…).
 
-| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+### Bảng A — Thanh tab
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| 1 | Tab Chờ xem xét | Tab | N/A | Tab mặc định | Danh sách nhóm hồ sơ nghi trùng (85–94%) chờ xác nhận (UC-IDR-02) |
-| 2 | Thẻ nhóm nghi trùng | Thẻ (card) | N/A | N/A | Mã nhóm, loại, khóa trùng, cảnh báo xung đột, số nguồn; bấm mở đối chiếu |
-| 3 | Tab Lịch sử gộp | Tab | N/A | N/A | Bảng nhật ký các lần gộp (UC-IDR-06) — chỉ Phụ trách dữ liệu/Quản trị xem đầy đủ |
-| 4 | Bảng lịch sử gộp | Bảng | N/A | N/A | ID, loại (tự động/thủ công), mã KH chính, mã gộp vào, độ tin cậy, khóa trùng, người quyết định, thời điểm |
-| 5 | Tab Yêu cầu tách hồ sơ | Tab | N/A | N/A | Danh sách đề xuất tách từ nút Báo cáo (UC-IDR-05) |
-| 6 | Bảng yêu cầu tách | Bảng | N/A | N/A | ID, mã KH liên quan, người báo cáo, thời gian, lý do, trạng thái |
-| 7 | Nút xử lý đề xuất tách | Nút | N/A | N/A | **Mở màn Tách hồ sơ (SCR-IDR-05) để Người phụ trách dữ liệu tách trực tiếp** — xem điểm lệch dưới |
+| A1 | Thanh 3 tab | Thanh tab | N/A | Tab Chờ xem xét | Ba tab: **Chờ xem xét** · **Lịch sử gộp** · **Yêu cầu tách hồ sơ**. Bấm tab đổi vùng nội dung bên dưới. Tab Lịch sử gộp và Yêu cầu tách chỉ hiện với vai trò có quyền (xem từng bảng) |
+
+---
+
+### Bảng B1 — Tab Chờ xem xét
+
+Hàng đợi các nhóm hồ sơ nghi trùng đang chờ người phụ trách dữ liệu xác nhận gộp. Điểm vào của UC-IDR-02.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B1.1 | Danh sách thẻ nhóm nghi trùng | Danh sách thẻ | N/A | N/A | Mỗi thẻ là một nhóm hồ sơ nghi trùng thuộc **vùng 85–94%** (Tầng 2) hoặc bị đưa vào hàng đợi do cấm gộp tự động (BR-IDR-01/02) |
+| B1.2 | Nội dung một thẻ nhóm | Thẻ (card) | N/A | N/A | Hiển thị: mã nhóm, loại khách (cá nhân/DN), khóa trùng nổi bật, cảnh báo xung đột (nếu có — BR-IDR-06), số mã nguồn trong nhóm |
+| B1.3 | Bấm mở thẻ | Tương tác | N/A | N/A | Bấm một thẻ mở màn Đối chiếu hồ sơ nghi trùng (SCR-IDR-02) để so sánh và quyết định gộp |
+
+---
+
+### Bảng B2 — Tab Lịch sử gộp
+
+Nhật ký các lần gộp hồ sơ đã thực hiện. Phục vụ UC-IDR-06. **Che theo vai trò:** chỉ Phụ trách dữ liệu/Quản trị xem đầy đủ; Tiếp thị/Kinh doanh/Vận hành không xem (bảng III.C360 — Nhật ký gộp).
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B2.1 | Bảng lịch sử gộp | Bảng | N/A | N/A | Mỗi dòng là một lần gộp. Cột: **ID** · **Loại** (tự động Tầng 1 / tự động Tầng 2 ≥95% / thủ công) · **Mã KH chính** · **Mã gộp vào** · **Độ tin cậy** · **Khóa trùng** · **Người quyết định** · **Thời điểm**. Bản ghi bất biến, chỉ đọc |
+
+---
+
+### Bảng B3 — Tab Yêu cầu tách hồ sơ
+
+Danh sách đề xuất tách gửi từ nút Báo cáo của các vai trò không có quyền tách (UC-IDR-05); người phụ trách dữ liệu xem và tự tách.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B3.1 | Bảng yêu cầu tách | Bảng | N/A | N/A | Mỗi dòng là một đề xuất tách. Cột: **ID** · **Mã KH liên quan** · **Người báo cáo** · **Thời gian** · **Lý do** · **Trạng thái** (chờ xử lý / đã tách / đã bỏ qua) |
+| B3.2 | Nút Xử lý đề xuất tách | Nút | N/A | N/A | **Mở màn Tách hồ sơ (SCR-IDR-05)** để Người phụ trách dữ liệu tách trực tiếp — **không có bước phê duyệt riêng** (solution D-07). Chỉ Người phụ trách dữ liệu thao tác |
 
 **Trạng thái đặc biệt:**
 - **Tab Chờ xem xét rỗng:** "Không còn nhóm nào chờ xem xét."
-- **Không đủ quyền (Tiếp thị/Kinh doanh/Vận hành với tab Lịch sử gộp):** ẩn tab hoặc thông báo quyền.
+- **Tab Lịch sử gộp / Yêu cầu tách — không đủ quyền (Tiếp thị/Kinh doanh/Vận hành):** ẩn tab; truy cập trực tiếp → "Bạn không có quyền truy cập chức năng này."
 
 > **Điểm lệch prototype (quan trọng — cần sửa khi triển khai):**
 > 1. Tab "Yêu cầu tách hồ sơ" trong prototype hiển thị **nút Phê duyệt / Từ chối** và ghi chú **"Chỉ Admin mới có thể phê duyệt hoặc từ chối yêu cầu Unmerge"** — đây là mô hình phê duyệt **cũ**. Theo solution D-07, giai đoạn này **không có bước phê duyệt riêng**: Người phụ trách dữ liệu xem đề xuất và **tự tách trực tiếp** qua SCR-IDR-05. Bỏ nút Phê duyệt/Từ chối và ghi chú Admin; thay bằng nút "Xử lý → mở màn Tách hồ sơ".
@@ -3596,30 +3647,59 @@ Cho phép người dùng ghi chú và gắn nhãn khách hàng cần chăm sóc 
 **Ánh xạ Use Case:** UC-ING-05 (+ UC-ING-07 phần cảnh báo/nhật ký).
 **Layout (theo prototype v3 — `KafkaScreen`):** (1) Dải 6 ô chỉ số tổng; (2) Biểu đồ lưu lượng theo thời gian + khung cảnh báo gần đây; (3) Bảng danh sách luồng theo nguồn (lọc theo trạng thái); (4) Bảng trượt chi tiết một luồng khi bấm chọn.
 
-**Bảng thành phần:**
+> **Cách trình bày:** đặc tả tách theo **Bảng A** (dải chỉ số tổng) + **Bảng B** (biểu đồ + cảnh báo) + **Bảng C** (bảng danh sách luồng theo nguồn) + **Bảng D** (bảng trượt chi tiết một luồng + hành động). Mã component đánh theo bảng (A1, C3, D2…).
 
-| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+### Bảng A — Dải chỉ số tổng
+
+Sáu ô số tóm tắt tình trạng toàn hệ thống, đặt trên cùng.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| 1 | Ô chỉ số Số luồng giám sát | Ô số | N/A | N/A | Tổng số luồng dữ liệu đang giám sát |
-| 2 | Ô chỉ số Hoạt động tốt | Ô số | N/A | N/A | Số luồng trạng thái tốt (BR-ING-10) |
-| 3 | Ô chỉ số Cần theo dõi | Ô số | N/A | N/A | Số luồng ở mức cảnh báo (vàng) |
-| 4 | Ô chỉ số Lỗi cần xử lý | Ô số | N/A | N/A | Số luồng ở mức báo động (đỏ) |
-| 5 | Ô chỉ số Lưu lượng hiện tại | Ô số | N/A | N/A | Số bản ghi/phút toàn hệ thống |
-| 6 | Ô chỉ số Bản ghi lỗi 24h | Ô số | N/A | N/A | Tổng bản ghi lỗi trong 24 giờ |
-| 7 | Biểu đồ lưu lượng theo thời gian | Biểu đồ cột | N/A | Khoảng 6 giờ | Chọn khoảng 1h/6h/24h/7 ngày; phân biệt bản ghi thành công / lỗi |
-| 8 | Khung Cảnh báo gần đây | Danh sách cảnh báo | N/A | N/A | Mức (cảnh báo/báo động), thời điểm, nguồn, nội dung; câu chữ theo BR-ING-06/07 |
-| 9 | Bộ lọc trạng thái luồng | Nút lọc | Không | Tất cả | Tất cả / Hoạt động tốt / Cần theo dõi / Lỗi / Ngưng hoạt động |
-| 10 | Cột Trạng thái luồng | Nhãn màu | N/A | N/A | Tốt / Cần theo dõi / Lỗi / Ngưng hoạt động (BR-ING-10) |
-| 11 | Cột Nguồn dữ liệu | Cột bảng | N/A | N/A | Tên hệ thống nguồn (VD CAS, MPITS, PayPost, MyVNPost) |
-| 12 | Cột Loại dữ liệu | Cột bảng | N/A | N/A | Khách hàng / Đơn hàng / Trạng thái phát / COD / Hành vi / Địa chỉ |
-| 13 | Cột Bản ghi/phút | Cột bảng (số) | N/A | N/A | Lưu lượng hiện tại của luồng |
-| 14 | Cột Tổng 24h | Cột bảng (số) | N/A | N/A | Tổng bản ghi nhận trong 24 giờ |
-| 15 | Cột Độ trễ | Cột bảng (số) | N/A | N/A | Độ trễ hiện tại; tô đỏ khi vượt ngưỡng |
-| 16 | Cột Bản ghi lỗi 24h | Cột bảng (số) | N/A | N/A | Số bản ghi lỗi; tô vàng/đỏ theo mức |
-| 17 | Cột Cập nhật | Cột bảng (thời gian) | N/A | N/A | Thời điểm đồng bộ gần nhất |
-| 18 | Bảng trượt chi tiết luồng | Bảng trượt | N/A | N/A | Nguồn, loại dữ liệu, bản ghi/phút, tổng 24h, độ trễ, bản ghi lỗi 24h + danh sách bản ghi lỗi gần nhất (mô tả lỗi, thời điểm) |
-| 19 | Nút Thử lại nguồn | Nút | N/A | N/A | Kích hoạt thử lại luồng; chuyển UC-ING-04 |
-| 20 | Nút Tạm dừng nguồn | Nút | N/A | N/A | Tạm dừng nhận từ nguồn; xác nhận nếu còn tồn đọng (UC-ING-06 E2) |
+| A1 | Ô chỉ số Số luồng giám sát | Ô số | N/A | N/A | Tổng số luồng dữ liệu đang được giám sát |
+| A2 | Ô chỉ số Hoạt động tốt | Ô số | N/A | N/A | Số luồng ở trạng thái tốt (BR-ING-10) |
+| A3 | Ô chỉ số Cần theo dõi | Ô số | N/A | N/A | Số luồng ở mức cảnh báo (vàng — BR-ING-06) |
+| A4 | Ô chỉ số Lỗi cần xử lý | Ô số | N/A | N/A | Số luồng ở mức báo động (đỏ — BR-ING-07) |
+| A5 | Ô chỉ số Lưu lượng hiện tại | Ô số | N/A | N/A | Tổng số bản ghi/phút toàn hệ thống ở thời điểm hiện tại |
+| A6 | Ô chỉ số Bản ghi lỗi 24h | Ô số | N/A | N/A | Tổng số bản ghi lỗi trong 24 giờ gần nhất |
+
+---
+
+### Bảng B — Biểu đồ lưu lượng và khung cảnh báo
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B1 | Biểu đồ lưu lượng theo thời gian | Biểu đồ cột | Không | Khoảng 6 giờ | Cột theo mốc thời gian, phân biệt bản ghi thành công / lỗi. Chọn khoảng hiển thị 1h / 6h / 24h / 7 ngày |
+| B2 | Khung Cảnh báo gần đây | Danh sách cảnh báo | N/A | N/A | Danh sách cảnh báo/báo động gần đây: mức (cảnh báo vàng / báo động đỏ), thời điểm, nguồn, nội dung. Câu chữ theo BR-ING-06/07 |
+
+---
+
+### Bảng C — Bảng danh sách luồng theo nguồn
+
+Mỗi dòng là một luồng dữ liệu theo nguồn; lọc được theo trạng thái.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| C1 | Bộ lọc trạng thái luồng | Nút lọc | Không | Tất cả | Lọc: Tất cả / Hoạt động tốt / Cần theo dõi / Lỗi / Ngưng hoạt động |
+| C2 | Cột Trạng thái luồng | Nhãn màu | N/A | N/A | Tốt / Cần theo dõi / Lỗi / Ngưng hoạt động (BR-ING-10) |
+| C3 | Cột Nguồn dữ liệu | Cột bảng | N/A | N/A | Tên hệ thống nguồn (VD CAS, MPITS, PayPost, MyVNPost) |
+| C4 | Cột Loại dữ liệu | Cột bảng | N/A | N/A | Khách hàng / Đơn hàng / Trạng thái phát / COD / Hành vi / Địa chỉ |
+| C5 | Cột Bản ghi/phút | Cột bảng (số) | N/A | N/A | Lưu lượng hiện tại của luồng |
+| C6 | Cột Tổng 24h | Cột bảng (số) | N/A | N/A | Tổng bản ghi nhận trong 24 giờ |
+| C7 | Cột Độ trễ | Cột bảng (số) | N/A | N/A | Độ trễ hiện tại của luồng; **tô đỏ khi vượt ngưỡng** (BR-ING-01) |
+| C8 | Cột Bản ghi lỗi 24h | Cột bảng (số) | N/A | N/A | Số bản ghi lỗi trong 24h; tô vàng/đỏ theo mức (BR-ING-06/07) |
+| C9 | Cột Cập nhật | Cột bảng (thời gian) | N/A | N/A | Thời điểm đồng bộ gần nhất của luồng |
+
+---
+
+### Bảng D — Bảng trượt chi tiết một luồng và hành động
+
+Mở ra khi bấm một luồng ở Bảng C.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| D1 | Bảng trượt chi tiết luồng | Bảng trượt | N/A | N/A | Chi tiết luồng đã chọn: nguồn, loại dữ liệu, bản ghi/phút, tổng 24h, độ trễ, bản ghi lỗi 24h + danh sách bản ghi lỗi gần nhất (mô tả lỗi, thời điểm) |
+| D2 | Nút Thử lại nguồn | Nút | N/A | N/A | Kích hoạt thử lại luồng đang lỗi (chuyển cơ chế UC-ING-04) |
+| D3 | Nút Tạm dừng nguồn | Nút | N/A | N/A | Tạm dừng nhận dữ liệu từ nguồn; xác nhận nếu còn tồn đọng chưa xử lý (UC-ING-06 E2) |
 
 **Trạng thái đặc biệt:**
 - **Cảnh báo (vàng):** "Luồng {nguồn} đang xử lý chậm / tỷ lệ lỗi tăng. Vui lòng theo dõi." (BR-ING-06).
@@ -3893,32 +3973,49 @@ Cho phép người dùng ghi chú và gắn nhãn khách hàng cần chăm sóc 
 **Ánh xạ Use Case:** UC-ANA-01, UC-ANA-03.
 **Layout (theo prototype v3 — `SegmentScreen` view=builder):** hai cột — (trái) biểu mẫu thông tin + trình dựng điều kiện; (phải) panel Xem trước kết quả. Trình dựng điều kiện dùng đệ quy `RuleGroup`: mỗi nhóm có toggle logic, đường kẻ dọc thụt lề, nút thêm điều kiện/nhóm con.
 
-**Bảng thành phần — Thông tin và cấu hình:**
+> **Cách trình bày:** đặc tả tách theo **Bảng A** (thông tin và cấu hình phân khúc) + **Bảng B** (trình dựng điều kiện + hành động) + **Bảng C** (panel Xem trước). Mã component đánh theo bảng (A1, B3, C2…).
 
-| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+### Bảng A — Thông tin và cấu hình phân khúc
+
+Khối biểu mẫu bên trái: đặt tên, mô tả và cấu hình cách phân khúc chạy.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| 1 | Ô Tên phân khúc | Ô nhập text | **Có** (đề xuất) | Rỗng | Placeholder "VD: Khách hàng nguy cơ rời bỏ Q3". Prototype cho lưu khi rỗng (nhãn "Không có tên") — đề xuất bắt buộc, xem OQ-ANA-06 |
-| 2 | Ô Mô tả | Ô nhập text | Không | Rỗng | Mô tả ngắn mục tiêu phân khúc |
-| 3 | Chọn Loại phân khúc | Danh sách chọn | Có | Phân khúc động | Động / Tĩnh (BR-ANA-04) |
-| 4 | Chọn Mảng dịch vụ trọng tâm | Danh sách chọn | Không | Tất cả mảng | 7 mảng dịch vụ chính hoặc Tất cả |
-| 5 | Chọn Tần suất cập nhật | Danh sách chọn | Có | Hàng ngày lúc 02:00 | Hàng ngày 02:00 / Mỗi giờ / Thời gian thực / Thủ công (BR-ANA-04) |
+| A1 | Ô Tên phân khúc | Ô nhập text | **Có** (đề xuất) | Rỗng | Tên gọi phân khúc. Placeholder "VD: Khách hàng nguy cơ rời bỏ Q3". Prototype cho lưu khi rỗng (nhãn "Không có tên") — đề xuất **bắt buộc**, xem OQ-ANA-06 |
+| A2 | Ô Mô tả | Ô nhập text | Không | Rỗng | Mô tả ngắn mục tiêu của phân khúc, giúp người khác hiểu phân khúc dùng để làm gì |
+| A3 | Chọn Loại phân khúc | Danh sách chọn | Có | Phân khúc động | **Động** (tự cập nhật khi dữ liệu thay đổi) / **Tĩnh** (chốt tại thời điểm tạo) — BR-ANA-04 |
+| A4 | Chọn Mảng dịch vụ trọng tâm | Danh sách chọn | Không | Tất cả mảng | Giới hạn phân khúc theo 1 trong 7 mảng dịch vụ chính, hoặc Tất cả |
+| A5 | Chọn Tần suất cập nhật | Danh sách chọn | Có | Hàng ngày lúc 02:00 | Chu kỳ phân khúc động tự chạy lại: Hàng ngày 02:00 / Mỗi giờ / Thời gian thực / Thủ công (BR-ANA-04). Chỉ áp dụng khi Loại = Động |
 
-**Bảng thành phần — Trình dựng điều kiện và xem trước:**
+---
 
-| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+### Bảng B — Trình dựng điều kiện và hành động
+
+Khối trung tâm: dựng cây điều kiện lọc khách hàng dạng nhóm lồng AND/OR (tối đa 3 tầng), kèm các nút thao tác.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| 6 | Câu tóm tắt tự sinh | Khối hiển thị | N/A | N/A | "PHÂN KHÚC NÀY LẤY KHÁCH HÀNG THOẢ: …" — dựng tự động từ cây điều kiện, cập nhật ngay khi sửa (BR-ANA-02) |
-| 7 | Toggle logic nhóm | Nút chuyển | Có | TẤT CẢ (AND) | Mỗi nhóm: **TẤT CẢ (AND)** / **BẤT KỲ (OR)** (BR-ANA-02). **Prototype chỉ có AND/OR — không có NOT** (BR-ANA-03, OQ-ANA-01) |
-| 8 | Điều kiện lá (Trường · Toán tử · Giá trị) | Bộ 3 ô (chọn·chọn·nhập) | Có (≥1 điều kiện) | Trường "Điểm rời bỏ", toán tử "≥" | Trường: 11 nhóm (BR-ANA-01); Toán tử: 8 phép `=,≠,>,<,≥,≤,chứa,thuộc`; Giá trị: ô nhập tự do |
-| 9 | Nút Thêm điều kiện | Nút | N/A | N/A | Thêm một điều kiện lá vào nhóm |
-| 10 | Nút Thêm nhóm con | Nút | N/A | N/A | Thêm nhóm con (lồng thêm 1 tầng); ẩn/khóa khi đã đạt tối đa **3 tầng** (BR-ANA-02) — hiển thị "Đã đạt tối đa 3 tầng lồng" |
-| 11 | Nút Xóa điều kiện / Xóa nhóm | Nút | N/A | N/A | Xóa một điều kiện hoặc cả nhóm |
-| 12 | Nút Ước tính số KH | Nút | N/A | N/A | Gọi ước lượng real-time (FR-ANA-02); trả kết quả sang panel Xem trước |
-| 13 | Nút Lưu phân khúc | Nút | N/A | N/A | Lưu; nếu phân khúc đang dùng chiến dịch → cảnh báo tác động (UC-ANA-03) trước khi lưu |
-| 14 | Nút Hủy | Nút | N/A | N/A | Về Danh sách phân khúc, không lưu |
-| 15 | Panel Xem trước — Quy mô dự kiến | Khối chỉ số | N/A | N/A | Số khách hàng khớp điều kiện; hiển thị sau khi bấm Ước tính (FR-ANA-02) |
-| 16 | Panel Xem trước — Kênh kích hoạt phù hợp | Khối | N/A | N/A | Gợi ý kênh (đã lọc theo trạng thái Đồng ý dữ liệu); nhắc "kiểm tra lại Consent trước khi kích hoạt" |
-| 17 | Panel Xem trước — Top hành vi chung | Khối | N/A | N/A | Đặc điểm hành vi chung của tệp (mô tả định tính) |
+| B1 | Câu tóm tắt tự sinh | Khối hiển thị | N/A | N/A | Câu văn xuôi mô tả điều kiện: "PHÂN KHÚC NÀY LẤY KHÁCH HÀNG THOẢ: …" — dựng tự động từ cây điều kiện, cập nhật ngay khi sửa (BR-ANA-02). Giúp người dùng đọc lại điều kiện bằng ngôn ngữ thường |
+| B2 | Toggle logic nhóm | Nút chuyển | Có | TẤT CẢ (AND) | Mỗi nhóm điều kiện chọn cách kết hợp: **TẤT CẢ (AND)** hoặc **BẤT KỲ (OR)** (BR-ANA-02). **Prototype chỉ có AND/OR — chưa có NOT** (BR-ANA-03, OQ-ANA-01) |
+| B3 | Điều kiện lá (Trường · Toán tử · Giá trị) | Bộ 3 ô (chọn · chọn · nhập) | Có (≥1 điều kiện) | Trường "Điểm rời bỏ", toán tử "≥" | Một dòng điều kiện gồm 3 phần: **Trường** (11 nhóm — BR-ANA-01); **Toán tử** (8 phép `= ≠ > < ≥ ≤ chứa thuộc`); **Giá trị** (ô nhập tự do) |
+| B4 | Nút Thêm điều kiện | Nút | N/A | N/A | Thêm một điều kiện lá vào nhóm hiện tại |
+| B5 | Nút Thêm nhóm con | Nút | N/A | N/A | Thêm một nhóm con (lồng thêm 1 tầng). Ẩn/khóa khi đã đạt **tối đa 3 tầng** (BR-ANA-02) — hiển thị "Đã đạt tối đa 3 tầng lồng" |
+| B6 | Nút Xóa điều kiện / Xóa nhóm | Nút | N/A | N/A | Xóa một điều kiện lá hoặc cả một nhóm điều kiện |
+| B7 | Nút Ước tính số KH | Nút | N/A | N/A | Gọi ước lượng thời gian thực số khách khớp điều kiện (FR-ANA-02); kết quả trả sang panel Xem trước (Bảng C) |
+| B8 | Nút Lưu phân khúc | Nút | N/A | N/A | Lưu phân khúc. **Vô hiệu khi cây điều kiện rỗng** (E3). Nếu phân khúc đang được chiến dịch dùng → cảnh báo tác động trước khi lưu (UC-ANA-03, BR-ANA-12) |
+| B9 | Nút Hủy | Nút | N/A | N/A | Quay về Danh sách phân khúc, không lưu thay đổi |
+
+---
+
+### Bảng C — Panel Xem trước
+
+Khối bên phải: hiển thị kết quả ước lượng sau khi bấm "Ước tính số KH".
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| C1 | Quy mô dự kiến | Khối chỉ số | N/A | N/A | Số khách hàng khớp điều kiện hiện tại; hiển thị sau khi bấm Ước tính (FR-ANA-02) |
+| C2 | Kênh kích hoạt phù hợp | Khối | N/A | N/A | Gợi ý kênh gửi phù hợp, **đã lọc theo trạng thái Đồng ý dữ liệu**; kèm nhắc "kiểm tra lại Consent trước khi kích hoạt" |
+| C3 | Top hành vi chung | Khối | N/A | N/A | Đặc điểm hành vi chung của tệp khách (mô tả định tính), giúp hiểu chân dung phân khúc |
 
 **Trạng thái đặc biệt:**
 - **Chưa ước tính:** panel Xem trước hiển thị "Bấm \"Ước tính số KH\" để xem trước quy mô và kênh kích hoạt phù hợp."
