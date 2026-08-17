@@ -437,14 +437,15 @@ const KH_DETAIL = {
 // ============================================================
 // NGHI TRÙNG ĐỊNH DANH — nguồn dữ liệu cho cờ cảnh báo ở màn Danh sách KH
 // và màn đối chiếu. Mô hình BA MỨC theo độ tin cậy:
-//   confidence ≥ 90 → hệ thống TỰ ĐỘNG GỘP (không cần hỏi)
-//   confidence 60–89 → NGHI TRÙNG — nên xác nhận (cờ ⚠ cam đậm, nhóm chính)
+//   Tầng 1 khóa mạnh → hệ thống TỰ ĐỘNG GỘP thẳng (không chấm điểm)
+//   Tầng 2: confidence ≥ 95 → tự động gộp; 85–94 → nghi trùng, cần xác nhận (cờ ⚠); 70–84 → quan hệ nghi vấn; <70 → không gộp
 //   confidence < 60  → GỢI Ý TIN CẬY THẤP — cân nhắc kỹ (cờ nhạt, nhóm tách riêng)
 // Với KH có KH_DETAIL: mảnh PENDING lấy trực tiếp từ sourcesData (mergeStatus).
 // Với KH chưa có KH_DETAIL: khai báo mảnh pending tối giản ở đây để vẫn demo được cờ.
 // ============================================================
-const CONF_AUTO = 90;   // ngưỡng tự động gộp
-const CONF_LOW  = 60;   // ranh giới giữa "nên xác nhận" và "tin cậy thấp"
+const CONF_AUTO    = 95;   // Tầng 2 — từ 95% trở lên: tự động gộp
+const CONF_LOW     = 85;   // ranh giới vùng "chờ xác nhận" (85–94%) vs "quan hệ nghi vấn"
+const CONF_SUSPECT = 70;   // 70–84%: lưu quan hệ nghi vấn trong Identity Graph, không gộp, không vào hàng đợi
 
 const SUSPECT_DUPLICATES = {
   // 2 KH demo chưa có KH_DETAIL — chỉ khai báo mảnh nghi trùng tối giản
@@ -499,17 +500,22 @@ function anchorFragment(uid) {
 // ============================================================
 // RULE HỢP NHẤT ĐỊNH DANH — bộ quy tắc hệ thống dùng để so khớp và quyết định
 // tự động gộp / gắn cờ nghi trùng. Đây chính là NGUỒN sinh ra cảnh báo ở màn Đối soát
-// định danh (Mục 1). Ngưỡng dùng chung: CONF_AUTO (≥90 → tự gộp), CONF_LOW (60 → ranh giới).
+// định danh (Mục 1). Ngưỡng Tầng 2: CONF_AUTO (≥95 → tự gộp), CONF_LOW (85 → ranh giới chờ xác nhận), CONF_SUSPECT (70 → quan hệ nghi vấn).
 // Giai đoạn đầu: READ-ONLY, chỉ hiển thị. Sửa rule là giai đoạn sau.
 // ============================================================
+// Tầng 1 — Đối sánh tuyệt đối (Deterministic, CDP.md 6.6.1): trùng khóa mạnh → gộp thẳng, KHÔNG chấm điểm.
+// 10 luật khóa mạnh theo tài liệu gốc. Cột "Ngưỡng" chỉ mang tính tham chiếu độ tin cậy; hành động là gộp/đề xuất theo khóa, không phải theo mốc %.
 const IDENTITY_RULES = [
-  { id:'R1', key:'CCCD',    field:'Số CCCD/CMND',        weight:'Rất cao', minConf:98, action:'AUTO', note:'Khớp CCCD tuyệt đối — định danh cá nhân duy nhất' },
-  { id:'R2', key:'MST',     field:'Mã số thuế (DN)',      weight:'Rất cao', minConf:96, action:'AUTO', note:'Khớp MST — định danh doanh nghiệp duy nhất' },
-  { id:'R3', key:'POST_ID', field:'PostID',               weight:'Cao',     minConf:95, action:'AUTO', note:'Khớp PostID — mã định danh nội bộ VNPost' },
-  { id:'R4', key:'PHONE_NAME', field:'SĐT + Họ tên khớp', weight:'Trung bình', minConf:85, action:'AUTO', note:'SĐT trùng và họ tên khớp đầy đủ (có dấu)' },
-  { id:'R5', key:'PHONE',   field:'Chỉ SĐT trùng',        weight:'Trung bình', minConf:70, action:'FLAG', note:'Chỉ khớp SĐT — có thể dùng chung số (người thân, shipper) nên cần xác nhận' },
-  { id:'R6', key:'NAME_FUZZY', field:'Tên gần đúng + SĐT', weight:'Thấp',   minConf:62, action:'FLAG', note:'Tên viết khác dấu/viết tắt, SĐT trùng — cần người đối chiếu' },
-  { id:'R7', key:'NAME_ONLY', field:'Chỉ tên gần đúng',   weight:'Rất thấp', minConf:50, action:'LOW', note:'Chỉ khớp tên mờ, không đủ cơ sở — chỉ gợi ý tin cậy thấp' },
+  { id:'R1',  key:'CCCD',        field:'Trùng CCCD hợp lệ',                    weight:'Rất cao', minConf:'Khóa mạnh', action:'AUTO', note:'Định danh cá nhân duy nhất — gộp thẳng, áp masking/mã hóa CCCD' },
+  { id:'R2',  key:'MST',         field:'Trùng mã số thuế hợp lệ',              weight:'Rất cao', minConf:'Khóa mạnh', action:'AUTO', note:'Định danh doanh nghiệp/KHL duy nhất — gộp thẳng vào hồ sơ DN' },
+  { id:'R3',  key:'MST_NAME',    field:'Trùng MST + tên DN gần giống',         weight:'Rất cao', minConf:'Khóa mạnh', action:'AUTO', note:'Gộp hồ sơ DN, lưu tên chuẩn và tên thay thế (alias)' },
+  { id:'R4',  key:'PHONE_EMAIL', field:'Trùng SĐT + email',                    weight:'Rất cao', minConf:'Khóa mạnh', action:'AUTO', note:'Cùng SĐT và email → gộp thẳng nếu không xung đột vai trò' },
+  { id:'R5',  key:'POST_ID',     field:'Trùng PostID',                         weight:'Cao',     minConf:'Khóa mạnh', action:'AUTO', note:'Gộp tài khoản số vào hồ sơ khách hàng' },
+  { id:'R6',  key:'CRM_ID',      field:'Trùng mã khách hàng CRM',              weight:'Cao',     minConf:'Khóa mạnh', action:'AUTO', note:'Gộp vào hồ sơ tương ứng của CRM' },
+  { id:'R7',  key:'KHL_ID',      field:'Trùng mã KHL',                         weight:'Cao',     minConf:'Khóa mạnh', action:'AUTO', note:'Gộp vào hồ sơ doanh nghiệp/KHL' },
+  { id:'R8',  key:'USER_APP',    field:'Trùng User ID App đã xác thực',        weight:'Cao',     minConf:'Khóa mạnh', action:'AUTO', note:'User ID app đã xác thực qua SĐT/PostID → gộp hành vi app vào hồ sơ' },
+  { id:'R9',  key:'EMAIL',       field:'Trùng email hợp lệ (không dùng chung)', weight:'Cao',    minConf:'Khóa mạnh', action:'FLAG', note:'Email trùng, không phải email dùng chung/doanh nghiệp → gộp hoặc đề xuất gộp' },
+  { id:'R10', key:'PHONE',       field:'Trùng SĐT đã chuẩn hóa (không dùng chung)', weight:'Cao', minConf:'Cần tín hiệu hỗ trợ', action:'FLAG', note:'Chỉ khớp SĐT — chỉ tự gộp khi có thêm tín hiệu hỗ trợ và đạt ngưỡng; SĐT dùng chung thì đưa hàng đợi. Tên KHÔNG được dùng làm khóa gộp độc lập' },
 ];
 
 // Ánh xạ action → nhãn hiển thị + màu
@@ -1095,8 +1101,8 @@ function IdentityScreen({ onC360 }) {
 
   const pendingGroups = GROUPS.filter(g => decisions[g.id] !== 'different');
 
-  const confColor = (c) => c >= 90 ? '#16A34A' : c >= 75 ? '#F59E0B' : '#DC2626';
-  const confBg    = (c) => c >= 90 ? '#dcfce7' : c >= 75 ? '#fef9c3' : '#fee2e2';
+  const confColor = (c) => c >= 95 ? '#16A34A' : c >= 85 ? '#F59E0B' : '#DC2626';
+  const confBg    = (c) => c >= 95 ? '#dcfce7' : c >= 85 ? '#fef9c3' : '#fee2e2';
 
   const COMPARE_FIELDS = [
     { key:'name',    label:'Họ tên / Tên DN' },
@@ -1142,7 +1148,7 @@ function IdentityScreen({ onC360 }) {
       {screenTab==='pending' && (
         <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
           <div style={{ fontSize:12, color:'#6B7280' }}>
-            Mỗi nhóm gồm các hồ sơ từ nhiều hệ thống mà BE xác định có thể là cùng 1 người. Độ tương đồng 60–89% — cần xác nhận thủ công.
+            Mỗi nhóm gồm các hồ sơ từ nhiều hệ thống mà hệ thống xác định có thể là cùng 1 người. Độ tin cậy 85–94% (Tầng 2) — cần xác nhận thủ công.
           </div>
           {pendingGroups.map(g => (
             <div key={g.id} className="panel" style={{ padding:0, overflow:'hidden', cursor:'pointer' }}
@@ -1221,7 +1227,7 @@ function IdentityScreen({ onC360 }) {
       {screenTab==='unmerge' && (
         <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
           <div style={{ padding:12, background:'#fef9c3', border:'1px solid #F59E0B', borderRadius:8, fontSize:12, color:'#d97706' }}>
-            Chỉ Admin mới có thể phê duyệt hoặc từ chối yêu cầu Unmerge.
+            Đây là các đề xuất tách do nhân viên báo cáo. <b>Người phụ trách dữ liệu</b> xem đề xuất và <b>tự tách trực tiếp</b> (bấm "Xử lý"); giai đoạn này không có bước phê duyệt/từ chối riêng.
           </div>
           <div className="panel" style={{ overflow:'hidden' }}>
             <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
@@ -1242,10 +1248,7 @@ function IdentityScreen({ onC360 }) {
                     <td style={{ padding:'10px 12px', fontSize:12, maxWidth:260 }}>{r.reason}</td>
                     <td style={{ padding:'10px 12px' }}><span className="badge badge-yellow">{r.status}</span></td>
                     <td style={{ padding:'10px 12px' }}>
-                      <div className="flex gap-2">
-                        <button style={{ padding:'5px 10px', background:'#DC2626', color:'white', border:'none', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer' }}>Phê duyệt</button>
-                        <button style={{ padding:'5px 10px', background:'#f3f4f6', color:'#6B7280', border:'none', borderRadius:6, fontSize:12, cursor:'pointer' }}>Từ chối</button>
-                      </div>
+                      <button style={{ padding:'5px 12px', background:'var(--brand)', color:'#1A1A1A', border:'1px solid #e1ad1f', borderRadius:6, fontSize:12, fontWeight:700, cursor:'pointer' }}>Xử lý → Tách hồ sơ</button>
                     </td>
                   </tr>
                 ))}
@@ -1318,7 +1321,7 @@ function IdentityScreen({ onC360 }) {
               <div key={p.uid} style={{ border:`2px solid ${confColor(p.confidence)}22`, borderRadius:10, padding:14, background:'white', position:'relative' }}>
                 {/* Source badge + confidence */}
                 <div className="flex items-center justify-between mb-2">
-                  <span style={{ fontSize:11, fontWeight:700, color:'white', background: p.confidence>=90 ? '#16A34A' : p.confidence>=75 ? '#F59E0B':'#DC2626', padding:'2px 8px', borderRadius:4 }}>
+                  <span style={{ fontSize:11, fontWeight:700, color:'white', background: p.confidence>=95 ? '#16A34A' : p.confidence>=85 ? '#F59E0B':'#DC2626', padding:'2px 8px', borderRadius:4 }}>
                     {p.source}
                   </span>
                   <span style={{ fontSize:12, fontWeight:800, color:confColor(p.confidence) }}>{p.confidence}%</span>
@@ -1681,8 +1684,8 @@ function Customer360Screen({ uid, onBack }) {
         {/* HỒ SƠ ĐA NGUỒN */}
         {tab==='mergehist' && (() => {
           const sources = kh.sourcesData || [];
-          const confColor = (c) => c >= 90 ? '#16A34A' : c >= 75 ? '#F59E0B' : '#DC2626';
-          const confBg    = (c) => c >= 90 ? '#dcfce7' : c >= 75 ? '#fef9c3' : '#fee2e2';
+          const confColor = (c) => c >= 95 ? '#16A34A' : c >= 85 ? '#F59E0B' : '#DC2626';
+          const confBg    = (c) => c >= 95 ? '#dcfce7' : c >= 85 ? '#fef9c3' : '#fee2e2';
 
           const FIELD_GROUPS = [
             {
@@ -1812,7 +1815,7 @@ function Customer360Screen({ uid, onBack }) {
                 return (
                 <div style={{ display:'flex', flexDirection:'column', gap:0 }}>
                   <div style={{ fontSize:12, color:'#6B7280', marginBottom:12 }}>
-                    Thứ tự các hệ thống nguồn đã được CDP <b>tự động gộp</b> vào Hồ sơ chuẩn (khóa mạnh ≥{CONF_AUTO}%). Nguồn đang chờ xác nhận chưa nằm trên dòng thời gian này.
+                    Thứ tự các hệ thống nguồn đã được CDP <b>tự động gộp</b> vào Hồ sơ chuẩn (Tầng 1 trùng khóa mạnh — gộp thẳng, hoặc Tầng 2 đạt ≥{CONF_AUTO}%). Nguồn đang chờ xác nhận chưa nằm trên dòng thời gian này.
                   </div>
                   {/* Hồ sơ chuẩn — điểm cuối */}
                   <div style={{ display:'flex', gap:16, alignItems:'flex-start', paddingBottom:16 }}>
@@ -2772,8 +2775,8 @@ function SuspectListScreen({ onReview }) {
       <div className="panel" style={{ padding:'14px 16px', display:'flex', gap:12, alignItems:'center', flexWrap:'wrap' }}>
         <div style={{ fontSize:12, color:'var(--muted)', lineHeight:1.6, flex:1, minWidth:260 }}>
           Mỗi dòng là một <b>hồ sơ gốc</b> đang có các mã định danh khác nghi trùng, <b>chưa hợp nhất</b> (mã định danh CDP chỉ sinh sau khi gộp).
-          Hệ thống tự động gộp mã có <b>độ tin cậy ≥ {CONF_AUTO}%</b> (khóa mạnh: MST, CCCD, PostID);
-          mã <b>{CONF_LOW}–{CONF_AUTO-1}%</b> cần bạn xác nhận; mã <b>dưới {CONF_LOW}%</b> chỉ là gợi ý tin cậy thấp.
+          Hệ thống hợp nhất theo <b>2 tầng</b>: <b>Tầng 1</b> — trùng khóa định danh mạnh (MST, CCCD, PostID, mã KH CRM, SĐT+email) → <b>gộp thẳng, không chấm điểm</b>, không nằm ở danh sách này.
+          <b>Tầng 2</b> — khi thiếu khóa mạnh, chấm điểm tin cậy: <b>≥{CONF_AUTO}%</b> tự gộp; <b>{CONF_LOW}–{CONF_AUTO-1}%</b> cần bạn xác nhận (danh sách bên dưới); <b>{CONF_SUSPECT}–{CONF_LOW-1}%</b> chỉ lưu quan hệ nghi vấn, chưa gộp; <b>dưới {CONF_SUSPECT}%</b> không gộp.
         </div>
         <div className="flex items-center gap-2" style={{ background:'var(--bg)', border:'1px solid var(--border)', borderRadius:10, padding:'7px 13px', minWidth:220 }}>
           <Icon name="search" />
@@ -2847,8 +2850,8 @@ function MergeReviewScreen({ uid, onBack }) {
   const hasGolden = Array.isArray(kh?.sourcesData) && kh.sourcesData.some(s => s.mergeStatus === 'AUTO_MERGED');
 
   // Mỗi mã nguồn có 1 lựa chọn "gộp vào hồ sơ chuẩn" (checkbox). Mặc định:
-  // - mảnh 60–89% (nên xác nhận): tick sẵn
-  // - mảnh <60% (tin cậy thấp): KHÔNG tick sẵn — chỉ gộp nếu người dùng chủ động chọn
+  // - mảnh 85–94% (Tầng 2 vùng chờ xác nhận): tick sẵn
+  // - mảnh <85% (tin cậy thấp): KHÔNG tick sẵn — chỉ gộp nếu người dùng chủ động chọn
   const [included, setIncluded] = React.useState(() => {
     const init = {};
     allFragments.forEach(f => { init[f.sourceId] = f.confidence >= CONF_LOW; });
@@ -2861,7 +2864,7 @@ function MergeReviewScreen({ uid, onBack }) {
   // Bước xem trước hồ sơ chuẩn dự kiến trước khi gộp
   const [showPreview, setShowPreview] = React.useState(false);
 
-  // Các mảnh đã auto-merge (khóa mạnh ≥90%) — chỉ để hiển thị, không hỏi lại.
+  // Các mảnh đã auto-merge (Tầng 1 khóa mạnh — gộp thẳng; hoặc Tầng 2 ≥95%) — chỉ để hiển thị, không hỏi lại.
   const autoMerged = (kh && Array.isArray(kh.sourcesData))
     ? kh.sourcesData.filter(s => s.mergeStatus === 'AUTO_MERGED')
     : [];
@@ -3026,7 +3029,7 @@ function MergeReviewScreen({ uid, onBack }) {
         </div>
         {autoMerged.length > 0 && (
           <div style={{ marginTop:14, paddingTop:14, borderTop:'1px solid var(--border)' }}>
-            <div style={{ fontSize:11, color:'var(--muted)', fontWeight:600, marginBottom:6 }}>ĐÃ TỰ ĐỘNG GỘP TỪ KHÓA MẠNH (≥{CONF_AUTO}%)</div>
+            <div style={{ fontSize:11, color:'var(--muted)', fontWeight:600, marginBottom:6 }}>ĐÃ TỰ ĐỘNG GỘP (Tầng 1 khóa mạnh hoặc Tầng 2 ≥{CONF_AUTO}%)</div>
             <div className="flex gap-2 flex-wrap">
               {autoMerged.map(s => (
                 <span key={s.sourceId} className="badge badge-green" title={s.matchKey}>✓ {s.source} {s.sourceId} ({s.confidence}%)</span>
@@ -3178,10 +3181,12 @@ function MergeReviewScreen({ uid, onBack }) {
 // Hiển thị bộ rule sinh ra cảnh báo ở màn Đối soát định danh + sơ đồ 3 mức ngưỡng.
 // ============================================================
 function IdentityRuleScreen() {
+  // Tầng 2 — Đối sánh xác suất: bốn vùng ngưỡng. (Tầng 1 khóa mạnh gộp thẳng, không qua các vùng này — xem ghi chú bên dưới.)
   const thresholds = [
-    { range:`≥ ${CONF_AUTO}%`, title:'Tự động gộp', desc:'Khóa mạnh (CCCD, MST, PostID). Hệ thống hợp nhất ngay, không cần người xác nhận.', color:'var(--success)', bg:'var(--success-soft)' },
-    { range:`${CONF_LOW}–${CONF_AUTO-1}%`, title:'Gắn cờ chờ xác nhận', desc:'Khóa yếu (chỉ SĐT, tên gần đúng). Gắn cờ ⚠ ở màn Đối soát định danh, chờ người đối chiếu.', color:'#8a5a00', bg:'var(--warn-soft)' },
-    { range:`< ${CONF_LOW}%`, title:'Gợi ý tin cậy thấp', desc:'Khớp rất yếu. Không chủ động đề nghị gộp, chỉ hiện dạng gợi ý tách riêng để cân nhắc.', color:'var(--muted)', bg:'var(--line)' },
+    { range:`≥ ${CONF_AUTO}%`, title:'Tự động gộp', desc:'Gần như chắc chắn cùng khách. Hệ thống hợp nhất ngay, không cần người xác nhận (khi không có xung đột dữ liệu).', color:'var(--success)', bg:'var(--success-soft)' },
+    { range:`${CONF_LOW}–${CONF_AUTO-1}%`, title:'Chờ người xác nhận', desc:'Khả năng cao là cùng khách. Đưa vào hàng đợi ở màn Đối soát định danh để người phụ trách dữ liệu đối chiếu và quyết định.', color:'#8a5a00', bg:'var(--warn-soft)' },
+    { range:`${CONF_SUSPECT}–${CONF_LOW-1}%`, title:'Quan hệ nghi vấn', desc:'Có liên quan nhưng chưa đủ chắc. Chỉ lưu quan hệ nghi vấn trong Identity Graph, KHÔNG gộp, không đưa vào hàng đợi.', color:'#2563EB', bg:'var(--info-soft)' },
+    { range:`< ${CONF_SUSPECT}%`, title:'Không gộp', desc:'Không đủ căn cứ. Không gộp; chỉ dùng làm tín hiệu phân tích nếu phù hợp.', color:'var(--muted)', bg:'var(--line)' },
   ];
 
   return (
@@ -3191,13 +3196,14 @@ function IdentityRuleScreen() {
         <span style={{ fontSize:20 }}>🔒</span>
         <div style={{ fontSize:12, color:'var(--text-2)', lineHeight:1.6, flex:1, minWidth:240 }}>
           Đây là bộ quy tắc hệ thống đang áp dụng để so khớp và quyết định hợp nhất định danh — cũng là nguồn sinh ra cảnh báo nghi trùng ở màn <b>Đối soát định danh</b>.
+          Hệ thống chạy <b>2 tầng</b>: <b>Tầng 1 — đối sánh tuyệt đối</b> (trùng khóa mạnh ở bảng dưới → gộp thẳng, không chấm điểm); <b>Tầng 2 — đối sánh xác suất</b> (khi thiếu khóa mạnh, chấm điểm theo 4 vùng bên dưới).
           Giai đoạn đầu <b>chỉ hiển thị</b>; việc thêm/sửa rule và điều chỉnh ngưỡng sẽ mở ở giai đoạn sau.
         </div>
       </div>
 
-      {/* Sơ đồ 3 mức ngưỡng */}
+      {/* Sơ đồ 4 vùng ngưỡng — Tầng 2 */}
       <div className="panel" style={{ padding:20 }}>
-        <div className="section-title">Ngưỡng độ tin cậy quyết định hành động</div>
+        <div className="section-title">Bốn vùng ngưỡng tin cậy — Tầng 2 (đối sánh xác suất)</div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:12 }}>
           {thresholds.map((t,i) => (
             <div key={i} style={{ borderRadius:10, border:`1px solid ${t.color}`, background:t.bg, padding:14 }}>
@@ -3212,7 +3218,7 @@ function IdentityRuleScreen() {
       {/* Bảng rule */}
       <div className="panel">
         <div style={{ padding:'16px 20px 4px', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:8 }}>
-          <div className="section-title" style={{ margin:0 }}>Danh sách rule so khớp định danh</div>
+          <div className="section-title" style={{ margin:0 }}>Danh sách luật đối sánh tuyệt đối — Tầng 1 (khóa mạnh)</div>
           <button disabled title="Giai đoạn sau"
             style={{ fontSize:12, fontWeight:700, border:'1px dashed var(--border)', borderRadius:8, padding:'6px 12px', background:'var(--bg)', color:'var(--muted)', cursor:'not-allowed' }}>
             + Thêm rule (Giai đoạn sau)
@@ -3235,7 +3241,7 @@ function IdentityRuleScreen() {
                     <td style={{ padding:'10px', color:'var(--muted)', fontFamily:'monospace', fontSize:11 }}>{r.id}</td>
                     <td style={{ padding:'10px', fontWeight:700, whiteSpace:'nowrap' }}>{r.field}</td>
                     <td style={{ padding:'10px', whiteSpace:'nowrap' }}><span className="badge badge-gray">{r.weight}</span></td>
-                    <td style={{ padding:'10px', whiteSpace:'nowrap' }} className="tabular-nums">≥ {r.minConf}%</td>
+                    <td style={{ padding:'10px', whiteSpace:'nowrap' }} className="tabular-nums">{typeof r.minConf === 'number' ? `≥ ${r.minConf}%` : r.minConf}</td>
                     <td style={{ padding:'10px', whiteSpace:'nowrap' }}>
                       <span className="badge" style={{ background:act.bg, color:act.color }}>{act.label}</span>
                     </td>
@@ -3251,7 +3257,14 @@ function IdentityRuleScreen() {
           </table>
         </div>
         <div style={{ padding:'10px 20px', borderTop:'1px solid var(--line)', fontSize:12, color:'var(--muted)' }}>
-          {IDENTITY_RULES.length} rule đang áp dụng · Thứ tự ưu tiên từ trên xuống (khóa mạnh xét trước)
+          {IDENTITY_RULES.length} luật khóa mạnh (Tầng 1) đang áp dụng · Thứ tự ưu tiên từ trên xuống (khóa mạnh xét trước)
+        </div>
+      </div>
+
+      {/* Ghi chú nhóm đối sánh xác suất — Tầng 2 */}
+      <div className="panel" style={{ padding:'14px 16px', background:'var(--bg-2)', border:'1px dashed var(--border)' }}>
+        <div style={{ fontSize:12, color:'var(--text-2)', lineHeight:1.7 }}>
+          <b>Tầng 2 — Đối sánh xác suất (chưa triển khai giai đoạn này):</b> khi không đủ khóa mạnh, hệ thống cộng điểm từ các tín hiệu hỗ trợ để tính độ tin cậy rồi áp 4 vùng ngưỡng ở trên. 10 tín hiệu theo tài liệu gốc: IP mạng bưu cục · thiết bị/Device ID · Cookie ID · khung giờ gửi hàng · địa chỉ gửi thường dùng · tuyến gửi thường xuyên · loại hàng/trọng lượng thường gặp · tên gần giống · lịch sử chăm sóc tương đồng · hành vi app/web. <b>Không tín hiệu nào được dùng làm khóa gộp độc lập</b> — chỉ cộng điểm; riêng <b>tên không bao giờ là khóa gộp độc lập</b>.
         </div>
       </div>
 

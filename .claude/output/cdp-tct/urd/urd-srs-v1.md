@@ -3656,17 +3656,18 @@ Danh sách đề xuất tách gửi từ nút Báo cáo của các vai trò khô
 
 | TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
 |---|---|---|---|---|---|
-| 1 | Banner read-only | Khối thông báo | N/A | N/A | "Giai đoạn đầu chỉ hiển thị; thêm/sửa rule mở ở giai đoạn sau" |
-| 2 | Khối sơ đồ ngưỡng tin cậy | Khối thẻ | N/A | N/A | **Bốn vùng: ≥95% tự gộp · 85–94% chờ xác nhận · 70–84% quan hệ nghi vấn · <70% không gộp** (BR-IDR-01) |
-| 3 | Bảng danh sách rule | Bảng | N/A | N/A | #, khóa khớp, trọng số, ngưỡng tin cậy, hành động, diễn giải, trạng thái |
-| 4 | Nút "Thêm rule (Giai đoạn sau)" | Nút vô hiệu | N/A | N/A | Vô hiệu hóa, chú thích "Giai đoạn sau" |
-| 5 | Nút "Sửa" mỗi dòng | Nút vô hiệu | N/A | N/A | Vô hiệu hóa |
-| 6 | Ghi chú giai đoạn sau | Nhãn | N/A | N/A | Nêu năng lực mở sau: thêm/sửa/bật-tắt rule, đặt thứ tự ưu tiên, rule chọn trường khi gộp |
+| 1 | Banner read-only + giải thích 2 tầng | Khối thông báo | N/A | N/A | Nêu: đây là bộ quy tắc hệ thống dùng so khớp định danh, cũng là nguồn sinh cảnh báo nghi trùng ở màn Đối soát. Hệ thống chạy **2 tầng**: **Tầng 1 — đối sánh tuyệt đối** (trùng khóa mạnh ở bảng dưới → gộp thẳng, không chấm điểm); **Tầng 2 — đối sánh xác suất** (thiếu khóa mạnh → chấm điểm 4 vùng). Giai đoạn đầu **chỉ hiển thị**, thêm/sửa rule mở ở giai đoạn sau |
+| 2 | Khối sơ đồ 4 vùng ngưỡng — Tầng 2 | Khối thẻ | N/A | N/A | Bốn thẻ vùng ngưỡng của **đối sánh xác suất (Tầng 2)**: **từ 95% trở lên** — tự động gộp (gần như chắc chắn cùng khách, khi không xung đột dữ liệu); **85–94%** — chờ người xác nhận (đưa vào hàng đợi đối soát); **70–84%** — quan hệ nghi vấn (lưu trong Identity Graph, không gộp, không vào hàng đợi); **dưới 70%** — không gộp. Ghi rõ: cặp trùng khóa mạnh đã gộp ở Tầng 1, không đi qua 4 vùng này |
+| 3 | Bảng luật đối sánh tuyệt đối — Tầng 1 | Bảng | N/A | N/A | Danh sách **10 luật khóa mạnh** (CDP.md 6.6.1): trùng CCCD · MST · MST+tên DN gần giống · SĐT+email · PostID · mã KH CRM · mã KHL · User ID app đã xác thực · email hợp lệ không dùng chung · SĐT đã chuẩn hóa không dùng chung. Cột: khóa khớp · trọng số · ngưỡng/điều kiện · hành động (gộp thẳng / đề xuất) · diễn giải · trạng thái. Riêng luật SĐT chỉ tự gộp khi có thêm tín hiệu hỗ trợ; **tên KHÔNG bao giờ là khóa gộp độc lập** |
+| 4 | Khối ghi chú nhóm đối sánh xác suất (Tầng 2) | Khối ghi chú | N/A | N/A | Nêu 10 tín hiệu xác suất (IP, thiết bị, cookie, khung giờ gửi, địa chỉ, tuyến gửi, loại hàng, tên gần giống, lịch sử chăm sóc, hành vi app) — **chỉ cộng điểm, không tín hiệu nào là khóa gộp độc lập**; nhóm này ưu tiên Medium, **chưa triển khai giai đoạn này** |
+| 5 | Nút "Thêm rule (Giai đoạn sau)" | Nút vô hiệu | N/A | N/A | Vô hiệu hóa, chú thích "Giai đoạn sau" |
+| 6 | Nút "Sửa" mỗi dòng | Nút vô hiệu | N/A | N/A | Vô hiệu hóa |
+| 7 | Ghi chú giai đoạn sau | Nhãn | N/A | N/A | Nêu năng lực mở sau: thêm/sửa/bật-tắt rule, điều chỉnh ngưỡng, đặt thứ tự ưu tiên, rule ưu tiên chọn trường khi gộp; mọi thay đổi rule sẽ ghi nhật ký |
 
 **Trạng thái đặc biệt:**
 - **Không đủ quyền:** "Bạn không có quyền truy cập chức năng này."
 
-> **Điểm lệch prototype (quan trọng — cần sửa khi triển khai):** prototype hiển thị **3 mức ngưỡng 90/60** và **thiếu vùng 70–84%**; danh sách rule thiếu 6 luật đối sánh của CDP.md 6.6.1 và có luật "SĐT + tên gần đúng → tự gộp" sai (tài liệu gốc: tên không được làm khóa gộp độc lập — BR-IDR-03). Bản thật phải: (a) hiển thị **4 vùng 95/85/70**; (b) bổ sung đủ 10 luật đối sánh tuyệt đối (6.6.1) + ghi nhận nhóm đối sánh xác suất FR-IDR-02 (ưu tiên Medium, chưa triển khai); (c) sửa hành động luật SĐT+tên về "chờ xác nhận", không tự gộp.
+> **Đồng bộ với prototype (đã khớp từ prototype v3 bản cập nhật):** trước đây prototype hiển thị 3 mức ngưỡng 90/60, thiếu vùng 70–84%, thiếu 6 luật đối sánh và có luật "SĐT + tên gần đúng → tự gộp" sai. **Đã sửa trong prototype:** (a) khối ngưỡng hiển thị **4 vùng 95/85/70** kèm giải thích 2 tầng; (b) bảng rule đủ **10 luật đối sánh tuyệt đối** (Tầng 1) + khối ghi chú nhóm đối sánh xác suất (Tầng 2, chưa triển khai); (c) bỏ luật "SĐT+tên → tự gộp", nêu rõ tên không được làm khóa gộp độc lập. Tài liệu và prototype nay thống nhất.
 
 ---
 
