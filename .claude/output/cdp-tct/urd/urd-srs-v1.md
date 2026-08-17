@@ -3256,50 +3256,169 @@ Bảng dưới là bộ quy tắc che (masking) chuẩn cho Lô 1, hợp nhất 
 **Ánh xạ Use Case:** UC-C360-02 (xem hồ sơ + masking), UC-C360-03 (ghi chú/nhãn), UC-C360-04 (hồ sơ liên kết + đa nguồn).
 **Layout (theo prototype v3):** (1) Nút quay lại; (2) Header card: avatar, tên, mã định danh CDP, nhãn loại/nhóm/trạng thái, dải thông tin phụ (mảng dịch vụ, hệ thống nguồn, tương tác gần nhất), dải 4 chỉ số (tổng đơn, doanh thu, điểm tích lũy, độ đầy đủ hồ sơ); (3) Thanh 11 tab; (4) Vùng nội dung tab.
 
-**Bảng thành phần — Header và điều hướng:**
+> **Cách trình bày:** do màn có nhiều tab, đặc tả tách thành từng bảng riêng — **Bảng A** (Header) · **Bảng B1–B11** (nội dung từng tab) · **Bảng C** (Ghi chú/Gắn nhãn). Mã component đánh theo bảng (A1, B9.4, C2…) để tham chiếu chính xác.
 
-| TT | Tên thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị |
+### Bảng A — Header và điều hướng
+
+Phần đầu màn, luôn hiển thị bất kể đang ở tab nào.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| 1 | Nút Quay lại danh sách | Nút | N/A | N/A | Về màn danh sách khách hàng |
-| 2 | Avatar + Tên khách hàng | Hiển thị | N/A | N/A | Chữ cái đầu + tên đầy đủ (mọi vai trò xem) |
-| 3 | Mã định danh CDP | Nhãn (chữ mono) | N/A | N/A | Mã hồ sơ chuẩn |
-| 4 | Nhãn Loại / Nhóm / Trạng thái | Nhãn màu | N/A | N/A | Cá nhân/DN, nhóm KH, trạng thái |
-| 5 | Dải mảng dịch vụ | Nhãn màu | N/A | N/A | Các mảng dịch vụ đang hoạt động; rỗng hiển thị "—" |
-| 6 | Dải hệ thống nguồn | Nhãn màu | N/A | N/A | Hệ thống có dữ liệu đóng góp |
-| 7 | Tương tác gần nhất | Hiển thị | N/A | N/A | Ngày tương tác gần nhất; rỗng "Chưa có dữ liệu" |
-| 8 | Chỉ số Tổng đơn | Ô số | N/A | N/A | Tổng số đơn |
-| 9 | Chỉ số Doanh thu 12 tháng | Ô số | N/A | N/A | Doanh thu 12 tháng gần nhất (khoảng thời gian cố định). **Che theo vai trò (nhóm Lịch sử giao dịch, bảng III.C360):** Tiếp thị xem **tổng hợp**; CSKH/Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị xem **đầy đủ** |
-| 10 | Chỉ số Điểm tích lũy | Ô số | N/A | N/A | Điểm loyalty; rỗng "—" |
-| 11 | Chỉ số Độ đầy đủ hồ sơ | Ô số + thanh | N/A | N/A | Phần trăm đầy đủ dữ liệu, có thanh tiến độ |
-| 12 | Thanh tab (10 nhóm / 11 tab) | Thanh tab | N/A | Tab Tổng quan | Tổng quan · Hồ sơ liên kết · Hồ sơ đa nguồn · Địa chỉ · Doanh nghiệp (tab điều kiện — chỉ khi KH doanh nghiệp) · Hoạt động theo mảng dịch vụ · Hành vi số · CSKH · Điểm số & Phân khúc · Đồng ý dữ liệu · Nhật ký. KH cá nhân thấy 10 tab (ẩn tab Doanh nghiệp) |
+| A1 | Nút Quay lại danh sách | Nút | N/A | N/A | Đưa người dùng trở về màn danh sách khách hàng (SCR-C360-01), giữ nguyên bộ lọc trước đó. Đặt góc trên trái |
+| A2 | Avatar + Tên khách hàng | Hiển thị | N/A | N/A | Ô tròn chứa chữ cái đầu của tên + tên đầy đủ khách hàng. Mọi vai trò đều xem được (nhóm Họ tên — bảng III.C360: đầy đủ cho tất cả) |
+| A3 | Mã định danh CDP | Nhãn (chữ mono) | N/A | N/A | Mã hồ sơ hợp nhất do CDP sinh ra sau khi gộp định danh. Chỉ đọc, dùng để tham chiếu duy nhất một khách hàng. Mọi vai trò xem được |
+| A4 | Nhãn Loại / Nhóm / Trạng thái | Nhãn màu | N/A | N/A | Ba nhãn màu cạnh tên: Loại (Cá nhân/Doanh nghiệp), Nhóm khách hàng, Trạng thái (Đang/Không hoạt động) |
+| A5 | Dải mảng dịch vụ | Nhãn màu | N/A | N/A | Danh sách các mảng dịch vụ khách đang sử dụng, hiển thị dạng nhãn. Không có dữ liệu → hiển thị "—" |
+| A6 | Dải hệ thống nguồn | Nhãn màu | N/A | N/A | Các hệ thống nguồn có dữ liệu đóng góp vào hồ sơ này (VD CAS, CRM, MyVNPost, PayPost) — cho biết hồ sơ được hợp nhất từ đâu |
+| A7 | Tương tác gần nhất | Hiển thị | N/A | N/A | Ngày khách có tương tác gần nhất với VNPost (tạo đơn, tra cứu, liên hệ). Rỗng → "Chưa có dữ liệu" |
+| A8 | Chỉ số Tổng đơn | Ô số | N/A | N/A | Tổng số đơn hàng khách đã phát sinh toàn thời gian, gộp mọi mảng dịch vụ. Chỉ đọc, tính tự động từ dữ liệu hợp nhất |
+| A9 | Chỉ số Doanh thu 12 tháng | Ô số | N/A | N/A | Tổng doanh thu khách mang lại trong 12 tháng gần nhất (khoảng thời gian cố định). **Che theo vai trò (nhóm Lịch sử giao dịch, bảng III.C360):** Tiếp thị xem **tổng hợp** (khoảng/nhóm giá trị); CSKH/Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị xem **con số đầy đủ** |
+| A10 | Chỉ số Điểm tích lũy | Ô số | N/A | N/A | Điểm khách hàng thân thiết (loyalty) hiện có, nếu có dữ liệu loyalty. Rỗng → "—" |
+| A11 | Chỉ số Độ đầy đủ hồ sơ | Ô số + thanh tiến độ | N/A | N/A | Phần trăm mức độ đầy đủ dữ liệu của hồ sơ (bao nhiêu trường quan trọng đã có giá trị), kèm thanh tiến độ trực quan. Chỉ đọc |
+| A12 | Thanh tab | Thanh tab | N/A | Tab Tổng quan | Thanh điều hướng **11 tab** (KH cá nhân thấy **10 tab** — ẩn tab Doanh nghiệp): Tổng quan · Hồ sơ liên kết · Hồ sơ đa nguồn · Địa chỉ · Doanh nghiệp (tab điều kiện) · Hoạt động theo mảng dịch vụ · Hành vi số · CSKH · Điểm số & Phân khúc · Đồng ý dữ liệu · Nhật ký. Bấm tab để đổi vùng nội dung bên dưới |
 
 > **Điểm lệch prototype (ghi nhận):** Prototype có ô chọn Vai trò (Role) ngay trên header để mô phỏng masking (CSKH/Marketing/Kinh doanh/Vận hành/Data Steward/Admin). Ở bản thật, **vai trò lấy từ tài khoản đăng nhập, không phải ô chọn** — ô này chỉ phục vụ demo, bỏ khi triển khai.
 
-**Bảng thành phần — Nội dung tab (theo nhóm dữ liệu và masking):**
+---
 
-| TT | Tab / Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả · Quyền hiển thị (masking theo III.C360) |
+### Bảng B1 — Tab Tổng quan
+
+Tab mặc định khi mở hồ sơ. Tóm tắt nhanh định danh, vai trò giao dịch và phân khúc của khách.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| 13 | Tab Tổng quan — Thông tin định danh | Danh sách trường | N/A | N/A | Giới tính, ngày sinh, SĐT, email, CCCD, PostID, bưu cục. **Che theo vai trò (bảng III.C360):** **SĐT/email** — che một phần với CSKH/Tiếp thị/Vận hành; đầy đủ với Kinh doanh/Phụ trách dữ liệu/Quản trị. **CCCD** — CSKH và Phụ trách dữ liệu **che**; Tiếp thị/Kinh doanh/Vận hành **KHÔNG xem** (ẩn hẳn); chỉ Quản trị xem đầy đủ theo quyền đặc biệt. Trường rỗng "Chưa có dữ liệu" |
-| 14 | Tab Tổng quan — Vai trò giao dịch | Nhãn + ô số | N/A | N/A | Số lần là Người gửi / Người nhận; nhãn vai trò chính. Người nhận **không có hồ sơ riêng** (A2) |
-| 15 | Tab Tổng quan — Phân khúc hiện tại | Nhãn màu | N/A | N/A | Các phân khúc khách hàng thuộc về |
-| 16 | Tab Hồ sơ liên kết — Bảng định danh liên kết | Bảng | N/A | N/A | Cột: Loại ID · Giá trị · Nguồn · Độ tin cậy · Cờ mã chính · **Trạng thái** (giá trị: *đã gộp* / *đã tách*) (UC-C360-04). Cột Trạng thái cập nhật thành "đã tách" sau khi tách hồ sơ — khớp hậu điều kiện UC-IDR-04 và SCR-IDR-05. Ẩn tab với Tiếp thị (bảng III.C360 dòng Hồ sơ liên kết) |
-| 17 | Tab Hồ sơ liên kết — Khối "Nghi ngờ gộp sai" + nút Báo cáo | Khối cảnh báo + nút | N/A | N/A | Nút **Báo cáo** hiện với CSKH/Kinh doanh/Vận hành (UC-IDR-05); **ẩn với Tiếp thị**; Người phụ trách dữ liệu thấy thêm nút Tách (UC-IDR-04). Xác nhận: "Yêu cầu báo cáo đã được ghi nhận. Người phụ trách dữ liệu sẽ xem xét trong 1–2 ngày làm việc." |
-| 18 | Tab Hồ sơ đa nguồn — Bảng so sánh field theo nguồn | Bảng (cuộn ngang) | N/A | N/A | Cột hồ sơ chuẩn (golden) + các cột nguồn; đánh dấu ⚠ trường xung đột; giá trị lấy theo nguồn ưu tiên (BR-IDR-12). Empty: "Chưa có dữ liệu nguồn" |
-| 19 | Tab Hồ sơ đa nguồn — Chế độ Dòng thời gian gộp | Nút chuyển + timeline | N/A | Chế độ So sánh | Timeline các lần gộp hồ sơ |
-| 20 | Tab Địa chỉ | Danh sách/bảng | N/A | N/A | **CSKH/Tiếp thị: đến phường/quận/tỉnh; Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị: đầy đủ** |
-| 21 | Tab Doanh nghiệp (chỉ KH doanh nghiệp) | Danh sách trường | N/A | N/A | MST, hợp đồng, công nợ; ẩn tab nếu là cá nhân |
-| 22 | Tab Hoạt động theo mảng dịch vụ | Bảng/khối theo mảng | N/A | N/A | Lịch sử giao dịch theo mảng; **Tiếp thị xem tổng hợp** |
-| 23 | Tab Hành vi số | Khối/bảng | N/A | N/A | **Vận hành: không xem; Kinh doanh: tổng hợp; còn lại: đầy đủ** |
-| 24 | Tab CSKH | Bảng lịch sử | N/A | N/A | Lịch sử khiếu nại, chăm sóc |
-| 25 | Tab Điểm số & Phân khúc | Khối điểm số | N/A | N/A | RFM/CLV/rời bỏ: Vận hành không xem, còn lại xem. **Điểm rủi ro thu hộ (COD Risk) và gian lận (Fraud): ẩn với CSKH và Tiếp thị**, chỉ Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị xem (BR-C360-03) |
-| 26 | Tab Đồng ý dữ liệu | Bảng trạng thái đồng ý | N/A | N/A | Opt-in/opt-out theo mục đích + kênh. **Che theo vai trò (bảng III.C360 — Trạng thái đồng ý):** CSKH/Tiếp thị/Kinh doanh/Phụ trách dữ liệu/Quản trị **xem**; **Vận hành/Thu hộ không xem** |
-| 27 | Tab Nhật ký | Bảng | N/A | N/A | Nguồn dữ liệu đóng góp + **tóm tắt nhật ký gộp của KH đang mở với CSKH**; Phụ trách dữ liệu/Quản trị xem đầy đủ (UC-IDR-06). Tiếp thị/Kinh doanh/Vận hành: không xem nhật ký gộp |
-| 28 | Khu vực Ghi chú / Gắn nhãn | Ô nhập + nút | Có (khi thêm) | Rỗng | Thêm ghi chú/nhãn (UC-C360-03); nội dung rỗng chặn lưu |
+| B1.1 | Khối Thông tin định danh | Danh sách trường | N/A | N/A | Nhóm trường định danh: giới tính, ngày sinh, số điện thoại, email, CCCD, PostID, bưu cục quản lý. **Che theo vai trò (bảng III.C360):** **SĐT/email** — che một phần (VD `0912***678`) với CSKH/Tiếp thị/Vận hành; đầy đủ với Kinh doanh/Phụ trách dữ liệu/Quản trị. **CCCD** — CSKH và Phụ trách dữ liệu thấy dạng **che**; Tiếp thị/Kinh doanh/Vận hành **KHÔNG xem** (ẩn hẳn); chỉ Quản trị xem đầy đủ theo quyền đặc biệt. Trường không có giá trị → "Chưa có dữ liệu" |
+| B1.2 | Khối Vai trò giao dịch | Nhãn + ô số | N/A | N/A | Số lần khách đóng vai **Người gửi** và số lần đóng vai **Người nhận**, kèm nhãn vai trò chính. Lưu ý: người nhận **không có hồ sơ riêng** trong CDP giai đoạn này (giả định A2) — chỉ đếm số lần |
+| B1.3 | Khối Phân khúc hiện tại | Nhãn màu | N/A | N/A | Các phân khúc động mà khách đang thuộc về, hiển thị dạng nhãn. Rỗng → "Chưa thuộc phân khúc nào" |
 
-**Trạng thái đặc biệt:**
-- **Không đủ quyền xem một nhóm:** "Bạn không có quyền xem thông tin này. Liên hệ quản trị hệ thống nếu công việc của bạn cần dùng đến."
-- **Ô rỗng có quyền xem:** "Chưa có dữ liệu"; cả tab: "Chưa có dữ liệu để hiển thị."
-- **Loading:** hiển thị trạng thái đang tải hồ sơ trước khi dữ liệu về.
+---
+
+### Bảng B2 — Tab Hồ sơ liên kết
+
+Cho biết hồ sơ chuẩn này được hợp nhất từ những mã định danh nguồn nào, và cho phép báo cáo/tách khi nghi gộp sai. **Ẩn toàn bộ tab với Tiếp thị** (bảng III.C360 — nhóm Hồ sơ liên kết: Tiếp thị không xem).
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B2.1 | Bảng định danh liên kết | Bảng | N/A | N/A | Mỗi dòng là một mã nguồn đã gộp vào hồ sơ chuẩn. Cột: **Loại ID** (SĐT/email/PostID/CRM ID/mã KHL…) · **Giá trị** · **Nguồn** (hệ thống phát sinh) · **Độ tin cậy** (điểm khớp) · **Cờ mã chính** (đánh dấu mã neo) · **Trạng thái** (giá trị *đã gộp* / *đã tách*). Cột Trạng thái tự chuyển thành "đã tách" sau khi tách hồ sơ — khớp hậu điều kiện UC-IDR-04 và SCR-IDR-05 |
+| B2.2 | Khối "Nghi ngờ gộp sai" | Khối cảnh báo | N/A | N/A | Vùng thông báo xuất hiện khi hệ thống hoặc người dùng nghi hồ sơ bị gộp nhầm; dẫn tới nút Báo cáo/Tách bên dưới |
+| B2.3 | Nút Báo cáo nghi gộp sai | Nút | N/A | N/A | Hiện với **CSKH/Kinh doanh/Vận hành** (UC-IDR-05) — các vai trò không có quyền tách; **ẩn với Tiếp thị**. Bấm để gửi đề xuất tách kèm lý do. Xác nhận: "Yêu cầu báo cáo đã được ghi nhận. Người phụ trách dữ liệu sẽ xem xét trong 1–2 ngày làm việc." |
+| B2.4 | Nút Tách hồ sơ | Nút | N/A | N/A | **Chỉ Người phụ trách dữ liệu** thấy (UC-IDR-04). Bấm mở màn Tách hồ sơ (SCR-IDR-05) để tách trực tiếp |
+
+---
+
+### Bảng B3 — Tab Hồ sơ đa nguồn
+
+So sánh giá trị từng trường giữa các hệ thống nguồn, cho thấy giá trị nào được chọn làm chuẩn (golden) và trường nào đang xung đột.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B3.1 | Bảng so sánh trường theo nguồn | Bảng (cuộn ngang) | N/A | N/A | Mỗi dòng là một trường dữ liệu; cột đầu là **giá trị hồ sơ chuẩn (golden)**, các cột sau là giá trị từ từng hệ thống nguồn. Trường có giá trị khác nhau giữa các nguồn được đánh dấu **⚠ xung đột**. Giá trị golden lấy theo nguồn ưu tiên (BR-IDR-12). Rỗng → "Chưa có dữ liệu nguồn" |
+| B3.2 | Nút chuyển chế độ Dòng thời gian gộp | Nút chuyển | Không | Chế độ So sánh | Chuyển giữa chế độ **So sánh** (bảng trên) và chế độ **Dòng thời gian gộp** (timeline) |
+| B3.3 | Dòng thời gian gộp | Timeline | N/A | N/A | Trục thời gian các lần hồ sơ được gộp: thời điểm, mã nguồn gộp vào, tự động hay thủ công, người quyết định |
+
+---
+
+### Bảng B4 — Tab Địa chỉ
+
+Địa chỉ gửi/nhận của khách, che chi tiết theo vai trò.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B4.1 | Danh sách địa chỉ | Danh sách/bảng | N/A | N/A | Các địa chỉ của khách kèm loại (gửi/nhận/thường dùng) và mã địa chỉ số. **Che theo vai trò (bảng III.C360 — Địa chỉ chi tiết):** CSKH/Tiếp thị chỉ thấy **đến phường/quận/tỉnh**; Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị thấy **đầy đủ** (gồm số nhà, ngõ) |
+
+---
+
+### Bảng B5 — Tab Doanh nghiệp *(tab điều kiện — chỉ hiện với khách hàng doanh nghiệp)*
+
+Thông tin pháp nhân, chỉ áp dụng cho khách doanh nghiệp/KHL. Khách cá nhân **không thấy tab này**.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B5.1 | Khối thông tin doanh nghiệp | Danh sách trường | N/A | N/A | Mã số thuế (MST), thông tin hợp đồng, công nợ. Chỉ hiển thị khi Loại khách hàng = Doanh nghiệp; nếu cá nhân thì tab ẩn hẳn khỏi thanh tab |
+
+---
+
+### Bảng B6 — Tab Hoạt động theo mảng dịch vụ
+
+Lịch sử giao dịch của khách, bóc tách theo từng mảng dịch vụ.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B6.1 | Khối hoạt động theo mảng | Bảng/khối theo mảng | N/A | N/A | Lịch sử giao dịch, sản lượng, doanh thu theo từng mảng dịch vụ. **Che theo vai trò (nhóm Lịch sử giao dịch, bảng III.C360):** Tiếp thị xem **tổng hợp**; các vai trò khác xem **đầy đủ**. *(Dữ liệu thu hộ/COD nếu hiển thị ở đây áp masking riêng của nhóm COD — xem tab liên quan, không nới lỏng ở tab này)* |
+
+---
+
+### Bảng B7 — Tab Hành vi số
+
+Hành vi của khách trên kênh số (app/web): đăng nhập, tra cứu, tương tác chiến dịch.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B7.1 | Khối hành vi số | Khối/bảng | N/A | N/A | Lịch sử hành vi trên app/web (mở app, tra cước, click chiến dịch…). **Che theo vai trò (bảng III.C360 — Hành vi số):** **Vận hành KHÔNG xem**; Kinh doanh xem **tổng hợp**; CSKH/Tiếp thị/Phụ trách dữ liệu/Quản trị xem **đầy đủ** |
+
+---
+
+### Bảng B8 — Tab CSKH
+
+Lịch sử chăm sóc và khiếu nại của khách.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B8.1 | Bảng lịch sử CSKH | Bảng lịch sử | N/A | N/A | Danh sách khiếu nại, phản ánh, lượt chăm sóc: thời điểm, kênh, nội dung tóm tắt, kết quả xử lý, trạng thái. Sắp theo thời gian giảm dần |
+
+---
+
+### Bảng B9 — Tab Điểm số & Phân khúc
+
+Các điểm số phân tích của khách. **Tab nhạy cảm nhất về quyền xem** — điểm rủi ro bị che theo vai trò (BR-C360-03).
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B9.1 | Khối điểm RFM | Khối 3 chỉ số | N/A | N/A | Ba điểm thành phần: **Recency** (lần mua gần nhất), **Frequency** (tần suất), **Monetary** (giá trị). **Che:** Vận hành/Thu hộ không xem; các vai trò khác xem (bảng III.C360) |
+| B9.2 | Điểm CLV (giá trị vòng đời) | Ô số | N/A | N/A | Giá trị vòng đời khách hàng dự kiến. **Che:** Vận hành/Thu hộ không xem; còn lại xem |
+| B9.3 | Điểm nguy cơ rời bỏ (Churn) | Ô số + nhãn mức | N/A | N/A | Xác suất/mức nguy cơ khách rời bỏ. **Che:** Vận hành/Thu hộ không xem; còn lại xem |
+| B9.4 | Điểm rủi ro thu hộ (COD Risk) | Ô số + nhãn mức | N/A | N/A | Mức rủi ro không thu được tiền COD. **Ẩn hoàn toàn với CSKH và Tiếp thị**; chỉ Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị xem (BR-C360-03) |
+| B9.5 | Điểm gian lận (Fraud) | Ô số + nhãn mức | N/A | N/A | Mức nghi ngờ gian lận. **Ẩn hoàn toàn với CSKH và Tiếp thị**; chỉ Kinh doanh/Vận hành/Phụ trách dữ liệu/Quản trị xem (BR-C360-03) |
+| B9.6 | Danh sách phân khúc | Nhãn màu | N/A | N/A | Các phân khúc động khách đang thuộc về; bấm một nhãn mở danh sách khách của phân khúc đó (SCR-ANA-01) |
+
+---
+
+### Bảng B10 — Tab Đồng ý dữ liệu
+
+Trạng thái đồng ý nhận thông tin của khách, theo từng mục đích và kênh.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B10.1 | Bảng trạng thái đồng ý | Bảng ma trận | N/A | N/A | Ma trận **mục đích × kênh** (vận hành/tiếp thị/phân tích × SMS/Zalo/email/push): mỗi ô là trạng thái opt-in/opt-out/chưa xác định, kèm thời điểm và nguồn ghi nhận. **Che theo vai trò (bảng III.C360 — Trạng thái đồng ý):** CSKH/Tiếp thị/Kinh doanh/Phụ trách dữ liệu/Quản trị **xem**; **Vận hành/Thu hộ không xem**. Đây là tab **chỉ xem** trong Customer 360 — thao tác quản lý consent ở màn SCR-GOV-03 |
+
+---
+
+### Bảng B11 — Tab Nhật ký
+
+Nguồn dữ liệu đóng góp vào hồ sơ và tóm tắt nhật ký gộp.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| B11.1 | Bảng nguồn dữ liệu đóng góp | Bảng | N/A | N/A | Các hệ thống nguồn đã đóng góp dữ liệu vào hồ sơ, kèm nhóm dữ liệu và thời điểm cập nhật gần nhất |
+| B11.2 | Tóm tắt nhật ký gộp | Bảng | N/A | N/A | Lịch sử gộp của khách đang mở. **Che theo vai trò (bảng III.C360 — Nhật ký gộp):** CSKH thấy **tóm tắt của khách đang mở**; Phụ trách dữ liệu/Quản trị xem **đầy đủ** (UC-IDR-06); Tiếp thị/Kinh doanh/Vận hành **không xem** |
+
+---
+
+### Bảng C — Khu vực Ghi chú / Gắn nhãn
+
+Cho phép người dùng ghi chú và gắn nhãn khách hàng cần chăm sóc đặc biệt (UC-C360-03). Hiển thị ở cạnh hồ sơ, không thuộc tab nào.
+
+| TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
+|---|---|---|---|---|---|
+| C1 | Danh sách ghi chú/nhãn hiện có | Danh sách | N/A | N/A | Các ghi chú/nhãn đã thêm, kèm người tạo và thời điểm |
+| C2 | Ô nhập ghi chú | Ô nhập text | Có (khi thêm) | Rỗng | Nhập nội dung ghi chú mới. Nội dung rỗng → chặn lưu, báo "Vui lòng nhập nội dung ghi chú." |
+| C3 | Bộ chọn nhãn | Bộ chọn | Không | Không chọn | Chọn nhãn đánh dấu (VD "Cần chăm sóc đặc biệt") |
+| C4 | Nút Lưu ghi chú/nhãn | Nút | N/A | N/A | Lưu ghi chú/nhãn kèm người tạo + thời điểm; ghi vào nhật ký (BR-C360-04). Yêu cầu quyền "Ghi chú / gắn nhãn" (II.3) |
+
+**Trạng thái đặc biệt (áp dụng cho mọi tab):**
+- **Không đủ quyền xem một nhóm/tab:** "Bạn không có quyền xem thông tin này. Liên hệ quản trị hệ thống nếu công việc của bạn cần dùng đến."
+- **Ô rỗng nhưng có quyền xem:** hiển thị "Chưa có dữ liệu"; cả tab rỗng: "Chưa có dữ liệu để hiển thị."
+- **Đang tải:** hiển thị trạng thái đang tải hồ sơ trước khi dữ liệu về.
 
 ---
 
