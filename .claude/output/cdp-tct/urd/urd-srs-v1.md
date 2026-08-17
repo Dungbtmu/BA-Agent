@@ -3548,8 +3548,8 @@ Phần đầu màn: điều hướng và bối cảnh hồ sơ đang đối chi�
 |---|---|---|---|---|---|
 | A1 | Nút Quay lại đối soát định danh | Nút | N/A | N/A | Trở về màn danh sách hồ sơ nghi trùng (SCR-IDR-01). Đặt góc trên trái |
 | A2 | Panel hồ sơ chuẩn (neo) | Khối | N/A | N/A | Thông tin hồ sơ gốc đang được đối chiếu: tên khách, mã hồ sơ gốc + nguồn, kèm câu hướng dẫn đối chiếu. Đây là "mã neo" — các mã khác được so với mã này |
-| A3 | Khối "Đã tự động gộp từ khóa mạnh" | Nhãn danh sách | N/A | N/A | Liệt kê các mã đã được **gộp deterministic ở Tầng 1** (trùng khóa mạnh) và các mã tự gộp Tầng 2 (≥95%) — **chỉ hiển thị để người dùng biết, không hỏi lại** (BR-IDR-00) |
-| A4 | Cảnh báo cặp rủi ro | Khối cảnh báo | N/A | N/A | Hiển thị nổi bật khi cặp thuộc trường hợp rủi ro: một bên người gửi/một bên người nhận, SĐT dùng chung, xung đột loại khách cá nhân/doanh nghiệp (BR-IDR-06). Đặt trên đầu bảng so sánh |
+| A3 | Khối "Đã tự động gộp từ khóa mạnh" | Nhãn danh sách | N/A | N/A | Liệt kê các mã hệ thống đã **tự gộp** vào hồ sơ này, gồm: mã gộp ở **Tầng 1** (trùng khóa định danh mạnh — mã số thuế, căn cước, PostID, mã khách hàng CRM, hoặc số điện thoại kèm email — gộp thẳng không qua chấm điểm) và mã gộp ở **Tầng 2** (đối sánh xác suất đạt từ 95%). Các mã này **chỉ hiển thị để người dùng biết bối cảnh, hệ thống không hỏi lại** vì đã đủ chắc chắn |
+| A4 | Cảnh báo cặp rủi ro | Khối cảnh báo | N/A | N/A | Vùng cảnh báo hiển thị nổi bật khi cặp nghi trùng thuộc trường hợp rủi ro, buộc người dùng cân nhắc kỹ trước khi gộp: (a) **một bên là người gửi, một bên là người nhận** (có thể là hai người khác nhau); (b) **số điện thoại dùng chung** (hotline/số gia đình); (c) **xung đột loại khách** — một mã là cá nhân, một mã là doanh nghiệp. Đặt trên đầu bảng so sánh |
 
 ---
 
@@ -3559,7 +3559,7 @@ Bảng đối chiếu từng trường giữa các mã nguồn nghi trùng (`Com
 
 | TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| B1 | Checkbox "Gộp mã này?" trên mỗi cột | Ô chọn | Không | **Tick sẵn** mã vùng 85–94%; **không** tick mã <85% | Người dùng chọn mã thuộc cùng khách hàng để đưa vào hợp nhất (BR-IDR-01) |
+| B1 | Checkbox "Gộp mã này?" trên mỗi cột | Ô chọn | Không | **Tick sẵn** mã có điểm tin cậy vùng 85–94% (khả năng cao là cùng khách); **không** tick sẵn mã dưới 85% | Người dùng chọn mã thuộc cùng khách hàng để đưa vào hợp nhất. Hệ thống tick sẵn mã vùng 85–94% vì đã khá chắc; mã dưới 85% để người dùng tự cân nhắc, không tick sẵn để tránh gộp nhầm |
 | B2 | Hàng dữ liệu so sánh | Bảng nhiều cột | N/A | N/A | Mỗi hàng một trường so sánh giữa các cột mã: độ tin cậy, nguồn, mã KH nguồn, tên, SĐT, email, CCCD/MST, khóa khớp, đóng góp thêm. *(Lưu ý: CCCD che theo vai trò như bảng III.C360; MST hiển thị bình thường — cân nhắc tách hai trường, xem ghi chú S-02)* |
 | B3 | Nhãn "tin cậy thấp" + làm mờ | Nhãn | N/A | N/A | Cột mã <85% được làm mờ và gắn nhãn cảnh báo tin cậy thấp, để người dùng thận trọng trước khi tick |
 | B4 | Bộ đếm số mã đã chọn | Nhãn | N/A | N/A | Hiển thị "Đã chọn {N} / {tổng} mã để hợp nhất". Cập nhật theo thời gian thực khi tick/bỏ tick |
@@ -3570,14 +3570,14 @@ Bảng đối chiếu từng trường giữa các mã nguồn nghi trùng (`Com
 
 ### Bảng C — Modal Xem trước hồ sơ chuẩn
 
-Cửa sổ bật lên khi bấm "Xem trước hồ sơ chuẩn": cho người dùng thấy hồ sơ chuẩn dự kiến trước khi xác nhận gộp (BR-IDR-05).
+Cửa sổ bật lên khi bấm "Xem trước hồ sơ chuẩn": **bắt buộc cho người dùng xem hồ sơ chuẩn dự kiến trước khi xác nhận gộp**, để thấy rõ sau khi gộp mỗi trường sẽ lấy giá trị nào và từ nguồn nào — tránh gộp mù.
 
 | TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| C1 | Bảng trường sau gộp | Bảng | N/A | N/A | Mỗi hàng một trường của hồ sơ chuẩn dự kiến. Cột: **Trường** · **Giá trị sau gộp** · **Lấy từ nguồn** (nguồn ưu tiên nào cung cấp) · cờ **Xung đột** khi các nguồn khác nhau (BR-IDR-05, BR-IDR-12) |
+| C1 | Bảng trường sau gộp | Bảng | N/A | N/A | Mỗi hàng một trường của hồ sơ chuẩn dự kiến. Cột: **Trường** · **Giá trị sau gộp** · **Lấy từ nguồn** · cờ **Xung đột**. Khi các nguồn có giá trị khác nhau ở một trường, hệ thống chọn giá trị theo **thứ tự nguồn ưu tiên** (ví dụ số điện thoại ưu tiên nguồn đã xác thực như PostID/MyVNPost; trạng thái thu hộ ưu tiên PayPost; địa chỉ ưu tiên bản đã chuẩn hóa) và đánh dấu cờ Xung đột để người dùng biết |
 | C2 | Bảng số liệu cộng dồn | Bảng | N/A | N/A | Số liệu định lượng cộng dồn từ các mã nguồn: tổng đơn, doanh thu, COD, công nợ |
 | C3 | Nút Quay lại chỉnh | Nút | N/A | N/A | Đóng modal, quay lại bảng so sánh để sửa lựa chọn mã |
-| C4 | Nút Xác nhận hợp nhất | Nút | N/A | N/A | Thực hiện hợp nhất các mã đã chọn. Thông báo: "Đã hợp nhất {N} mã định danh vào hồ sơ {mã}. Lịch sử giao dịch và điểm số đã được tính lại." Ghi nhật ký gộp thủ công (BR-IDR-07) |
+| C4 | Nút Xác nhận hợp nhất | Nút | N/A | N/A | Thực hiện hợp nhất các mã đã chọn. Thông báo: "Đã hợp nhất {N} mã định danh vào hồ sơ {mã}. Lịch sử giao dịch và điểm số đã được tính lại." Hệ thống **ghi nhật ký gộp thủ công không thể sửa/xóa** (ghi rõ người thực hiện, thời điểm, các mã đã gộp) để phục vụ giải trình và cho phép tách lại sau này |
 
 **Trạng thái đặc biệt:**
 - **Không còn mã nghi trùng:** "Không còn mã KH nào nghi trùng cho khách hàng này."
@@ -3585,7 +3585,7 @@ Cửa sổ bật lên khi bấm "Xem trước hồ sơ chuẩn": cho người d�
 - **Mất kết nối khi đối soát (E2):** thao tác chưa xác nhận không lưu; hồ sơ về lại danh sách chờ.
 - **Xung đột trường (E3):** đánh dấu "Xung đột", ưu tiên nguồn tin cậy cao nhất, cho xem giá trị nguồn khác.
 
-> **Điểm lệch prototype:** checkbox trong prototype tick sẵn mã ≥60% (CONF_LOW=60). Bản thật: tick sẵn mã **85–94%**, mã <85% không tick sẵn (BR-IDR-01). Danh sách mã đã tự gộp dùng nhãn "≥90%" — sửa thành **≥95%**.
+> **Điểm lệch prototype (bắt buộc sửa khi triển khai):** prototype tick sẵn mọi mã có điểm từ 60% trở lên — bản thật chỉ tick sẵn mã vùng **85–94%**, mã dưới 85% không tick sẵn (để người dùng tự cân nhắc). Danh sách mã đã tự gộp trong prototype dùng nhãn "≥90%" — bản thật sửa thành **≥95%** cho khớp ngưỡng tự gộp của Tầng 2.
 
 ---
 
@@ -3611,8 +3611,8 @@ Hàng đợi các nhóm hồ sơ nghi trùng đang chờ người phụ trách d
 
 | TT | Thành phần | Định dạng | Bắt buộc | Mặc định | Mô tả |
 |---|---|---|---|---|---|
-| B1.1 | Danh sách thẻ nhóm nghi trùng | Danh sách thẻ | N/A | N/A | Mỗi thẻ là một nhóm hồ sơ nghi trùng thuộc **vùng 85–94%** (Tầng 2) hoặc bị đưa vào hàng đợi do cấm gộp tự động (BR-IDR-01/02) |
-| B1.2 | Nội dung một thẻ nhóm | Thẻ (card) | N/A | N/A | Hiển thị: mã nhóm, loại khách (cá nhân/DN), khóa trùng nổi bật, cảnh báo xung đột (nếu có — BR-IDR-06), số mã nguồn trong nhóm |
+| B1.1 | Danh sách thẻ nhóm nghi trùng | Danh sách thẻ | N/A | N/A | Mỗi thẻ là một nhóm hồ sơ nghi trùng cần người xác nhận, gồm: nhóm có điểm tin cậy **vùng 85–94%** (đối sánh xác suất Tầng 2, khả năng cao là cùng khách nhưng chưa đủ chắc để tự gộp), hoặc nhóm tuy trùng khóa mạnh/điểm cao nhưng **bị chặn gộp tự động** vì thuộc trường hợp rủi ro (chỉ trùng vận đơn/địa chỉ/IP/thiết bị; số điện thoại hoặc email dùng chung; người gửi và người nhận chỉ trùng một thông tin phụ) |
+| B1.2 | Nội dung một thẻ nhóm | Thẻ (card) | N/A | N/A | Hiển thị: mã nhóm, loại khách (cá nhân/DN), khóa trùng nổi bật, số mã nguồn trong nhóm, và **cảnh báo xung đột** khi cặp thuộc trường hợp rủi ro (một bên người gửi/một bên người nhận, số điện thoại dùng chung, hoặc xung đột cá nhân với doanh nghiệp) |
 | B1.3 | Bấm mở thẻ | Tương tác | N/A | N/A | Bấm một thẻ mở màn Đối chiếu hồ sơ nghi trùng (SCR-IDR-02) để so sánh và quyết định gộp |
 
 ---
@@ -3642,7 +3642,7 @@ Danh sách đề xuất tách gửi từ nút Báo cáo của các vai trò khô
 
 > **Điểm lệch prototype (quan trọng — cần sửa khi triển khai):**
 > 1. Tab "Yêu cầu tách hồ sơ" trong prototype hiển thị **nút Phê duyệt / Từ chối** và ghi chú **"Chỉ Admin mới có thể phê duyệt hoặc từ chối yêu cầu Unmerge"** — đây là mô hình phê duyệt **cũ**. Theo solution D-07, giai đoạn này **không có bước phê duyệt riêng**: Người phụ trách dữ liệu xem đề xuất và **tự tách trực tiếp** qua SCR-IDR-05. Bỏ nút Phê duyệt/Từ chối và ghi chú Admin; thay bằng nút "Xử lý → mở màn Tách hồ sơ".
-> 2. Thẻ nhóm nghi trùng ghi "Độ tương đồng 60–89%" — sửa thành **85–94%** (BR-IDR-01).
+> 2. Thẻ nhóm nghi trùng trong prototype ghi "Độ tương đồng 60–89%" — bản thật sửa thành **85–94%** cho khớp vùng chờ xác nhận của đối sánh xác suất (Tầng 2).
 
 ---
 
