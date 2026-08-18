@@ -1138,7 +1138,7 @@ function IdentityScreen({ onC360 }) {
         {[
           { key:'pending', label:`Chờ xem xét (${pendingGroups.length})` },
           { key:'history', label:'Lịch sử merge' },
-          { key:'unmerge', label:`Yêu cầu tách hồ sơ (${UNMERGE_REQUESTS.filter(r=>r.status==='CHỜ DUYỆT').length})` },
+          { key:'unmerge', label:`Yêu cầu tách hồ sơ (${UNMERGE_REQUESTS.filter(r=>r.status==='Chờ xử lý').length})` },
         ].map(t => (
           <button key={t.key} onClick={() => setScreenTab(t.key)}
             className={`tab-btn ${screenTab===t.key ? 'active':''}`}>{t.label}</button>
@@ -1209,11 +1209,11 @@ function IdentityScreen({ onC360 }) {
                 <tr key={m.id} style={{ borderBottom:'1px solid #F3F4F6' }}>
                   <td style={{ padding:'10px 12px', fontFamily:'monospace', fontSize:12 }}>{m.id}</td>
                   <td style={{ padding:'10px 12px' }}>
-                    <span className={`badge ${m.type==='AUTO_MERGE' ? 'badge-blue':'badge-green'}`}>{m.type==='AUTO_MERGE' ? 'Tự động':'Thủ công'}</span>
+                    <span className={`badge ${m.type==='MANUAL' ? 'badge-green' : 'badge-blue'}`}>{m.type==='AUTO_T1' ? 'Tự động — Tầng 1 (khóa mạnh)' : m.type==='AUTO_T2' ? 'Tự động — Tầng 2 (≥95%)' : 'Thủ công'}</span>
                   </td>
                   <td style={{ padding:'10px 12px', fontSize:12, color:'#2563EB', fontFamily:'monospace' }}>{m.uidMaster}</td>
                   <td style={{ padding:'10px 12px', fontSize:12, color:'#7c3aed', fontFamily:'monospace' }}>{m.uidMerged}</td>
-                  <td style={{ padding:'10px 12px', fontWeight:700, color:confColor(m.confidence) }}>{m.confidence}%</td>
+                  <td style={{ padding:'10px 12px', fontWeight:700, color: typeof m.confidence==='number' ? confColor(m.confidence) : 'var(--muted)' }}>{typeof m.confidence==='number' ? `${m.confidence}%` : m.confidence}</td>
                   <td style={{ padding:'10px 12px', fontSize:12 }}><span className="badge badge-blue">{m.matchKeys}</span></td>
                   <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280' }}>{m.by}</td>
                   <td style={{ padding:'10px 12px', fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}>{m.at}</td>
@@ -1451,13 +1451,18 @@ function IdentityScreen({ onC360 }) {
 
 // Data mẫu lịch sử merge (audit log)
 const MERGE_HISTORY = [
-  { id:'MG-001', type:'AUTO_MERGE', uidMaster:'UID-0000123456', uidMerged:'UID-0000123999', confidence:94, matchKeys:'SĐT + Tên gần đúng', by:'SYSTEM', at:'12/06/2026 09:12', scoresBefore:'CLV 680 / COD Risk 42', scoresAfter:'CLV 742 / COD Risk 38' },
-  { id:'MG-002', type:'MANUAL',     uidMaster:'UID-0000987654', uidMerged:'UID-0000987001', confidence:78, matchKeys:'MST + Tên DN', by:'ds_trung@vnpost.vn', at:'10/06/2026 14:30', scoresBefore:'CLV 1100 / COD Risk 15', scoresAfter:'CLV 1248 / COD Risk 12' },
-  { id:'MG-003', type:'AUTO_MERGE', uidMaster:'UID-0000334411', uidMerged:'UID-0000334900', confidence:91, matchKeys:'SĐT', by:'SYSTEM', at:'08/06/2026 07:45', scoresBefore:'CLV 200 / COD Risk 55', scoresAfter:'CLV 220 / COD Risk 52' },
+  // Tầng 1 — khóa mạnh (PostID): gộp thẳng, KHÔNG chấm điểm → confidence hiển thị "Khóa mạnh"
+  { id:'MG-001', type:'AUTO_T1', uidMaster:'UID-0000123456', uidMerged:'UID-0000123999', confidence:'Khóa mạnh', matchKeys:'Trùng PostID', by:'SYSTEM', at:'12/06/2026 09:12', scoresBefore:'CLV 680 / COD Risk 42', scoresAfter:'CLV 742 / COD Risk 38' },
+  // Tầng 2 — tự động (≥95%): trùng SĐT + email, không có tên đơn độc làm khóa
+  { id:'MG-002', type:'AUTO_T2', uidMaster:'UID-0000445566', uidMerged:'UID-0000445001', confidence:96, matchKeys:'Trùng SĐT + email', by:'SYSTEM', at:'11/06/2026 03:20', scoresBefore:'CLV 520 / COD Risk 30', scoresAfter:'CLV 560 / COD Risk 28' },
+  // Thủ công: người phụ trách dữ liệu xác nhận cặp vùng 85–94%
+  { id:'MG-003', type:'MANUAL',  uidMaster:'UID-0000987654', uidMerged:'UID-0000987001', confidence:90, matchKeys:'Trùng SĐT + địa chỉ giao dịch', by:'ds_trung@vnpost.vn', at:'10/06/2026 14:30', scoresBefore:'CLV 1100 / COD Risk 15', scoresAfter:'CLV 1248 / COD Risk 12' },
+  // Tầng 1 — khóa mạnh (MST doanh nghiệp): gộp thẳng, không chấm điểm
+  { id:'MG-004', type:'AUTO_T1', uidMaster:'UID-0000334411', uidMerged:'UID-0000334900', confidence:'Khóa mạnh', matchKeys:'Trùng mã số thuế', by:'SYSTEM', at:'08/06/2026 07:45', scoresBefore:'CLV 200 / COD Risk 55', scoresAfter:'CLV 220 / COD Risk 52' },
 ];
 
 const UNMERGE_REQUESTS = [
-  { id:'UR-001', uidMaster:'UID-0000220088', reporter:'ds_lan@vnpost.vn', reportedAt:'25/06/2026 10:15', reason:'Hai cửa hàng khác nhau, trùng SĐT chủ nhưng là pháp nhân riêng biệt', status:'CHỜ DUYỆT', mergeRef:'MG-004' },
+  { id:'UR-001', uidMaster:'UID-0000220088', reporter:'ds_lan@vnpost.vn', reportedAt:'25/06/2026 10:15', reason:'Hai cửa hàng khác nhau, trùng SĐT chủ nhưng là pháp nhân riêng biệt', status:'Chờ xử lý', mergeRef:'MG-004' },
 ];
 
 // ============================================================
