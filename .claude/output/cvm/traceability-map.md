@@ -4,7 +4,7 @@
 > Baseline được tạo từ `urd-srs-v3.md` (2589 dòng, đã qua QA) — dùng làm nền tính impact cho các thay đổi phát sinh từ comment nghiệm thu sắp xử lý.
 
 ## Traceability Matrix — CVM
-Version: 2 | Cập nhật: 2026-08-21
+Version: 3 | Cập nhật: 2026-08-21
 
 | REQ ID | Mô tả ngắn | UC | WF | URD Section | Story | Ghi chú |
 |---|---|---|---|---|---|---|
@@ -72,7 +72,7 @@ Version: 2 | Cập nhật: 2026-08-21
 | REQ-CVM-062 | Deduplication Event — chống xử lý trùng event dựa trên event_id, TTL 24 giờ | — | — | URD-II.6.9 | | Dev-internal, không có UC/Screen tương ứng — [Cần xác nhận] |
 | REQ-CVM-063 | Quy tắc ánh xạ trạng thái SIM từ BSS sang CVM (Active/Suspended/Inactive) — riêng cho SIM vật lý và eSIM | UC-KH-00, UC-KH-01 | Screen 7, Screen 8 | URD-II.7, URD-III-UC-KH-00, URD-III-UC-KH-01, URD-IV-Screen7 (STT 6), URD-IV-Screen8 (STT 2) | | |
 | REQ-CVM-064 | Nguồn dữ liệu xác định "Đã cài app" — từ BSS `app_install_log`, CVM không lưu, query realtime | UC-KH-00, UC-KH-01 | Screen 7, Screen 8 | URD-II.7.4, URD-III-UC-KH-00, URD-III-UC-KH-01 | | Có Open question SA/Dev về API/batch — [Cần xác nhận] |
-| REQ-CVM-065 | Gửi lại (Retry) sau lần gửi đầu thất bại — cấu hình ở mức campaign: bật/tắt, số lần tối đa, khoảng cách tối thiểu; chỉ áp dụng khi lần đầu Failed/bị Throttle, không áp dụng khi đã Delivered | UC-KH-01 | Screen Settings (Tab 1) | URD-II.6.7, URD-IV-Screen-Settings (Tab 1) | | Mới thêm v4 — comment nghiệm thu "cho phép gửi lại" |
+| REQ-CVM-065 | **Nhắc lại (Re-engagement)** — sau khi gửi tin THÀNH CÔNG cho KH theo 1 trigger, nếu KH vẫn thoả điều kiện trigger gốc tại thời điểm kiểm tra thì gửi thêm 1-N lần nhắc; cấu hình riêng theo TỪNG campaign tại Campaign Builder (không phải System Settings): bật/tắt, số lần tối đa, khoảng cách tối thiểu (giờ); khác với Retry kỹ thuật (chỉ xảy ra khi gửi Failed) | UC-CAM-02 | Screen 3 | URD-II.6.10, URD-III-UC-CAM-02, URD-IV-Screen3 (Kênh & Lịch gửi STT 8) | | v4.1 — sửa lại từ v4.0: bản đầu đặt sai vị trí (System Settings) và sai ý nghĩa (retry kỹ thuật) so với yêu cầu thực tế của BA |
 | REQ-CVM-066 | Kiểm tra ký tự SMS có dấu/không dấu khi soạn nội dung — 70 ký tự/segment (có dấu) / 160 ký tự/segment (không dấu), tự phát hiện realtime | UC-CAM-02 | Screen 3 | URD-III-UC-CAM-02, URD-IV-Screen3 (Section 4 STT 9) | | Mới thêm v4 — comment nghiệm thu "check ký tự sms có dấu/không dấu" |
 | REQ-CVM-067 | Blacklist toàn hệ thống — danh sách độc lập với Blacklist theo campaign, áp dụng mọi campaign/mọi kênh, chỉ Admin thao tác; hỗ trợ cả Thêm thủ công (UC-BL-04) và Upload CSV (UC-BL-05) | UC-BL-04, UC-BL-05 | Screen 6A | URD-III-UC-BL-04, URD-III-UC-BL-05, URD-IV-Screen6A (STT 13) | | Mới thêm v4 — comment nghiệm thu "BL toàn hệ thống"; kiểm tra trước Blacklist theo campaign-kênh trong pipeline (xem II.6.4); UC-BL-05 bổ sung sau khi đóng OQ-12 |
 | REQ-CVM-068 | Nhóm mẫu tin nhắn theo Trigger áp dụng — trường mới không bắt buộc tại Template Editor, chỉ dùng để nhóm hiển thị tại Template List; cho phép Xóa cứng template chưa từng được campaign tham chiếu | UC-TPL-00, UC-TPL-01 | Screen 4A, Screen 4B | URD-III-UC-TPL-00, URD-III-UC-TPL-01, URD-IV-Screen4A | | Mới thêm v4 — comment nghiệm thu "nhóm lại theo trigger, cho phép xóa mẫu tin nhắn" |
@@ -86,7 +86,7 @@ Version: 2 | Cập nhật: 2026-08-21
 | UC ID | Phụ thuộc REQ |
 |---|---|
 | UC-CAM-01 | REQ-CVM-002, REQ-CVM-020 |
-| UC-CAM-02 | REQ-CVM-001, REQ-CVM-003, REQ-CVM-004, REQ-CVM-005, REQ-CVM-006, REQ-CVM-007, REQ-CVM-008, REQ-CVM-009, REQ-CVM-010, REQ-CVM-011, REQ-CVM-019, REQ-CVM-020, REQ-CVM-066 |
+| UC-CAM-02 | REQ-CVM-001, REQ-CVM-003, REQ-CVM-004, REQ-CVM-005, REQ-CVM-006, REQ-CVM-007, REQ-CVM-008, REQ-CVM-009, REQ-CVM-010, REQ-CVM-011, REQ-CVM-019, REQ-CVM-020, REQ-CVM-065, REQ-CVM-066 |
 | UC-CAM-03 | REQ-CVM-012 |
 | UC-CAM-04 | REQ-CVM-013 |
 | UC-CAM-05 | REQ-CVM-001, REQ-CVM-014, REQ-CVM-015 |
@@ -110,7 +110,7 @@ Version: 2 | Cập nhật: 2026-08-21
 | UC-BL-04 | REQ-CVM-067 |
 | UC-BL-05 | REQ-CVM-067 |
 | UC-KH-00 | REQ-CVM-038, REQ-CVM-063, REQ-CVM-064 |
-| UC-KH-01 | REQ-CVM-039, REQ-CVM-059, REQ-CVM-060, REQ-CVM-063, REQ-CVM-064, REQ-CVM-065 |
+| UC-KH-01 | REQ-CVM-039, REQ-CVM-059, REQ-CVM-060, REQ-CVM-063, REQ-CVM-064 |
 | UC-RPT-01 | REQ-CVM-040, REQ-CVM-041, REQ-CVM-042, REQ-CVM-043, REQ-CVM-044, REQ-CVM-045, REQ-CVM-046, REQ-CVM-047, REQ-CVM-048 |
 | UC-DSH-01 | REQ-CVM-049, REQ-CVM-050, REQ-CVM-051, REQ-CVM-052, REQ-CVM-053 |
 | UC-PRIORITY-01 | REQ-CVM-020, REQ-CVM-054, REQ-CVM-061 |
@@ -122,7 +122,7 @@ Version: 2 | Cập nhật: 2026-08-21
 | Screen 1 (Dashboard) | REQ-CVM-049, REQ-CVM-050, REQ-CVM-051, REQ-CVM-052, REQ-CVM-053 |
 | Screen 2 (Campaign List) | REQ-CVM-001, REQ-CVM-002, REQ-CVM-016, REQ-CVM-017, REQ-CVM-020, REQ-CVM-032, REQ-CVM-033 |
 | Screen 2B (Campaign Detail View) | REQ-CVM-013, REQ-CVM-016, REQ-CVM-017, REQ-CVM-032, REQ-CVM-033 |
-| Screen 3 (Campaign Builder) | REQ-CVM-001, REQ-CVM-003, REQ-CVM-004, REQ-CVM-005, REQ-CVM-006, REQ-CVM-007, REQ-CVM-008, REQ-CVM-009, REQ-CVM-010, REQ-CVM-011, REQ-CVM-012, REQ-CVM-018, REQ-CVM-019, REQ-CVM-020, REQ-CVM-031, REQ-CVM-032, REQ-CVM-033, REQ-CVM-066 |
+| Screen 3 (Campaign Builder) | REQ-CVM-001, REQ-CVM-003, REQ-CVM-004, REQ-CVM-005, REQ-CVM-006, REQ-CVM-007, REQ-CVM-008, REQ-CVM-009, REQ-CVM-010, REQ-CVM-011, REQ-CVM-012, REQ-CVM-018, REQ-CVM-019, REQ-CVM-020, REQ-CVM-031, REQ-CVM-032, REQ-CVM-033, REQ-CVM-065, REQ-CVM-066 |
 | Screen 4A (Template List) | REQ-CVM-021, REQ-CVM-025, REQ-CVM-068 |
 | Screen 4B (Template Editor) | REQ-CVM-022, REQ-CVM-024, REQ-CVM-068 |
 | Screen 4C (Template Detail View) | REQ-CVM-023 |
@@ -132,7 +132,7 @@ Version: 2 | Cập nhật: 2026-08-21
 | Screen 6B (Modal Thêm thủ công) | REQ-CVM-035 |
 | Screen 6C (Modal Upload danh sách) | REQ-CVM-036 |
 | Screen 7 (Customer List) | REQ-CVM-038, REQ-CVM-063, REQ-CVM-064 |
-| Screen 8 (Customer 360) | REQ-CVM-039, REQ-CVM-059, REQ-CVM-060, REQ-CVM-063, REQ-CVM-064, REQ-CVM-065 |
+| Screen 8 (Customer 360) | REQ-CVM-039, REQ-CVM-059, REQ-CVM-060, REQ-CVM-063, REQ-CVM-064 |
 | Screen 9 (Report / Analytics) | REQ-CVM-040, REQ-CVM-041, REQ-CVM-042, REQ-CVM-043, REQ-CVM-044, REQ-CVM-045, REQ-CVM-046, REQ-CVM-047, REQ-CVM-048 |
 | Screen Admin (Duyệt Campaign) | REQ-CVM-014 |
 | Screen Admin (Tab Trigger — danh sách) | REQ-CVM-026 |
@@ -155,12 +155,13 @@ Version: 2 | Cập nhật: 2026-08-21
 | URD-II.6.7 (Throttling & Frequency Cap) | REQ-CVM-060 |
 | URD-II.6.8 (Cross-campaign Priority) | REQ-CVM-020, REQ-CVM-061 |
 | URD-II.6.9 (Deduplication Event) | REQ-CVM-062 |
+| URD-II.6.10 (Nhắc lại — Re-engagement) | REQ-CVM-065 |
 | URD-II.7 (Ánh xạ trạng thái SIM) | REQ-CVM-063 |
 | URD-II.7.4 (Nguồn dữ liệu Đã cài app) | REQ-CVM-064 |
 | URD-Quy-tắc-Khối-3 (PARAM_INVALID / FILTER_INVALID) | REQ-CVM-011, REQ-CVM-032, REQ-CVM-033 |
 | URD-III-Bảng-toán-tử-hợp-lệ | REQ-CVM-031 |
 | URD-III-UC-CAM-01 | REQ-CVM-002, REQ-CVM-020 |
-| URD-III-UC-CAM-02 | REQ-CVM-001, REQ-CVM-003 → REQ-CVM-011, REQ-CVM-019, REQ-CVM-020, REQ-CVM-066 |
+| URD-III-UC-CAM-02 | REQ-CVM-001, REQ-CVM-003 → REQ-CVM-011, REQ-CVM-019, REQ-CVM-020, REQ-CVM-065, REQ-CVM-066 |
 | URD-III-UC-CAM-03 | REQ-CVM-012 |
 | URD-III-UC-CAM-04 | REQ-CVM-013 |
 | URD-III-UC-CAM-05 | REQ-CVM-001, REQ-CVM-014, REQ-CVM-015 |
@@ -184,14 +185,14 @@ Version: 2 | Cập nhật: 2026-08-21
 | URD-III-UC-BL-04 | REQ-CVM-067 |
 | URD-III-UC-BL-05 | REQ-CVM-067 |
 | URD-III-UC-KH-00 | REQ-CVM-038, REQ-CVM-063, REQ-CVM-064 |
-| URD-III-UC-KH-01 | REQ-CVM-039, REQ-CVM-059, REQ-CVM-060, REQ-CVM-063, REQ-CVM-064, REQ-CVM-065 |
+| URD-III-UC-KH-01 | REQ-CVM-039, REQ-CVM-059, REQ-CVM-060, REQ-CVM-063, REQ-CVM-064 |
 | URD-III-UC-RPT-01 | REQ-CVM-040 → REQ-CVM-048 |
 | URD-III-UC-DSH-01 | REQ-CVM-049 → REQ-CVM-053 |
 | URD-III-UC-PRIORITY-01 | REQ-CVM-020, REQ-CVM-054, REQ-CVM-061 |
 | URD-IV-Screen1 | REQ-CVM-049 → REQ-CVM-053 |
 | URD-IV-Screen2 | REQ-CVM-002, REQ-CVM-016, REQ-CVM-017, REQ-CVM-020, REQ-CVM-032, REQ-CVM-033 |
 | URD-IV-Screen2B | REQ-CVM-013, REQ-CVM-016, REQ-CVM-017, REQ-CVM-032, REQ-CVM-033 |
-| URD-IV-Screen3 | REQ-CVM-003 → REQ-CVM-012, REQ-CVM-018 → REQ-CVM-020, REQ-CVM-031 → REQ-CVM-033, REQ-CVM-066 |
+| URD-IV-Screen3 | REQ-CVM-003 → REQ-CVM-012, REQ-CVM-018 → REQ-CVM-020, REQ-CVM-031 → REQ-CVM-033, REQ-CVM-065, REQ-CVM-066 |
 | URD-IV-Screen4A | REQ-CVM-021, REQ-CVM-025, REQ-CVM-068 |
 | URD-IV-Screen4B | REQ-CVM-022, REQ-CVM-024, REQ-CVM-068 |
 | URD-IV-Screen4C | REQ-CVM-023 |
@@ -201,10 +202,10 @@ Version: 2 | Cập nhật: 2026-08-21
 | URD-IV-Screen6B | REQ-CVM-035 |
 | URD-IV-Screen6C | REQ-CVM-036 |
 | URD-IV-Screen7 | REQ-CVM-038, REQ-CVM-063, REQ-CVM-064 |
-| URD-IV-Screen8 | REQ-CVM-039, REQ-CVM-059, REQ-CVM-060, REQ-CVM-063, REQ-CVM-064, REQ-CVM-065 |
+| URD-IV-Screen8 | REQ-CVM-039, REQ-CVM-059, REQ-CVM-060, REQ-CVM-063, REQ-CVM-064 |
 | URD-IV-Screen9 | REQ-CVM-040 → REQ-CVM-048 |
 | URD-IV-Screen-Admin | REQ-CVM-014, REQ-CVM-026 → REQ-CVM-033 |
-| URD-IV-Screen-Settings | REQ-CVM-020, REQ-CVM-054, REQ-CVM-060, REQ-CVM-061, REQ-CVM-065 |
+| URD-IV-Screen-Settings | REQ-CVM-020, REQ-CVM-054, REQ-CVM-060, REQ-CVM-061 |
 
 ---
 
@@ -216,3 +217,4 @@ Version: 2 | Cập nhật: 2026-08-21
 | 2026-08-21 | MODIFY | REQ-CVM-003, REQ-CVM-007, REQ-CVM-009, REQ-CVM-017, REQ-CVM-018, REQ-CVM-019, REQ-CVM-020, REQ-CVM-021, REQ-CVM-022, REQ-CVM-031, REQ-CVM-034, REQ-CVM-035, REQ-CVM-036, REQ-CVM-037, REQ-CVM-038, REQ-CVM-039, REQ-CVM-060 | SYNC theo Change Set 2026-08-21 (comment nghiệm thu CVM) — patch urd-srs-v3.md → v4.md, xem chi tiết mục CÁC THAY ĐỔI trong urd-srs-v4.md |
 | 2026-08-21 | ADD | REQ-CVM-065, REQ-CVM-066, REQ-CVM-067, REQ-CVM-068 | 4 requirement mới từ Change Set 2026-08-21: Gửi lại (Retry), kiểm tra ký tự SMS có dấu/không dấu, Blacklist toàn hệ thống (UC-BL-04 mới), nhóm Template theo Trigger + Xóa |
 | 2026-08-21 | MODIFY | REQ-CVM-067 | Sau QA/postcheck: đóng OQ-12 (Có — bổ sung Upload CSV cho Blacklist toàn hệ thống), thêm UC-BL-05; đồng thời fix PC-01 (postcheck) — bổ sung UC-BL-04 vào Function Tree/Permission Matrix/RBAC Matrix (II.2/II.3/II.4), trước đó chỉ có ở Section III/IV |
+| 2026-08-21 | MODIFY | REQ-CVM-065 | Sửa lại (v4.1): bản v4.0 đặt sai vị trí (System Settings) và sai ý nghĩa (retry kỹ thuật khi Failed) — đổi thành "Nhắc lại" (Re-engagement), cấu hình riêng theo từng campaign tại Campaign Builder, chỉ nhắc khi KH vẫn thoả điều kiện trigger gốc. UC/WF/URD Section đổi từ UC-KH-01/Screen 8/II.6.7 sang UC-CAM-02/Screen 3/II.6.10 (mới) |
