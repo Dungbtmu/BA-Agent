@@ -1,7 +1,7 @@
 # Context dự án — Trợ lý ảo AI all-in-one (chatbot-cskh-mvno)
 
 > Tài liệu ghi nhận bối cảnh đầu vào của dự án, tổng hợp từ yêu cầu của Ban và meeting note buổi họp đầu tiên với Ban.
-> Đây là tài liệu **input gốc** — ghi lại nguyên văn nội dung đã nhận, không phải kết quả phân tích của BA.
+> Đây là tài liệu **input gốc**: ghi lại nội dung đã nhận, không phải kết quả phân tích của BA.
 
 ---
 
@@ -23,17 +23,17 @@
 
 ### 2.1. Mục tiêu
 
-Xây dựng trợ lý AI all-in-one theo hướng GenAI, thông minh hơn và hỗ trợ nhiều lĩnh vực để tạo khác biệt với chatbot của các nhà mạng khác.
+Xây dựng trợ lý AI all-in-one theo hướng GenAI, thông minh hơn và hỗ trợ nhiều lĩnh vực, nhằm tạo khác biệt với chatbot của các nhà mạng khác.
 
 ### 2.2. Phạm vi
 
-- Tích hợp vào **Super App** trước mắt.
+- Trước mắt tích hợp vào **Super App**.
 - Mỗi lĩnh vực được tổ chức thành **một module riêng**, có **dữ liệu riêng để training**.
-- Phần chia module là việc của bên AI / dữ liệu / luồng xử lý. Về mặt trải nghiệm, người dùng chỉ thao tác trên **một giao diện / một đoạn chat duy nhất**.
+- Việc chia module thuộc về bên AI / dữ liệu / luồng xử lý. Về trải nghiệm, người dùng chỉ thao tác trên **một giao diện, một đoạn chat duy nhất**.
 
 ### 2.3. Người dùng
 
-Người dùng cuối (end user) — thuê bao sử dụng dịch vụ nhà mạng.
+Người dùng cuối (end user): thuê bao sử dụng dịch vụ nhà mạng.
 
 ### 2.4. Ngôn ngữ hỗ trợ
 
@@ -41,26 +41,27 @@ Tiếng Việt, tiếng Anh và tiếng Trung.
 
 ### 2.5. Dữ liệu và hiện trạng
 
-- Dữ liệu lấy từ nhiều nguồn, không chỉ Super App:
-  - **Super App:** các nhóm nghiệp vụ đã có sẵn chức năng/nội dung trên App (ví dụ giải trí, đặt vé máy bay).
-  - **Hệ thống BSS:** dữ liệu nhóm Viễn thông. BSS đang trong quá trình triển khai, nhưng đã có thông tin BSS **có thể trả về API** cho phần Viễn thông.
-- App chưa lên store.
-- Cần họp với các đầu mối để làm rõ thông tin, dữ liệu hiện có và dữ liệu có thể cung cấp.
+Dữ liệu lấy từ nhiều nguồn, không chỉ Super App:
 
-### 2.6. Phạm vi MVP — theo từng nhóm nghiệp vụ
+- **Super App:** các nhóm nghiệp vụ mà App đã có sẵn chức năng hoặc nội dung (ví dụ giải trí, đặt vé máy bay).
+- **Hệ thống BSS:** dữ liệu nhóm Viễn thông. BSS đang trong quá trình triển khai, nhưng đã xác nhận BSS **có thể trả về API** cho phần Viễn thông.
 
-Tập trung vào các nhóm nghiệp vụ khả thi:
+Hiện trạng khác: App chưa lên store. Cần họp với các đầu mối để làm rõ thông tin, dữ liệu hiện có và dữ liệu có thể cung cấp.
 
-| Nhóm nghiệp vụ | Hiện trạng / hướng xử lý đã thống nhất | Việc cần làm rõ (theo meeting note) |
+### 2.6. Phạm vi MVP — đánh giá theo từng nhóm nghiệp vụ
+
+MVP tập trung vào các nhóm nghiệp vụ khả thi:
+
+| Nhóm nghiệp vụ | Hiện trạng / hướng xử lý | Việc cần làm rõ |
 |---|---|---|
-| Viễn thông | Trước mắt khả thi. Lấy dữ liệu qua API bên BSS (BSS đang triển khai nhưng có thể trả về API cho phần Viễn thông). Cần hỗ trợ người dùng tương tác bằng ngôn ngữ tự nhiên. | Dữ liệu và API từ BSS (chờ cung cấp); tiến độ triển khai BSS. |
-| Tài chính & thanh toán | Chưa chắc khả thi. Hiện chưa biết Super App đã có chức năng tài chính & thanh toán hay chưa. | Super App có chức năng này hay chưa; bên Dịch vụ số có thể cung cấp được chưa; cung cấp những thông tin nào. |
-| Giải trí | Super App đã có các nội dung này. | Trải nghiệm và trao đổi thêm: những luồng nào cần thông tin gì. |
+| Viễn thông | Trước mắt khả thi. Lấy dữ liệu qua API của BSS (BSS đang triển khai nhưng có thể trả về API cho phần Viễn thông). Cần hỗ trợ người dùng tương tác bằng ngôn ngữ tự nhiên. | Dữ liệu và API từ BSS (chờ cung cấp); tiến độ triển khai BSS. |
+| Tài chính & thanh toán | Chưa chắc khả thi. Hiện chưa biết Super App đã có chức năng tài chính & thanh toán hay chưa. | Super App có chức năng này hay chưa; bên Dịch vụ số có thể cung cấp được chưa và cung cấp những thông tin nào. |
+| Giải trí | Super App đã có các nội dung này. | Trao đổi thêm về trải nghiệm: những luồng nào cần thông tin gì. |
 | Du lịch và tiện ích | Super App đã có chức năng đặt vé máy bay. Lịch trình ăn uống theo địa điểm: trước mắt có thể **hard code các địa điểm cố định** để AI đọc và đưa ra gợi ý. | Phân rã để biết bên App cần cung cấp thông tin gì. |
 | Cá nhân và công việc | Phạm vi MVP là **Email** (trên Outlook): lấy dữ liệu, tóm tắt, soạn và gửi email. Bên AI đã phát triển được phần này. | — |
-| Các nhóm nghiệp vụ khác | Chưa xác định. | Phân rã và tìm hiểu đầu mối, tình trạng hiện tại. BA bổ sung chi tiết tại mục Đầu ra cần thực hiện. |
+| Các nhóm nghiệp vụ khác | Chưa xác định. | Phân rã, tìm hiểu đầu mối và tình trạng hiện tại. |
 
-> **Lưu ý:** Thông tin trong bảng trên mới là hướng xử lý ở mức định hướng, chưa có chi tiết cụ thể cho nhóm nào. **Tất cả các nhóm nghiệp vụ** (không chỉ nhóm "Các nhóm nghiệp vụ khác") đều cần BA phân rã, tìm hiểu đầu mối và tình trạng hiện tại, rồi bổ sung chi tiết tại mục 2.8 (Đầu ra BA cần thực hiện).
+> **Lưu ý:** Bảng trên mới là định hướng, chưa nhóm nào có chi tiết cụ thể. **Tất cả các nhóm nghiệp vụ**, kể cả nhóm đang được đánh giá là chưa khả thi, đều cần BA phân rã, tìm hiểu đầu mối và tình trạng hiện tại, sau đó bổ sung chi tiết theo mục 2.8.
 
 ### 2.7. Tích hợp bổ sung
 
@@ -68,22 +69,27 @@ Có nhu cầu kết nối **Google Calendar** và **Apple Calendar** cho nghiệ
 
 ### 2.8. Đầu ra BA cần thực hiện
 
-- Phân rã nghiệp vụ, tìm hiểu đầu mối và tình trạng hiện tại cho **tất cả** các nhóm nghiệp vụ (hiện chưa nhóm nào có chi tiết cụ thể), kể cả nhóm/nghiệp vụ đang được đánh giá là chưa khả thi.
-- Với từng nghiệp vụ sau phân rã: xác định cần gì, đang có gì, để giải thích được vì sao khả thi / chưa khả thi, làm căn cứ đánh giá timeline và lập kế hoạch triển khai.
-- Xác định các nội dung cần **TTVT** làm rõ.
-- Xây dựng mô tả nghiệp vụ chi tiết để TTVT triển khai UI/UX.
-- Với từng nhóm nghiệp vụ, BA phải phân tích và chỉ rõ:
-  - Cần thông tin gì, lấy từ hệ thống nào.
-  - Bên hệ thống nguồn cần cung cấp thông tin gì.
-  - Thông tin / luồng nào do BA phân tích; luồng nào do bên AI xử lý.
-  - Data flow đi như thế nào.
-- Mục tiêu: BA define rõ phần nghiệp vụ của các bên để từng bên biết mình cần làm gì.
+**Sản phẩm bàn giao:**
+
+- Phân rã nghiệp vụ của **tất cả** các nhóm, kể cả nhóm hoặc nghiệp vụ đang được đánh giá là chưa khả thi.
+- Danh sách nội dung cần **TTVT** làm rõ.
+- Mô tả nghiệp vụ chi tiết để TTVT triển khai UI/UX.
+
+**Với từng nghiệp vụ sau phân rã, BA phân tích và chỉ rõ:**
+
+- Cần thông tin gì, lấy từ hệ thống nào.
+- Hệ thống nguồn cần cung cấp thông tin gì.
+- Thông tin, luồng nào do BA phân tích; luồng nào do bên AI xử lý.
+- Data flow đi như thế nào.
+- Nghiệp vụ cần gì, đang có gì, để giải thích được vì sao khả thi hoặc chưa khả thi, làm căn cứ đánh giá timeline và lập kế hoạch triển khai.
+
+**Mục tiêu:** BA định nghĩa rõ phần nghiệp vụ của các bên để mỗi bên biết mình cần làm gì.
 
 ---
 
 ## 3. Ghi chú của BA
 
-- BA đang chưa rõ phạm vi công việc của BA khi triển khai một hệ thống chatbot kết hợp cả luồng nghiệp vụ và AI → cần làm rõ (xem mục 4).
+BA chưa rõ phạm vi công việc của mình khi triển khai một hệ thống chatbot kết hợp cả luồng nghiệp vụ và AI. Nội dung này cần được làm rõ.
 
 ---
 
@@ -91,6 +97,6 @@ Có nhu cầu kết nối **Google Calendar** và **Apple Calendar** cho nghiệ
 
 | # | Nội dung | Nguồn |
 |---|---|---|
-| 1 | Nhóm 5 (Sức khỏe và đời sống cá nhân) và nhóm 7 (Khác) không được nêu tên riêng trong danh sách MVP — hiện được đánh giá là **chưa khả thi** (thuộc dòng "Các nhóm nghiệp vụ khác"). Vẫn phải phân rã chi tiết từng nghiệp vụ như các nhóm khác để xác định cần gì, đang có gì, từ đó biết lý do chưa khả thi và điều kiện để khả thi. | Mục 1 và 2.6 |
-| 2 | Nhóm Cá nhân và công việc: MVP chỉ nêu Email. Các nghiệp vụ còn lại (lịch, task, Slide, chuyển giọng nói thành văn bản, phân tích hình ảnh/tài liệu) hiện được đánh giá là chưa khả thi trong MVP; lịch có nhu cầu tích hợp bổ sung (Mục 2.7). Vẫn phải phân rã chi tiết từng nghiệp vụ để đánh giá khả thi. | Mục 1 và 2.6 |
-| 3 | Tên viết tắt **TTVT** xuất hiện trong meeting note — cần xác nhận đơn vị này là đầu mối triển khai UI/UX. | Mục 2.8 |
+| 1 | Nhóm 5 (Sức khỏe và đời sống cá nhân) và nhóm 7 (Khác) không được nêu tên riêng trong danh sách MVP, hiện được đánh giá là **chưa khả thi** (thuộc dòng "Các nhóm nghiệp vụ khác"). Vẫn phải phân rã chi tiết từng nghiệp vụ như các nhóm khác, để biết lý do chưa khả thi và điều kiện để khả thi. | Mục 1 và 2.6 |
+| 2 | Nhóm Cá nhân và công việc: MVP chỉ nêu Email. Các nghiệp vụ còn lại (lịch, task, Slide, chuyển giọng nói thành văn bản, phân tích hình ảnh/tài liệu) hiện được đánh giá là chưa khả thi trong MVP. Riêng lịch có nhu cầu tích hợp bổ sung (mục 2.7). Vẫn phải phân rã chi tiết để đánh giá khả thi. | Mục 1, 2.6 và 2.7 |
+| 3 | Từ viết tắt **TTVT** xuất hiện trong meeting note. Cần xác nhận đây là đơn vị triển khai UI/UX. | Mục 2.8 |
