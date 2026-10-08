@@ -60,13 +60,15 @@ Tập trung vào các nhóm nghiệp vụ khả thi:
 | Cá nhân và công việc | Phạm vi MVP là **Email** (trên Outlook): lấy dữ liệu, tóm tắt, soạn và gửi email. Bên AI đã phát triển được phần này. | — |
 | Các nhóm nghiệp vụ khác | Chưa xác định. | Phân rã và tìm hiểu đầu mối, tình trạng hiện tại. BA bổ sung chi tiết tại mục Đầu ra cần thực hiện. |
 
+> **Lưu ý:** Thông tin trong bảng trên mới là hướng xử lý ở mức định hướng, chưa có chi tiết cụ thể cho nhóm nào. **Tất cả các nhóm nghiệp vụ** (không chỉ nhóm "Các nhóm nghiệp vụ khác") đều cần BA phân rã, tìm hiểu đầu mối và tình trạng hiện tại, rồi bổ sung chi tiết tại mục 2.8 (Đầu ra BA cần thực hiện).
+
 ### 2.7. Tích hợp bổ sung
 
 Có nhu cầu kết nối **Google Calendar** và **Apple Calendar** cho nghiệp vụ quản lý lịch họp, nhắc nhở,...
 
 ### 2.8. Đầu ra BA cần thực hiện
 
-- Phân rã nghiệp vụ.
+- Phân rã nghiệp vụ, tìm hiểu đầu mối và tình trạng hiện tại cho **tất cả** các nhóm nghiệp vụ (hiện chưa nhóm nào có chi tiết cụ thể).
 - Xác định các nội dung cần **TTVT** làm rõ.
 - Xây dựng mô tả nghiệp vụ chi tiết để TTVT triển khai UI/UX.
 - Với từng nhóm nghiệp vụ, BA phải phân tích và chỉ rõ:
