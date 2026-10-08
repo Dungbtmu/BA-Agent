@@ -54,7 +54,7 @@ Tập trung vào các nhóm nghiệp vụ khả thi:
 | Nhóm nghiệp vụ | Hiện trạng / hướng xử lý đã thống nhất | Việc cần làm rõ (theo meeting note) |
 |---|---|---|
 | Viễn thông | Trước mắt khả thi. Lấy dữ liệu qua API bên BSS (BSS đang triển khai nhưng có thể trả về API cho phần Viễn thông). Cần hỗ trợ người dùng tương tác bằng ngôn ngữ tự nhiên. | Dữ liệu và API từ BSS (chờ cung cấp); tiến độ triển khai BSS. |
-| Tài chính & thanh toán | Chưa chắc khả thi. | Bên Dịch vụ số có thể cung cấp được chưa; cung cấp những thông tin nào. |
+| Tài chính & thanh toán | Chưa chắc khả thi. Hiện chưa biết Super App đã có chức năng tài chính & thanh toán hay chưa. | Super App có chức năng này hay chưa; bên Dịch vụ số có thể cung cấp được chưa; cung cấp những thông tin nào. |
 | Giải trí | Super App đã có các nội dung này. | Trải nghiệm và trao đổi thêm: những luồng nào cần thông tin gì. |
 | Du lịch và tiện ích | Super App đã có chức năng đặt vé máy bay. Lịch trình ăn uống theo địa điểm: trước mắt có thể **hard code các địa điểm cố định** để AI đọc và đưa ra gợi ý. | Phân rã để biết bên App cần cung cấp thông tin gì. |
 | Cá nhân và công việc | Phạm vi MVP là **Email** (trên Outlook): lấy dữ liệu, tóm tắt, soạn và gửi email. Bên AI đã phát triển được phần này. | — |
