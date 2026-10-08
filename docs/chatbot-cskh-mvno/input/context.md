@@ -68,7 +68,8 @@ Có nhu cầu kết nối **Google Calendar** và **Apple Calendar** cho nghiệ
 
 ### 2.8. Đầu ra BA cần thực hiện
 
-- Phân rã nghiệp vụ, tìm hiểu đầu mối và tình trạng hiện tại cho **tất cả** các nhóm nghiệp vụ (hiện chưa nhóm nào có chi tiết cụ thể).
+- Phân rã nghiệp vụ, tìm hiểu đầu mối và tình trạng hiện tại cho **tất cả** các nhóm nghiệp vụ (hiện chưa nhóm nào có chi tiết cụ thể), kể cả nhóm/nghiệp vụ đang được đánh giá là chưa khả thi.
+- Với từng nghiệp vụ sau phân rã: xác định cần gì, đang có gì, để giải thích được vì sao khả thi / chưa khả thi, làm căn cứ đánh giá timeline và lập kế hoạch triển khai.
 - Xác định các nội dung cần **TTVT** làm rõ.
 - Xây dựng mô tả nghiệp vụ chi tiết để TTVT triển khai UI/UX.
 - Với từng nhóm nghiệp vụ, BA phải phân tích và chỉ rõ:
@@ -90,6 +91,6 @@ Có nhu cầu kết nối **Google Calendar** và **Apple Calendar** cho nghiệ
 
 | # | Nội dung | Nguồn |
 |---|---|---|
-| 1 | Nhóm 5 (Sức khỏe và đời sống cá nhân) và nhóm 7 (Khác) không được nêu tên riêng trong danh sách MVP — giả định tạm thời thuộc dòng "Các nhóm nghiệp vụ khác", chưa vào MVP. | Mục 1 và 2.6 |
-| 2 | Nhóm Cá nhân và công việc: MVP chỉ nêu Email. Các nghiệp vụ còn lại (lịch, task, Slide, chuyển giọng nói thành văn bản, phân tích hình ảnh/tài liệu) chưa rõ có vào MVP hay không; lịch có nhu cầu tích hợp bổ sung (Mục 2.7). | Mục 1 và 2.6 |
+| 1 | Nhóm 5 (Sức khỏe và đời sống cá nhân) và nhóm 7 (Khác) không được nêu tên riêng trong danh sách MVP — hiện được đánh giá là **chưa khả thi** (thuộc dòng "Các nhóm nghiệp vụ khác"). Vẫn phải phân rã chi tiết từng nghiệp vụ như các nhóm khác để xác định cần gì, đang có gì, từ đó biết lý do chưa khả thi và điều kiện để khả thi. | Mục 1 và 2.6 |
+| 2 | Nhóm Cá nhân và công việc: MVP chỉ nêu Email. Các nghiệp vụ còn lại (lịch, task, Slide, chuyển giọng nói thành văn bản, phân tích hình ảnh/tài liệu) hiện được đánh giá là chưa khả thi trong MVP; lịch có nhu cầu tích hợp bổ sung (Mục 2.7). Vẫn phải phân rã chi tiết từng nghiệp vụ để đánh giá khả thi. | Mục 1 và 2.6 |
 | 3 | Tên viết tắt **TTVT** xuất hiện trong meeting note — cần xác nhận đơn vị này là đầu mối triển khai UI/UX. | Mục 2.8 |
