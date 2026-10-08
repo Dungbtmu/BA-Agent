@@ -41,7 +41,9 @@ Tiếng Việt, tiếng Anh và tiếng Trung.
 
 ### 2.5. Dữ liệu và hiện trạng
 
-- Dữ liệu dự kiến lấy toàn bộ từ Super App.
+- Dữ liệu lấy từ nhiều nguồn, không chỉ Super App:
+  - **Super App:** các nhóm nghiệp vụ đã có sẵn chức năng/nội dung trên App (ví dụ giải trí, đặt vé máy bay).
+  - **Hệ thống BSS:** dữ liệu nhóm Viễn thông. BSS đang trong quá trình triển khai, nhưng đã có thông tin BSS **có thể trả về API** cho phần Viễn thông.
 - App chưa lên store.
 - Cần họp với các đầu mối để làm rõ thông tin, dữ liệu hiện có và dữ liệu có thể cung cấp.
 
@@ -51,7 +53,7 @@ Tập trung vào các nhóm nghiệp vụ khả thi:
 
 | Nhóm nghiệp vụ | Hiện trạng / hướng xử lý đã thống nhất | Việc cần làm rõ (theo meeting note) |
 |---|---|---|
-| Viễn thông | Trước mắt khả thi. Đợi dữ liệu và lấy qua API bên BSS. Cần hỗ trợ người dùng tương tác bằng ngôn ngữ tự nhiên. | Dữ liệu và API từ BSS (chờ cung cấp). |
+| Viễn thông | Trước mắt khả thi. Lấy dữ liệu qua API bên BSS (BSS đang triển khai nhưng có thể trả về API cho phần Viễn thông). Cần hỗ trợ người dùng tương tác bằng ngôn ngữ tự nhiên. | Dữ liệu và API từ BSS (chờ cung cấp); tiến độ triển khai BSS. |
 | Tài chính & thanh toán | Chưa chắc khả thi. | Bên Dịch vụ số có thể cung cấp được chưa; cung cấp những thông tin nào. |
 | Giải trí | Super App đã có các nội dung này. | Trải nghiệm và trao đổi thêm: những luồng nào cần thông tin gì. |
 | Du lịch và tiện ích | Super App đã có chức năng đặt vé máy bay. Lịch trình ăn uống theo địa điểm: trước mắt có thể **hard code các địa điểm cố định** để AI đọc và đưa ra gợi ý. | Phân rã để biết bên App cần cung cấp thông tin gì. |
