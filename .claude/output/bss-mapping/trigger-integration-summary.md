@@ -4,6 +4,13 @@
 >
 > Nguồn đối chiếu chính: `data-contract-template.md`.
 
+> **Cập nhật 2026-11-02 — Mô hình tích hợp đã thống nhất với CNTT:** CVM là **consumer** của Kafka (Cloud-CNTT). Các nguồn (BSS, OCS, SuperApp...) là **producer**, đẩy CDR hoặc message lên Kafka. BSS đẩy vào kho chung chứ không cấp trực tiếp cho CVM; API chỉ dùng để lấy thông tin bổ sung. Vì vậy:
+> - "File CSV" và "API event" trong tài liệu này được hiểu là **schema nội dung (các field)** của CDR/message, không còn là cách truyền.
+> - "BSS push CSV/SFTP" và "OCS gọi API CVM" được hiểu là **nguồn phát sinh dữ liệu**; cách truyền thực tế là Kafka. Với OCS, nguồn chỉ đẩy CDR, nên CVM tự lắng nghe rồi xử lý.
+> - Chưa sửa từng dòng mô tả trigger bên dưới, vì topic, cấu trúc message và độ trễ thực tế chưa được khai báo.
+> - [ ] OQ-KAFKA-1: Với từng nguồn BSS/OCS, tên topic, cấu trúc message, khóa phân vùng và timestamp (giờ-phút-giây) trên Kafka Cloud-CNTT là gì? Trao đổi với anh Hùng (CNTT) khi khai báo CVM làm consumer.
+> - Đánh giá khả thi trigger theo CDR mẫu: xem `cdr-trigger-feasibility.md`.
+
 | Nhóm vòng đời | Nhánh nghiệp vụ | Mã | Tên trigger/event | Loại xử lý | Cơ chế tích hợp | Timing/SLA chính | Ghi chú |
 |---|---|---|---|---|---|---|---|
 | NHÓM 1 — Kích hoạt | VIỄN THÔNG | `E01` | SIM kích hoạt lần đầu | `Near Realtime` | Push Event API từ BSS sang CVM | 30–60 phút sau khi SIM ACTIVE lần đầu | Mốc `NGAY_0`; dùng `msisdn_status_history.change_date` |

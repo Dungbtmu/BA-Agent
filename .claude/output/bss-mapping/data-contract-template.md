@@ -10,13 +10,20 @@
 > File này được đồng bộ các thay đổi cốt lõi (thêm trigger `E_CHURN_RISK`, rule E08 90%/lần 3). Các thay đổi chi tiết theo bảng trigger đầy đủ — đổi timing sang NearRealtime (E02, E04, E05, E09, U_PRE_EXPIRY, U_POST_EXPIRY, E_LOCK_1C, E_PRE_LOCK_2C), thêm trigger **`U05-B-RT`** (NearRealtime, riêng biệt với `U05-B` batch — KHÔNG gộp chung schema) khi KH hết quota ngày/tuần 3 lần liên tiếp, bổ sung trường KH/kênh/chu kỳ gói (U02 `plan_cycle`, U04/U06 chỉ gói tháng, U07 4 case + đổi phôi, U09 sinh nhật nhà mạng, E_USAGE_NEED_ANALYSIS chốt 2 tháng, E_NO_PLAN_X_DAYS chốt ngưỡng x=10 (1 mốc duy nhất), chuẩn hóa phân khúc HSSV/tài xế/CBCNVVP/hưu trí) — **được đặc tả đầy đủ trong `data-contract-template-lifecycle.md`**. Khi có khác biệt giữa 2 file, lấy bản `-lifecycle.md` làm chuẩn.
 > Nhóm Open Question chờ tài liệu VTDĐ (trường OB, nguyên tắc gói gợi ý, nguyên tắc nâng gói): xem Phần Open Questions của bản `-lifecycle.md`.
 
+> **Cập nhật 2026-11-02 — Mô hình tích hợp đã thống nhất với CNTT:** CVM là **consumer** của Kafka (Cloud-CNTT). Các nguồn (BSS, OCS, SuperApp...) là **producer**, đẩy CDR hoặc message lên Kafka. BSS đẩy vào kho chung chứ không cấp trực tiếp cho CVM; API chỉ dùng để lấy thông tin bổ sung. Vì vậy:
+> - "File CSV" và "API event" trong tài liệu này được hiểu là **schema nội dung (các field)** của CDR/message, không còn là cách truyền.
+> - "BSS push CSV/SFTP" và "OCS gọi API CVM" được hiểu là **nguồn phát sinh dữ liệu**; cách truyền thực tế là Kafka. Với OCS, nguồn chỉ đẩy CDR, nên CVM tự lắng nghe rồi xử lý.
+> - Chưa sửa từng dòng mô tả trigger bên dưới, vì topic, cấu trúc message và độ trễ thực tế chưa được khai báo.
+> - [ ] OQ-KAFKA-1: Với từng nguồn BSS/OCS, tên topic, cấu trúc message, khóa phân vùng và timestamp (giờ-phút-giây) trên Kafka Cloud-CNTT là gì? Trao đổi với anh Hùng (CNTT) khi khai báo CVM làm consumer.
+> - Đánh giá khả thi trigger theo CDR mẫu: xem `cdr-trigger-feasibility.md`.
+
 **Quy ước chung:**
 - Encoding: UTF-8
 - Delimiter CSV: dấu phẩy (`,`)
 - Header row: có (dòng đầu tiên là tên cột)
 - Datetime format: `YYYY-MM-DD HH:MM:SS` (UTC+7)
 - Tên file: `{tên_file}_{YYYYMMDD}.csv`
-- Cơ chế delivery: BSS push vào SFTP/thư mục CVM đọc
+- Cơ chế delivery: Kafka của Cloud-CNTT (CVM là consumer; BSS/OCS là producer). Quy ước CSV ở trên chỉ áp dụng cho file mẫu và đối soát
 - Giá trị rỗng: để trống (không dùng NULL hay 0 thay thế)
 
 ---

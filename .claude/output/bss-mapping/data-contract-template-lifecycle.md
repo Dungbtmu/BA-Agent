@@ -6,13 +6,20 @@
 > Cập nhật: 2026-06-03 — Tái cấu trúc theo sơ đồ vòng đời CVM: Nhóm vòng đời → Nhánh nghiệp vụ VIỄN THÔNG/APP → Kỹ thuật NearRealtime/Batch/CSV; giữ nguyên payload/schema từ bản gốc.
 > Trạng thái: **DRAFT — cần xác nhận với Tech Lead / SA**
 
+> **Cập nhật 2026-11-02 — Mô hình tích hợp đã thống nhất với CNTT:** CVM là **consumer** của Kafka (Cloud-CNTT). Các nguồn (BSS, OCS, SuperApp...) là **producer**, đẩy CDR hoặc message lên Kafka. BSS đẩy vào kho chung chứ không cấp trực tiếp cho CVM; API chỉ dùng để lấy thông tin bổ sung. Vì vậy:
+> - "File CSV" và "API event" trong tài liệu này được hiểu là **schema nội dung (các field)** của CDR/message, không còn là cách truyền.
+> - "BSS push CSV/SFTP" và "OCS gọi API CVM" được hiểu là **nguồn phát sinh dữ liệu**; cách truyền thực tế là Kafka. Với OCS, nguồn chỉ đẩy CDR, nên CVM tự lắng nghe rồi xử lý.
+> - Chưa sửa từng dòng mô tả trigger bên dưới, vì topic, cấu trúc message và độ trễ thực tế chưa được khai báo.
+> - [ ] OQ-KAFKA-1: Với từng nguồn BSS/OCS, tên topic, cấu trúc message, khóa phân vùng và timestamp (giờ-phút-giây) trên Kafka Cloud-CNTT là gì? Trao đổi với anh Hùng (CNTT) khi khai báo CVM làm consumer.
+> - Đánh giá khả thi trigger theo CDR mẫu: xem `cdr-trigger-feasibility.md`.
+
 **Quy ước chung:**
 - Encoding: UTF-8
 - Delimiter CSV: dấu phẩy (`,`)
 - Header row: có (dòng đầu tiên là tên cột)
 - Datetime format: `YYYY-MM-DD HH:MM:SS` (UTC+7)
 - Tên file: `{tên_file}_{YYYYMMDD}.csv`
-- Cơ chế delivery: BSS push vào SFTP/thư mục CVM đọc
+- Cơ chế delivery: Kafka của Cloud-CNTT (CVM là consumer; BSS/OCS là producer). Quy ước CSV ở trên chỉ áp dụng cho file mẫu và đối soát
 - Giá trị rỗng: để trống (không dùng NULL hay 0 thay thế)
 
 ---
